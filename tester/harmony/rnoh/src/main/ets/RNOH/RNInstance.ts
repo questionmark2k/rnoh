@@ -40,7 +40,7 @@ export type LifecycleEventArgsByEventName = {
     jsBundleUrl: string,
     appKeys: string[]
   }];
-  RELOAD: [];
+  RELOAD: [{reason: string | undefined}];
 }
 
 export type BundleExecutionStatus = "RUNNING" | "DONE"
@@ -347,11 +347,21 @@ export class RNInstanceImpl implements RNInstance {
     } catch (err) {
       this.bundleExecutionStatusByBundleURL.delete(bundleURL)
       if (err instanceof JSBundleProviderError) {
-        this.logger.error(err.message)
+        const errorMessages: string[] = []
+        errorMessages.push(err.message)
+        const originalErrors = err.originalError
+        if (Array.isArray(originalErrors)) {
+          for (let err of originalErrors) {
+            if (err instanceof Error) {
+              errorMessages.push(err.message)
+            }
+          }
+        }
+        this.logger.error(errorMessages.join("\n"))
       } else if (err instanceof Error) {
         this.logger.error(err.message)
       }
-      throw err
+      throw new Error("Couldn't run a JS bundle")
     } finally {
       stopTracing()
     }

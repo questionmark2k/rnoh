@@ -1,3 +1,4 @@
+import { RNInstanceImpl } from '../../RNOH/RNInstance';
 import { RNOHLogger } from '../../RNOH/RNOHLogger';
 import type { TurboModuleContext } from '../../RNOH/TurboModule';
 import { TurboModule } from '../../RNOH/TurboModule';
@@ -13,11 +14,15 @@ export class DevSettingsTurboModule extends TurboModule {
   }
 
   public reload() {
-    this.logger.warn("DevSettings::reload is not supported");
+    if (this.ctx.rnInstance instanceof RNInstanceImpl) {
+      this.ctx.rnInstance.lifecycleEventEmitter.emit("RELOAD", { reason: undefined })
+    }
   }
 
   public reloadWithReason(reason: string) {
-    this.logger.warn("DevSettings::reloadWithReason is not supported");
+    if (this.ctx.rnInstance instanceof RNInstanceImpl) {
+      this.ctx.rnInstance.lifecycleEventEmitter.emit("RELOAD", { reason })
+    }
   }
 
   public onFastRefresh() {
@@ -55,5 +60,4 @@ export class DevSettingsTurboModule extends TurboModule {
   public setIsShakeToShowDevMenuEnabled(enabled: boolean) {
     this.logger.warn("DevSettings::setIsShakeToShowDevMenuEnabled is not supported");
   }
-
 }

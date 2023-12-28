@@ -29,7 +29,7 @@ export abstract class JSBundleProvider {
 
 
 export class JSBundleProviderError extends Error {
-  constructor(private msg: string, private originalError: unknown = undefined) {
+  constructor(private msg: string, public originalError: unknown = undefined) {
     super(msg)
   }
 }
@@ -190,7 +190,7 @@ export class AnyJSBundleProvider extends JSBundleProvider {
         }
       }
     }
-    throw new JSBundleProviderError("None of the jsBundleProviders was able to load the bundle", errors)
+    throw new JSBundleProviderError("None of the jsBundleProviders was able to load the bundle:", errors)
   }
 
   getHotReloadConfig(): HotReloadConfig | null {

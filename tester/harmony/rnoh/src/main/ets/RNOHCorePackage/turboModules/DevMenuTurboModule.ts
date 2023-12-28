@@ -35,7 +35,7 @@ export class DevMenuTurboModule extends TurboModule {
   public reload() {
     const rnInstance = this.ctx.rnInstance
     if (rnInstance instanceof RNInstanceImpl) {
-      rnInstance.lifecycleEventEmitter.emit("RELOAD")
+      rnInstance.lifecycleEventEmitter.emit("RELOAD", { reason: undefined })
     }
   }
 
