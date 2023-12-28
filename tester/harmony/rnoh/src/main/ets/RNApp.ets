@@ -45,32 +45,42 @@ export struct RNApp {
   private logger!: RNOHLogger
 
   aboutToAppear() {
+    this.init()
+  }
+
+  aboutToDisappear() {
+    this.cleanUp()
+  }
+
+  private async init() {
     this.logger = this.rnAbility.getLogger().clone("RNApp")
-    const stopTracing = this.logger.clone("aboutToAppear").startTracing()
+    const stopTracing = this.logger.clone("init").startTracing()
     try {
-      (async () => {
-        await (async () => {
-          this.rnInstance = await this.getOrCreateRNInstance()
-          await this.onSetUp(this.rnInstance)
-          const jsBundleExecutionStatus = this.rnInstance.getBundleExecutionStatus(this.jsBundleProvider?.getURL())
-          if (this.jsBundleProvider && jsBundleExecutionStatus === undefined) {
-            await this.rnInstance.runJSBundle(this.jsBundleProvider)
-            this.shouldShow = true
-            return;
-          }
-          if (jsBundleExecutionStatus !== "DONE") {
-            this.cleanUpCallbacks.push(this.rnInstance.subscribeToLifecycleEvents("JS_BUNDLE_EXECUTION_FINISH", (args) => {
-              if (args.appKeys.includes(this.appKey)) {
-                this.shouldShow = true
-              }
-            }))
-          } else {
-            this.shouldShow = true
-          }
-        })()
-        stopTracing()
+      await (async () => {
+        this.rnInstance = await this.getOrCreateRNInstance()
+        this.cleanUpCallbacks.push(this.rnInstance.subscribeToLifecycleEvents("RELOAD", () => {
+          this.cleanUp()
+          this.init()
+        }))
+        await this.onSetUp(this.rnInstance)
+        const jsBundleExecutionStatus = this.rnInstance.getBundleExecutionStatus(this.jsBundleProvider?.getURL())
+        if (this.jsBundleProvider && jsBundleExecutionStatus === undefined) {
+          await this.rnInstance.runJSBundle(this.jsBundleProvider)
+          this.shouldShow = true
+          return;
+        }
+        if (jsBundleExecutionStatus !== "DONE") {
+          this.cleanUpCallbacks.push(this.rnInstance.subscribeToLifecycleEvents("JS_BUNDLE_EXECUTION_FINISH", (args) => {
+            if (args.appKeys.includes(this.appKey)) {
+              this.shouldShow = true
+            }
+          }))
+        } else {
+          this.shouldShow = true
+        }
       })()
-    } catch(reason) {
+      stopTracing()
+    } catch (reason) {
       if (typeof reason === "string")
         this.rnAbility.getLogger().error(reason)
       else if (reason instanceof Error) {
@@ -82,8 +92,9 @@ export struct RNApp {
     }
   }
 
-  aboutToDisappear() {
-    const stopTracing = this.logger.clone("aboutToDisappear").startTracing()
+  private cleanUp() {
+    const stopTracing = this.logger.clone("cleanUp").startTracing()
+    this.shouldShow = false
     if (this.shouldDestroyRNInstance) {
       this.rnAbility.destroyAndUnregisterRNInstance(this.rnInstance)
     }

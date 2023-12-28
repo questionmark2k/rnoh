@@ -14,7 +14,7 @@ export class JSPackagerClient {
   private rnInstance: RNInstance;
 
   constructor(logger: RNOHLogger, rnInstance: RNInstance) {
-    this.logger = logger;
+    this.logger = logger.clone("JSPackagerClient");
     this.rnInstance = rnInstance;
   }
 
@@ -23,28 +23,35 @@ export class JSPackagerClient {
     const url = this.buildUrl(config);
     this.webSocket.on("message", (err, data) => {
       if (err) {
-        this.logger.error("JSPackagerClient websocket error " + err.message);
+        this.logger.error("Websocket error " + err.message);
         return;
       }
       if (typeof data === "string") {
         const message = JSON.parse(data);
-        if (message.method === "devMenu") {
-          const devMenuTurboModule = this.rnInstance.getTurboModule<DevMenuTurboModule>("DevMenu");
-          devMenuTurboModule.show();
+        const devMenuTurboModule = this.rnInstance.getTurboModule<DevMenuTurboModule>(DevMenuTurboModule.NAME);
+        switch (message.method) {
+          case "devMenu":
+            devMenuTurboModule.show();
+            break;
+          case "reload":
+            devMenuTurboModule.reload();
+            break;
+          default:
+            this.logger.warn(`Unsupported action: ${message.method}`)
         }
       }
     })
     this.webSocket.connect(url, (err, _data) => {
       if (!err) {
-        this.logger.info("JSPackagerClient websocket connected successfully");
+        this.logger.info("Websocket connected successfully");
       } else {
-        this.logger.error("JSPackagerClient websocket connection failed, err: " + JSON.stringify(err));
+        this.logger.error("Websocket connection failed, err: " + JSON.stringify(err));
       }
     });
   }
 
-  public disconnect() {
-    this.webSocket.close();
+  public onDestroy() {
+    this.webSocket?.close();
   }
 
   private buildUrl(config: JSPackagerClientConfig): string {

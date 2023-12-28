@@ -2,6 +2,7 @@ import type { TurboModuleContext } from '../../RNOH/TurboModule';
 import { TurboModule } from '../../RNOH/TurboModule';
 import window from '@ohos.window';
 import { RNOHLogger } from '../../RNOH/RNOHLogger';
+import { RNInstanceImpl } from "../../RNOH/RNInstance"
 
 enum DialogButtonDirection {
   AUTO, HORIZONTAL, VERTICAL,
@@ -32,7 +33,10 @@ export class DevMenuTurboModule extends TurboModule {
   }
 
   public reload() {
-    this.logger.warn("DevMenu::reload is not supported");
+    const rnInstance = this.ctx.rnInstance
+    if (rnInstance instanceof RNInstanceImpl) {
+      rnInstance.lifecycleEventEmitter.emit("RELOAD")
+    }
   }
 
   public debugRemotely(enableDebug: boolean) {
@@ -48,6 +52,13 @@ export class DevMenuTurboModule extends TurboModule {
   }
 
   private createDevMenuDefaultButtons() {
+    this.devMenuButtons.push({
+      value: "Reload",
+      action: () => {
+        this.reload()
+        this.devMenuDialogVisible = false;
+      },
+    });
     this.devMenuButtons.push({
       value: "Toggle Element Inspector",
       action: () => {

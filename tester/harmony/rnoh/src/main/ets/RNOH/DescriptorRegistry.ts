@@ -68,7 +68,7 @@ export class DescriptorRegistry {
     }
   }
 
-  public destroy() {
+  public onDestroy() {
     const stopTracing = this.logger.clone("destroy").startTracing()
     this.cleanUpCallbacks.forEach(cb => cb())
     stopTracing()

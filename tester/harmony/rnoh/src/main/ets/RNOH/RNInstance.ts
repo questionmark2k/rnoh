@@ -40,6 +40,7 @@ export type LifecycleEventArgsByEventName = {
     jsBundleUrl: string,
     appKeys: string[]
   }];
+  RELOAD: [];
 }
 
 export type BundleExecutionStatus = "RUNNING" | "DONE"
@@ -137,7 +138,7 @@ export class RNInstanceImpl implements RNInstance {
   public descriptorRegistry: DescriptorRegistry;
   public componentCommandHub: RNComponentCommandHub;
   public componentManagerRegistry: ComponentManagerRegistry;
-  private lifecycleEventEmitter = new EventEmitter<LifecycleEventArgsByEventName>()
+  public lifecycleEventEmitter = new EventEmitter<LifecycleEventArgsByEventName>()
   private componentNameByDescriptorType = new Map<string, string>()
   private logger: RNOHLogger
   private surfaceHandles: Set<SurfaceHandle> = new Set()
@@ -154,18 +155,20 @@ export class RNInstanceImpl implements RNInstance {
 
   constructor(
     private id: number,
-    logger: RNOHLogger,
+    private injectedLogger: RNOHLogger,
     public abilityContext: common.UIAbilityContext,
     private napiBridge: NapiBridge,
     private defaultProps: Record<string, any>,
     private createRNOHContext: (rnInstance: RNInstance) => RNOHContext
   ) {
-    this.logger = logger.clone("RNInstance")
-    const stopTracing = this.logger.clone("constructor").startTracing()
-    this.componentManagerRegistry = new ComponentManagerRegistry(logger);
+    this.logger = injectedLogger.clone("RNInstance")
+    this.onCreate()
+  }
+
+  public onCreate() {
+    this.componentManagerRegistry = new ComponentManagerRegistry(this.injectedLogger);
     this.componentCommandHub = new RNComponentCommandHub();
-    this.responderLockDispatcher = new ResponderLockDispatcher(this.componentManagerRegistry, this.componentCommandHub, logger)
-    stopTracing()
+    this.responderLockDispatcher = new ResponderLockDispatcher(this.componentManagerRegistry, this.componentCommandHub, this.injectedLogger)
   }
 
   public onDestroy() {
@@ -181,7 +184,7 @@ export class RNInstanceImpl implements RNInstance {
       this.napiBridge.destroyReactNativeInstance(this.id)
     }
     this.turboModuleProvider.onDestroy()
-    this.jsPackagerClient?.disconnect();
+    this.jsPackagerClient?.onDestroy();
     stopTracing()
   }
 
@@ -310,9 +313,8 @@ export class RNInstanceImpl implements RNInstance {
   }
 
   public emitDeviceEvent(eventName: string, params: any) {
-    const stopTracing = this.logger.clone(`emitDeviceEvent (eventName: ${eventName})`).startTracing()
+    this.logger.clone(`emitDeviceEvent`).debug(eventName)
     this.napiBridge.callRNFunction(this.id, "RCTDeviceEventEmitter", "emit", [eventName, params]);
-    stopTracing()
   }
 
   public getBundleExecutionStatus(bundleURL: string): BundleExecutionStatus | undefined {
