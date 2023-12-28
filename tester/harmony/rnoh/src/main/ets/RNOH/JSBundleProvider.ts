@@ -65,6 +65,9 @@ export class MetroJSBundleProvider extends JSBundleProvider {
     return new MetroJSBundleProvider(`http://${ip}:${port}/index.bundle?platform=harmony&dev=true&minify=false`, appKeys)
   }
 
+  /**
+   * If "localhost" doesn't work, try reversed ports forwarding "hdc rport tcp:8081 tcp:8081".
+   */
   constructor(private bundleUrl: string = "http://localhost:8081/index.bundle?platform=harmony&dev=true&minify=false", private appKeys: string[] = []) {
     super()
   }

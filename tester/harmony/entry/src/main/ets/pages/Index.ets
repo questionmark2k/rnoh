@@ -10,7 +10,6 @@ import {
 import { SampleView, SAMPLE_VIEW_TYPE, PropsDisplayer } from "rnoh-sample-package"
 import font from '@ohos.font';
 import { createRNPackages } from '../RNPackagesFactory'
-import { METRO_SERVER_IP } from "../codegen/MetroHostConstants"
 
 @Builder
 export function CustomComponentBuilder(ctx: ComponentBuilderContext) {
@@ -81,9 +80,10 @@ struct Index {
           },
           jsBundleProvider: new TraceJSBundleProviderDecorator(
             new AnyJSBundleProvider([
-              MetroJSBundleProvider.fromServerIp(METRO_SERVER_IP),
+              new MetroJSBundleProvider(),
               new ResourceJSBundleProvider(this.rnAbility.context.resourceManager, 'hermes_bundle.hbc'),
-              new ResourceJSBundleProvider(this.rnAbility.context.resourceManager, 'bundle.harmony.js')]),
+              new ResourceJSBundleProvider(this.rnAbility.context.resourceManager, 'bundle.harmony.js')
+              ]),
             this.rnAbility.getLogger()),
         })
       }
