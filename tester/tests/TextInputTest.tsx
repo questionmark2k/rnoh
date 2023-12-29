@@ -213,6 +213,8 @@ export function TextInputTest() {
       </TestCase>
       <TestCase
         modal
+        skip
+        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/736
         itShould="trigger onKeyPress event after pressing key (press 'A' to pass)"
         initialState={''}
         arrange={({setState}) => (
