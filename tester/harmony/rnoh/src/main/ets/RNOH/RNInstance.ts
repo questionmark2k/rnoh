@@ -171,7 +171,7 @@ export class RNInstanceImpl implements RNInstance {
     this.responderLockDispatcher = new ResponderLockDispatcher(this.componentManagerRegistry, this.componentCommandHub, this.injectedLogger)
   }
 
-  public onDestroy() {
+  public async onDestroy() {
     const stopTracing = this.logger.clone("onDestroy").startTracing()
     for (const surfaceHandle of this.surfaceHandles) {
       if (surfaceHandle.isRunning()) {
@@ -184,7 +184,6 @@ export class RNInstanceImpl implements RNInstance {
       this.napiBridge.destroyReactNativeInstance(this.id)
     }
     this.turboModuleProvider.onDestroy()
-    this.jsPackagerClient?.onDestroy();
     stopTracing()
   }
 
@@ -332,11 +331,6 @@ export class RNInstanceImpl implements RNInstance {
       if (hotReloadConfig) {
         this.callRNFunction("HMRClient", "setup", ["harmony", hotReloadConfig.bundleEntry, hotReloadConfig.host, hotReloadConfig.port, true])
         this.logger.info("Configured hot reloading")
-      }
-      const jsPackagerClientConfig = jsBundleProvider.getJSPackagerClientConfig()
-      if (jsPackagerClientConfig) {
-        this.jsPackagerClient = new JSPackagerClient(this.logger, this);
-        this.jsPackagerClient.connectToMetroMessages(jsPackagerClientConfig);
       }
       this.lifecycleState = LifecycleState.READY
       this.bundleExecutionStatusByBundleURL.set(bundleURL, "DONE")

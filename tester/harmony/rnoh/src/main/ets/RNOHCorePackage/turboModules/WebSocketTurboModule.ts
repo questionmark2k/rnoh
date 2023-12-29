@@ -1,6 +1,6 @@
 import webSocket from '@ohos.net.webSocket'
 import util from '@ohos.util'
-import { TurboModule } from "../../RNOH/TurboModule";
+import { TurboModule, TurboModuleContext, RNOHLogger } from "../../RNOH/ts";
 
 const WEB_SOCKET_SUPPORTED_EVENT_NAMES = ["websocketOpen", "websocketClosed", "websocketFailed", "websocketMessage"] as const;
 
@@ -9,12 +9,20 @@ export class WebSocketTurboModule extends TurboModule {
 
   private socketsById: Map<number, webSocket.WebSocket> = new Map();
   private base64 = new util.Base64Helper()
+  private logger: RNOHLogger
+
+  constructor(ctx: TurboModuleContext) {
+    super(ctx)
+    this.logger = ctx.logger.clone("WebSocketTurboModule")
+  }
+
 
   getSupportedEvents() {
     return WEB_SOCKET_SUPPORTED_EVENT_NAMES
   }
 
   connect(url: string, protocols: string[] | undefined | null, options: { headers?: object }, socketID: number) {
+    this.logger.clone("connect").debug(url)
     const ws = webSocket.createWebSocket();
 
     ws.on('open', (data) => {

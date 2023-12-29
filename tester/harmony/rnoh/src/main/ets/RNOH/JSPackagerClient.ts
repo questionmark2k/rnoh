@@ -1,7 +1,7 @@
 import webSocket from '@ohos.net.webSocket';
-import { DevMenuTurboModule } from '../RNOHCorePackage/turboModules';
 import { RNOHLogger } from './RNOHLogger';
-import { RNInstance } from './ts';
+import type { DevToolsController } from "./DevToolsController"
+import type { DevMenu } from "./DevMenu"
 
 export interface JSPackagerClientConfig {
   host: string,
@@ -11,11 +11,9 @@ export interface JSPackagerClientConfig {
 export class JSPackagerClient {
   private webSocket: webSocket.WebSocket;
   private logger: RNOHLogger;
-  private rnInstance: RNInstance;
 
-  constructor(logger: RNOHLogger, rnInstance: RNInstance) {
+  constructor(logger: RNOHLogger, private devToolsController: DevToolsController, private devMenu: DevMenu) {
     this.logger = logger.clone("JSPackagerClient");
-    this.rnInstance = rnInstance;
   }
 
   public connectToMetroMessages(config: JSPackagerClientConfig) {
@@ -28,13 +26,12 @@ export class JSPackagerClient {
       }
       if (typeof data === "string") {
         const message = JSON.parse(data);
-        const devMenuTurboModule = this.rnInstance.getTurboModule<DevMenuTurboModule>(DevMenuTurboModule.NAME);
         switch (message.method) {
           case "devMenu":
-            devMenuTurboModule.show();
+            this.devMenu.show()
             break;
           case "reload":
-            devMenuTurboModule.reload();
+            this.devToolsController.reload(undefined)
             break;
           default:
             this.logger.warn(`Unsupported action: ${message.method}`)
@@ -50,8 +47,11 @@ export class JSPackagerClient {
     });
   }
 
-  public onDestroy() {
-    this.webSocket?.close();
+  public async onDestroy() {
+    /**
+     * Closing this websocket creates prevents subsequent loading a bundle from Metro server and connecting this client, when connected using "localhost" url.
+     */
+    // await this.webSocket?.close();
   }
 
   private buildUrl(config: JSPackagerClientConfig): string {

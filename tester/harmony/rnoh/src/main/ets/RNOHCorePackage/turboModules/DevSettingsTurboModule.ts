@@ -1,4 +1,3 @@
-import { RNInstanceImpl } from '../../RNOH/RNInstance';
 import { RNOHLogger } from '../../RNOH/RNOHLogger';
 import type { TurboModuleContext } from '../../RNOH/TurboModule';
 import { TurboModule } from '../../RNOH/TurboModule';
@@ -14,15 +13,13 @@ export class DevSettingsTurboModule extends TurboModule {
   }
 
   public reload() {
-    if (this.ctx.rnInstance instanceof RNInstanceImpl) {
-      this.ctx.rnInstance.lifecycleEventEmitter.emit("RELOAD", { reason: undefined })
-    }
+    this.ctx.logger.clone("reload").debug()
+    this.ctx.rnAbility.devToolsController.reload(undefined)
   }
 
   public reloadWithReason(reason: string) {
-    if (this.ctx.rnInstance instanceof RNInstanceImpl) {
-      this.ctx.rnInstance.lifecycleEventEmitter.emit("RELOAD", { reason })
-    }
+    this.ctx.logger.clone("reloadWithReason").debug(reason)
+    this.ctx.rnAbility.devToolsController.reload(reason)
   }
 
   public onFastRefresh() {

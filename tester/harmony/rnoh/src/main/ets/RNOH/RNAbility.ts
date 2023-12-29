@@ -8,6 +8,9 @@ import libRNOHApp from 'librnoh_app.so'
 import { RNInstanceRegistry } from './RNInstanceRegistry';
 import { RNInstance, RNInstanceOptions, RNInstanceImpl } from './RNInstance';
 import { RNOHContext } from "./RNOHContext"
+import { DevToolsController } from "./DevToolsController"
+import { DevMenu } from "./DevMenu"
+import { JSPackagerClient, JSPackagerClientConfig } from "./JSPackagerClient"
 
 const RNOH_BANNER = '\n\n\n' +
   '██████╗ ███╗   ██╗ ██████╗ ██╗  ██╗' + '\n' +
@@ -28,6 +31,10 @@ export abstract class RNAbility extends UIAbility {
   protected initializationDateTime: Date
   protected readinessDateTime: Date | undefined
   protected isDebugModeEnabled: boolean = true
+  protected jsPackagerClient: JSPackagerClient | undefined = undefined
+
+  public devToolsController: DevToolsController
+  public devMenu: DevMenu
 
   async onCreate(want, param) {
     this.initializationDateTime = new Date()
@@ -51,8 +58,25 @@ export abstract class RNAbility extends UIAbility {
       (rnInstance) => this.createRNOHContext({
         rnInstance
       }))
+    this.devToolsController = new DevToolsController(this.rnInstanceRegistry)
+    this.devMenu = new DevMenu(this.devToolsController, this.context, this.providedLogger)
+    this.jsPackagerClient = new JSPackagerClient(this.providedLogger, this.devToolsController, this.devMenu)
+    const jsPackagerClientConfig = this.getJSPackagerClientConfig()
+    if (jsPackagerClientConfig) {
+      this.jsPackagerClient.connectToMetroMessages(jsPackagerClientConfig)
+    }
     AppStorage.setOrCreate('RNAbility', this)
     stopTracing()
+  }
+
+  protected getJSPackagerClientConfig(): JSPackagerClientConfig | null {
+    if (!this.isDebugModeEnabled) {
+      return null
+    }
+    return {
+      host: "localhost",
+      port: 8081
+    }
   }
 
   protected shouldCleanUpRNInstance__hack(): boolean {
@@ -61,9 +85,12 @@ export abstract class RNAbility extends UIAbility {
 
   onDestroy() {
     const stopTracing = this.logger.clone("onDestroy").startTracing()
+    this.jsPackagerClient.onDestroy()
     this.rnInstanceRegistry.forEach(instance => instance.onDestroy())
     stopTracing()
   }
+
+
 
   public markReadiness(): void {
     if (!this.readinessDateTime) {
@@ -121,7 +148,6 @@ export abstract class RNAbility extends UIAbility {
         }
         logger.info("Succeeded in loading the content", JSON.stringify(data))
       });
-
     }).catch((err: Error) => {
       logger.error("Failed to setup window", JSON.stringify(err))
     }).finally(() => {

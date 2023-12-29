@@ -58,8 +58,8 @@ export struct RNApp {
     try {
       await (async () => {
         this.rnInstance = await this.getOrCreateRNInstance()
-        this.cleanUpCallbacks.push(this.rnInstance.subscribeToLifecycleEvents("RELOAD", () => {
-          this.cleanUp()
+        this.cleanUpCallbacks.push(this.rnAbility.devToolsController.eventEmitter.subscribe("RELOAD", async () => {
+          await this.cleanUp()
           this.init()
         }))
         await this.onSetUp(this.rnInstance)
@@ -92,11 +92,11 @@ export struct RNApp {
     }
   }
 
-  private cleanUp() {
+  private async cleanUp() {
     const stopTracing = this.logger.clone("cleanUp").startTracing()
     this.shouldShow = false
     if (this.shouldDestroyRNInstance) {
-      this.rnAbility.destroyAndUnregisterRNInstance(this.rnInstance)
+      await this.rnAbility.destroyAndUnregisterRNInstance(this.rnInstance)
     }
     this.cleanUpCallbacks.forEach(cleanUp => cleanUp())
     stopTracing()
