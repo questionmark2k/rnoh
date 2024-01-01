@@ -17,7 +17,7 @@ import {useContext} from 'react';
 import React from 'react';
 import {Button} from '../components';
 
-export const MiscTest = () => {
+export const MiscPropsTest = () => {
   const rootTag: RootTag = useContext(RootTagContext);
 
   return (

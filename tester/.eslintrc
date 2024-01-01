@@ -7,6 +7,7 @@
     "@typescript-eslint/no-unused-vars": "warn",
     "react-hooks/exhaustive-deps": "off",
     "radix": "off",
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "max-lines": "off"
   }
 }
