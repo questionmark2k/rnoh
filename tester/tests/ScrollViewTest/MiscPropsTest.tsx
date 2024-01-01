@@ -1,5 +1,5 @@
 import {TestCase, TestSuite} from '@rnoh/testerino';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import React from 'react';
 import {COMMON_PROPS, getScrollViewContent} from './fixtures';
 import {useEffect, useRef, useState} from 'react';
@@ -45,8 +45,8 @@ export function MiscProps() {
       </TestCase>
       <TestCase
         modal
-        skip
-        itShould="[FAILS on Harmony/Android] display ScrollView with different contentInsets (contentInset)"
+        skip={Platform.select({android: 'fails', harmony: 'fails on Android'})}
+        itShould="display ScrollView with different contentInsets (contentInset)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/304
       >
         <View style={styles.wrapperView}>
@@ -97,8 +97,8 @@ export function MiscProps() {
       </TestCase>
       <TestCase
         modal
-        skip
-        itShould="[FAILS on Harmony/Android] scroll outside of the content when pressing the button (scrollToOverflowEnabled)"
+        skip={Platform.select({android: 'fails', harmony: 'fails on Android'})}
+        itShould="scroll outside of the content when pressing the button (scrollToOverflowEnabled)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/315
       >
         <ScrollToOverflowEnabledTestCase />

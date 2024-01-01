@@ -38,10 +38,12 @@ export function NavigationContainer({
         },
         registeredPageNames,
       }}>
-      <Page name="INDEX">
-        <IndexPage />
-      </Page>
-      {children}
+      <View style={{width: '100%', height: '100%', flexDirection: 'column'}}>
+        <Page name="INDEX">
+          <IndexPage />
+        </Page>
+        {children}
+      </View>
     </NavigationContext.Provider>
   );
 }
@@ -69,7 +71,7 @@ export function Page({name, children}: {name: string; children: any}) {
           <Text style={styles.buttonText}>{'‹ Back'}</Text>
         </TouchableOpacity>
       )}
-      {children}
+      <View style={{width: '100%', flex: 1}}>{children}</View>
     </View>
   ) : null;
 }

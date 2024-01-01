@@ -238,7 +238,12 @@ export const SectionListTest = () => {
           />
         </Modal>
       </TestCase>
-      <TestCase itShould="[FAILS on Android/Harmony] display onScroll native event throttled every second">
+      <TestCase
+        itShould="display onScroll native event throttled every second"
+        skip={Platform.select({
+          android: 'RN bug',
+          harmony: "doesn't work on Android",
+        })}>
         {/* https://github.com/facebook/react-native/issues/18441 */}
         <Modal>
           <ObjectDisplayer

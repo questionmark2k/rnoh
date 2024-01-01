@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 import {TestSuite, TestCase} from '@rnoh/testerino';
 import React, {useState} from 'react';
 import {Button} from '../components';
@@ -556,8 +556,11 @@ export function ViewTest() {
         </View>
       </TestCase>
       <TestCase
-        skip
-        itShould="[FAILS on Android/Harmony] pass on blue rect touch (onResponderReject)"
+        skip={Platform.select({
+          android: 'bug in RN',
+          harmony: 'bug in RN, fails on Android',
+        })}
+        itShould="pass on blue rect touch (onResponderReject)"
         initialState={{
           responderRejectedCount: 0,
           responderGrantedCount: 0,

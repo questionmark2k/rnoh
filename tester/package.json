@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@gorhom/portal": "^1.0.14",
-    "@rnoh/testerino": "^0.0.8",
     "chai": "4.3.7",
     "d3-scale-chromatic": "^3.0.0",
     "react": "18.2.0",
@@ -38,6 +37,7 @@
     "@react-native-community/eslint-config": "^3.2.0",
     "@react-native/eslint-config": "^0.74.0",
     "@react-native/metro-config": "^0.72.6",
+    "@rnoh/testerino": "^0.0.9",
     "@tsconfig/react-native": "^2.0.2",
     "@types/chai": "^4.3.4",
     "@types/d3-scale-chromatic": "^3.0.0",

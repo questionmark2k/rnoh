@@ -1,5 +1,5 @@
 import {TestCase, TestSuite} from '@rnoh/testerino';
-import {ScrollView, StyleSheet, TextInput, View} from 'react-native';
+import {Platform, ScrollView, StyleSheet, TextInput, View} from 'react-native';
 import {COMMON_PROPS, getScrollViewContent} from './fixtures';
 
 export function KeyboardTest() {
@@ -25,8 +25,8 @@ export function KeyboardTest() {
       </TestCase>
       <TestCase
         modal
-        skip
-        itShould="[FAILS on Harmony/Android] adjust the scrollview when showing keyboard (automaticallyAdjustKeyboardInsets)"
+        skip={Platform.select({android: 'fails', harmony: 'fails on Android'})}
+        itShould="adjust the scrollview when showing keyboard (automaticallyAdjustKeyboardInsets)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/302
       >
         <View style={styles.wrapperView}>
@@ -36,8 +36,11 @@ export function KeyboardTest() {
       </TestCase>
       <TestCase
         modal
-        skip
-        itShould="[FAILS on Harmony/ Android Emulator] the left scrollview should dismiss the keyboard on tap and the right one shouldn't (keyboardShouldPersistTaps)"
+        skip={Platform.select({
+          android: 'fails',
+          harmony: 'fails on Android Emulator',
+        })}
+        itShould="the left scrollview should dismiss the keyboard on tap and the right one shouldn't (keyboardShouldPersistTaps)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/311
       >
         <View>

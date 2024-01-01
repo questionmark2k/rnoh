@@ -39,8 +39,8 @@ function App() {
             <Page
               key={testSuiteName}
               name={`TESTS: ${testSuiteName.replace('Test', '')}`}>
-              <Tester>
-                <ScrollView style={{marginBottom: 100}}>
+              <Tester style={{flex: 1}}>
+                <ScrollView style={{flex: 1}}>
                   <TestSuite key={testSuiteName} />
                 </ScrollView>
               </Tester>

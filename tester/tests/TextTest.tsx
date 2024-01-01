@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 import {TestSuite, TestCase} from '@rnoh/testerino';
 import {Button, PressCounter} from '../components';
 import {useState} from 'react';
@@ -753,10 +753,13 @@ export function TextTest() {
           </View>
         </TestCase>
         <TestCase
-          skip
-          itShould="[FAILS on Harmony and Android] display the attachment inline with text">
+          skip={Platform.select({
+            android: 'not supported',
+            harmony: 'RN problem, also fails on Android',
+          })}
+          itShould="display the attachment inline with text">
           <Text style={{padding: 20}}>
-            Fragment1
+            Fragment1ii
             <PressCounter />
           </Text>
         </TestCase>
