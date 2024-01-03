@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   View,
   SectionList,
@@ -7,29 +7,35 @@ import {
   SectionListProps,
   RefreshControl,
   Platform,
+  ViewabilityConfig,
 } from 'react-native';
 import {TestCase, TestSuite} from '@rnoh/testerino';
 import {Button, Modal, ObjectDisplayer} from '../components';
 
 interface SectionData {
+  id: string;
   title: string;
   data: string[];
 }
 
 const DATA: SectionData[] = [
   {
+    id: '0',
     title: 'Main dishes',
     data: ['Pizza', 'Burger', 'Risotto'],
   },
   {
+    id: '1',
     title: 'Sides',
     data: ['French Fries', 'Onion Rings', 'Fried Shrimps'],
   },
   {
+    id: '2',
     title: 'Drinks',
     data: ['Water', 'Coke', 'Beer'],
   },
   {
+    id: '3',
     title: 'Desserts',
     data: ['Cheese Cake', 'Ice Cream'],
   },
@@ -38,7 +44,7 @@ const DATA: SectionData[] = [
 const commonProps = {
   style: {width: 256},
   sections: DATA,
-  keyExtractor: (item, index) => item + index,
+  keyExtractor: (item, index) => item.id,
   renderSectionHeader: ({section}) => (
     <Text style={styles.title}>{section.title}</Text>
   ),
@@ -292,6 +298,11 @@ export const SectionListTest = () => {
           />
         </Modal>
       </TestCase>
+      <TestCase itShould="click on 'Record interaction' button changes the first three items background color to blue">
+        <Modal contentContainerStyle={{width: '85%'}}>
+          <SectionListRecordInteractionTest />
+        </Modal>
+      </TestCase>
     </TestSuite>
   );
 };
@@ -367,6 +378,92 @@ function DelayedDisplayer(props: {
   }, []);
 
   return <>{isVisible ? props.renderContent() : null}</>;
+}
+
+export interface ViewToken<TItem> {
+  item: TItem;
+  key: string;
+  index: number | null;
+  isViewable: boolean;
+  section?: any | undefined;
+}
+
+type OnViewableItemsChangedType<TItem> = {
+  viewableItems: Array<ViewToken<TItem>>;
+  changed: Array<ViewToken<TItem>>;
+};
+
+function SectionListRecordInteractionTest() {
+  const [visibleItems, setVisibleItems] = useState<string[]>([]);
+
+  const ref = useRef<SectionList>(null);
+
+  const defaultViewabilityConfig: ViewabilityConfig = useMemo(() => {
+    return {
+      waitForInteraction: true,
+      minimumViewTime: 100,
+      itemVisiblePercentThreshold: 70,
+    };
+  }, []);
+
+  const handleOnPress = () => {
+    if (ref.current) {
+      ref.current.recordInteraction();
+    }
+  };
+
+  const onViewableItemsChanged = ({
+    viewableItems,
+  }: OnViewableItemsChangedType<string>) => {
+    const newVisibleItems = viewableItems
+      .filter(viewableItem => viewableItem.index != null)
+      .map(viewableItem => viewableItem.item);
+
+    setVisibleItems(newVisibleItems);
+  };
+
+  return (
+    <>
+      <View style={{marginBottom: 10}}>
+        <Button label="Record interaction" onPress={handleOnPress} />
+        <Text style={{padding: 10}}>
+          Visible Items are: {JSON.stringify(visibleItems)}
+        </Text>
+      </View>
+      <SectionList
+        ref={ref}
+        sections={DATA}
+        scrollEnabled={false}
+        keyExtractor={(_, index) => String(index)}
+        renderSectionHeader={({section}) => (
+          <Text style={styles.title}>{section.title}</Text>
+        )}
+        renderItem={({item}) => (
+          <View
+            style={[
+              {
+                height: 200,
+                backgroundColor: 'lightblue',
+                marginBottom: 10,
+              },
+              visibleItems.includes(item) && {backgroundColor: 'blue'},
+            ]}>
+            <Text
+              style={{
+                fontSize: 32,
+                height: 200,
+                textAlign: 'center',
+                textAlignVertical: 'center',
+              }}>
+              {item}
+            </Text>
+          </View>
+        )}
+        viewabilityConfig={defaultViewabilityConfig}
+        onViewableItemsChanged={onViewableItemsChanged}
+      />
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
