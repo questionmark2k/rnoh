@@ -1,5 +1,5 @@
-import { Point } from "./types"
-import { ViewStyle } from "./RNTypes"
+import { Point } from './types';
+import { ViewStyle } from './RNTypes';
 
 /** 0-1 */
 export type NormalizedScalar = number;

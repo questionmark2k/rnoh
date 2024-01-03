@@ -162,27 +162,18 @@ export struct RNTextInput {
   }
 
   onSubmitEditing(): void {
-    focusControl.requestFocus(`fixedBlur${this.tag}`)
     this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onSubmitEditing", this.value)
+  }
+
+  maybeFocusOnAppear(): void {
+    if (this.descriptorWrapper?.autoFocus && !this.descriptor.state.wasAlreadyRendered) {
+      focusControl.requestFocus(`TextInput@${this.tag}`);
+    }
+    this.descriptor.state.wasAlreadyRendered = true
   }
 
   build() {
     RNViewBase({ ctx: this.ctx, tag: this.tag, componentManager: this.componentManager }) {
-      /**
-       * Focus hack (1/2)
-       * This invisible buttons are needed to solve focusing issues.
-       * The first one ensures that the TextInput will not autoFocus when the property is set to false, and the
-       * second allows blurring after submitting text.
-       * */
-      if (!(this.descriptorWrapper?.autoFocus ?? false)) {
-        Button()
-          .key(`fixedAutoFocus${this.tag}`)
-          .width(0)
-          .height(0)
-          .padding(0)
-          .margin(0)
-          .defaultFocus(true)
-      }
       if (this.descriptor.props.multiline) {
         TextArea({ controller: this.areaController, placeholder: this.descriptor.props.placeholder, text: this.value })
           .fontColor(this.descriptorWrapper?.fontColor)
@@ -208,7 +199,7 @@ export struct RNTextInput {
           .borderRadius(0)
           .backgroundColor(Color.Transparent)
           .onFocus(() => this.onFocusEvent())
-          .defaultFocus(this.descriptorWrapper?.autoFocus ?? false)
+          .defaultFocus(false)
           .onBlur(() => this.onBlurEvent())/*
            * We need to handle padding manually as TextArea does not handle padding correctly
            * - it does not respect percentage padding and the scroll area size is to big */
@@ -222,6 +213,7 @@ export struct RNTextInput {
             height: this.descriptorWrapper?.height
           })
           .key(`TextInput@${this.tag}`)
+          .onAppear(() => this.maybeFocusOnAppear())
       } else {
         TextInput({
           controller: this.inputController,
@@ -257,7 +249,7 @@ export struct RNTextInput {
           .backgroundColor(Color.Transparent)
           .onSubmit(() => this.onSubmitEditing())
           .onFocus(() => this.onFocusEvent())
-          .defaultFocus(this.descriptorWrapper?.autoFocus ?? false)
+          .defaultFocus(false)
           .onBlur(() => this.onBlurEvent())/*
            * We need to handle padding manually as TextInput does not handle padding correctly
            * - the text is always centered. */
@@ -271,17 +263,8 @@ export struct RNTextInput {
             height: this.descriptorWrapper?.height
           })
           .key(`TextInput@${this.tag}`)
+          .onAppear(() => this.maybeFocusOnAppear())
       }
-      /**
-       * Focus hack (2/2)
-       */
-      Button()
-        .key(`fixedBlur${this.tag}`)
-        .width(0)
-        .height(0)
-        .padding(0)
-        .margin(0)
-        .defaultFocus(false)
     }
   }
 }

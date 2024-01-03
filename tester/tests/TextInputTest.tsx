@@ -22,9 +22,6 @@ export function TextInputTest() {
       <TestCase modal itShould="render non-editable textInput">
         <TextInputWithText style={styles.textInput} editable={false} />
       </TestCase>
-      <TestCase modal itShould="render unfocusable text input">
-        <TextInputWithText style={styles.textInput} focusable={false} />
-      </TestCase>
       <TestCase modal itShould="render textInput with Pacifico Regular font">
         <TextInputWithText
           style={[styles.textInput, {fontFamily: 'Pacifico-Regular'}]}
@@ -33,7 +30,7 @@ export function TextInputTest() {
       <TestCase modal itShould="render textInput with caret hidden">
         <TextInputWithText style={styles.textInput} caretHidden />
       </TestCase>
-      <TestSuite name="blur">
+      <TestSuite name="focus/blur">
         <TestCase
           modal
           itShould="blur text on submit (singleline)"
@@ -88,6 +85,44 @@ export function TextInputTest() {
             multiline
           />
         </TestCase>
+        <TestCase
+          modal
+          itShould="automatically focus textInput when displayed"
+          initialState={false}
+          arrange={({setState}) => (
+            <TextInputWithText
+              style={styles.textInput}
+              autoFocus
+              onFocus={() => setState(true)}
+            />
+          )}
+          assert={({expect, state}) => {
+            expect(state).to.be.true;
+          }}
+        />
+        <TestCase
+          modal
+          itShould="focus textInput on click"
+          initialState={false}
+          arrange={({setState}) => (
+            <TextInput
+              style={styles.textInput}
+              onFocus={() => setState(true)}
+            />
+          )}
+          assert={({expect, state}) => {
+            expect(state).to.be.true;
+          }}
+        />
+        <TestCase
+          modal
+          itShould="focus textInput when pressing the button"
+          initialState={false}
+          arrange={({setState}) => <FocusTextInputTest setState={setState} />}
+          assert={({state, expect}) => {
+            expect(state).to.be.true;
+          }}
+        />
       </TestSuite>
       <TestCase
         modal
@@ -100,26 +135,6 @@ export function TextInputTest() {
           underlineColorAndroid={'blue'}
         />
       </TestCase>
-      <TestCase
-        modal
-        itShould="focus textInput on click"
-        initialState={false}
-        arrange={({setState}) => (
-          <TextInput style={styles.textInput} onFocus={() => setState(true)} />
-        )}
-        assert={({expect, state}) => {
-          expect(state).to.be.true;
-        }}
-      />
-      <TestCase
-        modal
-        itShould="focus textInput when pressing the button"
-        initialState={false}
-        arrange={({setState}) => <FocusTextInputTest setState={setState} />}
-        assert={({state, expect}) => {
-          expect(state).to.be.true;
-        }}
-      />
       <TestCase modal itShould="render textinput with red placeholder">
         <TextInputWithText
           style={styles.textInput}
@@ -168,21 +183,6 @@ export function TextInputTest() {
           }}
         />
       </TestCase>
-      <TestCase
-        modal
-        itShould="automatically focus textInput when displayed"
-        initialState={false}
-        arrange={({setState}) => (
-          <TextInputWithText
-            style={styles.textInput}
-            autoFocus
-            onFocus={() => setState(true)}
-          />
-        )}
-        assert={({expect, state}) => {
-          expect(state).to.be.true;
-        }}
-      />
       <TestCase
         modal
         itShould="toggle between different capitalization modes"

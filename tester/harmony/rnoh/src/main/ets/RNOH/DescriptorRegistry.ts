@@ -1,8 +1,7 @@
-import { Tag, Descriptor, NativeId, DescriptorWrapper } from './DescriptorBase';
-import { Mutation } from './Mutation';
-import { MutationType } from './Mutation';
-import type { RNInstanceImpl } from './RNInstance'
-import type { RNOHLogger } from './RNOHLogger'
+import { Descriptor, DescriptorWrapper, NativeId, Tag } from './DescriptorBase';
+import { Mutation, MutationType } from './Mutation';
+import type { RNInstanceImpl } from './RNInstance';
+import type { RNOHLogger } from './RNOHLogger';
 
 type RootDescriptor = Descriptor<"RootView", any>
 
@@ -273,6 +272,7 @@ export class DescriptorRegistry {
         // NOTE: animated props override the ones from the mutation
         props: { ...currentDescriptor!.props, ...mutationDescriptor.props, ...animatedProps },
         rawProps: { ...currentDescriptor!.rawProps, ...mutationDescriptor.rawProps, ...animatedProps },
+        state: { ...currentDescriptor!.state, ...mutationDescriptor.state },
         childrenTags: children,
       };
       this.saveDescriptor(newDescriptor)

@@ -27,7 +27,9 @@ export interface TextInputRawProps extends ViewRawProps {
   clearTextOnFocus?: boolean
 }
 
-export interface TextInputState {}
+export interface TextInputState {
+  wasAlreadyRendered?: boolean
+}
 
 export interface Selection {
   start: number,
