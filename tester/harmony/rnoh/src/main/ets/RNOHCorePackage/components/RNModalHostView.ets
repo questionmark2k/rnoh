@@ -1,19 +1,18 @@
 import display from '@ohos.display';
-import { Size} from '../../RNOH'
-import { Descriptor} from '../../RNOH/DescriptorBase';
-import { Tag } from '../../RNOH/DescriptorBase'
-import { RNOHContext } from '../../RNOH/RNOHContext'
-import { ViewBaseProps } from './RNViewBase'
-import { TouchDispatcher } from '../../RNOH/TouchDispatcher'
+import { Size } from '../../RNOH';
+import { Descriptor, Tag } from '../../RNOH/DescriptorBase';
+import { RNOHContext } from '../../RNOH/RNOHContext';
+import { ViewBaseProps } from './RNViewBase';
+import { TouchDispatcher } from '../../RNOH/TouchDispatcher';
 import { RNModalHostViewManager } from '../componentManagers/RNModalHostViewManager';
-import { CustomComponentBuilder } from './RNComponentFactory'
-import { RNComponentFactory, buildRNComponent } from './RNComponentFactory'
+import { buildRNComponent, CustomComponentBuilder, RNComponentFactory } from './RNComponentFactory';
 
 interface ModalHostViewProps extends ViewBaseProps {
   transparent: boolean;
   visible: boolean;
   identifier: number;
 };
+
 interface ModalHostViewState {
   screenSize: Size
 };
@@ -28,17 +27,24 @@ struct ModalHostViewDialog {
   public ctx!: RNOHContext
   public tag!: Tag
   @BuilderParam public buildCustomComponent!: CustomComponentBuilder
-
   @State descriptor: ModalHostViewDescriptor = Object() as ModalHostViewDescriptor
   controller: CustomDialogController
   @State showContent: boolean = false
-  unsubscribeFromDescriptorChanges: () => void | undefined = () => {}
+  unsubscribeFromDescriptorChanges: () => void | undefined = () => {
+  }
   private cleanUpCallbacks: (() => void)[] = []
   touchDispatcher!: TouchDispatcher;
   componentManager!: RNModalHostViewManager;
 
   emitComponentEvent(eventName: string) {
     this.ctx.rnInstanceManager.emitComponentEvent(this.tag, eventName, {});
+  }
+
+  updateState() {
+    const displayClass = display.getDefaultDisplaySync();
+    const height = px2vp(displayClass.height);
+    const width = px2vp(displayClass.width);
+    this.ctx.descriptorRegistry.setState<ModalHostViewState>(this.tag, { screenSize: { height, width } });
   }
 
   aboutToAppear() {
@@ -54,11 +60,12 @@ struct ModalHostViewDialog {
       this.showContent = true
     })
     this.touchDispatcher = new TouchDispatcher(this.tag, this.ctx.rnInstance, this.ctx.logger);
-
-    const displayClass = display.getDefaultDisplaySync();
-    const height = px2vp(displayClass.height);
-    const width = px2vp(displayClass.width);
-    this.ctx.descriptorRegistry.setState<ModalHostViewState>(this.tag, { screenSize: { height, width } });
+    this.cleanUpCallbacks.push(
+      this.ctx.rnInstance.subscribeToLifecycleEvents("CONFIGURATION_UPDATE", (_newConfig) => {
+        this.updateState();
+      })
+    )
+    this.updateState();
   }
 
   aboutToDisappear() {
