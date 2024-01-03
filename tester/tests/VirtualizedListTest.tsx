@@ -28,7 +28,7 @@ const getItem = (_data: unknown, index: number): ItemData => ({
 const getItemCountVirtualized = (_data: unknown): number => 50;
 
 const Item = ({title}: {title: string}) => (
-  <View style={{height: 48, padding: 16, borderBottomWidth: 1}}>
+  <View style={{height: 48, padding: 16, borderWidth: 1}}>
     <Text style={{width: '100%', height: 24}}>{title}</Text>
   </View>
 );
@@ -112,17 +112,17 @@ export function VirtualizedListTest() {
       <TestSuite name="ref">
         <TestCase
           modal
-          itShould="Scroll to the element with the index 10 (Item 11) - scrollToIndex()">
+          itShould="scroll to the element with the index 10 (Item 11) - scrollToIndex()">
           <VirtualizedListScrollToIndexTest />
         </TestCase>
         <TestCase
           modal
-          itShould="Scroll to the specific element (Item 3) - scrollToItem()">
+          itShould="scroll to the specific element (Item 3) - scrollToItem()">
           <VirtualizedListScrollToItemTest />
         </TestCase>
         <TestCase
           modal
-          itShould="Scroll to the end of the list - scrollToEnd()"
+          itShould="scroll to the end of the list - scrollToEnd()"
           initialState={false}
           arrange={({state, setState}) => {
             return (
@@ -138,7 +138,7 @@ export function VirtualizedListTest() {
         />
         <TestCase
           modal
-          itShould="Get the node number - getScrollableNode()"
+          itShould="get the node number - getScrollableNode()"
           initialState={undefined}
           arrange={({state, setState}) => {
             return (
@@ -156,7 +156,7 @@ export function VirtualizedListTest() {
 
         <TestCase
           modal
-          itShould="Get the scroll ref - getScrollRef()"
+          itShould="get the scroll ref - getScrollRef()"
           initialState={undefined}
           arrange={({state, setState}) => {
             return (
@@ -170,7 +170,7 @@ export function VirtualizedListTest() {
       </TestSuite>
       <TestCase
         modal
-        itShould="Click (call on ref.recordInteraction()) on button before first scroll should trigger onViewableItemsChanged and change the first two items background color to blue"
+        itShould="click (call on ref.recordInteraction()) on button before first scroll should trigger onViewableItemsChanged and change the first two items background color to blue"
         initialState={[]}
         arrange={({state, setState}) => {
           return (
@@ -188,13 +188,48 @@ export function VirtualizedListTest() {
       />
       <TestCase
         modal
-        itShould="Change background color of visible items after scrolling slightly (to blue when fully visible and lightblue when at least 20% is visible)">
+        itShould="change background color of visible items after scrolling slightly (to blue when fully visible and lightblue when at least 20% is visible)">
         <VirtualizedListTestViewabiliyConfigCallbackPairs />
       </TestCase>
       <TestCase
         modal
-        itShould="Change background color of fully visible items after 2 seconds">
+        itShould="change background color of fully visible items after 2 seconds">
         <VirtualizedListViewabilityConfigViewTime />
+      </TestCase>
+      <TestCase
+        modal
+        itShould="display even items with a lightgray background and odd items should have lightblue background (CellRenderedComponent)">
+        <VirtualizedListCellRendererComponent />
+      </TestCase>
+      <TestCase
+        modal
+        itShould='display "Separator" text on lightgray background between items'>
+        <VirtualizedListItemSeparatorTest />
+      </TestCase>
+      <TestCase
+        modal
+        itShould='display "Empty Component" text on lightgray background when data is empty'>
+        <VirtualizedListListEmptyComponentTest />
+      </TestCase>
+      <TestCase
+        modal
+        itShould='display "Item Component" text on lightgray background'>
+        <VirtualizedListListItemComponent />
+      </TestCase>
+      <TestCase
+        modal
+        itShould='display "List Footer Component" text on lightgray background at the end of the list'>
+        <VirtualizedListListFooterComponent />
+      </TestCase>
+      <TestCase
+        modal
+        itShould='display "List Footer Component" text on red background at the end of the list'>
+        <VirtualizedListListFooterComponentStyles />
+      </TestCase>
+      <TestCase
+        modal
+        itShould='display "List Header Component" text on small lightgray background on red background at the start of the list'>
+        <VirtualizedListListHeaderComponent />
       </TestCase>
     </TestSuite>
   );
@@ -676,5 +711,222 @@ function VirtualizedListViewabilityConfigViewTime() {
         onViewableItemsChanged={onViewableItemsChanged}
       />
     </View>
+  );
+}
+
+function VirtualizedListCellRendererComponent() {
+  return (
+    <VirtualizedList
+      style={{height: 128}}
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+      CellRendererComponent={({
+        index,
+        children,
+        style,
+      }: {
+        index: number;
+        children: React.ReactNode;
+        style: any;
+      }) => {
+        return (
+          <View
+            style={{
+              ...style,
+              backgroundColor: index % 2 === 0 ? 'lightblue' : 'lightgray',
+            }}>
+            {children}
+          </View>
+        );
+      }}
+    />
+  );
+}
+
+function VirtualizedListItemSeparatorTest() {
+  return (
+    <VirtualizedList
+      style={{height: 128}}
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+      ItemSeparatorComponent={() => (
+        <View
+          style={{
+            height: 20,
+            backgroundColor: 'lightgray',
+            alignSelf: 'center',
+            width: '90%',
+          }}>
+          <Text>Separator</Text>
+        </View>
+      )}
+    />
+  );
+}
+
+function VirtualizedListListEmptyComponentTest() {
+  return (
+    <VirtualizedList
+      style={{height: 128}}
+      data={[]}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => 0}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+      ListEmptyComponent={() => (
+        <View
+          style={{
+            backgroundColor: 'lightgray',
+            alignSelf: 'center',
+            width: '90%',
+            height: 100,
+          }}>
+          <Text>Empty Component</Text>
+        </View>
+      )}
+    />
+  );
+}
+
+function VirtualizedListListItemComponent() {
+  return (
+    <VirtualizedList
+      style={{height: 128}}
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      // @ts-ignore
+      ListItemComponent={props => (
+        <View
+          style={{
+            backgroundColor: 'lightgray',
+            alignSelf: 'center',
+            width: '90%',
+            height: 100,
+            borderBottomWidth: 1,
+            justifyContent: 'center',
+          }}>
+          <Text style={{textAlign: 'center'}}>Item Component</Text>
+          <Text style={{textAlign: 'center'}}>{props.item.title}</Text>
+        </View>
+      )}
+    />
+  );
+}
+
+function VirtualizedListListFooterComponent() {
+  return (
+    <VirtualizedList
+      style={{height: 128}}
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      ListFooterComponent={() => (
+        <View
+          style={{
+            backgroundColor: 'lightgray',
+            alignSelf: 'center',
+            width: '90%',
+            height: 100,
+            borderBottomWidth: 1,
+            justifyContent: 'center',
+          }}>
+          <Text style={{textAlign: 'center'}}>List Footer Component</Text>
+        </View>
+      )}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+    />
+  );
+}
+
+function VirtualizedListListFooterComponentStyles() {
+  return (
+    <VirtualizedList
+      style={{height: 128}}
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      ListFooterComponent={() => (
+        <View>
+          <Text style={{textAlign: 'center'}}>List Footer Component</Text>
+        </View>
+      )}
+      ListFooterComponentStyle={{
+        backgroundColor: 'red',
+        alignSelf: 'center',
+        width: '90%',
+        height: 100,
+        borderBottomWidth: 1,
+        justifyContent: 'center',
+      }}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+    />
+  );
+}
+
+function VirtualizedListListHeaderComponent() {
+  return (
+    <VirtualizedList
+      style={{height: 128}}
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      ListHeaderComponent={() => (
+        <View
+          style={{
+            backgroundColor: 'lightgray',
+          }}>
+          <Text style={{textAlign: 'center'}}>List Header Component</Text>
+        </View>
+      )}
+      ListHeaderComponentStyle={{
+        backgroundColor: 'red',
+        alignSelf: 'center',
+        width: '90%',
+        height: 100,
+        borderBottomWidth: 1,
+        justifyContent: 'center',
+      }}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+    />
   );
 }
