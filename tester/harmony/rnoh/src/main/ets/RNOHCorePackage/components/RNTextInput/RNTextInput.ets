@@ -113,7 +113,11 @@ export struct RNTextInput {
 
   onDescriptorChange(newDescriptor: TextInputDescriptor) {
     this.descriptor = newDescriptor;
-    this.descriptorWrapper = new TextInputDescriptorWrapper(this.descriptor)
+    this.descriptorWrapper = new TextInputDescriptorWrapper(this.descriptor);
+    if (this.descriptor.props.text !== this.value) {
+      this.value = this.descriptor.props.text ?? '';
+      this.shouldIgnoreNextValueChange = true;
+    }
     if (this.componentManager) {
       this.componentManager?.setIsEnabled(newDescriptor.props.editable ?? true);
     }
@@ -145,6 +149,7 @@ export struct RNTextInput {
           const parsedArgs = parseSetTextAndSelectionCommandCallback(args);
           if (parsedArgs.value !== undefined) {
             this.value = parsedArgs.value;
+            this.shouldIgnoreNextValueChange = true;
           }
         } else if (command === 'focus') {
           focusControl.requestFocus(`TextInput@${this.tag}`)
