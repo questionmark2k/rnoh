@@ -1,7 +1,7 @@
 import type resmgr from '@ohos.resourceManager';
-import http from '@ohos.net.http';
 import { RNOHLogger } from './RNOHLogger';
 import urlUtils from '@ohos.url';
+import { fetchDataFromUrl } from './HttpRequestHelper';
 
 export interface HotReloadConfig {
   bundleEntry: string,
@@ -91,51 +91,12 @@ export class MetroJSBundleProvider extends JSBundleProvider {
   }
 
   async getBundle(): Promise<ArrayBuffer> {
-    return new Promise((resolve, reject) => {
-      const httpRequest = http.createHttp();
-      const dataChunks: ArrayBuffer[] = [];
-
-      function cleanUp() {
-        httpRequest.destroy();
-      }
-
-      httpRequest.on("dataReceive", (chunk) => {
-        dataChunks.push(chunk);
-      });
-
-      httpRequest.on("dataEnd", () => {
-        const totalLength = dataChunks.map(chunk => chunk.byteLength).reduce((acc, length) => acc + length, 0);
-        const result = new Uint8Array(totalLength);
-        let offset = 0;
-        for (const chunk of dataChunks) {
-          const chunkArray = new Uint8Array(chunk);
-          result.set(chunkArray, offset);
-          offset += chunk.byteLength;
-        }
-        resolve(result.buffer);
-        cleanUp();
-      });
-
-      try {
-        httpRequest.requestInStream(
-          this.bundleUrl,
-          {
-            header: {
-              'Content-Type': 'text/javascript'
-            },
-          },
-          (err, data) => {
-            if (err) {
-              reject(new JSBundleProviderError(`Couldn't load JSBundle from ${this.bundleUrl}`, err));
-              cleanUp();
-            }
-          }
-        );
-      } catch (err) {
-        reject(new JSBundleProviderError(`Couldn't load JSBundle from ${this.bundleUrl}`, err))
-        cleanUp();
-      }
-    })
+    try {
+      const response = await fetchDataFromUrl(this.bundleUrl, { headers: { 'Content-Type': 'text/javascript' } });
+      return response.result;
+    } catch (err) {
+      throw new JSBundleProviderError(`Couldn't load JSBundle from ${this.bundleUrl}`, err)
+    }
   }
 }
 

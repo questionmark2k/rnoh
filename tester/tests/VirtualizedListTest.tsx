@@ -477,7 +477,7 @@ function VirtualizedListGetScrollToEnd({
   );
 }
 
-export interface ViewToken<TItem> {
+interface ViewToken<TItem> {
   item: TItem;
   key: string;
   index: number | null;

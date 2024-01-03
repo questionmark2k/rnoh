@@ -1,4 +1,4 @@
-import type image from '@ohos.multimedia.image';
+import { RemoteImageSource } from './RemoteImageSource';
 
 export class RemoteImageCache<T> {
   protected data: Map<string, T>;
@@ -40,4 +40,4 @@ export class RemoteImageCache<T> {
   }
 }
 
-export class RemoteImageMemoryCache extends RemoteImageCache<image.ImageSource> {};
+export class RemoteImageMemoryCache extends RemoteImageCache<RemoteImageSource> {};

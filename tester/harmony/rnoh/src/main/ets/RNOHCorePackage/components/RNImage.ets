@@ -10,7 +10,7 @@ export interface ImageProps extends ViewBaseProps {
   blurRadius: number
 }
 
-interface ImageRawProps extends ViewRawProps{
+interface ImageRawProps extends ViewRawProps {
   alt: string
   resizeMethod: string
 }
@@ -37,6 +37,7 @@ export interface ImageState {}
 
 
 export type ImageDescriptor = Descriptor<"Image", ImageProps, ImageState, ImageRawProps>;
+
 class ImageDescriptorWrapper extends ViewDescriptorWrapperBase<"Image", ImageProps, ImageState, ImageRawProps> {
 }
 
@@ -54,7 +55,6 @@ export struct RNImage {
   tag: number = 0
   @State descriptor: ImageDescriptor = Object() as ImageDescriptor
   @State descriptorWrapper: ImageDescriptorWrapper | undefined = undefined
-
   // workaround: `@State` fields cannot be unions of primitive (`string`) and object (`Resource`, `PixelMap`) types
   @State imageSource: ImageSourceHolder | undefined = undefined
   defaultColorFilter: number[] = [
@@ -99,20 +99,21 @@ export struct RNImage {
     }
     const imageLoader = this.ctx.rnInstance.getTurboModule<ImageLoaderTurboModule>("ImageLoader");
     this.imageSource = undefined;
-    imageLoader.getImageSource(uri).then(async (imageSource) => {
-      const frameCounter = await imageSource.getFrameCount();
-      if (frameCounter === 1) {
-        // use the downloaded or cached image source
-        this.imageSource = new ImageSourceHolder(await imageSource.createPixelMap());
-      } else {
-        // an animated GIF
-        this.imageSource = new ImageSourceHolder(imageSource['location'] ?? uri)
+    imageLoader.getRemoteImageSource(uri).then(async (remoteImage) => {
+      try {
+        const imageSource = remoteImage.getImageSource();
+        const frameCounter = await imageSource.getFrameCount();
+        if (frameCounter === 1) {
+          // use the downloaded or cached image source
+          this.imageSource = new ImageSourceHolder(await imageLoader.getPixelMap(uri));
+        } else {
+          // an animated GIF
+          this.imageSource = new ImageSourceHolder(remoteImage.getLocation())
+        }
+      } catch (error) {
+        this.dispatchOnError(error.message);
       }
-    }).catch((error: RemoteImageLoaderError) => {
-      // fallback to passing uri to the Image component
-      this.imageSource = new ImageSourceHolder(uri);
     })
-    return;
   }
 
   /*
@@ -125,7 +126,7 @@ export struct RNImage {
   * }
    */
   getResizeMode(resizeMode: number) {
-    switch(resizeMode) {
+    switch (resizeMode) {
       case 0:
         return ImageFit.Cover;
       case 1:
@@ -184,7 +185,7 @@ export struct RNImage {
           .interpolation(ImageInterpolation.High)
           .width("100%")
           .height("100%")
-          .autoResize(this.descriptor.rawProps.resizeMethod!=='scale')
+          .autoResize(this.descriptor.rawProps.resizeMethod !== 'scale')
           .objectFit(this.getResizeMode(this.descriptor.props.resizeMode))
           .objectRepeat(this.descriptor.props.resizeMode === 4 ?
           ImageRepeat.XY : ImageRepeat.NoRepeat)

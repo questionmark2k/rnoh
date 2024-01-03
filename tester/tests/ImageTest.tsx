@@ -1,4 +1,4 @@
-import {Image, Text, View} from 'react-native';
+import {Image, ImageSourcePropType, ScrollView, Text, View} from 'react-native';
 import {TestCase, TestSuite} from '@rnoh/testerino';
 import React from 'react';
 import {Button} from '../components';
@@ -6,6 +6,8 @@ import {Button} from '../components';
 const WRONG_IMAGE_SRC = 'not_image';
 const LOCAL_IMAGE_ASSET_ID = require('../assets/pravatar-131.jpg');
 const REMOTE_IMAGE_URL = 'https://i.pravatar.cc/100?img=31';
+const LARGE_REMOTE_IMAGE_URL =
+  'https://images.unsplash.com/photo-1556740749-887f6717d7e4';
 const REMOTE_REDIRECT_IMAGE_URL = 'http://placeholder.com/350x150';
 const REMOTE_GIF_URL =
   'https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif';
@@ -21,31 +23,26 @@ export const ImageTest = () => {
           source={LOCAL_IMAGE_ASSET_ID}
         />
       </TestCase>
-      <TestCase itShould="support loading remote images">
-        <Image
-          style={{borderRadius: 8, borderWidth: 1, height: 100}}
-          source={{uri: REMOTE_IMAGE_URL}}
-          resizeMode="contain"
-        />
-      </TestCase>
-      <TestCase itShould="support loading remote images (with http redirect)">
-        <Image
-          style={{borderRadius: 8, borderWidth: 1, height: 150}}
-          source={{uri: REMOTE_REDIRECT_IMAGE_URL}}
-        />
-      </TestCase>
-      <TestCase itShould="support loading image data uris">
-        <Image
-          style={{borderRadius: 8, borderWidth: 1, height: 150}}
-          source={{uri: DATA_URI}}
-        />
-      </TestCase>
-      <TestCase itShould="support loading remote animated gifs">
-        <Image
-          style={{borderRadius: 8, borderWidth: 1, height: 400}}
-          source={{uri: REMOTE_GIF_URL}}
-        />
-      </TestCase>
+      <ImageExampleCase
+        itShould="support loading remote images"
+        source={{uri: REMOTE_IMAGE_URL}}
+      />
+      <ImageExampleCase
+        itShould="support loading remote images (with http redirect)"
+        source={{uri: REMOTE_REDIRECT_IMAGE_URL}}
+      />
+      <ImageExampleCase
+        itShould="support loading large remote images (over 5mb)"
+        source={{uri: LARGE_REMOTE_IMAGE_URL}}
+      />
+      <ImageExampleCase
+        itShould="support loading image data uris"
+        source={{uri: DATA_URI}}
+      />
+      <ImageExampleCase
+        itShould="support loading remote animated gifs"
+        source={{uri: REMOTE_GIF_URL}}
+      />
       <TestCase itShould="display alt when the image doesn't load">
         <View>
           <Image
@@ -370,9 +367,39 @@ export const ImageTest = () => {
           </View>
         </View>
       </TestCase>
+      <TestCase
+        modal
+        itShould="load many large images without causing out-of-memory issues">
+        <ScrollView>
+          {Array.from({length: 25}, (_, index) => (
+            <Image
+              key={index}
+              style={{width: 200, height: 200}}
+              source={{uri: LARGE_REMOTE_IMAGE_URL}}
+            />
+          ))}
+        </ScrollView>
+      </TestCase>
     </TestSuite>
   );
 };
+
+const ImageExampleCase = ({
+  itShould,
+  source,
+}: {
+  itShould: string;
+  source: ImageSourcePropType;
+}) => (
+  <TestCase itShould={itShould}>
+    <Image
+      style={{borderRadius: 8, borderWidth: 1, height: 150}}
+      source={source}
+      onError={e => console.error(e.nativeEvent.error)}
+      // resizeMode="contain"
+    />
+  </TestCase>
+);
 
 const SwitchSourceTest = () => {
   const SOURCES = [

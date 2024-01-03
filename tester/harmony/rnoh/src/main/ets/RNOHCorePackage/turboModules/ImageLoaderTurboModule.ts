@@ -7,6 +7,7 @@ import {
   RemoteImageMemoryCache
 } from '../../RemoteImageLoader';
 import image from '@ohos.multimedia.image';
+import { RemoteImageSource } from '../../RemoteImageLoader/RemoteImageSource';
 
 export class ImageLoaderTurboModule extends TurboModule {
   static NAME = "ImageLoader" as const
@@ -25,7 +26,7 @@ export class ImageLoaderTurboModule extends TurboModule {
 
   public async getSize(uri: string): Promise<number[]> {
     const imageSource = await this.imageLoader.getImageSource(uri)
-    const imageInfo = await imageSource.getImageInfo()
+    const imageInfo = await imageSource.getImageSource().getImageInfo()
     return [imageInfo.size.width, imageInfo.size.height]
   }
 
@@ -58,17 +59,38 @@ export class ImageLoaderTurboModule extends TurboModule {
     return this.imageLoader.getImageFromCache(uri)
   }
 
-  public async getImageSource(uri: string): Promise<image.ImageSource> {
+  public async getRemoteImageSource(uri:string): Promise<RemoteImageSource> {
     try {
       const imageSource = await this.imageLoader.getImageSource(uri);
-      return imageSource
+      return imageSource;
     }
     catch (e) {
       if (!(e instanceof RemoteImageLoaderError) && e instanceof Object && e.message) {
-        throw new RemoteImageLoaderError(`Failed to load the image: ${e.message}`)
+        throw new RemoteImageLoaderError(`Failed to load the image: ${e.message}`);
       }
-      throw new RemoteImageLoaderError(`Failed to load the image.`)
+      if (typeof e === 'string') {
+        throw new RemoteImageLoaderError(e);
+      }
+      throw e;
+    }
+  }
 
+  public async getImageSource(uri: string): Promise<image.ImageSource> {
+    return (await this.getRemoteImageSource(uri)).getImageSource()
+  }
+
+  public async getPixelMap(uri: string): Promise<image.PixelMap> {
+    try {
+      return await this.imageLoader.getPixelMap(uri);
+    }
+    catch (e) {
+      if (!(e instanceof RemoteImageLoaderError) && e instanceof Object && e.message) {
+        throw new RemoteImageLoaderError(`Failed to load the image: ${e.message}`);
+      }
+      if (typeof e === 'string') {
+        throw new RemoteImageLoaderError(e);
+      }
+      throw e;
     }
   }
 }

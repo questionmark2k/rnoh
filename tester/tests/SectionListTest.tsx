@@ -44,7 +44,7 @@ const DATA: SectionData[] = [
 const commonProps = {
   style: {width: 256},
   sections: DATA,
-  keyExtractor: (item, index) => item.id,
+  keyExtractor: (item, _index) => item.id,
   renderSectionHeader: ({section}) => (
     <Text style={styles.title}>{section.title}</Text>
   ),
@@ -380,7 +380,7 @@ function DelayedDisplayer(props: {
   return <>{isVisible ? props.renderContent() : null}</>;
 }
 
-export interface ViewToken<TItem> {
+interface ViewToken<TItem> {
   item: TItem;
   key: string;
   index: number | null;
