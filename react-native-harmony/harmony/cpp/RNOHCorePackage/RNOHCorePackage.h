@@ -29,6 +29,7 @@
 #include "RNOHCorePackage/TurboModules/I18nManagerTurboModule.h"
 #include "RNOHCorePackage/TurboModules/DevSettingsTurboModule.h"
 #include "RNOHCorePackage/TurboModules/DevMenuTurboModule.h"
+#include "RNOHCorePackage/TurboModules/LogBoxTurboModule.h"
 #include "RNOHCorePackage/ComponentBinders/ViewComponentJSIBinder.h"
 #include "RNOHCorePackage/ComponentBinders/ViewComponentNapiBinder.h"
 #include "RNOHCorePackage/ComponentBinders/ImageComponentJSIBinder.h"
@@ -99,6 +100,8 @@ class RNOHCoreTurboModuleFactoryDelegate : public TurboModuleFactoryDelegate {
             return std::make_shared<DevSettingsTurboModule>(ctx, name);
         } else if (name == "DevMenu") {
             return std::make_shared<DevMenuTurboModule>(ctx, name);
+        } else if (name == "LogBox") {
+            return std::make_shared<LogBoxTurboModule>(ctx, name);
         }
         return nullptr;
     };

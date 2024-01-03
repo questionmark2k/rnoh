@@ -1,6 +1,7 @@
-import { CustomComponentBuilder } from './RNOHCorePackage';
+import { CustomComponentBuilder, LogBoxTurboModule } from './RNOHCorePackage';
 import { JSBundleProvider, RNAbility, RNInstance, RNInstanceOptions, RNOHLogger } from './RNOH';
 import { RNSurface, SurfaceConfig2 } from './RNSurface';
+import { LogBoxDialog } from "./LogBoxDialog"
 
 interface CustomRNInstance {
   rnInstance: RNInstance
@@ -40,6 +41,7 @@ export struct RNApp {
   @StorageLink('RNAbility') private rnAbility: RNAbility = {} as RNAbility
   private rnInstance!: RNInstance
   @State private shouldShow: boolean = false
+  private logBoxDialogController!: CustomDialogController
   private shouldDestroyRNInstance: boolean = false
   private cleanUpCallbacks: (() => void)[] = []
   private logger!: RNOHLogger
@@ -58,6 +60,23 @@ export struct RNApp {
     try {
       await (async () => {
         this.rnInstance = await this.getOrCreateRNInstance()
+        this.logBoxDialogController = new CustomDialogController({
+          cornerRadius: 0,
+          customStyle: true,
+          alignment: DialogAlignment.TopStart,
+          backgroundColor: Color.Transparent,
+          builder: LogBoxDialog({
+            rnInstance: this.rnInstance,
+            initialProps: this.initialProps,
+            buildCustomComponent: this.buildCustomComponent,
+          })
+        })
+        this.cleanUpCallbacks.push(this.rnInstance.getTurboModule<LogBoxTurboModule>(LogBoxTurboModule.NAME).eventEmitter.subscribe("SHOW", () => {
+          this.logBoxDialogController.open()
+        }))
+        this.cleanUpCallbacks.push(this.rnInstance.getTurboModule<LogBoxTurboModule>(LogBoxTurboModule.NAME).eventEmitter.subscribe("HIDE", () => {
+          this.logBoxDialogController.close()
+        }))
         this.cleanUpCallbacks.push(this.rnAbility.devToolsController.eventEmitter.subscribe("RELOAD", async () => {
           await this.cleanUp()
           this.init()

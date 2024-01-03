@@ -8,6 +8,7 @@ export * from "./KeyboardObserverTurboModule";
 export * from "./NativeAnimatedTurboModule"
 export * from "./NetworkingTurboModule";
 export * from "./PlatformConstantsTurboModule";
+export * from "./LogBoxTurboModule";
 
 export * from "./SourceCodeTurboModule";
 

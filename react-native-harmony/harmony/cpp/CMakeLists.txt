@@ -401,6 +401,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/DeviceInfoTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/ExceptionsManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/ImageLoaderTurboModule.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/LogBoxTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/LinkingManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/NetworkingTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/PlatformConstantsTurboModule.cpp"
