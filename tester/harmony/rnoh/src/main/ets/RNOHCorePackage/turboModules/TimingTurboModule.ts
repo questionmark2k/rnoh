@@ -51,8 +51,8 @@ export class TimingTurboModule extends TurboModule {
       return;
     }
 
+    this.nativeTimerMap.delete(id);
     const { nativeTimerId, repeats } = timer;
-
     if (repeats) {
       clearInterval(nativeTimerId);
     } else {
@@ -62,5 +62,10 @@ export class TimingTurboModule extends TurboModule {
 
   setSendIdleEvents(enabled: boolean): void {
     this.ctx.logger.warn(`TimingTurboModule::setSendIdleEvents(${enabled}): not implemented`);
+  }
+
+  public __onDestroy__(): void {
+    const timerIds = [...this.nativeTimerMap.keys()];
+    timerIds.forEach(id => this.deleteTimer(id))
   }
 }
