@@ -3,7 +3,7 @@ import { EventEmitter } from "./EventEmitter"
 
 
 export class DevToolsController {
-  public eventEmitter = new EventEmitter<{ "RELOAD": [{ reason: string | undefined }] }>()
+  public eventEmitter = new EventEmitter<{ "RELOAD": [{ reason: string | undefined }], "DISMISS_RNOH_ERROR_DIALOG" }>()
 
   constructor(private rnInstanceRegistry: RNInstanceRegistry) {
   }
@@ -16,5 +16,9 @@ export class DevToolsController {
     this.rnInstanceRegistry.forEach(rnInstance => {
       rnInstance.emitDeviceEvent("toggleElementInspector", {});
     })
+  }
+
+  dismissRNOHErrorDialog(): void {
+    this.eventEmitter.emit("DISMISS_RNOH_ERROR_DIALOG")
   }
 }

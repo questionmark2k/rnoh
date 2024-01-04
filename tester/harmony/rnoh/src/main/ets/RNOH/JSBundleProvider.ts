@@ -49,7 +49,7 @@ export class ResourceJSBundleProvider extends JSBundleProvider {
     } catch (err) {
       throw new JSBundleProviderError({
         whatHappened: `Couldn't load JSBundle from ${this.path}`,
-        originalErrorOrContextData: err,
+        extraData: err,
         howCanItBeFixed: [`Check if a bundle exists at "<YOUR_ENTRY_MODULE>/src/main/resources/rawfile/${this.path}". (You can create a JS bundle with "react-native bundle-harmony" command.`]
       })
     }
@@ -107,7 +107,7 @@ export class MetroJSBundleProvider extends JSBundleProvider {
       }
       throw new JSBundleProviderError({
         whatHappened: `Couldn't load JSBundle from ${this.bundleUrl}`,
-        originalErrorOrContextData: err,
+        extraData: err,
         howCanItBeFixed: suggestions
       })
     }
@@ -156,7 +156,7 @@ export class AnyJSBundleProvider extends JSBundleProvider {
     throw new JSBundleProviderError({
       whatHappened: "None of the provided JSBundleProviders was able to load a bundle",
       howCanItBeFixed: reducedError.getSuggestions(),
-      originalErrorOrContextData: reducedError.getDetails()
+      extraData: reducedError.getDetails()
     })
   }
 

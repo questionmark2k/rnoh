@@ -346,8 +346,8 @@ export class RNInstanceImpl implements RNInstance {
       } else {
         this.logger.error(new RNOHError({
           whatHappened: "Couldn't run a JS bundle",
-          howCanItBeFixed: ["Please report this problem"],
-          originalErrorOrContextData: err
+          howCanItBeFixed: ["Fix your application code. It probably can't be compiled or an error was thrown at the top-level."],
+          extraData: err,
         }))
       }
     } finally {

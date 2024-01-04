@@ -23,10 +23,9 @@ const RNOH_BANNER = '\n\n\n' +
   '██║  ██║██║ ╚████║╚██████╔╝██║  ██║' + '\n' +
   '╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝' + '\n\n'
 
-export type ErrorEventEmitter = EventEmitter<{ "NEW_ERROR": [RNOHError] }>
 
 export abstract class RNAbility extends UIAbility {
-  public errorEventEmitter: ErrorEventEmitter = new EventEmitter()
+  public eventEmitter: EventEmitter<{ "NEW_ERROR": [RNOHError] }> = new EventEmitter()
   protected lastError: RNOHError | null = null
   protected storage: LocalStorage
   protected napiBridge: NapiBridge = null
@@ -93,7 +92,7 @@ export abstract class RNAbility extends UIAbility {
 
   public reportError(err: RNOHError) {
     this.lastError = err
-    this.errorEventEmitter.emit("NEW_ERROR", err)
+    this.eventEmitter.emit("NEW_ERROR", err)
   }
 
   protected getJSPackagerClientConfig(): JSPackagerClientConfig | null {

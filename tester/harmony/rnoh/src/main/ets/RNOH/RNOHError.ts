@@ -4,14 +4,15 @@ export class RNOHError extends Error {
       return `${idx + 1}) ${err.getMessage()}`
     }).join("\n")
     const suggestions = rnohErrors.flatMap(err => err.getSuggestions())
-    const details = rnohErrors.map(err => err.getDetails()).filter(d =>!!d).map((d, idx) => `${idx + 1}) ${d}`).join("\n")
-    return new RNOHError({ whatHappened: message, howCanItBeFixed: suggestions, originalErrorOrContextData: details })
+    const details = rnohErrors.map(err => err.getDetails()).filter(d =>!!d).map((d, idx) => `${idx + 1}) ${d.trim()}`).join("\n\n")
+    return new RNOHError({ whatHappened: message, howCanItBeFixed: suggestions, extraData: details })
   }
 
   constructor(private data: {
     whatHappened: string,
     howCanItBeFixed: string[]
-    originalErrorOrContextData?: any
+    extraData?: any
+    customStack?: string
   }) {
     super(data.whatHappened)
   }
@@ -24,19 +25,30 @@ export class RNOHError extends Error {
     return this.data.howCanItBeFixed
   }
 
+  getStack() {
+    return this.data.customStack ?? this.stack
+  }
+
   getDetails(): string {
-    if (!this.data.originalErrorOrContextData) {
+    if (!this.data.extraData) {
       return ""
     }
-    if (this.data.originalErrorOrContextData instanceof Error) {
-      return this.data.originalErrorOrContextData.message
+    if (this.data.extraData instanceof Error) {
+      return this.data.extraData.message.trim()
     }
-    if (typeof this.data.originalErrorOrContextData === "object" && "message" in this.data.originalErrorOrContextData) {
-      return this.data.originalErrorOrContextData.message
+    if (typeof this.data.extraData === "object" && "message" in this.data.extraData) {
+      return this.data.extraData.message.trim()
     }
-    if (typeof this.data.originalErrorOrContextData === "string") {
-      return this.data.originalErrorOrContextData
+    if (typeof this.data.extraData === "string") {
+      return this.data.extraData.trim()
     }
-    return ""
+    try {
+      return JSON.stringify(this.data.extraData, null, 2)
+    } catch (err) {
+      return ""
+    }
   }
+}
+
+export class FatalRNOHError extends RNOHError {
 }

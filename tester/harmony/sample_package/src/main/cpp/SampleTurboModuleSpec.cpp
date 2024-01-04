@@ -75,6 +75,13 @@ static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getPromisedAr
     return jsi::Value(static_cast<ArkTSTurboModule &>(turboModule).callAsync(rt, "getPromisedArray", args, count));
 }
 
+static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_displayRNOHError(jsi::Runtime &rt,
+                                                                                    react::TurboModule &turboModule,
+                                                                                    const jsi::Value *args,
+                                                                                    size_t count) {
+    return jsi::Value(static_cast<ArkTSTurboModule &>(turboModule).call(rt, "displayRNOHError", args, count));
+}
+
 NativeSampleTurboModuleSpecJSI::NativeSampleTurboModuleSpecJSI(const ArkTSTurboModule::Context ctx, const std::string name)
     : ArkTSTurboModule(ctx, name) {
     methodMap_["voidFunc"] = MethodMetadata{0, __hostFunction_NativeSampleTurboModuleSpecJSI_voidFunc};
@@ -86,4 +93,5 @@ NativeSampleTurboModuleSpecJSI::NativeSampleTurboModuleSpecJSI(const ArkTSTurboM
     methodMap_["registerFunction"] = MethodMetadata{1, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_registerFunction};
     methodMap_["getPromisedArray"] = MethodMetadata{0, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getPromisedArray};
     methodMap_["doAsyncJob"] = MethodMetadata{0, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_doAsyncJob};
+    methodMap_["displayRNOHError"] = MethodMetadata{1, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_displayRNOHError};
 }

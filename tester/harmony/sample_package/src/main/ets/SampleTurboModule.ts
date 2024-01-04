@@ -1,4 +1,4 @@
-import { TurboModule } from 'rnoh/ts';
+import { TurboModule, RNOHError } from 'rnoh/ts';
 
 export class SampleTurboModule extends TurboModule {
   voidFunc() {
@@ -51,5 +51,14 @@ export class SampleTurboModule extends TurboModule {
 
   getPromisedArray() {
     return Promise.resolve([1,2,3])
+  }
+
+  displayRNOHError(data: {
+    whatHappened: string,
+    howCanItBeFixed: string[]
+    extraData?: any
+    customStack?: string
+  }) {
+    this.ctx.logger.error(new RNOHError(data))
   }
 }
