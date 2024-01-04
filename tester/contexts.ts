@@ -1,3 +1,3 @@
 import React from 'react';
 
-export const InitialParamsContext = React.createContext(undefined);
+export const AppParamsContext = React.createContext(undefined);

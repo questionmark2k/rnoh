@@ -1,9 +1,14 @@
 import {TestSuite, TestCase} from '@rnoh/testerino';
 import React from 'react';
-import {InitialParamsContext} from '../contexts';
+import {AppParamsContext} from '../contexts';
+import {Button} from '../components';
+import {AppRegistry, Text} from 'react-native';
+import {name as appName} from '../app.json';
 
 export function AppRegistryTest() {
-  const initialProps = React.useContext<any>(InitialParamsContext);
+  const {initialProps, ...rest} = React.useContext<any>(AppParamsContext);
+
+  const [registry, setRegistry] = React.useState(AppRegistry.getRegistry());
 
   return (
     <TestSuite name="AppRegistry">
@@ -11,6 +16,83 @@ export function AppRegistryTest() {
         itShould="receive initialParams from the native side"
         fn={({expect}) => {
           expect(initialProps).not.to.be.undefined;
+        }}
+      />
+      <TestCase itShould="set surface props">
+        <Button
+          label="set surface props"
+          onPress={() => {
+            const newProps = {
+              ...rest,
+              initialProps: {...initialProps, foo: 'baz'},
+            };
+            AppRegistry.setSurfaceProps(appName, newProps);
+          }}
+        />
+      </TestCase>
+      <TestCase itShould="display registry">
+        <Text>{JSON.stringify(registry, null, 2)}</Text>
+      </TestCase>
+      <TestCase
+        itShould="register section when button is pressed"
+        initialState={false}
+        arrange={({setState}) => (
+          <Button
+            label="add section"
+            onPress={() => {
+              AppRegistry.registerSection('foo', () => () => null);
+              setRegistry(AppRegistry.getRegistry());
+              setState(true);
+            }}
+          />
+        )}
+        assert={({expect}) => {
+          const sectionKeys = AppRegistry.getSectionKeys();
+          expect(sectionKeys).to.include('foo');
+        }}
+      />
+      <TestCase
+        itShould="register runnable when button is pressed"
+        initialState={false}
+        arrange={({setState}) => (
+          <Button
+            label="add runnable"
+            onPress={() => {
+              AppRegistry.registerRunnable('foo', _ => {});
+              setRegistry(AppRegistry.getRegistry());
+              setState(true);
+            }}
+          />
+        )}
+        assert={({expect}) => {
+          const runnable = AppRegistry.getRunnable('foo');
+          expect(runnable).to.not.be.undefined;
+        }}
+      />
+      <TestCase
+        itShould="execute runnable when button is pressed"
+        initialState={undefined}
+        arrange={({setState}) => (
+          <Button
+            label="register and execute runnable"
+            onPress={() => {
+              AppRegistry.registerRunnable('bar', appParams => {
+                setState(appParams);
+              });
+              setRegistry(AppRegistry.getRegistry());
+              AppRegistry.runApplication('bar', {foo: 'bar'});
+            }}
+          />
+        )}
+        assert={({state, expect}) => {
+          expect(state).to.not.be.undefined;
+          expect(state).to.deep.eq({foo: 'bar'});
+        }}
+      />
+      <TestCase
+        itShould="return app keys"
+        fn={({expect}) => {
+          expect(AppRegistry.getAppKeys()).to.include(appName);
         }}
       />
     </TestSuite>
