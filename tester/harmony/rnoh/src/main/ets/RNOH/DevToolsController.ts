@@ -8,7 +8,7 @@ export class DevToolsController {
   constructor(private rnInstanceRegistry: RNInstanceRegistry) {
   }
 
-  reload(reason: string | undefined): void {
+  reload(reason: string | undefined = undefined): void {
     this.eventEmitter.emit("RELOAD", { reason })
   }
 

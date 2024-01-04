@@ -2,6 +2,7 @@ import { ComponentBuilderContext, RNOHLogger } from 'rnoh';
 import {
   RNApp,
   RNAbility,
+  RNOHErrorDialog,
   AnyJSBundleProvider,
   MetroJSBundleProvider,
   ResourceJSBundleProvider,
@@ -70,6 +71,9 @@ struct Index {
   build() {
     Column() {
       if (this.rnAbility && this.shouldShow) {
+        if (this.rnAbility.isDebugModeEnabled()) {
+          RNOHErrorDialog()
+        }
         RNApp({
           rnInstanceConfig: { createRNPackages },
           initialProps: { "foo": "bar" } as Record<string, string>,

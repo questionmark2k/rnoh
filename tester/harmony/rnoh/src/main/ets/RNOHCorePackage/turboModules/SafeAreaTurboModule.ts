@@ -1,3 +1,4 @@
+import type common from '@ohos.app.ability.common';
 import WindowUtils from '@ohos.window';
 import display from '@ohos.display';
 import type { TurboModuleContext } from "../../RNOH/ts";
@@ -6,17 +7,21 @@ import { StatusBarTurboModule } from "./StatusBarTurboModule"
 
 declare function px2vp(arg: number): number
 
+export interface StatusBarStatusProvider {
+  isStatusBarHidden(): boolean
+}
+
 export class SafeAreaTurboModule extends TurboModule {
   public static readonly NAME = 'SafeAreaTurboModule';
 
   static async create(ctx: TurboModuleContext, statusBarTurboModule: StatusBarTurboModule) {
-    const initialInsets = await this.createInsets(ctx, statusBarTurboModule)
+    const initialInsets = await this.createInsets(ctx.uiAbilityContext, statusBarTurboModule.isStatusBarHidden())
     const window = await WindowUtils.getLastWindow(ctx.uiAbilityContext)
     return new SafeAreaTurboModule(ctx, initialInsets, window, statusBarTurboModule)
   }
 
-  private static async createInsets(ctx: TurboModuleContext, statusBarTurboModule: StatusBarTurboModule): Promise<SafeAreaInsets> {
-    const win = await WindowUtils.getLastWindow(ctx.uiAbilityContext)
+  public static async createInsets(uiAbilityContext: common.UIAbilityContext, isStatusBarHidden: boolean): Promise<SafeAreaInsets> {
+    const win = await WindowUtils.getLastWindow(uiAbilityContext)
     const [displayCutoutInfo, systemAvoidArea, cutoutAvoidArea] = await Promise.all([
     display.getDefaultDisplaySync().getCutoutInfo(),
     win.getWindowAvoidArea(WindowUtils.AvoidAreaType.TYPE_SYSTEM),
@@ -30,7 +35,7 @@ export class SafeAreaTurboModule extends TurboModule {
       bottomRect: displayCutoutInfo.waterfallDisplayAreaRects.bottom
     }
     const avoidAreas = [cutoutAvoidArea, waterfallAvoidArea]
-    if (!statusBarTurboModule.isStatusBarHidden()) {
+    if (!isStatusBarHidden) {
       avoidAreas.push(systemAvoidArea)
     }
     const insets = getSafeAreaInsetsFromAvoidAreas(avoidAreas, win.getWindowProperties().windowRect)
@@ -45,7 +50,7 @@ export class SafeAreaTurboModule extends TurboModule {
   }
 
   private onSafeAreaChange() {
-    SafeAreaTurboModule.createInsets(this.ctx, this.ctx.rnInstance.getTurboModule(StatusBarTurboModule.NAME)).then((insets) => {
+    SafeAreaTurboModule.createInsets(this.ctx.uiAbilityContext, this.ctx.rnInstance.getTurboModule<StatusBarTurboModule>(StatusBarTurboModule.NAME).isStatusBarHidden()).then((insets) => {
       this.ctx.rnInstance.emitDeviceEvent("SAFE_AREA_INSETS_CHANGE", insets);
     })
   }

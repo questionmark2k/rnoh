@@ -1,16 +1,19 @@
+// @ts-ignore
+import libRNOHApp from 'librnoh_app.so'
 import UIAbility from '@ohos.app.ability.UIAbility';
 import { NapiBridge } from "./NapiBridge"
 import type { RNOHLogger } from "./RNOHLogger";
 import { StandardRNOHLogger } from "./RNOHLogger"
 import window from '@ohos.window';
 import type { TurboModuleProvider } from "./TurboModuleProvider"
-import libRNOHApp from 'librnoh_app.so'
 import { RNInstanceRegistry } from './RNInstanceRegistry';
 import { RNInstance, RNInstanceOptions, RNInstanceImpl } from './RNInstance';
 import { RNOHContext } from "./RNOHContext"
 import { DevToolsController } from "./DevToolsController"
 import { DevMenu } from "./DevMenu"
 import { JSPackagerClient, JSPackagerClientConfig } from "./JSPackagerClient"
+import { RNOHError } from "./RNOHError"
+import { EventEmitter } from "./EventEmitter"
 
 const RNOH_BANNER = '\n\n\n' +
   '██████╗ ███╗   ██╗ ██████╗ ██╗  ██╗' + '\n' +
@@ -20,7 +23,11 @@ const RNOH_BANNER = '\n\n\n' +
   '██║  ██║██║ ╚████║╚██████╔╝██║  ██║' + '\n' +
   '╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝' + '\n\n'
 
+export type ErrorEventEmitter = EventEmitter<{ "NEW_ERROR": [RNOHError] }>
+
 export abstract class RNAbility extends UIAbility {
+  public errorEventEmitter: ErrorEventEmitter = new EventEmitter()
+  protected lastError: RNOHError | null = null
   protected storage: LocalStorage
   protected napiBridge: NapiBridge = null
   protected turboModuleProvider: TurboModuleProvider
@@ -30,7 +37,7 @@ export abstract class RNAbility extends UIAbility {
   protected window: window.Window | undefined
   protected initializationDateTime: Date
   protected readinessDateTime: Date | undefined
-  protected isDebugModeEnabled: boolean = true
+  protected isDebugModeEnabled_: boolean = true
   protected jsPackagerClient: JSPackagerClient | undefined = undefined
 
   public devToolsController: DevToolsController
@@ -44,11 +51,11 @@ export abstract class RNAbility extends UIAbility {
     const stopTracing = this.logger.clone("onCreate").startTracing()
     this.napiBridge = new NapiBridge(libRNOHApp, this.providedLogger)
     const { isDebugModeEnabled } = this.napiBridge.onInit(this.shouldCleanUpRNInstance__hack())
-    this.isDebugModeEnabled = isDebugModeEnabled
+    this.isDebugModeEnabled_ = isDebugModeEnabled
     if (this.logger instanceof StandardRNOHLogger) {
-      this.logger.setMinSeverity(this.isDebugModeEnabled ? "debug" : "info")
+      this.logger.setMinSeverity(this.isDebugModeEnabled_ ? "debug" : "info")
     }
-    if (this.isDebugModeEnabled) {
+    if (this.isDebugModeEnabled_) {
       this.logger.warn("Debug mode is enabled. Performance is affected.")
     }
     this.rnInstanceRegistry = new RNInstanceRegistry(
@@ -69,8 +76,28 @@ export abstract class RNAbility extends UIAbility {
     stopTracing()
   }
 
+  onDestroy() {
+    const stopTracing = this.logger.clone("onDestroy").startTracing()
+    this.jsPackagerClient.onDestroy()
+    this.rnInstanceRegistry.forEach(instance => instance.onDestroy())
+    stopTracing()
+  }
+
+  public getLastError(): RNOHError | null {
+    return this.lastError
+  }
+
+  public isDebugModeEnabled() {
+    return this.isDebugModeEnabled_
+  }
+
+  public reportError(err: RNOHError) {
+    this.lastError = err
+    this.errorEventEmitter.emit("NEW_ERROR", err)
+  }
+
   protected getJSPackagerClientConfig(): JSPackagerClientConfig | null {
-    if (!this.isDebugModeEnabled) {
+    if (!this.isDebugModeEnabled_) {
       return null
     }
     return {
@@ -82,15 +109,6 @@ export abstract class RNAbility extends UIAbility {
   protected shouldCleanUpRNInstance__hack(): boolean {
     return false
   }
-
-  onDestroy() {
-    const stopTracing = this.logger.clone("onDestroy").startTracing()
-    this.jsPackagerClient.onDestroy()
-    this.rnInstanceRegistry.forEach(instance => instance.onDestroy())
-    stopTracing()
-  }
-
-
 
   public markReadiness(): void {
     if (!this.readinessDateTime) {
@@ -123,7 +141,7 @@ export abstract class RNAbility extends UIAbility {
   }
 
   protected createLogger(): RNOHLogger {
-    return new StandardRNOHLogger();
+    return new StandardRNOHLogger(this);
   }
 
   public getLogger(): RNOHLogger {

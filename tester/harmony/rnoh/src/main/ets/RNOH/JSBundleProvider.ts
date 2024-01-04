@@ -1,4 +1,5 @@
 import type resmgr from '@ohos.resourceManager';
+import { RNOHError } from "./RNOHError"
 import { RNOHLogger } from './RNOHLogger';
 import urlUtils from '@ohos.url';
 import { fetchDataFromUrl } from './HttpRequestHelper';
@@ -23,10 +24,7 @@ export abstract class JSBundleProvider {
 }
 
 
-export class JSBundleProviderError extends Error {
-  constructor(private msg: string, public originalError: unknown = undefined) {
-    super(msg)
-  }
+export class JSBundleProviderError extends RNOHError {
 }
 
 
@@ -49,7 +47,11 @@ export class ResourceJSBundleProvider extends JSBundleProvider {
       const bundle = bundleFileContent.buffer;
       return bundle;
     } catch (err) {
-      throw new JSBundleProviderError(`Couldn't load JSBundle from ${this.path}`, err)
+      throw new JSBundleProviderError({
+        whatHappened: `Couldn't load JSBundle from ${this.path}`,
+        originalErrorOrContextData: err,
+        howCanItBeFixed: [`Check if a bundle exists at "<YOUR_ENTRY_MODULE>/src/main/resources/rawfile/${this.path}". (You can create a JS bundle with "react-native bundle-harmony" command.`]
+      })
     }
   }
 }
@@ -60,9 +62,6 @@ export class MetroJSBundleProvider extends JSBundleProvider {
     return new MetroJSBundleProvider(`http://${ip}:${port}/index.bundle?platform=harmony&dev=true&minify=false`, appKeys)
   }
 
-  /**
-   * If "localhost" doesn't work, try reversed ports forwarding "hdc rport tcp:8081 tcp:8081".
-   */
   constructor(private bundleUrl: string = "http://localhost:8081/index.bundle?platform=harmony&dev=true&minify=false", private appKeys: string[] = []) {
     super()
   }
@@ -95,7 +94,22 @@ export class MetroJSBundleProvider extends JSBundleProvider {
       const response = await fetchDataFromUrl(this.bundleUrl, { headers: { 'Content-Type': 'text/javascript' } });
       return response.result;
     } catch (err) {
-      throw new JSBundleProviderError(`Couldn't load JSBundle from ${this.bundleUrl}`, err)
+      const suggestions = ["Is Metro server running? Did you run `react-native start`?"]
+      const hotReloadConfig = this.getHotReloadConfig()
+      if (hotReloadConfig) {
+        if (hotReloadConfig.host === "localhost") {
+          suggestions.push(`Try forwarding data from a device port to a host port (hdc rport tcp:${hotReloadConfig.port} tcp:${hotReloadConfig.port})`)
+          suggestions.push(`Are you testing on a real device? Did you connect it to your computer?`)
+        } else {
+          suggestions.push(`Are you testing on a real device? Is your phone connected to the same Wi-Fi network as your computer?`)
+          suggestions.push(`Are you testing on a real device? Does "${hotReloadConfig.host}" matches your computer IP in your local network? Did you use "react-native create-metro-host-constants-harmony"?`)
+        }
+      }
+      throw new JSBundleProviderError({
+        whatHappened: `Couldn't load JSBundle from ${this.bundleUrl}`,
+        originalErrorOrContextData: err,
+        howCanItBeFixed: suggestions
+      })
     }
   }
 }
@@ -106,7 +120,10 @@ export class AnyJSBundleProvider extends JSBundleProvider {
   constructor(private jsBundleProviders: JSBundleProvider[]) {
     super()
     if (jsBundleProviders.length === 0) {
-      throw new JSBundleProviderError("Expected at least 1 JS bundle provider")
+      throw new JSBundleProviderError({
+        whatHappened: "AnyJSBundleProvider received an empty list of providers",
+        howCanItBeFixed: ["Provide at least one JSBundleProvider to AnyJSBundleProvider"]
+      })
     }
   }
 
@@ -135,7 +152,12 @@ export class AnyJSBundleProvider extends JSBundleProvider {
         }
       }
     }
-    throw new JSBundleProviderError("None of the jsBundleProviders was able to load the bundle:", errors)
+    const reducedError = JSBundleProviderError.fromMultipleRNOHErrors(errors)
+    throw new JSBundleProviderError({
+      whatHappened: "None of the provided JSBundleProviders was able to load a bundle",
+      howCanItBeFixed: reducedError.getSuggestions(),
+      originalErrorOrContextData: reducedError.getDetails()
+    })
   }
 
   getHotReloadConfig(): HotReloadConfig | null {
