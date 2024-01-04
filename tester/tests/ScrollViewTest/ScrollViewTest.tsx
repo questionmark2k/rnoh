@@ -10,7 +10,8 @@ import {PointerEventsTest} from './PointerEventsTest';
 import {SnapTest} from './SnapTest';
 import {MomentumCallbacksTest} from './MomentumCallbacksTest';
 import {KeyboardTest} from './KeyboardTest';
-import {MiscPropsTest} from '../MiscTest';
+import {MiscPropsTest} from './MiscPropsTest';
+import {ScrollToTest} from './ScrollToTest';
 
 export function ScrollViewTest() {
   return (
@@ -23,6 +24,7 @@ export function ScrollViewTest() {
       <SnapTest />
       <MomentumCallbacksTest />
       <KeyboardTest />
+      <ScrollToTest />
       <MiscPropsTest />
       <TestCase
         modal

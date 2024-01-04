@@ -5,7 +5,7 @@ import {COMMON_PROPS, getScrollViewContent} from './fixtures';
 import {useEffect, useRef, useState} from 'react';
 import {Button, ObjectDisplayer} from '../../components';
 
-export function MiscProps() {
+export function MiscPropsTest() {
   return (
     <TestSuite name="misc props">
       <TestCase
