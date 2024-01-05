@@ -3,6 +3,7 @@ import {
   convertMeasuredFragmentsToPositionedFragments,
   reduceMeasuredFragments,
 } from './FragmentUtils';
+import {justifyLineOfMeasuredFragments} from './JustificationUtils';
 import type {
   ContainerConfig,
   Fragment,
@@ -87,7 +88,7 @@ export class UnhyphenatedWordWrapStrategy<
         isIgnoredIfBreaksLine: token.isIgnoredIfBreaksLine,
       };
     } else {
-      throw new ParagraphMeasurerError(`Unsupported fragment`);
+      throw new ParagraphMeasurerError('Unsupported fragment');
     }
   }
 
@@ -102,18 +103,44 @@ export class UnhyphenatedWordWrapStrategy<
         ((containerConfig.padding?.left ?? 0) +
           (containerConfig.padding?.right ?? 0));
     }
-    return this.distributeMeasuredTokensAcrossLines(
+    const isJustified = containerConfig.horizontalAlignment === 'justified';
+    const linesOfMeasuredTokens = this.distributeMeasuredTokensAcrossLines(
       measuredTokens,
       contentContainerWidth,
-    ).map(lineOfMeasuredTokens => ({
+    );
+    if (!isJustified) {
+      return linesOfMeasuredTokens.map(lineOfMeasuredTokens => ({
+        positionedFragments: convertMeasuredFragmentsToPositionedFragments(
+          reduceMeasuredFragments(lineOfMeasuredTokens),
+        ),
+        size: this.getLineSizeFromMeasuredTokens(lineOfMeasuredTokens),
+      }));
+    }
+
+    const reducedFragments = linesOfMeasuredTokens.map(reduceMeasuredFragments);
+    const linesOfJustifiedMeasuredFragments = reducedFragments.map(
+      (line, idx) => {
+        if (idx === reducedFragments.length - 1) {
+          return line;
+        }
+        return justifyLineOfMeasuredFragments(
+          line,
+          contentContainerWidth,
+          this.textFragmentMeasurer,
+        );
+      },
+    );
+    return linesOfJustifiedMeasuredFragments.map(lineOfMeasuredFragments => ({
       positionedFragments: convertMeasuredFragmentsToPositionedFragments(
-        reduceMeasuredFragments(lineOfMeasuredTokens),
+        lineOfMeasuredFragments,
       ),
-      size: this.getLineSizeFromMeasuredTokens(lineOfMeasuredTokens),
+      size: this.getLineSizeFromMeasuredTokens(lineOfMeasuredFragments),
     }));
   }
 
-  private getLineSizeFromMeasuredTokens(measuredTokens: MeasuredToken[]): Size {
+  private getLineSizeFromMeasuredTokens(
+    measuredTokens: MeasuredFragment[],
+  ): Size {
     const width = measuredTokens
       .map(measuredFragment => measuredFragment.size.width)
       .reduce((sum, width) => sum + width, 0);

@@ -75,7 +75,8 @@ export class RNParagraphManager extends RNViewManager {
         horizontalAlignment: ({
           left: 'start',
           center: 'center',
-          right: 'end'
+          right: 'end',
+          justified: 'justified'
         } as const)[textDescriptor.props.textAlign ?? "left"],
         maxNumberOfLines: textDescriptor.props.maximumNumberOfLines || undefined
       },

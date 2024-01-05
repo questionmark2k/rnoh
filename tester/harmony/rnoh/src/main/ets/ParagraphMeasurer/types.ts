@@ -44,7 +44,7 @@ export type MeasuredLine<TTextExtraData extends Record<string, any> = any> = {
   size: Size;
 };
 
-export type HorizontalAlignment = 'start' | 'center' | 'end';
+export type HorizontalAlignment = 'start' | 'center' | 'end' | 'justified';
 
 export type ContainerConfig = {
   width?: number;

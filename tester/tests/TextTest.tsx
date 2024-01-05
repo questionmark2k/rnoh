@@ -979,9 +979,7 @@ export function TextTest() {
             </Text>
           </View>
         </TestCase>
-        <TestCase
-          skip // justify: https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/388
-          itShould="show text with different horizontal alignments">
+        <TestCase itShould="show text with different horizontal alignments">
           <Text style={{textAlign: 'left'}}>
             <Text>Left: </Text>
             <Text style={{fontSize: 8}}>{SAMPLE_PARAGRAPH_TEXT}</Text>
@@ -1033,6 +1031,24 @@ export function TextTest() {
         </TestCase>
         <TestCase itShould="text should be disabled">
           <TextDisabledTest />
+        </TestCase>
+        <TestCase modal itShould="show justified text (manually added spaces)">
+          <Text
+            style={{
+              textAlign: 'justify',
+              backgroundColor: 'green',
+            }}>
+            <Text style={{fontSize: 16}}>Justify te st</Text>
+            <Text style={{fontSize: 8, backgroundColor: 'purple'}}>
+              Quis exercitation do eu in laboris nulla sit elit officia.
+              Incididunt ipsum aliquip IncididuntIncididunt commodo proident
+            </Text>
+            <Text style={{fontSize: 38, backgroundColor: 'blue'}}>
+              Quis exercitation do eu in laboris nulla sit elit officia.
+              Incididunt ipsum aliquip IncididuntIncididunrumbumlublum commodo
+              proident
+            </Text>
+          </Text>
         </TestCase>
         <TestCase
           modal
