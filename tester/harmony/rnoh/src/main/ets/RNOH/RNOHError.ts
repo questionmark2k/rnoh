@@ -33,14 +33,16 @@ export class RNOHError extends Error {
     if (!this.data.extraData) {
       return ""
     }
-    if (this.data.extraData instanceof Error) {
-      return this.data.extraData.message.trim()
-    }
-    if (typeof this.data.extraData === "object" && "message" in this.data.extraData) {
-      return this.data.extraData.message.trim()
-    }
     if (typeof this.data.extraData === "string") {
       return this.data.extraData.trim()
+    }
+    if (this.data.extraData instanceof Error) {
+      let lines = [`${this.data.extraData.name}: ${this.data.extraData.message}`]
+      for (let stackEntry of (this.data.extraData.stack ?? "").split("\n")) {
+        lines.push("")
+        lines.push(stackEntry)
+      }
+      return lines.join("\n")
     }
     try {
       return JSON.stringify(this.data.extraData, null, 2)

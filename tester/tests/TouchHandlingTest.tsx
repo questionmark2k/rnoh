@@ -2,6 +2,8 @@ import {TestCase, TestSuite} from '@rnoh/testerino';
 import {useEffect, useRef, useState} from 'react';
 import {
   Animated,
+  PanResponder,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -115,6 +117,11 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
+      <TestCase
+        modal
+        itShould="allow vertical scroll when flinging fast after horizontal swipe on gray area">
+        <ScrollViewLockedIssue />
+      </TestCase>
     </TestSuite>
   );
 }
@@ -255,3 +262,54 @@ const TouchIssue1 = ({onPress}: {onPress: () => void}) => {
     );
   }
 };
+
+class ScrollViewLockedIssue extends React.Component {
+  textInput: any;
+  blur = () => {
+    this.textInput.blur();
+  };
+  _gestureHandlers: any;
+  componentWillMount() {
+    this._gestureHandlers = PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponder: (event, gestureState) => {
+        const touchCapture =
+          Math.abs(gestureState.dx) > 10 || Math.abs(gestureState.dy) > 10;
+        console.log('====================touchCapture=' + touchCapture);
+        return touchCapture;
+      },
+      onMoveShouldSetPanResponderCapture: () => false,
+      onPanResponderMove: (_evt, _gestureState) => {
+        console.warn('move');
+      },
+    });
+  }
+
+  render(): React.ReactNode {
+    return (
+      <ScrollView style={{height: '75%'}}>
+        <View style={{height: 100}}>
+          <Text>this is first part</Text>
+        </View>
+        <View
+          style={{height: 300, backgroundColor: 'green'}}
+          {...this._gestureHandlers.panHandlers}>
+          <Text>this is second part</Text>
+        </View>
+        <View
+          style={{
+            height: 800,
+            backgroundColor: 'yellow',
+          }}
+          {...this._gestureHandlers.panHandlers}>
+          <TouchableOpacity onPress={() => console.log('1111111')}>
+            <Text style={{backgroundColor: 'gray', height: 100}}>
+              SWIPE HORIZONTALLY HERE
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
+}

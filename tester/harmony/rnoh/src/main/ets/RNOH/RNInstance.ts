@@ -243,24 +243,32 @@ export class RNInstanceImpl implements RNInstance {
   }
 
   private onCppMessage(type: string, payload: any) {
-    switch (type) {
-      case "SCHEDULER_DID_SET_IS_JS_RESPONDER": {
-        if (payload.blockNativeResponder) {
-          this.responderLockDispatcher.onBlockResponder(payload.tag)
-        } else {
-          this.responderLockDispatcher.onUnblockResponder(payload.tag)
+    try {
+      switch (type) {
+        case "SCHEDULER_DID_SET_IS_JS_RESPONDER": {
+          if (payload.blockNativeResponder) {
+            this.responderLockDispatcher.onBlockResponder(payload.tag, "REACT_NATIVE")
+          } else {
+            this.responderLockDispatcher.onUnblockResponder(payload.tag, "REACT_NATIVE")
+          }
+          break;
         }
-        break;
+        default:
+          this.logger.error(`Unknown action: ${type}`)
       }
-      default:
-        this.logger.error(`Unknown action: ${type}`)
+    } catch (err) {
+      this.logger.error(new RNOHError({
+        whatHappened: `Failed to handle CPP Message: ${type}`,
+        howCanItBeFixed: [],
+        extraData: err
+      }))
     }
   }
 
   public blockComponentsGestures(tag: Tag) {
-    this.responderLockDispatcher.onBlockResponder(tag)
+    this.responderLockDispatcher.onBlockResponder(tag, "EXTERNAL")
     return () => {
-      this.responderLockDispatcher.onUnblockResponder(tag)
+      this.responderLockDispatcher.onUnblockResponder(tag, "EXTERNAL")
     }
   }
 
