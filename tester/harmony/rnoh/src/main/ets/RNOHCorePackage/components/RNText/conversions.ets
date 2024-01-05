@@ -1,5 +1,5 @@
 import { convertColorSegmentsToString } from '../../../RNOH/CppBridgeUtils';
-import { EllipsizeMode, TextShadowProps } from './types';
+import { EllipsizeMode, TextRawProps, TextShadowProps } from './types';
 
 export function stringToAlignment(alignment?: string) {
   switch (alignment) {
@@ -142,4 +142,21 @@ export function getTextDecorationLine(textDecorationLine: number | undefined) {
     default:
       return TextDecorationType.None;
   }
+}
+
+export function getFontSize(fontSize: number | undefined, rawProps: TextRawProps) {
+  if (!fontSize) {
+    return undefined;
+  }
+  const pixelUnit = rawProps.allowFontScaling ? 'fp' : 'vp';
+  return `${fontSize}${pixelUnit}`;
+}
+
+export function getMinFontSize(fontSize: number | undefined, rawProps: TextRawProps) {
+  if (!fontSize || !rawProps.minimumFontScale || !rawProps.adjustsFontSizeToFit) {
+    return undefined;
+  }
+  const pixelUnit = rawProps.allowFontScaling ? 'fp' : 'vp';
+  const size = Number(fontSize) * rawProps.minimumFontScale;
+  return `${size}${pixelUnit}`;
 }

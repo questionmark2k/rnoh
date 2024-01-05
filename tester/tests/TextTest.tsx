@@ -1169,6 +1169,19 @@ export function TextTest() {
             </Text>
           </View>
         </TestCase>
+        <TestCase modal itShould="adjust text size to fit the container">
+          <TextAdjustsFontSizeToFitTest />
+        </TestCase>
+        <TestCase modal itShould="render text with allowFontScaling">
+          <Text allowFontScaling>Scaled</Text>
+          <Text allowFontScaling={false}>Not scaled</Text>
+          <Text style={{fontSize: 40}} allowFontScaling>
+            Scaled big
+          </Text>
+          <Text style={{fontSize: 40}} allowFontScaling={false}>
+            Not scaled big
+          </Text>
+        </TestCase>
       </TestSuite>
     </TestSuite>
   );
@@ -1304,6 +1317,26 @@ const TextPressNestedTest = () => {
           </Text>
         </Text>
       </View>
+    </View>
+  );
+};
+
+const TextAdjustsFontSizeToFitTest = () => {
+  const testCases = [
+    {adjustsFontSizeToFit: true, minimumFontScale: 0.1},
+    {adjustsFontSizeToFit: true, minimumFontScale: 0.5},
+    {adjustsFontSizeToFit: true, minimumFontScale: 0.9},
+    {adjustsFontSizeToFit: false, minimumFontScale: 0.2},
+  ];
+  return (
+    <View style={{height: 400, marginTop: 50}}>
+      {testCases.map((testCase, index) => (
+        <View key={index} style={{backgroundColor: 'purple'}}>
+          <Text {...testCase} style={{fontSize: 50}} numberOfLines={1}>
+            4x Very long text Very long text Very long text Very long text
+          </Text>
+        </View>
+      ))}
     </View>
   );
 };

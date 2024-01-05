@@ -11,6 +11,8 @@ import {
   getMaxLines,
   ellipsizeModeToTextOverflow,
   getTextShadow,
+  getFontSize,
+  getMinFontSize,
   capitalizeTextIfNecessary,
 } from './conversions'
 import { AttributedFragment } from './types';
@@ -64,7 +66,10 @@ export struct RNSimpleText {
         .fontColor(convertColorSegmentsToString(this.fragment?.fontColor))
         .fontFamily(this.fragment?.fontFamily)
         .fontWeight(this.fragment?.fontWeight)
-        .fontSize(this.fragment?.fontSize)
+        .fontSize(getFontSize(this.fragment?.fontSize, this.descriptor.rawProps))
+        .minFontSize(getMinFontSize(this.fragment?.fontSize, this.descriptor.rawProps))
+        .maxFontSize(getFontSize(this.fragment?.fontSize, this.descriptor.rawProps))
+        .heightAdaptivePolicy(this.descriptor.rawProps.adjustsFontSizeToFit ? TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST : TextHeightAdaptivePolicy.MAX_LINES_FIRST)
         .fontStyle(stringToFontStyle(this.fragment?.fontStyle))
         .decoration({
           type: getTextDecorationLine(this.fragment?.textDecorationLine),
