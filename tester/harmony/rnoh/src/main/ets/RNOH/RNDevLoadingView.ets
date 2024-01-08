@@ -1,5 +1,5 @@
 import { RNAbility } from "./RNAbility"
-import { SafeAreaInsets, createSafeAreaInsets} from "./SafeAreaInsets"
+import { SafeAreaInsets, createSafeAreaInsets } from "./SafeAreaInsets"
 
 @Component
 export struct RNDevLoadingView {
@@ -24,18 +24,16 @@ export struct RNDevLoadingView {
   }
 
   build() {
-    Stack() {
-      if (this.safeAreaInsets && this.message) {
-        Text(this.message)
-          .fontColor("white")
-          .fontSize(12)
-          .backgroundColor("rgba(0,0,0,0.6)")
-          .width("100%")
-          .padding({ top: 8, bottom: 8 })
-          .position({ x: 0, y: this.useSafeAreaInsets ? this.safeAreaInsets.top : 0 })
-          .textAlign(TextAlign.Center)
-      }
-    }.width("100%").height("100%")
+    if (this.safeAreaInsets && this.message) {
+      Text(this.message)
+        .fontColor("white")
+        .fontSize(12)
+        .backgroundColor("rgba(0,0,0,0.6)")
+        .width("100%")
+        .padding({ top: 8, bottom: 8 })
+        .position({ x: 0, y: this.useSafeAreaInsets ? this.safeAreaInsets.top : 0 })
+        .textAlign(TextAlign.Center)
+    }
 
   }
 }
