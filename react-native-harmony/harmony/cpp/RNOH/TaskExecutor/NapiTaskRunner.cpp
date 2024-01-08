@@ -7,7 +7,7 @@
 
 namespace rnoh {
 
-NapiTaskRunner::NapiTaskRunner(napi_env env) : env(env) {
+NapiTaskRunner::NapiTaskRunner(napi_env env, ExceptionHandler exceptionHandler) : env(env), exceptionHandler(std::move(exceptionHandler)) {
     // NOTE: let's hope the JS runtime doesn't move between system threads...
     threadId = std::this_thread::get_id();
     auto loop = getLoop();
@@ -34,7 +34,11 @@ NapiTaskRunner::NapiTaskRunner(napi_env env) : env(env) {
         while (!tasksQueue.empty()) {
             auto task = std::move(tasksQueue.front());
             tasksQueue.pop();
+            try {
             task();
+            } catch (std::exception const &e) {
+                runner->exceptionHandler(e);
+            }
         }
 
         result = napi_close_handle_scope(runner->env, scope);
@@ -75,6 +79,10 @@ void NapiTaskRunner::runSyncTask(Task &&task) {
 
 bool NapiTaskRunner::isOnCurrentThread() const {
     return threadId == std::this_thread::get_id();
+}
+
+void NapiTaskRunner::setExceptionHandler(ExceptionHandler handler) {
+    exceptionHandler = std::move(handler);
 }
 
 uv_loop_t *NapiTaskRunner::getLoop() const {

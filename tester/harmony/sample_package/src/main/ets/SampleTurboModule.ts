@@ -61,4 +61,8 @@ export class SampleTurboModule extends TurboModule {
   }) {
     this.ctx.logger.error(new RNOHError(data))
   }
+
+  throwExceptionArk() {
+    throw new Error("Exception thrown from ArkTS")
+  }
 }

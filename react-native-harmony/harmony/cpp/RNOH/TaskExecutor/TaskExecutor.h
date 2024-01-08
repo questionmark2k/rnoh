@@ -19,6 +19,7 @@ enum TaskThread {
 class TaskExecutor {
   public:
     using Task = AbstractTaskRunner::Task;
+    using ExceptionHandler = AbstractTaskRunner::ExceptionHandler;
     using Shared = std::shared_ptr<TaskExecutor>;
     using Weak = std::weak_ptr<TaskExecutor>;
 
@@ -30,6 +31,8 @@ class TaskExecutor {
     bool isOnTaskThread(TaskThread thread) const;
 
     std::optional<TaskThread> getCurrentTaskThread() const;
+    
+    void setExceptionHandler(ExceptionHandler handler);
 
   private:
     std::array<std::shared_ptr<AbstractTaskRunner>, TaskThread::BACKGROUND + 1> m_taskRunners;

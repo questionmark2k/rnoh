@@ -53,4 +53,10 @@ std::optional<TaskThread> TaskExecutor::getCurrentTaskThread() const {
     }
 }
 
+void TaskExecutor::setExceptionHandler(ExceptionHandler handler) {
+    for (auto &taskRunner : m_taskRunners) {
+        taskRunner->setExceptionHandler(handler);
+    }
+}
+
 } // namespace rnoh

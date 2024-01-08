@@ -11,12 +11,13 @@
 #include <uv.h>
 
 #include "AbstractTaskRunner.h"
+#include "DefaultExceptionHandler.h"
 
 namespace rnoh {
 
 class NapiTaskRunner : public AbstractTaskRunner  {
   public:
-    NapiTaskRunner(napi_env env);
+    NapiTaskRunner(napi_env env, ExceptionHandler exceptionHandler = defaultExceptionHandler);
     ~NapiTaskRunner() override;
 
     NapiTaskRunner(const NapiTaskRunner &) = delete;
@@ -26,6 +27,8 @@ class NapiTaskRunner : public AbstractTaskRunner  {
     void runSyncTask(Task &&task) override;
 
     bool isOnCurrentThread() const override;
+
+    void setExceptionHandler(ExceptionHandler handler) override;
 
   private:
     napi_env env;
@@ -37,6 +40,7 @@ class NapiTaskRunner : public AbstractTaskRunner  {
     std::thread::id threadId;
     std::condition_variable cv;
     std::shared_ptr<std::atomic_bool> running = std::make_shared<std::atomic_bool>(true);
+    ExceptionHandler exceptionHandler;
 };
 
 } // namespace rnoh

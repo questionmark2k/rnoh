@@ -8,12 +8,13 @@
 #include <thread>
 
 #include "AbstractTaskRunner.h"
+#include "DefaultExceptionHandler.h"
 
 namespace rnoh {
 
 class ThreadTaskRunner : public AbstractTaskRunner {
   public:
-    ThreadTaskRunner(std::string name);
+    ThreadTaskRunner(std::string name, ExceptionHandler exceptionHandler = defaultExceptionHandler);
     ~ThreadTaskRunner() override;
 
     ThreadTaskRunner(const ThreadTaskRunner &) = delete;
@@ -23,6 +24,8 @@ class ThreadTaskRunner : public AbstractTaskRunner {
     void runSyncTask(Task &&task) override;
 
     bool isOnCurrentThread() const override;
+
+    void setExceptionHandler(ExceptionHandler handler) override;
 
   private:
     void runLoop();
@@ -38,6 +41,7 @@ class ThreadTaskRunner : public AbstractTaskRunner {
     std::queue<std::function<void()>> syncTaskQueue;
     std::mutex mutex;
     std::condition_variable cv;
+    ExceptionHandler exceptionHandler;
 };
 
 } // namespace rnoh

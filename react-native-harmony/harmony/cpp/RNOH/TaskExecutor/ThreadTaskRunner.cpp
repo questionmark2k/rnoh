@@ -5,7 +5,7 @@
 
 namespace rnoh {
 
-ThreadTaskRunner::ThreadTaskRunner(std::string name) : name(name) {
+ThreadTaskRunner::ThreadTaskRunner(std::string name, ExceptionHandler exceptionHandler) : name(name), exceptionHandler(std::move(exceptionHandler)) {
     thread = std::thread([this] { runLoop(); });
     auto handle = thread.native_handle();
     pthread_setname_np(handle, name.c_str());
@@ -52,6 +52,10 @@ bool ThreadTaskRunner::isOnCurrentThread() const {
     return std::this_thread::get_id() == thread.get_id();
 }
 
+void ThreadTaskRunner::setExceptionHandler(ExceptionHandler handler) {
+    exceptionHandler = std::move(handler);
+}
+
 void ThreadTaskRunner::runLoop() {
     while (running) {
         std::unique_lock<std::mutex> lock(mutex);
@@ -66,8 +70,7 @@ void ThreadTaskRunner::runLoop() {
             try {
                 task();
             } catch (std::exception const &e) {
-                LOG(ERROR) << "Exception thrown in sync task";
-                LOG(ERROR) << e.what();
+                exceptionHandler(e);
             }
             // notify the threads that called runSyncTask.
             // it's not enough to notify one thread,
@@ -83,13 +86,7 @@ void ThreadTaskRunner::runLoop() {
             try {
                 task();
             } catch (std::exception const &e) {
-                LOG(ERROR) << "Exception thrown in task";
-                LOG(ERROR) << e.what();
-                try {
-                    std::rethrow_if_nested(e);
-                } catch (const std::exception &nested) {
-                    LOG(ERROR) << nested.what();
-                }
+                exceptionHandler(e);
             }
         }
     }

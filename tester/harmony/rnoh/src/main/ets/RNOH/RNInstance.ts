@@ -254,6 +254,15 @@ export class RNInstanceImpl implements RNInstance {
           }
           break;
         }
+        case "RNOH_ERROR": {
+          this.logger.error(new RNOHError({
+            whatHappened: payload.message,
+            howCanItBeFixed: [],
+            customStack: payload.stack,
+            extraData: payload.nested,
+          }));
+          break;
+        }
         default:
           this.logger.error(`Unknown action: ${type}`)
       }

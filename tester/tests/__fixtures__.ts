@@ -17,6 +17,8 @@ interface SampleTurboModuleProtocol {
     extraData?: any;
     customStack?: string;
   }): void;
+  throwExceptionCpp(): never;
+  throwExceptionArk(): never;
 }
 
 interface Spec extends TurboModule, SampleTurboModuleProtocol {}

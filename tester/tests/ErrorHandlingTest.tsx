@@ -39,6 +39,34 @@ export function ErrorHandlingTest() {
           extraData: {foo: 'bar'},
         }}
       />
+      <TestCase itShould="display exception thrown from turbomodule (CPP)">
+        <Button
+          label="Throw Exception"
+          onPress={() => {
+            SampleTurboModule.throwExceptionCpp();
+          }}
+        />
+      </TestCase>
+      <TestCase itShould="display exception thrown from turbomodule (ArkTS)">
+        <Button
+          label="Throw Exception"
+          onPress={() => {
+            SampleTurboModule.throwExceptionArk();
+          }}
+        />
+      </TestCase>
+      <TestCase itShould="not display error when exception is caught">
+        <Button
+          label="Throw Exception"
+          onPress={() => {
+            try {
+              SampleTurboModule.throwExceptionCpp();
+            } catch (e) {
+              // do nothing
+            }
+          }}
+        />
+      </TestCase>
     </TestSuite>
   );
 }
