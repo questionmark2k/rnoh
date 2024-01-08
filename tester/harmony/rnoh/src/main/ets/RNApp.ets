@@ -1,5 +1,13 @@
 import { CustomComponentBuilder, LogBoxTurboModule } from './RNOHCorePackage';
-import { JSBundleProvider, RNAbility, RNInstance, RNInstanceOptions, RNOHLogger } from './RNOH';
+import {
+  JSBundleProvider,
+  RNAbility,
+  RNInstance,
+  RNInstanceOptions,
+  RNOHLogger,
+  RNOHContext,
+  RNDevLoadingView
+} from './RNOH';
 import { RNSurface, SurfaceConfig2 } from './RNSurface';
 import { LogBoxDialog } from "./LogBoxDialog"
 
@@ -45,6 +53,7 @@ export struct RNApp {
   private shouldDestroyRNInstance: boolean = false
   private cleanUpCallbacks: (() => void)[] = []
   private logger!: RNOHLogger
+  private ctx!: RNOHContext
 
   aboutToAppear() {
     this.init()
@@ -60,6 +69,7 @@ export struct RNApp {
     try {
       await (async () => {
         this.rnInstance = await this.getOrCreateRNInstance()
+        this.ctx = this.rnAbility.createRNOHContext({ rnInstance: this.rnInstance })
         this.logBoxDialogController = new CustomDialogController({
           cornerRadius: 0,
           customStyle: true,
@@ -135,13 +145,16 @@ export struct RNApp {
     Stack() {
       if (this.shouldShow) {
         RNSurface({
-          ctx: this.rnAbility.createRNOHContext({ rnInstance: this.rnInstance }),
+          ctx: this.ctx,
           surfaceConfig: {
             initialProps: this.initialProps ?? {},
             appKey: this.appKey,
           } as SurfaceConfig2,
           buildCustomComponent: this.buildCustomComponent,
         })
+      }
+      if (this.rnAbility!.isDebugModeEnabled()) {
+        RNDevLoadingView({ useSafeAreaInsets: true }).position({x: 0, y: 0})
       }
     }.width("100%")
     .height("100%")

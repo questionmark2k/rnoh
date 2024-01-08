@@ -118,7 +118,10 @@ export abstract class RNAbility extends UIAbility {
 
   public async createAndRegisterRNInstance(options: RNInstanceOptions): Promise<RNInstance> {
     const stopTracing = this.logger.clone("createAndRegisterRNInstance").startTracing()
-    const result = await this.rnInstanceRegistry.createInstance(options)
+    const result = await this.rnInstanceRegistry.createInstance({
+      ...options,
+      devToolsController: this.devToolsController
+    })
     stopTracing()
     return result
   }

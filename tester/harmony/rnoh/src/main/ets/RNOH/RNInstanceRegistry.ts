@@ -1,11 +1,11 @@
 import type common from '@ohos.app.ability.common';
-import type { RNInstance} from './RNInstance';
+import type { RNInstance } from './RNInstance';
 import { RNInstanceImpl } from './RNInstance';
 import type { NapiBridge } from './NapiBridge';
 import type { RNOHContext } from './RNOHContext';
 import type { RNOHLogger } from './RNOHLogger';
 import type { RNPackage, RNPackageContext } from './RNPackage';
-
+import type { DevToolsController } from "./DevToolsController"
 
 export class RNInstanceRegistry {
   private instanceMap: Map<number, RNInstanceImpl> = new Map();
@@ -20,7 +20,8 @@ export class RNInstanceRegistry {
 
   public async createInstance(
     options: {
-      createRNPackages: (ctx: RNPackageContext) => RNPackage[]
+      createRNPackages: (ctx: RNPackageContext) => RNPackage[],
+      devToolsController: DevToolsController,
     }
   ): Promise<RNInstance> {
     const id = this.napiBridge.getNextRNInstanceId();
@@ -30,6 +31,7 @@ export class RNInstanceRegistry {
       this.abilityContext,
       this.napiBridge,
       this.getDefaultProps(),
+      options.devToolsController,
       this.createRNOHContext
     )
     await instance.initialize(options.createRNPackages({}))

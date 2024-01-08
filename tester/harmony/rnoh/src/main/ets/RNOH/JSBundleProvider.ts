@@ -14,12 +14,16 @@ export interface HotReloadConfig {
 export abstract class JSBundleProvider {
   abstract getURL(): string
 
-  abstract getBundle(): Promise<ArrayBuffer>
+  abstract getBundle(onProgress?: (progress: number) => void): Promise<ArrayBuffer>
 
   abstract getAppKeys(): string[]
 
   getHotReloadConfig(): HotReloadConfig | null {
     return null
+  }
+
+  getHumanFriendlyURL(): string {
+    return this.getURL()
   }
 }
 
@@ -41,7 +45,7 @@ export class ResourceJSBundleProvider extends JSBundleProvider {
     return this.appKeys
   }
 
-  async getBundle() {
+  async getBundle(onProgress?: (progress: number) => void) {
     try {
       const bundleFileContent = await this.resourceManager.getRawFileContent(this.path);
       const bundle = bundleFileContent.buffer;
@@ -89,9 +93,9 @@ export class MetroJSBundleProvider extends JSBundleProvider {
     }
   }
 
-  async getBundle(): Promise<ArrayBuffer> {
+  async getBundle(onProgress?: (progress: number) => void): Promise<ArrayBuffer> {
     try {
-      const response = await fetchDataFromUrl(this.bundleUrl, { headers: { 'Content-Type': 'text/javascript' } });
+      const response = await fetchDataFromUrl(this.bundleUrl, { headers: { 'Content-Type': 'text/javascript' } }, onProgress);
       return response.result;
     } catch (err) {
       const suggestions = ["Is Metro server running? Did you run `react-native start`?"]
@@ -111,6 +115,11 @@ export class MetroJSBundleProvider extends JSBundleProvider {
         howCanItBeFixed: suggestions
       })
     }
+  }
+
+  getHumanFriendlyURL(): string {
+    const hotReloadConfig = this.getHotReloadConfig()!
+    return `${hotReloadConfig.host}:${hotReloadConfig.port}`
   }
 }
 
@@ -132,6 +141,11 @@ export class AnyJSBundleProvider extends JSBundleProvider {
     return jsBundleProvider?.getURL() ?? "?"
   }
 
+  getHumanFriendlyURL(): string {
+    const jsBundleProvider = this.pickedJSBundleProvider ?? this.jsBundleProviders[0]
+    return jsBundleProvider?.getHumanFriendlyURL() ?? "?"
+  }
+
   getAppKeys() {
     if (!this.pickedJSBundleProvider) {
       return []
@@ -139,11 +153,11 @@ export class AnyJSBundleProvider extends JSBundleProvider {
     return this.pickedJSBundleProvider.getAppKeys()
   }
 
-  async getBundle() {
+  async getBundle(onProgress?: (progress: number) => void) {
     const errors: JSBundleProviderError[] = []
     for (const jsBundleProvider of this.jsBundleProviders) {
       try {
-        const bundle = await jsBundleProvider.getBundle()
+        const bundle = await jsBundleProvider.getBundle(onProgress)
         this.pickedJSBundleProvider = jsBundleProvider;
         return bundle;
       } catch (err) {
@@ -181,9 +195,9 @@ export class TraceJSBundleProviderDecorator extends JSBundleProvider {
     return this.jsBundleProvider.getURL()
   }
 
-  async getBundle() {
+  async getBundle(onProgress?: (progress: number) => void) {
     const stopTracing = this.logger.clone('getBundle').startTracing()
-    const result = await this.jsBundleProvider.getBundle()
+    const result = await this.jsBundleProvider.getBundle(onProgress)
     stopTracing()
     return result
   }
@@ -194,5 +208,9 @@ export class TraceJSBundleProviderDecorator extends JSBundleProvider {
 
   getHotReloadConfig(): HotReloadConfig {
     return this.jsBundleProvider.getHotReloadConfig()
+  }
+
+  getHumanFriendlyURL(): string {
+    return this.jsBundleProvider.getHumanFriendlyURL()
   }
 }

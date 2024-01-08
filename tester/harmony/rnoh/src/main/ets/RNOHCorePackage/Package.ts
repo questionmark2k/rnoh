@@ -20,7 +20,8 @@ import {
   StatusBarTurboModule,
   TimingTurboModule,
   WebSocketTurboModule,
-  LogBoxTurboModule
+  LogBoxTurboModule,
+  DevLoadingViewTurboModule
 } from './turboModules';
 import { LinkingManagerTurboModule } from './turboModules/LinkingManagerTurboModule';
 import { ViewDescriptorWrapper } from './components/ts';
@@ -58,6 +59,7 @@ const TURBO_MODULE_CLASS_BY_NAME: Record<string, typeof TurboModule> = {
   [WebSocketTurboModule.NAME]: WebSocketTurboModule,
   [I18nManagerTurboModule.NAME]: I18nManagerTurboModule,
   [LogBoxTurboModule.NAME]: LogBoxTurboModule,
+  [DevLoadingViewTurboModule.NAME]: DevLoadingViewTurboModule,
 };
 
 const EAGER_TURBO_MODULE_CLASS_BY_NAME = {

@@ -16,7 +16,7 @@ import type { Tag } from './DescriptorBase'
 import type { RNPackage, RNPackageContext } from './RNPackage'
 import type { TurboModule } from './TurboModule'
 import { ResponderLockDispatcher } from './ResponderLockDispatcher'
-import { JSPackagerClient } from './JSPackagerClient'
+import { DevToolsController } from './DevToolsController'
 import { RNOHError } from './RNOHError'
 
 export type SurfaceContext = {
@@ -43,6 +43,7 @@ export type LifecycleEventArgsByEventName = {
   }];
   RELOAD: [{ reason: string | undefined }];
 }
+
 
 export type BundleExecutionStatus = "RUNNING" | "DONE"
 
@@ -145,7 +146,6 @@ export class RNInstanceImpl implements RNInstance {
   private surfaceHandles: Set<SurfaceHandle> = new Set()
   private responderLockDispatcher: ResponderLockDispatcher
   private isFeatureFlagEnabledByName = new Map<FeatureFlagName, boolean>()
-  private jsPackagerClient: JSPackagerClient
 
   /**
    * @deprecated
@@ -160,6 +160,7 @@ export class RNInstanceImpl implements RNInstance {
     public abilityContext: common.UIAbilityContext,
     private napiBridge: NapiBridge,
     private defaultProps: Record<string, any>,
+    private devToolsController: DevToolsController,
     private createRNOHContext: (rnInstance: RNInstance) => RNOHContext
   ) {
     this.logger = injectedLogger.clone("RNInstance")
@@ -333,8 +334,11 @@ export class RNInstanceImpl implements RNInstance {
     const stopTracing = this.logger.clone("runJSBundle").startTracing()
     const bundleURL = jsBundleProvider.getURL()
     try {
+      this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id, `Loading from ${jsBundleProvider.getHumanFriendlyURL()}...`)
       this.bundleExecutionStatusByBundleURL.set(bundleURL, "RUNNING")
-      const jsBundle = await jsBundleProvider.getBundle()
+      const jsBundle = await jsBundleProvider.getBundle((progress) => {
+        this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id, `Loading from ${jsBundleProvider.getHumanFriendlyURL()} (${Math.round(progress * 100)}%)`)
+      })
       await this.napiBridge.loadScript(this.id, jsBundle, bundleURL)
       const hotReloadConfig = jsBundleProvider.getHotReloadConfig()
       if (hotReloadConfig) {
@@ -359,6 +363,7 @@ export class RNInstanceImpl implements RNInstance {
         }))
       }
     } finally {
+      this.devToolsController.eventEmitter.emit("HIDE_DEV_LOADING_VIEW", this.id)
       stopTracing()
     }
   }

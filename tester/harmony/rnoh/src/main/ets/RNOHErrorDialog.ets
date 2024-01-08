@@ -1,5 +1,5 @@
-import { RNAbility, Edges, RNOHError, FatalRNOHError } from "./RNOH"
-import { SafeAreaTurboModule } from "./RNOHCorePackage/turboModules"
+import { RNAbility, Edges, RNOHError, FatalRNOHError, createSafeAreaInsets } from "./RNOH"
+
 
 @Component
 export struct RNOHErrorDialog {
@@ -68,7 +68,7 @@ struct RNOHErrorCustomDialog {
     this.cleanUpListeners.push(this.rnAbility.eventEmitter.subscribe("NEW_ERROR", (err: RNOHError) => {
       this.handleError(err)
     }))
-    SafeAreaTurboModule.createInsets(this.rnAbility.context, false).then((insets) => {
+    createSafeAreaInsets(this.rnAbility.context, false).then((insets) => {
       this.insets = insets
     })
   }

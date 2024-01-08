@@ -10,7 +10,7 @@ export type FetchResult = {
   result: ArrayBuffer,
 }
 
-export async function fetchDataFromUrl(url: string, options: FetchOptions = { usingCache: true }): Promise<FetchResult> {
+export async function fetchDataFromUrl(url: string, options: FetchOptions = { usingCache: true }, onProgress?: (progress: number) => void): Promise<FetchResult> {
   return new Promise((resolve, reject) => {
     const httpRequest = http.createHttp();
     const dataChunks: ArrayBuffer[] = [];
@@ -27,6 +27,10 @@ export async function fetchDataFromUrl(url: string, options: FetchOptions = { us
         cleanUp();
       }
     }
+
+    httpRequest.on("dataReceiveProgress", ({receiveSize, totalSize}) => {
+      onProgress?.(receiveSize / totalSize)
+    })
 
     httpRequest.on("headersReceive", (data) => {
       headers = data;

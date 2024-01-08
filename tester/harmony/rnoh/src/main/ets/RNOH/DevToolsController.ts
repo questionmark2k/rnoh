@@ -3,7 +3,18 @@ import { EventEmitter } from "./EventEmitter"
 
 
 export class DevToolsController {
-  public eventEmitter = new EventEmitter<{ "RELOAD": [{ reason: string | undefined }], "DISMISS_RNOH_ERROR_DIALOG" }>()
+  public eventEmitter = new EventEmitter<{
+    "RELOAD": [{ reason: string | undefined }],
+    "DISMISS_RNOH_ERROR_DIALOG",
+    "SHOW_DEV_LOADING_VIEW": [
+      rnInstanceId: number,
+      message: string,
+      color?: number,
+      backgroundColor?: number
+    ],
+    "HIDE_DEV_LOADING_VIEW": [      rnInstanceId: number,
+    ]
+  }>()
 
   constructor(private rnInstanceRegistry: RNInstanceRegistry) {
   }
