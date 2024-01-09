@@ -326,6 +326,14 @@ export class RNInstanceImpl implements RNInstance {
   }
 
   public callRNFunction(moduleName: string, functionName: string, args: unknown[]): void {
+    if (this.lifecycleState === LifecycleState.BEFORE_CREATE) {
+      // wait until the bundle has been loaded before calling the function
+      const cancel = this.subscribeToLifecycleEvents("JS_BUNDLE_EXECUTION_FINISH", () => {
+        this.napiBridge.callRNFunction(this.id, moduleName, functionName, args);
+        cancel();
+      });
+      return;
+    }
     this.napiBridge.callRNFunction(this.id, moduleName, functionName, args)
   }
 
@@ -335,7 +343,7 @@ export class RNInstanceImpl implements RNInstance {
 
   public emitDeviceEvent(eventName: string, params: any) {
     this.logger.clone(`emitDeviceEvent`).debug(eventName)
-    this.napiBridge.callRNFunction(this.id, "RCTDeviceEventEmitter", "emit", [eventName, params]);
+    this.callRNFunction("RCTDeviceEventEmitter", "emit", [eventName, params]);
   }
 
   public getBundleExecutionStatus(bundleURL: string): BundleExecutionStatus | undefined {
@@ -353,12 +361,12 @@ export class RNInstanceImpl implements RNInstance {
       })
       this.initialBundleUrl = this.initialBundleUrl ?? bundleURL
       await this.napiBridge.loadScript(this.id, jsBundle, bundleURL)
+      this.lifecycleState = LifecycleState.READY
       const hotReloadConfig = jsBundleProvider.getHotReloadConfig()
       if (hotReloadConfig) {
         this.callRNFunction("HMRClient", "setup", ["harmony", hotReloadConfig.bundleEntry, hotReloadConfig.host, hotReloadConfig.port, true])
         this.logger.info("Configured hot reloading")
       }
-      this.lifecycleState = LifecycleState.READY
       this.bundleExecutionStatusByBundleURL.set(bundleURL, "DONE")
       this.lifecycleEventEmitter.emit("JS_BUNDLE_EXECUTION_FINISH", {
         jsBundleUrl: bundleURL,
