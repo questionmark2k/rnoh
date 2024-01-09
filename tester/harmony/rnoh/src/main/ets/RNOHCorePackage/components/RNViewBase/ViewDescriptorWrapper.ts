@@ -1,19 +1,19 @@
 import {
-  convertColorValueToHex,
-  convertColorValueToColorSegments,
-  convertColorSegmentsToString,
-  ReadonlyTransformationMatrix,
-  TransformMatrix,
-  Descriptor,
   BorderStyle,
-  PointerEvents,
-  getTransformedVector,
+  CompactValue,
+  convertColorSegmentsToString,
+  convertColorValueToColorSegments,
+  convertColorValueToHex,
+  Corners,
+  Descriptor,
   DescriptorWrapper,
   Edges,
-  Corners,
-  CompactValue
-} from "../../../RNOH/ts"
-import { AccessibilityLevel, ViewBaseProps, ViewRawProps } from "./types"
+  getTransformedVector,
+  PointerEvents,
+  ReadonlyTransformationMatrix,
+  TransformMatrix
+} from '../../../RNOH/ts'
+import { AccessibilityLevel, ViewBaseProps, ViewRawProps } from './types'
 import matrix4 from '@ohos.matrix4'
 import { ShadowStyleIOS } from '../../../RNOH/RNTypes'
 
@@ -93,7 +93,7 @@ export class ViewDescriptorWrapperBase<TType extends string = string, TProps ext
       bottom: this.rawProps.borderBottomColor,
       start: this.rawProps.borderStartColor,
       end: this.rawProps.borderEndColor
-    }), (value) => convertColorValueToHex(value))
+    }), (value) => convertColorValueToHex(value, "#FF000000"))
   }
 
 

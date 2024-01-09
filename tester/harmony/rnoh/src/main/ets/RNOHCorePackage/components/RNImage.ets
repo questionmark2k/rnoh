@@ -1,4 +1,3 @@
-import { RemoteImageLoaderError } from '../../RemoteImageLoader/RemoteImageLoaderError';
 import { ColorSegments, Descriptor, getTintColorMatrix, RNOHContext } from '../../RNOH';
 import { ImageLoaderTurboModule } from '../turboModules/ImageLoaderTurboModule';
 import { RNViewBase, ViewBaseProps, ViewDescriptorWrapperBase, ViewRawProps } from './RNViewBase';
@@ -183,8 +182,12 @@ export struct RNImage {
         Image(this.imageSource.source)
           .accessibilityText(this.descriptor.rawProps.alt)
           .interpolation(ImageInterpolation.High)
-          .width("100%")
-          .height("100%")
+          .width(this.descriptorWrapper?.width)
+          .height(this.descriptorWrapper?.height)
+          .position({
+            x: 0,
+            y: 0,
+          })
           .autoResize(this.descriptor.rawProps.resizeMethod !== 'scale')
           .objectFit(this.getResizeMode(this.descriptor.props.resizeMode))
           .objectRepeat(this.descriptor.props.resizeMode === 4 ?
