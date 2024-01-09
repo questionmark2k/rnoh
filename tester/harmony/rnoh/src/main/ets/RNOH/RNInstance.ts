@@ -120,6 +120,8 @@ export interface RNInstance {
    * @returns a function that cancels this this effect
    */
   blockComponentsGestures(targetComponentTag: Tag): (() => void)
+
+  getInitialBundleUrl(): string | undefined
 }
 
 /**
@@ -146,6 +148,7 @@ export class RNInstanceImpl implements RNInstance {
   private surfaceHandles: Set<SurfaceHandle> = new Set()
   private responderLockDispatcher: ResponderLockDispatcher
   private isFeatureFlagEnabledByName = new Map<FeatureFlagName, boolean>()
+  private initialBundleUrl: string | undefined = undefined
 
   /**
    * @deprecated
@@ -348,6 +351,7 @@ export class RNInstanceImpl implements RNInstance {
       const jsBundle = await jsBundleProvider.getBundle((progress) => {
         this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id, `Loading from ${jsBundleProvider.getHumanFriendlyURL()} (${Math.round(progress * 100)}%)`)
       })
+      this.initialBundleUrl = this.initialBundleUrl ?? bundleURL
       await this.napiBridge.loadScript(this.id, jsBundle, bundleURL)
       const hotReloadConfig = jsBundleProvider.getHotReloadConfig()
       if (hotReloadConfig) {
@@ -434,6 +438,10 @@ export class RNInstanceImpl implements RNInstance {
       return this.componentNameByDescriptorType.get(descriptorType)!
     }
     return descriptorType
+  }
+
+  getInitialBundleUrl(): string | undefined {
+    return this.initialBundleUrl
   }
 }
 

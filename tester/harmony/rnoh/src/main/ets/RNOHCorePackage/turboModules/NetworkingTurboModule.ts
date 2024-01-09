@@ -68,6 +68,19 @@ export class NetworkingTurboModule extends TurboModule {
     throw new Error("Unsupported query response type");
   }
 
+  private encodeBody(data: Object): string | ArrayBuffer | Object {
+    if ('string' in data) {
+      return data.string as string
+    }
+    if ('base64' in data) {
+      const base64 = data.base64 as string;
+      const textEncoder = new util.TextEncoder();
+      const byteArray = textEncoder.encodeInto(base64);
+      return byteArray.buffer;
+    }
+    return data;
+  }
+
   sendRequest(query: Query, callback: (requestId: number) => void) {
     const requestId = this.createId()
 
@@ -83,13 +96,15 @@ export class NetworkingTurboModule extends TurboModule {
       this.sendEvent("didCompleteNetworkResponse", [requestId, error])
     }
 
+    const extraData = this.encodeBody(query.data);
+
     const httpRequest = http.createHttp();
     httpRequest.request(
       query.url,
       {
         method: this.REQUEST_METHOD_BY_NAME[query.method],
         header: query.headers,
-        extraData: query.data,
+        extraData: extraData,
         connectTimeout: query.timeout,
         readTimeout: query.timeout
       },
