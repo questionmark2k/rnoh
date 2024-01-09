@@ -11,7 +11,6 @@ TProps extends ViewBaseProps = ViewBaseProps,
 TState extends ViewBaseState = ViewBaseState,
 TRawProps extends ViewRawProps = ViewRawProps> = Descriptor<TType, TProps, TState, TRawProps>;
 
-
 /**
  * @deprecated: Use ViewBaseDescriptor instead.
  */
@@ -23,6 +22,7 @@ export struct RNViewBase {
   public tag: number = 0
   public componentManager!: RNViewManager;
   @Prop public customAlign: Alignment = Alignment.TopStart;
+  @Prop public controlsFocus: boolean = true;
   @BuilderParam public renderChildren: () => void
   @State private descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
   private unregisterDescriptorChangesListener?: () => void = undefined
@@ -102,8 +102,21 @@ export struct RNViewBase {
     return matrix4.init(rawTransformationMatrix as TransformMatrix)
   }
 
+  onClickEvent(): void {
+    if (this.controlsFocus) {
+      this.ctx.rnInstance.emitComponentEvent(this.tag, "onClick", {})
+    }
+  }
+
   build() {
     Stack() {
+      /**
+       * Focus hack: container components cannot be focused if they don't contain focusable children.
+       * An invisible button is added to a focusable View to avoid this problem.
+       */
+      if (this.controlsFocus && this.descriptorWrapper?.focusable) {
+        Button().width(0).height(0).padding(0).margin(0)
+      }
       this.renderChildren()
     }
     .align(this.customAlign)
@@ -125,5 +138,6 @@ export struct RNViewBase {
     .accessibilityText(this.descriptorWrapper?.accessibilityText)
     .accessibilityLevel(this.descriptorWrapper?.accessibilityLevel)
     .accessibilityDescription(this.descriptorWrapper?.accessibilityDescription)
+    .onClick(() => this.onClickEvent())
   }
 }

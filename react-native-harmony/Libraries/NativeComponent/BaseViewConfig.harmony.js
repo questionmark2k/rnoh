@@ -23,6 +23,18 @@ const bubblingEventTypes = {
       bubbled: 'onChange',
     },
   },
+  topFocus: {
+    phasedRegistrationNames: {
+      bubbled: 'onFocus',
+      captured: 'onFocusCapture',
+    },
+  },
+  topBlur: {
+    phasedRegistrationNames: {
+      bubbled: 'onBlur',
+      captured: 'onBlurCapture',
+    },
+  },
   topSelect: {
     phasedRegistrationNames: {
       captured: 'onSelectCapture',

@@ -173,7 +173,7 @@ export struct RNTextInput {
   }
 
   build() {
-    RNViewBase({ ctx: this.ctx, tag: this.tag, componentManager: this.componentManager }) {
+    RNViewBase({ ctx: this.ctx, tag: this.tag, componentManager: this.componentManager, controlsFocus: false }) {
       if (this.descriptor.props.multiline) {
         TextArea({ controller: this.areaController, placeholder: this.descriptor.props.placeholder, text: this.value })
           .fontColor(this.descriptorWrapper?.fontColor)
@@ -214,6 +214,7 @@ export struct RNTextInput {
           })
           .key(`TextInput@${this.tag}`)
           .onAppear(() => this.maybeFocusOnAppear())
+          .focusable(this.descriptorWrapper?.focusable ?? true)
       } else {
         TextInput({
           controller: this.inputController,
@@ -264,6 +265,7 @@ export struct RNTextInput {
           })
           .key(`TextInput@${this.tag}`)
           .onAppear(() => this.maybeFocusOnAppear())
+          .focusable(this.descriptorWrapper?.focusable ?? true)
       }
     }
   }

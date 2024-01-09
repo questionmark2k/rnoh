@@ -53,7 +53,8 @@ export struct RNSwitch {
     RNViewBase({
       ctx: this.ctx,
       tag: this.tag,
-      componentManager: this.componentManager
+      componentManager: this.componentManager,
+      controlsFocus: false,
     }) {
       Toggle({ type: ToggleType.Switch, isOn: this.descriptor.props.value })
         .margin(0)
@@ -61,9 +62,11 @@ export struct RNSwitch {
         .height("100%")
         .selectedColor(convertColorSegmentsToString(this.descriptor.props.trackColor))
         .switchPointColor(convertColorSegmentsToString(this.descriptor.props.thumbColor))
-        .onChange((isOn) => { this.onChange(isOn) })
+        .onChange((isOn) => {
+          this.onChange(isOn)
+        })
         .enabled(!this.descriptor.props.disabled)
-        .focusable(this.descriptor.rawProps.focusable ?? false)
+        .focusable(this.descriptor.rawProps.focusable ?? true)
     }
   }
 }

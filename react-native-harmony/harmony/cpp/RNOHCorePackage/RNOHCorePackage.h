@@ -55,6 +55,7 @@
 #include "RNOHCorePackage/EventEmitRequestHandlers/ModalEventEmitRequestHandler.h"
 #include "RNOHCorePackage/EventEmitRequestHandlers/SwitchEventEmitRequestHandler.h"
 #include "RNOHCorePackage/EventEmitRequestHandlers/ImageEventEmitRequestHandler.h"
+#include "RNOHCorePackage/EventEmitRequestHandlers/ViewEventEmitRequestHandler.h"
 
 namespace rnoh {
 
@@ -170,7 +171,8 @@ class RNOHCorePackage : public Package {
                 std::make_shared<ModalEventEmitRequestHandler>(),
                 std::make_shared<SwitchEventEmitRequestHandler>(),
                 std::make_shared<PullToRefreshViewEventEmitRequestHandler>(),
-                std::make_shared<ImageEventEmitRequestHandler>()};
+                std::make_shared<ImageEventEmitRequestHandler>(),
+                std::make_shared<ViewEventEmitRequestHandler>()};
     }
 };
 

@@ -11,6 +11,15 @@ class ViewComponentJSIBinder : public BaseComponentJSIBinder {
         events.setProperty(rt, "topTouchMove", createBubblingCapturedEvent(rt, "onTouchMove"));
         events.setProperty(rt, "topTouchEnd", createBubblingCapturedEvent(rt, "onTouchEnd"));
         events.setProperty(rt, "topTouchCancel", createBubblingCapturedEvent(rt, "onTouchCancel"));
+        events.setProperty(rt, "topFocus", createBubblingCapturedEvent(rt, "onFocus"));
+        events.setProperty(rt, "topBlur", createBubblingCapturedEvent(rt, "onBlur"));
+        return events;
+    }
+    facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
+        facebook::jsi::Object events(rt);
+
+        events.setProperty(rt, "topClick", createDirectEvent(rt, "onClick"));
+
         return events;
     }
 };

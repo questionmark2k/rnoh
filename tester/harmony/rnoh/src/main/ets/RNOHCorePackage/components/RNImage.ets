@@ -175,6 +175,7 @@ export struct RNImage {
     RNViewBase({
       ctx: this.ctx,
       tag: this.tag,
+      controlsFocus: false
     }) {
       // NOTE: this ensures we switch the image source, even if the new source is bad.
       // ArkUI keeps displaying the last "good" image when the passed source parameter changes
@@ -201,6 +202,7 @@ export struct RNImage {
             }
             this.imageSource = undefined;
           })
+          .focusable(this.descriptorWrapper?.focusable ?? false)
       }
     }
   }
