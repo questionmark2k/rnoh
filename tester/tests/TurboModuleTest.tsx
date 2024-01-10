@@ -1,5 +1,5 @@
 import {TestCase, TestSuite} from '@rnoh/testerino';
-import {SampleTurboModule} from './__fixtures__';
+import {SampleTurboModule} from 'react-native-harmony-sample-package';
 
 export function TurboModuleTest() {
   return (
