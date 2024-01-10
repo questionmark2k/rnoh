@@ -1,13 +1,1 @@
-{
-  "license": "ISC",
-  "types": "",
-  "devDependencies": {
-    "rnoh": "file:../rnoh"
-  },
-  "name": "rnoh-sample-package",
-  "description": "",
-  "main": "index.ets",
-  "type": "module",
-  "version": "0.0.1",
-  "dependencies": {}
-}
+{license:'ISC',types:'',devDependencies:{rnoh:'file:../rnoh'},name:'rnoh-sample-package',description:'',main:'index.ets',type:'module',version:'1.0.0',dependencies:{}}
