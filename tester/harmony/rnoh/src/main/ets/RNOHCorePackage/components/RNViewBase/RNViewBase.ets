@@ -102,8 +102,8 @@ export struct RNViewBase {
     return matrix4.init(rawTransformationMatrix as TransformMatrix)
   }
 
-  onClickEvent(): void {
-    if (this.controlsFocus) {
+  onClickEvent(event: ClickEvent): void {
+    if (this.controlsFocus && event.source !== SourceType.TouchScreen) {
       this.ctx.rnInstance.emitComponentEvent(this.tag, "onClick", {})
     }
   }
@@ -138,6 +138,6 @@ export struct RNViewBase {
     .accessibilityText(this.descriptorWrapper?.accessibilityText)
     .accessibilityLevel(this.descriptorWrapper?.accessibilityLevel)
     .accessibilityDescription(this.descriptorWrapper?.accessibilityDescription)
-    .onClick(() => this.onClickEvent())
+    .onClick((event: ClickEvent) => this.onClickEvent(event))
   }
 }
