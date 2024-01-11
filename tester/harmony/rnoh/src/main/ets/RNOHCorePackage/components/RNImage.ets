@@ -179,7 +179,7 @@ export struct RNImage {
     }) {
       // NOTE: this ensures we switch the image source, even if the new source is bad.
       // ArkUI keeps displaying the last "good" image when the passed source parameter changes
-      if (this.imageSource !== undefined) {
+      if (this.imageSource?.source !== undefined) {
         Image(this.imageSource.source)
           .accessibilityText(this.descriptor.rawProps.alt)
           .interpolation(ImageInterpolation.High)
