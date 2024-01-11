@@ -1,5 +1,5 @@
-import { RNInstanceRegistry } from "./RNInstanceRegistry"
-import { EventEmitter } from "./EventEmitter"
+import { RNInstanceRegistry } from './RNInstanceRegistry'
+import { EventEmitter } from './EventEmitter'
 
 
 export class DevToolsController {
@@ -26,6 +26,12 @@ export class DevToolsController {
   toggleElementInspector(): void {
     this.rnInstanceRegistry.forEach(rnInstance => {
       rnInstance.emitDeviceEvent("toggleElementInspector", {});
+    })
+  }
+
+  emitDevMenuShown(): void {
+    this.rnInstanceRegistry.forEach(rnInstance => {
+      rnInstance.emitDeviceEvent("RCTDevMenuShown", {});
     })
   }
 

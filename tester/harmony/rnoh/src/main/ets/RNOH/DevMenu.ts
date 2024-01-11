@@ -1,6 +1,6 @@
 import window from '@ohos.window';
-import { DevToolsController } from "./DevToolsController"
-import { RNOHLogger } from "./RNOHLogger"
+import { DevToolsController } from './DevToolsController';
+import { RNOHLogger } from './RNOHLogger';
 import type common from '@ohos.app.ability.common';
 
 
@@ -62,6 +62,7 @@ export class DevMenu {
         }
         uiContext.showAlertDialog(dialogParams)
         this.devMenuDialogVisible = true;
+        this.devToolsController.emitDevMenuShown();
       }
     }).catch(() => {
       this.logger.error("DevMenu dialog couldn't be displayed.");
