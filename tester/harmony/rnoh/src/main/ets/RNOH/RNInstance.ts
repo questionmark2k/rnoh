@@ -18,6 +18,7 @@ import type { TurboModule } from './TurboModule'
 import { ResponderLockDispatcher } from './ResponderLockDispatcher'
 import { DevToolsController } from './DevToolsController'
 import { RNOHError } from './RNOHError'
+import window from '@ohos.window'
 
 export type SurfaceContext = {
   width: number
@@ -42,6 +43,7 @@ export type LifecycleEventArgsByEventName = {
     appKeys: string[]
   }];
   RELOAD: [{ reason: string | undefined }];
+  WINDOW_SIZE_CHANGE: [windowSize: window.Size];
 }
 
 
@@ -424,6 +426,10 @@ export class RNInstanceImpl implements RNInstance {
 
   public onConfigurationUpdate(...args: Parameters<UIAbility["onConfigurationUpdate"]>) {
     this.lifecycleEventEmitter.emit("CONFIGURATION_UPDATE", ...args)
+  }
+
+  public onWindowSizeChange(windowSize: window.Size) {
+    this.lifecycleEventEmitter.emit("WINDOW_SIZE_CHANGE", windowSize);
   }
 
   private getNextSurfaceTag(): Tag {

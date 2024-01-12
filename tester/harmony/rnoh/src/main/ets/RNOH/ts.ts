@@ -25,3 +25,4 @@ export * from "./RNOHLogger"
 export * from "./RNOHError"
 export * from './JSPackagerClient'
 export * from "./SafeAreaInsets"
+export * from "./DisplayMetricsManager"

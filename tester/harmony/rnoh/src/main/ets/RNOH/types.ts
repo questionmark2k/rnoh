@@ -35,3 +35,16 @@ export type Corners<T> = {
 }
 
 export type PointerEvents = "auto" | "none" | "box-none" | "box-only"
+
+export type DisplayMetrics = {
+  windowPhysicalPixels: PhysicalPixels,
+  screenPhysicalPixels: PhysicalPixels,
+};
+
+export type PhysicalPixels = {
+  width: number,
+  height: number,
+  scale: number,
+  fontScale: number,
+  densityDpi: number,
+}

@@ -1,4 +1,3 @@
-import display from '@ohos.display';
 import { Size } from '../../RNOH';
 import { Descriptor, Tag } from '../../RNOH/DescriptorBase';
 import { RNOHContext } from '../../RNOH/RNOHContext';
@@ -41,10 +40,13 @@ struct ModalHostViewDialog {
   }
 
   updateState() {
-    const displayClass = display.getDefaultDisplaySync();
-    const height = px2vp(displayClass.height);
-    const width = px2vp(displayClass.width);
-    this.ctx.descriptorRegistry.setState<ModalHostViewState>(this.tag, { screenSize: { height, width } });
+    const windowPhysicalPixels = this.ctx.rnAbility.getDisplayMetrics()
+      .windowPhysicalPixels;
+    const height = px2vp(windowPhysicalPixels.height);
+    const width = px2vp(windowPhysicalPixels.width);
+    this.ctx.descriptorRegistry.setState<ModalHostViewState>(this.tag, {
+      screenSize: { height, width }
+    });
   }
 
   aboutToAppear() {
@@ -61,7 +63,7 @@ struct ModalHostViewDialog {
     })
     this.touchDispatcher = new TouchDispatcher(this.tag, this.ctx.rnInstance, this.ctx.logger);
     this.cleanUpCallbacks.push(
-      this.ctx.rnInstance.subscribeToLifecycleEvents("CONFIGURATION_UPDATE", (_newConfig) => {
+      this.ctx.rnInstance.subscribeToLifecycleEvents("WINDOW_SIZE_CHANGE", (_windowSize) => {
         this.updateState();
       })
     )

@@ -1,19 +1,21 @@
 // @ts-ignore
-import libRNOHApp from 'librnoh_app.so'
+import libRNOHApp from 'librnoh_app.so';
 import UIAbility from '@ohos.app.ability.UIAbility';
-import { NapiBridge } from "./NapiBridge"
-import type { RNOHLogger } from "./RNOHLogger";
-import { StandardRNOHLogger } from "./RNOHLogger"
+import { NapiBridge } from './NapiBridge';
+import type { RNOHLogger } from './RNOHLogger';
+import { StandardRNOHLogger } from './RNOHLogger';
 import window from '@ohos.window';
-import type { TurboModuleProvider } from "./TurboModuleProvider"
+import type { TurboModuleProvider } from './TurboModuleProvider';
 import { RNInstanceRegistry } from './RNInstanceRegistry';
-import { RNInstance, RNInstanceOptions, RNInstanceImpl } from './RNInstance';
-import { RNOHContext } from "./RNOHContext"
-import { DevToolsController } from "./DevToolsController"
-import { DevMenu } from "./DevMenu"
-import { JSPackagerClient, JSPackagerClientConfig } from "./JSPackagerClient"
-import { RNOHError } from "./RNOHError"
-import { EventEmitter } from "./EventEmitter"
+import { RNInstance, RNInstanceImpl, RNInstanceOptions } from './RNInstance';
+import { RNOHContext } from './RNOHContext';
+import { DevToolsController } from './DevToolsController';
+import { DevMenu } from './DevMenu';
+import { JSPackagerClient, JSPackagerClientConfig } from './JSPackagerClient';
+import { RNOHError } from './RNOHError';
+import { EventEmitter } from './EventEmitter';
+import { DisplayMetrics } from './types';
+import { DisplayMetricsManager } from './DisplayMetricsManager';
 
 const RNOH_BANNER = '\n\n\n' +
   '██████╗ ███╗   ██╗ ██████╗ ██╗  ██╗' + '\n' +
@@ -22,6 +24,7 @@ const RNOH_BANNER = '\n\n\n' +
   '██╔══██╗██║╚██╗██║██║   ██║██╔══██║' + '\n' +
   '██║  ██║██║ ╚████║╚██████╔╝██║  ██║' + '\n' +
   '╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝' + '\n\n'
+
 
 
 export abstract class RNAbility extends UIAbility {
@@ -38,6 +41,8 @@ export abstract class RNAbility extends UIAbility {
   protected readinessDateTime: Date | undefined
   protected isDebugModeEnabled_: boolean = true
   protected jsPackagerClient: JSPackagerClient | undefined = undefined
+  protected displayMetricsManager: DisplayMetricsManager = undefined
+  private unregisterWindowListenerCallback: () => void;
 
   public devToolsController: DevToolsController
   public devMenu: DevMenu
@@ -72,6 +77,7 @@ export abstract class RNAbility extends UIAbility {
     if (jsPackagerClientConfig) {
       this.jsPackagerClient.connectToMetroMessages(jsPackagerClientConfig)
     }
+    this.displayMetricsManager = new DisplayMetricsManager(this.logger);
     AppStorage.setOrCreate('RNAbility', this)
     stopTracing()
   }
@@ -80,6 +86,7 @@ export abstract class RNAbility extends UIAbility {
     const stopTracing = this.logger.clone("onDestroy").startTracing()
     this.jsPackagerClient.onDestroy()
     this.rnInstanceRegistry.forEach(instance => instance.onDestroy())
+    this.unregisterWindowListenerCallback();
     stopTracing()
   }
 
@@ -161,6 +168,12 @@ export abstract class RNAbility extends UIAbility {
     const logger = this.logger.clone("onWindowStageCreate")
     const stopTracing = logger.startTracing()
     const mainWindow = windowStage.getMainWindowSync()
+    mainWindow.on('windowSizeChange', (windowSize) => {
+      this.displayMetricsManager.updateWindowSize(windowSize);
+      this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onWindowSizeChange(windowSize))
+    })
+    this.unregisterWindowListenerCallback = () => mainWindow.off("windowSizeChange",
+      (windowSize) => this.displayMetricsManager.updateWindowSize(windowSize))
     this.onWindowSetup(mainWindow).then(async () => {
       windowStage.loadContent(this.getPagePath(), (err, data) => {
         if (err.code) {
@@ -174,6 +187,7 @@ export abstract class RNAbility extends UIAbility {
     }).finally(() => {
       stopTracing()
     })
+    this.displayMetricsManager.updateDisplayMetrics(mainWindow.getWindowProperties().windowRect)
   }
 
   onMemoryLevel(level) {
@@ -186,6 +200,7 @@ export abstract class RNAbility extends UIAbility {
 
   onConfigurationUpdate(config) {
     const stopTracing = this.logger.clone("onConfigurationUpdate").startTracing()
+    this.displayMetricsManager.updateDisplayMetrics()
     this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onConfigurationUpdate(config))
     stopTracing()
   }
@@ -216,4 +231,8 @@ export abstract class RNAbility extends UIAbility {
   }
 
   abstract getPagePath(): string
+
+  public getDisplayMetrics(): DisplayMetrics {
+    return this.displayMetricsManager.getDisplayMetrics();
+  }
 }
