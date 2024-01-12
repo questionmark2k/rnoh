@@ -41,6 +41,7 @@ export abstract class RNAbility extends UIAbility {
 
   public devToolsController: DevToolsController
   public devMenu: DevMenu
+  private inForeground: boolean = false;
 
   async onCreate(want, param) {
     this.initializationDateTime = new Date()
@@ -191,14 +192,20 @@ export abstract class RNAbility extends UIAbility {
 
   onForeground() {
     const stopTracing = this.logger.clone("onForeground").startTracing()
+    this.inForeground = true
     this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onForeground())
     stopTracing()
   }
 
   onBackground() {
     const stopTracing = this.logger.clone("onBackground").startTracing()
+    this.inForeground = false
     this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onBackground())
     stopTracing()
+  }
+
+  public getAbilityState(): "FOREGROUND" | "BACKGROUND" {
+    return this.inForeground ? "FOREGROUND" : "BACKGROUND";
   }
 
   onBackPress() {

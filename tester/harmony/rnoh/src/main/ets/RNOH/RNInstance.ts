@@ -420,7 +420,6 @@ export class RNInstanceImpl implements RNInstance {
   public onBackground() {
     this.lifecycleState = LifecycleState.PAUSED
     this.lifecycleEventEmitter.emit("BACKGROUND")
-
   }
 
   public onConfigurationUpdate(...args: Parameters<UIAbility["onConfigurationUpdate"]>) {
