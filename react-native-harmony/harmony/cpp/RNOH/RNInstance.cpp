@@ -157,7 +157,6 @@ void RNInstance::startSurface(react::Tag surfaceId,
             .width = width,
             .height = height};
         auto layoutContext = surfaceHandler->getLayoutContext();
-        surfaceHandler->setDisplayMode(react::DisplayMode::Suspended);
         layoutContext.viewportOffset = {viewportOffsetX, viewportOffsetY};
         layoutContext.pointScaleFactor = pixelRatio;
         surfaceHandler->constraintLayout(layoutConstraints, layoutContext);

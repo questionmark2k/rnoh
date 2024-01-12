@@ -99,6 +99,7 @@ export struct RNSurface {
 
   updateSurfaceConstraints() {
     if (this.shouldStartSurface) {
+      this.surfaceHandle.setDisplayMode(DisplayMode.Visible)
       this.surfaceHandle.start(
         {
           width: this.surfaceWidth,
@@ -108,7 +109,6 @@ export struct RNSurface {
           pixelRatio: vp2px(1)
         },
         this.initialProps)
-      this.surfaceHandle.setDisplayMode(DisplayMode.Visible)
       this.shouldStartSurface = false
     } else {
       this.surfaceHandle.updateConstraints({
