@@ -1,5 +1,38 @@
 # Changelog
 
+## v0.72.13
+- added `View::focusable` support
+- added `DevLoadingView` support
+- added `Text::adjustFontSizeToFit` support
+- added RedBox support
+- added LogBox support
+- added Layout inspector support
+- added `DevMenu` support
+- added hot reloading support
+- added `TextInput::allowFontScaling` support
+- added `Image::resizeMethod` support
+- removed `TextInput::onKeyPress`
+- fixed errors on loading `Image`
+- fixed border displaying in `Image`
+- fixed nested scrolling issues
+- fixed `textAlign: justify`
+- fixed timers not being cleaned up when TimingTurboModule was destroyed
+- fixed `Modal` not changing position after screen rotation
+- fixed `TextInputState` issues
+- fixed `TextInput` sending change event when value changed in props
+- fixed large bundles not being able to load from Metro
+- fixed issues with instance cleanup
+- fixed `ScrollView` offset not updating after content size changed
+- fixed native responder unlocking too soon
+- fixed problems with disabled components intercepting touches
+- fixed issues related to app teardown
+- fixed `RefreshControl::progressViewOffset`
+- fixed crashes with NativeAnimated destructor
+- fixed crashes when using `PanResponder`
+- fixed crashes on subsequent app starts
+- fixed `Animated.View` props animations
+- fixed `onPress` in nested `Text`
+
 ## v0.72.12
 - added `ScrollView::inverted` prop support
 - added more detailed logs
