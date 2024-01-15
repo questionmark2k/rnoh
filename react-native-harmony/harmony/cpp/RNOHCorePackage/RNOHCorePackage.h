@@ -13,6 +13,7 @@
 #include "RNOHCorePackage/TurboModules/AlertManagerTurboModule.h"
 #include "RNOHCorePackage/TurboModules/AppearanceTurboModule.h"
 #include "RNOHCorePackage/TurboModules/AppStateTurboModule.h"
+#include "RNOHCorePackage/TurboModules/BlobTurboModule.h"
 #include "RNOHCorePackage/TurboModules/DeviceEventManagerTurboModule.h"
 #include "RNOHCorePackage/TurboModules/DeviceInfoTurboModule.h"
 #include "RNOHCorePackage/TurboModules/ExceptionsManagerTurboModule.h"
@@ -68,6 +69,8 @@ class RNOHCoreTurboModuleFactoryDelegate : public TurboModuleFactoryDelegate {
             return std::make_shared<AppearanceTurboModule>(ctx, name);
         } else if (name == "AppState") {
             return std::make_shared<AppStateTurboModule>(ctx, name);
+        // } else if (name == "BlobModule") {
+        //     return std::make_shared<BlobTurboModule>(ctx, name);
         } else if (name == "DeviceEventManager") {
             return std::make_shared<DeviceEventManagerTurboModule>(ctx, name);
         } else if (name == "DeviceInfo") {

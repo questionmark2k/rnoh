@@ -86,14 +86,12 @@ export const NetworkingTest = () => {
       />
       <TestCase
         itShould="download data to a blob"
+        skip="BlobTurboModule support is not enabled"
         fn={async ({expect}) => {
           const response = await fetch('https://reactnative.dev/movies.json');
           const result = await response.blob();
           expect(result.size).to.be.eq(458);
         }}
-        // TODO: implement Blob support
-        // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/620
-        skip
       />
       <TestCase
         itShould="fail on bad url"

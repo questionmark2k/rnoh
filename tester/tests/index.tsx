@@ -7,6 +7,7 @@ export * from './AppRegistryTest';
 export * from './AppStateTest';
 export * from './AppearanceTest';
 export * from './BackHandlerTest';
+export * from './BlobTest';
 export * from './ButtonTest';
 export * from './ConsoleTest';
 export * from './CustomNativeComponentTest';

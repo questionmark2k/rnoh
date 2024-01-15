@@ -398,6 +398,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/AlertManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/AppearanceTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/AppStateTurboModule.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/BlobTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/DeviceEventManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/DeviceInfoTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/ExceptionsManagerTurboModule.cpp"

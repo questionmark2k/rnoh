@@ -4,6 +4,7 @@ import {
   AlertManagerTurboModule,
   AppearanceTurboModule,
   AppStateTurboModule,
+  BlobTurboModule,
   DeviceEventManagerTurboModule,
   DeviceInfoTurboModule,
   DevMenuTurboModule,
@@ -44,6 +45,8 @@ const TURBO_MODULE_CLASS_BY_NAME: Record<string, typeof TurboModule> = {
   [AlertManagerTurboModule.NAME]: AlertManagerTurboModule,
   [AppearanceTurboModule.NAME]: AppearanceTurboModule,
   [AppStateTurboModule.NAME]: AppStateTurboModule,
+  // commented out as BlobTurboModule isn't finished and it breaks things.
+  // [BlobTurboModule.NAME]: BlobTurboModule,
   [DeviceEventManagerTurboModule.NAME]: DeviceEventManagerTurboModule,
   [DevSettingsTurboModule.NAME]: DevSettingsTurboModule,
   [DevMenuTurboModule.NAME]: DevMenuTurboModule,

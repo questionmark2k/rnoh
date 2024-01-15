@@ -1,10 +1,12 @@
 import http from '@ohos.net.http'
 import util from "@ohos.util";
 
-import { TurboModule } from "../../RNOH/TurboModule";
+import { TurboModule } from "../../../RNOH/TurboModule";
+import { NetworkEventsDispatcher } from './NetworkEventDispatcher';
+import ArrayList from '@ohos.util.ArrayList';
 
 type ResponseType =
-  | 'base64'
+| 'base64'
   | 'blob'
   | 'text';
 
@@ -19,11 +21,18 @@ interface Query {
   withCredentials: boolean,
 }
 
+export type UriHandler = {
+  supports: (query: Query) => boolean;
+  fetch: (query: Query) => Object;
+}
+
 export class NetworkingTurboModule extends TurboModule {
   public static readonly NAME = 'Networking';
   private nextId: number = 0
   private requestMap: Map<number, http.HttpRequest> = new Map();
+  private networkEventDispatcher: NetworkEventsDispatcher = new NetworkEventsDispatcher(this.ctx.rnInstance)
   private base64Helper: util.Base64Helper = new util.Base64Helper();
+  private uriHandlers: ArrayList<UriHandler> = new ArrayList();
 
   private REQUEST_METHOD_BY_NAME: Record<string, http.RequestMethod> = {
     OPTIONS: http.RequestMethod.OPTIONS,
@@ -36,14 +45,22 @@ export class NetworkingTurboModule extends TurboModule {
     CONNECT: http.RequestMethod.CONNECT,
   }
 
+  addUriHandler(handler: UriHandler) {
+    this.uriHandlers.add(handler);
+  }
+
+  removeUriHandler(handler: UriHandler) {
+    this.uriHandlers.remove(handler);
+  }
+
   decodeBuffer(buf: ArrayBuffer): string {
     const textDecoder = util.TextDecoder.create();
     const byteArray = new Uint8Array(buf);
-    return textDecoder.decodeWithStream(byteArray, {stream: false});
+    return textDecoder.decodeWithStream(byteArray, { stream: false });
   }
 
-  async encodeResponse(query: Query, response: string | Object | ArrayBuffer): Promise<string | Object> {
-    if (query.responseType === 'text') {
+  async encodeResponse(response: string | Object | ArrayBuffer, responseType: ResponseType): Promise<string | Object> {
+    if (responseType === 'text') {
       if (typeof response === 'string') {
         return response;
       } else if (response instanceof ArrayBuffer) {
@@ -52,7 +69,7 @@ export class NetworkingTurboModule extends TurboModule {
         // NOTE: Object responses have been long deprecated in Ark, we don't expect them here
         throw new Error("INTERNAL: unexpected Object http response");
       }
-    } else if (query.responseType === 'base64') {
+    } else if (responseType === 'base64') {
       let byteArray: Uint8Array;
       if (typeof response === 'string') {
         const textEncoder = new util.TextEncoder();
@@ -81,24 +98,22 @@ export class NetworkingTurboModule extends TurboModule {
     return data;
   }
 
+
   sendRequest(query: Query, callback: (requestId: number) => void) {
     const requestId = this.createId()
+    const httpRequest = http.createHttp();
 
-    const onFinish = async (status: number, headers: Object, response: string | Object | ArrayBuffer) => {
-      this.sendEvent("didReceiveNetworkResponse", [requestId, status, headers, query.url])
-      const encodedResponse = await this.encodeResponse(query, response);
-      this.sendEvent("didReceiveNetworkData", [requestId, encodedResponse])
-      this.sendEvent("didCompleteNetworkResponse", [requestId, ""])
-    }
-
-    const onError = (status: number, headers: Object, error: string) => {
-      this.sendEvent("didReceiveNetworkResponse", [requestId, status, headers, query.url])
-      this.sendEvent("didCompleteNetworkResponse", [requestId, error])
+    for (const handler of this.uriHandlers) {
+      if (handler.supports(query)) {
+        const response = handler.fetch(query);
+        this.networkEventDispatcher.dispatchDidReceiveNetworkData(requestId, response);
+        this.networkEventDispatcher.dispatchDidCompleteNetworkResponse(requestId);
+        return;
+      }
     }
 
     const extraData = this.encodeBody(query.data);
 
-    const httpRequest = http.createHttp();
     httpRequest.request(
       query.url,
       {
@@ -108,16 +123,20 @@ export class NetworkingTurboModule extends TurboModule {
         connectTimeout: query.timeout,
         readTimeout: query.timeout
       },
-      (err, data) => {
+      async (err, data) => {
         if (!err) {
-          onFinish(data.responseCode, {}, data.result);
+          this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, data.responseCode, query.headers, query.url);
+          this.networkEventDispatcher.dispatchDidReceiveNetworkData(requestId, await this.encodeResponse(data.result, query.responseType));
+          this.networkEventDispatcher.dispatchDidCompleteNetworkResponse(requestId);
         } else {
-          onError(data?.responseCode ?? 0, {}, err.toString());
+          this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, data?.responseCode ?? 0, {
+          }, query.url)
+          this.networkEventDispatcher.dispatchDidCompleteNetworkResponseWithError(requestId, err.toString());
         }
         httpRequest.destroy();
         this.requestMap.delete(requestId)
       }
-    )
+    );
 
     this.requestMap.set(requestId, httpRequest);
     callback(requestId)
@@ -133,9 +152,5 @@ export class NetworkingTurboModule extends TurboModule {
 
   private createId(): number {
     return this.nextId++
-  }
-
-  private sendEvent(eventName: string, body: Object) {
-    this.ctx.rnInstanceManager.emitDeviceEvent(eventName, body)
   }
 }
