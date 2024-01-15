@@ -17,6 +17,7 @@ export interface RefreshLoadingProgressBuilderParams {
 }
 
 export const RN_PULL_TO_REFRESH_VIEW_NAME: string = "PullToRefreshView"
+
 export type PullToRefreshDescriptor = Descriptor<"PullToRefreshView", PullToRefreshProps, PullToRefreshState, PullToRefreshRawProps>
 
 @Component
@@ -66,6 +67,7 @@ export struct RNPullToRefreshView {
 
     // Emit this event only when a user initiated pull to refresh, not when RN changed `refreshing` prop.
     if ([RefreshStatus.Drag, RefreshStatus.OverDrag].includes(this.prevAndCurrentRefreshStatus[0])) {
+
       this.ctx.rnInstance.emitComponentEvent(
         this.descriptor.tag,
         "refresh",
@@ -80,7 +82,7 @@ export struct RNPullToRefreshView {
       .width('112px')
       .height('112px')
       .color(params.tintColor)
-      .translate({x: 0,y: (typeof params.progressOffsetView === 'number' ? params.progressOffsetView+ 'px' : 0)})
+      .translate({ x: 0, y: (typeof params.progressOffsetView === 'number' ? params.progressOffsetView + 'px' : 0) })
       .opacity(this.loadingOpacity)
       .animation({ duration: 300 })
   }
@@ -102,6 +104,12 @@ export struct RNPullToRefreshView {
       }
       if (refreshStatus === RefreshStatus.Inactive || refreshStatus === RefreshStatus.Done) {
         this.loadingOpacity = 0;
+      }
+
+      // React Native `refreshing` prop should be the only source of truth
+      const isRefreshing = !!this.descriptor.rawProps.refreshing;
+      if (refreshStatus === RefreshStatus.Refresh && !isRefreshing && this.isRefreshing) {
+        this.isRefreshing = isRefreshing;
       }
     })
     .onRefreshing(() => this.handleRefresh())

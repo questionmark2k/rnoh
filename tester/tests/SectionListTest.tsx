@@ -380,7 +380,7 @@ function DelayedDisplayer(props: {
   return <>{isVisible ? props.renderContent() : null}</>;
 }
 
-interface ViewToken<TItem> {
+export interface ViewTokenItem<TItem> {
   item: TItem;
   key: string;
   index: number | null;
@@ -389,8 +389,8 @@ interface ViewToken<TItem> {
 }
 
 type OnViewableItemsChangedType<TItem> = {
-  viewableItems: Array<ViewToken<TItem>>;
-  changed: Array<ViewToken<TItem>>;
+  viewableItems: Array<ViewTokenItem<TItem>>;
+  changed: Array<ViewTokenItem<TItem>>;
 };
 
 function SectionListRecordInteractionTest() {

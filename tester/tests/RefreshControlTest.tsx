@@ -1,4 +1,12 @@
-import {FlatList, RefreshControl, ScrollView, Text, View} from 'react-native';
+import {
+  FlatList,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {TestCase, TestSuite} from '@rnoh/testerino';
 import {useEffect, useState} from 'react';
 
@@ -65,6 +73,18 @@ export const RefreshControlTest = () => {
       >
         <PullToRefreshProgressViewOffset progressViewOffset={100} />
       </TestCase>
+      <TestCase
+        itShould="display double refresh control for 2 seconds in nested scroll view"
+        modal
+        skip={Platform.select({harmony: true, android: false})} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/770
+      >
+        <PullToRefreshInNestedScrollViews />
+      </TestCase>
+      <TestCase
+        itShould="display one refresh control - for 3 seconds in nested scroll view"
+        modal>
+        <PullToRefreshInNestedScrollViewsDifferentSource />
+      </TestCase>
     </TestSuite>
   );
 };
@@ -126,3 +146,176 @@ function PullToRefreshProgressViewOffset({
     </ScrollView>
   );
 }
+
+const wait = (timeout: number) => {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeout);
+  });
+};
+
+const PullToRefreshInNestedScrollViews = () => {
+  const [refreshing, setRefrehing] = useState(false);
+
+  const onRefresh = () => {
+    setRefrehing(true);
+    wait(2000).then(() => {
+      setRefrehing(false);
+    });
+  };
+
+  return (
+    <ScrollView
+      contentContainerStyle={styles.scrollView}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <ScrollView
+        contentContainerStyle={{
+          ...styles.scrollView,
+          backgroundColor: 'white',
+        }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+        <Text style={styles.text}>
+          inner-scrollView Press and hold down the area to refresh. The refresh
+          label does not bounce back
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView Press and hold down the area to refresh. The refresh
+          label does not bounce back
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView Press and hold down the area to refresh. The refresh
+          label does not bounce back
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView Press and hold down the area to refresh. The refresh
+          label does not bounce back
+        </Text>
+      </ScrollView>
+    </ScrollView>
+  );
+};
+
+const PullToRefreshInNestedScrollViewsDifferentSource = () => {
+  const [firstRefreshing, setFirstRefrehing] = useState(false);
+  const [secondRefreshing, setSecondRefrehing] = useState(false);
+
+  const onFirstsRefresh = () => {
+    setFirstRefrehing(true);
+    wait(3000).then(() => {
+      setFirstRefrehing(false);
+    });
+  };
+
+  const onSecondRefresh = () => {
+    setSecondRefrehing(true);
+    wait(4000).then(() => {
+      setSecondRefrehing(false);
+    });
+  };
+
+  return (
+    <ScrollView
+      contentContainerStyle={styles.scrollView}
+      refreshControl={
+        <RefreshControl
+          refreshing={firstRefreshing}
+          onRefresh={onFirstsRefresh}
+        />
+      }>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <Text>outer-scrollView</Text>
+      <ScrollView
+        contentContainerStyle={{
+          ...styles.scrollView,
+          backgroundColor: 'white',
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={secondRefreshing}
+            onRefresh={onSecondRefresh}
+          />
+        }>
+        <Text style={styles.text}>
+          inner-scrollView Press and hold down the area to refresh. The refresh
+          label does not bounce back
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView Press and hold down the area to refresh. The refresh
+          label does not bounce back
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView Press and hold down the area to refresh. The refresh
+          label does not bounce back
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
+        </Text>
+        <Text style={styles.text}>
+          inner-scrollView Press and hold down the area to refresh. The refresh
+          label does not bounce back
+        </Text>
+      </ScrollView>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: 'pink',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    backgroundColor: 'green',
+  },
+});

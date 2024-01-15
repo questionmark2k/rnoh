@@ -536,8 +536,8 @@ const MockedVideoPlayer = ({
         {playMockVideo
           ? 'Playing'
           : prefetchMockVideo
-          ? 'Prefetching...'
-          : 'Waiting to be visible'}
+            ? 'Prefetching...'
+            : 'Waiting to be visible'}
       </Text>
     </View>
   );
