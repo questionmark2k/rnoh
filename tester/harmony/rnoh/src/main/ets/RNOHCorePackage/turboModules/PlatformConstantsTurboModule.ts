@@ -5,7 +5,11 @@ export class PlatformConstantsTurboModule extends TurboModule {
   public static readonly NAME = 'PlatformConstants';
 
   getConstants() {
-    const versionParts = this.ctx.reactNativeVersion.split('.', 3);
+    let versionParts: unknown[] = this.ctx.reactNativeVersion.split('.', 3);
+    versionParts = versionParts.map(part => {
+      const asNumber = Number(part);
+      return isNaN(asNumber) ? part : asNumber;
+    });
 
     return {
       Model: deviceInfo.productModel,
