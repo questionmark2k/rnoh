@@ -363,7 +363,6 @@ export function ViewTest() {
           }}
         />
         <TestCase
-          skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/424
           itShould="call only outer when pressing inner view"
           initialState={{inner: false, outer: false, outerContainer: true}}
           arrange={({setState, reset}) => {

@@ -72,8 +72,6 @@ export struct RNViewBase {
         return HitTestMode.None
       case "box-none":
         return HitTestMode.None
-      case "box-only":
-        return HitTestMode.Block
       default:
         return HitTestMode.Default
     }
