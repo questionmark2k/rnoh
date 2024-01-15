@@ -1,4 +1,10 @@
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import {TestSuite, TestCase} from '@rnoh/testerino';
 import React, {useState} from 'react';
 import {Button} from '../components';
@@ -446,36 +452,56 @@ export function ViewTest() {
         }}
       />
       <TestCase
-        itShould="render view focusable with a non-touch input device"
-        skip
-        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/258
-      >
-        <View style={{width: '100%', height: 100}}>
-          <View
-            style={{
-              width: 100,
-              height: 100,
-              backgroundColor: 'blue',
-            }}
-            // @ts-ignore
-            tabIndex={0}
-            skip
-          />
-        </View>
-      </TestCase>
-      <TestCase itShould="render view not focusable with a non-touch input device">
-        <View style={{width: '100%', height: 100}}>
-          <View
-            style={{
-              width: 100,
-              height: 100,
-              backgroundColor: 'blue',
-            }}
-            // @ts-ignore
-            tabIndex={-1}
-          />
-        </View>
-      </TestCase>
+        itShould="blue view should not allow clicks with non-touch input device"
+        modal
+        initialState={{first: false, second: false, third: false}}
+        arrange={({setState}) => (
+          <View style={{width: '100%', height: 100, flexDirection: 'row'}}>
+            <TouchableWithoutFeedback
+              onPress={() => setState(prev => ({...prev, first: true}))}>
+              <View
+                style={{
+                  width: 76,
+                  height: 76,
+                  marginRight: 4,
+                  backgroundColor: 'red',
+                }}
+              />
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback
+              onPress={() => setState(prev => ({...prev, second: true}))}>
+              <View
+                style={{
+                  width: 76,
+                  height: 76,
+                  marginRight: 4,
+                  backgroundColor: 'blue',
+                }}
+                // @ts-ignore
+                tabIndex={-1}
+              />
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback
+              onPress={() => setState(prev => ({...prev, third: true}))}>
+              <View
+                style={{
+                  width: 76,
+                  height: 76,
+                  marginRight: 4,
+                  backgroundColor: 'red',
+                }}
+              />
+            </TouchableWithoutFeedback>
+          </View>
+        )}
+        assert={({state, expect}) => {
+          expect(state).to.be.deep.eq({
+            first: true,
+            second: false,
+            third: true,
+          });
+        }}
+      />
       <TestCase itShould="render view with fixed width and aspectRatio 1">
         <View style={{width: '100%', height: 100}}>
           <View
