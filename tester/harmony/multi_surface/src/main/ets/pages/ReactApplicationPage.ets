@@ -21,7 +21,7 @@ struct ReactApplicationPage {
       SampleView({
         ctx: ctx.rnohContext,
         tag: ctx.descriptor.tag,
-        buildCustomComponent: this.buildCustomComponent.bind(this)
+        buildCustomComponent: this.buildCustomComponent
       })
     } else if (ctx.descriptor.type === PropsDisplayer.NAME) {
       PropsDisplayer({
@@ -31,18 +31,17 @@ struct ReactApplicationPage {
     }
   }
 
-  onBackPress() {
-    return this.rnAbility?.onBackPress();
+  onBackPress(): boolean {
+    return this.rnAbility?.onBackPress() ?? false;
   }
 
   build() {
     Column() {
       RNApp({
         rnInstanceConfig: {createRNPackages},
-        initialProps: { foo: "bar" },
         appKey: "app_name",
-        buildCustomComponent: this.buildCustomComponent.bind(this),
-        jsBundleProvider: new AnyJSBundleProvider([new MetroJSBundleProvider(), new ResourceJSBundleProvider(this.rnAbility.context.resourceManager)]),
+        buildCustomComponent: this.buildCustomComponent,
+        jsBundleProvider: new AnyJSBundleProvider([new MetroJSBundleProvider(), new ResourceJSBundleProvider(this.rnAbility!.context.resourceManager)]),
       })
     }
     .height('100%')

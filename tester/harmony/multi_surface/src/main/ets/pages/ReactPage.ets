@@ -2,15 +2,20 @@ import type { ComponentBuilderContext} from 'rnoh';
 import { RNAbility, RNInstance, RNSurface, SurfaceHandle} from 'rnoh'
 import { SAMPLE_VIEW_TYPE, SampleView, PropsDisplayer } from 'rnoh-sample-package'
 import router from '@ohos.router'
+import { SurfaceConfig1 } from 'rnoh/src/main/ets/RNSurface';
+
+interface PageParams {
+  appKey: string
+}
 
 @Entry
 @Component
 struct ReactPage {
-  @State appKey: string = router.getParams()["appKey"]
+  @State appKey: string = (router.getParams() as PageParams).appKey
   @State surfaceHandle: SurfaceHandle | undefined = undefined;
   @State showSurface: boolean = false;
-  @StorageLink('RNAbility') private rnAbility: RNAbility = undefined
-  @StorageLink('AppRNInstance') rnInstance: RNInstance = undefined
+  @StorageLink('RNAbility') private rnAbility: RNAbility | undefined = undefined
+  @StorageLink('AppRNInstance') rnInstance: RNInstance | undefined = undefined
 
   @Builder
   buildCustomComponent(ctx: ComponentBuilderContext) {
@@ -18,7 +23,7 @@ struct ReactPage {
       SampleView({
         ctx: ctx.rnohContext,
         tag: ctx.descriptor.tag,
-        buildCustomComponent: this.buildCustomComponent.bind(this)
+        buildCustomComponent: this.buildCustomComponent
       })
     } else if (ctx.descriptor.type === PropsDisplayer.NAME) {
       PropsDisplayer({
@@ -28,27 +33,30 @@ struct ReactPage {
     }
   }
 
-  onBackPress() {
-    return this.rnAbility?.onBackPress();
+  onBackPress(): boolean {
+    return this.rnAbility?.onBackPress() ?? false;
   }
 
   getOrCreateSurface() {
-    const surfacesMap: Record<string, SurfaceHandle> = AppStorage.get("ReactSurfaceByAppKey");
+    const surfacesMap: Record<string, SurfaceHandle> = AppStorage.get("ReactSurfaceByAppKey") ?? {};
 
     if (surfacesMap[this.appKey]) {
       return surfacesMap[this.appKey];
     }
 
-    const surfaceHandle = this.rnInstance.createSurface(this.appKey);
-    surfaceHandle.start(
-      {
-        width: 384,
-        height: 715,
-        surfaceOffsetX: 0,
-        surfaceOffsetY: 0,
-      },
-      {});
-    surfacesMap[this.appKey] = surfaceHandle;
+    const surfaceHandle = this.rnInstance?.createSurface(this.appKey);
+    if (surfaceHandle !== undefined) {
+      surfaceHandle.start(
+        {
+          width: 384,
+          height: 715,
+          surfaceOffsetX: 0,
+          surfaceOffsetY: 0,
+          pixelRatio: vp2px(1)
+        },
+        {});
+      surfacesMap[this.appKey] = surfaceHandle;
+    }
     return surfaceHandle;
   }
 
@@ -77,12 +85,12 @@ struct ReactPage {
         }
         .height("5%")
         .enabled(this.surfaceHandle !== undefined)
-      } else {
+      } else if (this.rnAbility && this.rnInstance && this.surfaceHandle) {
         Row() {
           RNSurface({
             ctx: this.rnAbility.createRNOHContext({ rnInstance: this.rnInstance }),
-            buildCustomComponent: this.buildCustomComponent.bind(this),
-            surfaceConfig: { surfaceHandle: this.surfaceHandle },
+            buildCustomComponent: this.buildCustomComponent,
+            surfaceConfig: { surfaceHandle: this.surfaceHandle } as SurfaceConfig1,
           })
         }
         .height("95%")
@@ -90,5 +98,6 @@ struct ReactPage {
     }
     .width("100%")
     .height("100%")
+    .margin(32)
   }
 }

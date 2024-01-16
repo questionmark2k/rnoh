@@ -51,5 +51,6 @@ struct Index {
       .width('100%')
       .divider({strokeWidth: 4})
     }.height('100%')
+    .margin(32)
   }
 }
