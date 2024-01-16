@@ -4,14 +4,14 @@ import {SampleTurboModule} from './SampleTurboModule';
 
 class SampleTurboModulesFactory extends TurboModulesFactory {
   createTurboModule(name: string): TurboModule | null {
-    if (name === 'SampleTurboModule') {
+    if (name === 'SampleTurboModule' || name === "GeneratedSampleTurboModule") {
       return new SampleTurboModule(this.ctx);
     }
     return null;
   }
 
   hasTurboModule(name: string): boolean {
-    return name === 'SampleTurboModule';
+    return name === 'SampleTurboModule' || name === "GeneratedSampleTurboModule";
   }
 }
 

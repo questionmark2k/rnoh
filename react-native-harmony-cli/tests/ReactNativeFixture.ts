@@ -32,6 +32,20 @@ export class ReactNativeFixture {
     ).stdout;
   }
 
+  codegenHarmony(args: {
+    etsOutputPath: string;
+    cppOutputPath: string;
+    projectRootPath: string;
+  }) {
+    return execaCommandSync(
+      `react-native codegen-harmony --ets-output-path ${this.useCwd(
+        args.etsOutputPath
+      )} --cpp-output-path ${this.useCwd(
+        args.cppOutputPath
+      )} --project-root-path ${this.useCwd(args.projectRootPath)}`
+    ).stdout;
+  }
+
   private useCwd(relPath: string) {
     return pathUtils.join(this.cwd, relPath);
   }

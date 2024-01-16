@@ -29,7 +29,7 @@ void ArkJS::maybeRethrowAsCpp(napi_status status) {
     }
     napi_value nError;
     napi_get_and_clear_last_exception(m_env, &nError);
-    
+
     auto message = getObjectProperty(nError, "message");
     auto messageStr = getString(message);
     throw std::runtime_error(messageStr);
@@ -428,8 +428,7 @@ RNOHNapiObjectBuilder &RNOHNapiObjectBuilder::addProperty(const char *name, face
         {"topLeft", nullptr, nullptr, nullptr, nullptr, m_arkJs.createDouble(value.topLeft), napi_default_jsproperty, nullptr},
         {"topRight", nullptr, nullptr, nullptr, nullptr, m_arkJs.createDouble(value.topRight), napi_default_jsproperty, nullptr},
         {"bottomLeft", nullptr, nullptr, nullptr, nullptr, m_arkJs.createDouble(value.bottomLeft), napi_default_jsproperty, nullptr},
-        {"bottomRight", nullptr, nullptr, nullptr, nullptr, m_arkJs.createDouble(value.bottomRight), napi_default_jsproperty, nullptr}
-    };
+        {"bottomRight", nullptr, nullptr, nullptr, nullptr, m_arkJs.createDouble(value.bottomRight), napi_default_jsproperty, nullptr}};
 
     napi_define_properties(m_env, n_value, 4, corners);
     addProperty(name, n_value);
@@ -464,7 +463,7 @@ napi_value RNOHNapiObjectBuilder::build() {
         for (auto const &[key, value] : m_properties) {
             properties.push_back(napi_property_descriptor{
                 key.c_str(), // UTF-8 encoded property name
-                nullptr, // name string as napi_value
+                nullptr,     // name string as napi_value
 
                 nullptr, // method implementation
                 nullptr, // getter

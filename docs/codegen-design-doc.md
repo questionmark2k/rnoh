@@ -15,6 +15,11 @@ Codegen is responsible for generating CPP and native code based from project's F
 - APP_DEVELOPER
 - PACKAGE_DEVELOPER
 
+## User Stories
+- As an APP_DEVELOPER, I don't want to think about code generation, so that I can focus on my application code.
+- As an APP_DEVELOPER, I want to generate code for my turbo modules and fabric components, so that I don't need to touch CPP.
+- As a PACKAGE_DEVELOPER, I want to partially generate code, so that I can provide my CPP turbo modules.
+
 ## Design
 CODEGEN will be provided by the `react-native-harmony-cli` package. The code should be written in such a way that a potential extraction to `react-native-harmony-codegen` package should be easy. `@react-native/codegen` will be used to extract information from an APP_PROJECT. Due to lack of the eTS and CPP AST NPM packages, the template-based approach is preferable. CODEGEN will leverage NodeJS, because it is already used by `react-native-harmony-cli`, and NodeJS can be run on MacOS, Windows and Linux.
 
@@ -34,8 +39,6 @@ CODEGEN will be provided by the `react-native-harmony-cli` package. The code sho
 - CODEGEN reads data from APP_PROJECT to `schema.json` which is later used to generate code.
 - CODEGEN code is located in `@react-native/codegen`
 - `@react-native/codegen` uses template-based code generation (instead of AST-based code generation)
-
-
 
 
 #### `package.json::codegenConfig`

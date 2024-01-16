@@ -78,7 +78,7 @@ function syncVersions(
     ohPackageJSONFileContent['version'] = packageJSONFileContent['version'];
     fs.writeFileSync(
       ohPackageJSONFilePath,
-      JSON5.stringify(ohPackageJSONFileContent)
+      JSON5.stringify(ohPackageJSONFileContent, null, 2)
     );
   }
 }
