@@ -35,6 +35,7 @@ void RNInstance::initialize() {
             // install `console.log` (etc.) implementation
             react::bindNativeLogger(rt, nativeLogger);
         });
+    jsExecutorFactory->setEnableDebugger(m_shouldEnableDebugger);
     auto jsQueue = std::make_shared<MessageQueueThread>(this->taskExecutor);
     auto moduleRegistry = std::make_shared<react::ModuleRegistry>(std::move(modules));
     this->instance->initializeBridge(

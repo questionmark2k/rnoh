@@ -70,7 +70,7 @@ export abstract class RNAbility extends UIAbility {
       (rnInstance) => this.createRNOHContext({
         rnInstance
       }))
-    this.devToolsController = new DevToolsController(this.rnInstanceRegistry)
+    this.devToolsController = new DevToolsController(this.rnInstanceRegistry, this.providedLogger)
     this.devMenu = new DevMenu(this.devToolsController, this.context, this.providedLogger)
     this.jsPackagerClient = new JSPackagerClient(this.providedLogger, this.devToolsController, this.devMenu)
     const jsPackagerClientConfig = this.getJSPackagerClientConfig()
@@ -127,8 +127,9 @@ export abstract class RNAbility extends UIAbility {
   public async createAndRegisterRNInstance(options: RNInstanceOptions): Promise<RNInstance> {
     const stopTracing = this.logger.clone("createAndRegisterRNInstance").startTracing()
     const result = await this.rnInstanceRegistry.createInstance({
+      enableDebugger: this.isDebugModeEnabled_,
+      devToolsController: this.devToolsController,
       ...options,
-      devToolsController: this.devToolsController
     })
     stopTracing()
     return result

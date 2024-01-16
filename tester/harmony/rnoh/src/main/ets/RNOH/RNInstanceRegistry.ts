@@ -22,6 +22,7 @@ export class RNInstanceRegistry {
     options: {
       createRNPackages: (ctx: RNPackageContext) => RNPackage[],
       devToolsController: DevToolsController,
+      enableDebugger?: boolean,
     }
   ): Promise<RNInstance> {
     const id = this.napiBridge.getNextRNInstanceId();
@@ -32,7 +33,8 @@ export class RNInstanceRegistry {
       this.napiBridge,
       this.getDefaultProps(),
       options.devToolsController,
-      this.createRNOHContext
+      this.createRNOHContext,
+      options.enableDebugger ?? false
     )
     await instance.initialize(options.createRNPackages({}))
     this.instanceMap.set(id, instance)

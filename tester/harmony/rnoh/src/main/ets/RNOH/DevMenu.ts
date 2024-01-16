@@ -39,6 +39,20 @@ export class DevMenu {
         this.devMenuDialogVisible = false;
       },
     });
+    this.devMenuButtons.push({
+      value: "Open Debugger",
+      action: () => {
+        this.devToolsController.openDebugger();
+        this.devMenuDialogVisible = false;
+      }
+    });
+    this.devMenuButtons.push({
+      value: "Open React DevTools",
+      action: () => {
+        this.devToolsController.openDevTools();
+        this.devMenuDialogVisible = false;
+      }
+    });
   }
 
   public show() {

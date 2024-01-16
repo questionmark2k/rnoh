@@ -48,3 +48,28 @@ export type PhysicalPixels = {
   fontScale: number,
   densityDpi: number,
 }
+
+export type InspectorPageId = number
+
+export interface InspectorPage {
+  id: InspectorPageId,
+  title: string,
+  vm: string
+}
+
+// RemoteConnection allows the VM to send debugger messages to the debugger.
+export interface InspectorRemoteConnection {
+  onMessage(message: string)
+  onDisconnect()
+}
+
+// LocalConnection allows the debugger to send debugger messages to the VM.
+export interface InspectorLocalConnection {
+  sendMessage(payload: unknown)
+  disconnect()
+}
+
+export interface InspectorInstance {
+  getPages(): InspectorPage[]
+  connect(pageId: InspectorPageId, remote: InspectorRemoteConnection): InspectorLocalConnection
+}

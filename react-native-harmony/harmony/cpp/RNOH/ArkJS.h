@@ -45,6 +45,8 @@ class ArkJS {
 
     napi_value createSingleUseCallback(std::function<void(std::vector<folly::dynamic>)> &&callback);
 
+    napi_value createFunction(std::string const &name, napi_callback callback, void *data = nullptr);
+
     napi_value createArray();
 
     napi_value createArray(std::vector<napi_value>);

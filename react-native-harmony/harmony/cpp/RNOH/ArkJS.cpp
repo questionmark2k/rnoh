@@ -171,10 +171,13 @@ napi_value singleUseCallback(napi_env env, napi_callback_info info) {
  * Consider changing this implementation when adding napi finalizers is supported. .
  */
 napi_value ArkJS::createSingleUseCallback(std::function<void(std::vector<folly::dynamic>)> &&callback) {
-    std::string fnName = "callback";
+    return createFunction("callback", singleUseCallback, createNapiCallback(std::move(callback)));
+}
+
+napi_value ArkJS::createFunction(std::string const &name, napi_callback callback, void *data) {
     napi_value result;
-    auto status = napi_create_function(m_env, fnName.c_str(), fnName.length(), singleUseCallback, createNapiCallback(std::move(callback)), &result);
-    this->maybeThrowFromStatus(status, "Couldn't create a callback");
+    auto status = napi_create_function(m_env, name.c_str(), name.length(), callback, data, &result);
+    this->maybeThrowFromStatus(status, "Couldn't create a function");
     return result;
 }
 

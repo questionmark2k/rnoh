@@ -278,6 +278,10 @@ target_link_libraries(folly_futures libevent)
 
 # HERMES
 add_library(hermes-engine::libhermes SHARED IMPORTED)
+add_compile_options(
+    # TODO: check if building in debug mode
+    -DHERMES_ENABLE_DEBUGGER
+)
 set(hermes_include_dirs
     "${third_party_dir}/hermes/API"
     "${third_party_dir}/hermes/public"
@@ -382,6 +386,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOH/LogSink.cpp"
     "${RNOH_CPP_DIR}/RNOH/NativeLogger.cpp"
     "${RNOH_CPP_DIR}/RNOH/ArkJS.cpp"
+    "${RNOH_CPP_DIR}/RNOH/Inspector.cpp"
     "${RNOH_CPP_DIR}/RNOH/MountingManager.cpp"
     "${RNOH_CPP_DIR}/RNOH/ShadowViewRegistry.cpp"
     "${RNOH_CPP_DIR}/RNOH/TurboModuleProvider.cpp"
@@ -458,4 +463,9 @@ target_link_libraries(rnoh PUBLIC
     react_bridging
     react_render_animations
 )
-target_compile_options(rnoh PUBLIC ${folly_compile_options} -DRAW_PROPS_ENABLED -std=c++17)
+
+target_compile_options(rnoh PUBLIC
+    ${folly_compile_options}
+    -DRAW_PROPS_ENABLED
+    -std=c++17
+)

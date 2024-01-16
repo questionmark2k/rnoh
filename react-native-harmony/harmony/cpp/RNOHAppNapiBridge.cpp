@@ -13,6 +13,7 @@
 #include "RNOH/UITicker.h"
 #include "RNInstanceFactory.h"
 #include "RNOH/TaskExecutor/ThreadTaskRunner.h"
+#include "RNOH/Inspector.h"
 
 using namespace rnoh;
 
@@ -60,13 +61,14 @@ static napi_value getNextRNInstanceId(napi_env env, napi_callback_info info) {
 static napi_value createReactNativeInstance(napi_env env, napi_callback_info info) {
     LOG(INFO) << "createReactNativeInstance";
     ArkJS arkJs(env);
-    auto args = arkJs.getCallbackArgs(info, 6);
+    auto args = arkJs.getCallbackArgs(info, 7);
     size_t instanceId = arkJs.getDouble(args[0]);
     auto arkTsTurboModuleProviderRef = arkJs.createReference(args[1]);
     auto mutationsListenerRef = arkJs.createReference(args[2]);
     auto commandDispatcherRef = arkJs.createReference(args[3]);
     auto eventDispatcherRef = arkJs.createReference(args[4]);
     auto measureTextFnRef = arkJs.createReference(args[5]);
+    auto shouldEnableDebugger = arkJs.getBoolean(args[6]);
     auto rnInstance = createRNInstance(
         instanceId,
         env,
@@ -101,7 +103,8 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
         },
         measureTextFnRef,
         eventDispatcherRef,
-        uiTicker);
+        uiTicker,
+        shouldEnableDebugger);
 
     auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
     if (rnInstanceById.find(instanceId) != rnInstanceById.end()) {
@@ -363,7 +366,8 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"emitComponentEvent", nullptr, emitComponentEvent, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"callRNFunction", nullptr, callRNFunction, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"onMemoryLevel", nullptr, onMemoryLevel, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"updateState", nullptr, updateState, nullptr, nullptr, nullptr, napi_default, nullptr}};
+        {"updateState", nullptr, updateState, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"getInspectorWrapper", nullptr, rnoh::getInspectorWrapper, nullptr, nullptr, nullptr, napi_default, nullptr}};
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc);
     return exports;

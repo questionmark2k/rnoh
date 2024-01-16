@@ -5,6 +5,8 @@ import type { AttributedString, ParagraphAttributes, LayoutConstrains } from "./
 import { measureParagraph } from "./TextLayoutManager"
 import type { DisplayMode } from './CppBridgeUtils'
 import { RNOHLogger } from "./RNOHLogger"
+import type { InspectorInstance } from './types'
+
 
 export class NapiBridge {
   private logger: RNOHLogger
@@ -28,8 +30,7 @@ export class NapiBridge {
                                                         commandName: string,
                                                         args: unknown) => void,
                             onCppMessage: (type: string, payload: any) => void,
-
-
+                            shouldEnableDebugger: boolean
   ) {
     this.libRNOHApp?.createReactNativeInstance(
       instanceId,
@@ -47,7 +48,8 @@ export class NapiBridge {
           console.error(err)
           throw err
         }
-      });
+      },
+      shouldEnableDebugger);
   }
 
   destroyReactNativeInstance(instanceId: number) {
@@ -165,5 +167,9 @@ export class NapiBridge {
 
   updateState(instanceId: number, componentName: string, tag: Tag, state: unknown): void {
     this.libRNOHApp?.updateState(instanceId, componentName, tag, state)
+  }
+
+  getInspectorWrapper(): InspectorInstance {
+    return this.libRNOHApp?.getInspectorWrapper();
   }
 }

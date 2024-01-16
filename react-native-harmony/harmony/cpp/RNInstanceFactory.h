@@ -32,7 +32,8 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
                                              MountingManager::CommandDispatcher &&commandDispatcher,
                                              napi_ref measureTextFnRef,
                                              napi_ref napiEventDispatcherRef,
-                                             UITicker::Shared uiTicker) {
+                                             UITicker::Shared uiTicker,
+                                             bool shouldEnableDebugger) {
     std::shared_ptr<TaskExecutor> taskExecutor = std::make_shared<TaskExecutor>(env);
     auto mainThreadChannel = std::make_shared<ArkTSChannel>(taskExecutor, ArkJS(env), napiEventDispatcherRef);
 
@@ -113,5 +114,6 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
                                         std::move(commandDispatcher),
                                         mainThreadChannel,
                                         uiTicker,
-                                        shadowViewRegistry);
+                                        shadowViewRegistry,
+                                        shouldEnableDebugger);
 }

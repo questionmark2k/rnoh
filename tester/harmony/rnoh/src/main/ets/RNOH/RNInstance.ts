@@ -19,6 +19,7 @@ import { ResponderLockDispatcher } from './ResponderLockDispatcher'
 import { DevToolsController } from './DevToolsController'
 import { RNOHError } from './RNOHError'
 import window from '@ohos.window'
+import { DevServerHelper } from './DevServerHelper';
 
 export type SurfaceContext = {
   width: number
@@ -166,7 +167,8 @@ export class RNInstanceImpl implements RNInstance {
     private napiBridge: NapiBridge,
     private defaultProps: Record<string, any>,
     private devToolsController: DevToolsController,
-    private createRNOHContext: (rnInstance: RNInstance) => RNOHContext
+    private createRNOHContext: (rnInstance: RNInstance) => RNOHContext,
+    private shouldEnableDebugger: boolean
   ) {
     this.logger = injectedLogger.clone("RNInstance")
     this.onCreate()
@@ -243,7 +245,8 @@ export class RNInstanceImpl implements RNInstance {
       },
       (type, payload) => {
         this.onCppMessage(type, payload)
-      }
+      },
+      this.shouldEnableDebugger
     )
     stopTracing()
   }
@@ -368,6 +371,9 @@ export class RNInstanceImpl implements RNInstance {
       if (hotReloadConfig) {
         this.callRNFunction("HMRClient", "setup", ["harmony", hotReloadConfig.bundleEntry, hotReloadConfig.host, hotReloadConfig.port, true])
         this.logger.info("Configured hot reloading")
+      }
+      if (this.shouldEnableDebugger) {
+        DevServerHelper.connectToDevServer(bundleURL, this.logger, this.napiBridge.getInspectorWrapper());
       }
       this.bundleExecutionStatusByBundleURL.set(bundleURL, "DONE")
       this.lifecycleEventEmitter.emit("JS_BUNDLE_EXECUTION_FINISH", {

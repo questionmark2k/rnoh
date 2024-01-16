@@ -46,7 +46,8 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
                MountingManager::CommandDispatcher &&commandDispatcher,
                ArkTSChannel::Shared arkTsChannel,
                UITicker::Shared uiTicker,
-               ShadowViewRegistry::Shared shadowViewRegistry)
+               ShadowViewRegistry::Shared shadowViewRegistry,
+               bool shouldEnableDebugger)
         : m_id(id),
           instance(std::make_shared<facebook::react::Instance>()),
           m_contextContainer(contextContainer),
@@ -61,7 +62,8 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
           m_mutationsListener(mutationsListener),
           m_commandDispatcher(commandDispatcher),
           m_arkTsChannel(arkTsChannel),
-          m_uiTicker(uiTicker) {
+          m_uiTicker(uiTicker),
+          m_shouldEnableDebugger(shouldEnableDebugger){
         this->unsubscribeUITickListener = this->m_uiTicker->subscribe(m_id, [this]() {
             this->taskExecutor->runTask(TaskThread::MAIN, [this]() {
                 this->onUITick();
@@ -115,6 +117,7 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
     std::function<void()> unsubscribeUITickListener = nullptr;
     std::atomic<bool> m_shouldRelayUITick;
     ArkTSChannel::Shared m_arkTsChannel;
+    bool m_shouldEnableDebugger;
 
     void initialize();
     void initializeScheduler();
