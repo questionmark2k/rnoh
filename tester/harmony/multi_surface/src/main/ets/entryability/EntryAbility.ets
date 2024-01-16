@@ -1,13 +1,10 @@
 import { AnyJSBundleProvider, MetroJSBundleProvider, ResourceJSBundleProvider, RNAbility, SurfaceHandle} from 'rnoh/ts';
 import { createRNPackages } from '../RNPackagesFactory';
-import AbilityConstant from '@ohos.app.ability.AbilityConstant';
-import Want from '@ohos.app.ability.Want';
+import window from '@ohos.window';
 
 export default class EntryAbility extends RNAbility {
-  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
-    super.onCreate(want, launchParam);
-
-    const rnInstance = await this.createAndRegisterRNInstance({createRNPackages});
+  public async onWindowSetup(win: window.Window): Promise<void> {
+    const rnInstance = await this.createAndRegisterRNInstance({createRNPackages})
     rnInstance.runJSBundle(new AnyJSBundleProvider([new MetroJSBundleProvider(), new ResourceJSBundleProvider(this.context.resourceManager, 'bundle.harmony.js')]))
     AppStorage.setOrCreate("AppRNInstance", rnInstance);
 

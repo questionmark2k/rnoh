@@ -48,7 +48,7 @@ export abstract class RNAbility extends UIAbility {
   public devMenu: DevMenu
   private inForeground: boolean = false;
 
-  async onCreate(want, param) {
+  onCreate(want, param) {
     this.initializationDateTime = new Date()
     this.providedLogger = this.createLogger()
     this.providedLogger.info(RNOH_BANNER)
