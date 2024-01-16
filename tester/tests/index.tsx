@@ -12,6 +12,7 @@ export * from './ButtonTest';
 export * from './ConsoleTest';
 export * from './CustomNativeComponentTest';
 export * from './DimensionsTest';
+export * from './DevSettingsTest';
 export * from './ErrorHandlingTest';
 export * from './FlatListTest';
 export * from './I18nManagerTest';
