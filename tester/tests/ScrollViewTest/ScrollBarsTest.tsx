@@ -54,6 +54,18 @@ export function ScrollBarsTest() {
       <TestCase modal itShould="flash scroll indicators">
         <FlashIndicatorsTest />
       </TestCase>
+      <TestCase
+        modal
+        skip
+        itShould="[FAILS on Harmony/Android] It should move the scroll bar by 50px from the right and by 200px from the top and bottom">
+        <ScrollViewScrollIndicatorInsetsTest />
+      </TestCase>
+      <TestCase
+        modal
+        skip
+        itShould="[FAILS on Harmony/Android] It should move the scroll bar and the scroll content by 50px from the left and by 100px from the left and right">
+        <ScrollViewContentInsetsTest />
+      </TestCase>
     </TestSuite>
   );
 }
@@ -73,6 +85,35 @@ function FlashIndicatorsTest() {
         scrollEnabled={true}
         showsVerticalScrollIndicator={false}
         ref={scrollRef}>
+        {getScrollViewContent({})}
+      </ScrollView>
+    </View>
+  );
+}
+
+function ScrollViewScrollIndicatorInsetsTest() {
+  return (
+    <View style={styles.wrapperView}>
+      <ScrollView
+        style={{
+          ...styles.wrapperView,
+        }}
+        scrollIndicatorInsets={{right: 50, bottom: 200, top: 200}}>
+        {getScrollViewContent({})}
+      </ScrollView>
+    </View>
+  );
+}
+
+function ScrollViewContentInsetsTest() {
+  return (
+    <View style={styles.wrapperView}>
+      <ScrollView
+        style={{
+          ...styles.wrapperView,
+        }}
+        contentInset={{left: 50, bottom: 100, top: 100}}
+        scrollIndicatorInsets={{left: 50, bottom: 100, top: 100}}>
         {getScrollViewContent({})}
       </ScrollView>
     </View>
