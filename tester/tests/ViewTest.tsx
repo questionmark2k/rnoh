@@ -144,9 +144,7 @@ export function ViewTest() {
           />
         </View>
       </TestCase>
-      <TestCase
-        skip
-        itShould="render rectangle with borders with different widths and colors">
+      <TestCase itShould="render rectangle with borders with different widths and colors">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
