@@ -173,8 +173,14 @@ export abstract class RNAbility extends UIAbility {
       this.displayMetricsManager.updateWindowSize(windowSize);
       this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onWindowSizeChange(windowSize))
     })
-    this.unregisterWindowListenerCallback = () => mainWindow.off("windowSizeChange",
-      (windowSize) => this.displayMetricsManager.updateWindowSize(windowSize))
+    this.unregisterWindowListenerCallback = () => {
+      try {
+        mainWindow.off("windowSizeChange",
+          (windowSize) => this.displayMetricsManager.updateWindowSize(windowSize))
+      } catch {
+        this.logger.error("Error when trying to unsubscribe from window size changes")
+      }
+    }
     this.onWindowSetup(mainWindow).then(async () => {
       windowStage.loadContent(this.getPagePath(), (err, data) => {
         if (err.code) {
