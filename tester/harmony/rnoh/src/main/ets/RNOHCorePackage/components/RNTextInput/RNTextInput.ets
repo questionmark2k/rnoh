@@ -108,6 +108,7 @@ export struct RNTextInput {
   }
 
   onBlurEvent() {
+    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onEndEditing", this.value)
     this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onBlur", this.value)
   }
 

@@ -18,6 +18,7 @@ enum TextInputEventType {
     TEXT_INPUT_UNSUPPORTED,
     TEXT_INPUT_ON_CHANGE,
     TEXT_INPUT_ON_SUBMIT_EDITING,
+    TEXT_INPUT_ON_END_EDITING,
     TEXT_INPUT_ON_FOCUS,
     TEXT_INPUT_ON_BLUR,
     TEXT_INPUT_ON_KEY_PRESS,
@@ -28,6 +29,8 @@ TextInputEventType getTextInputEventType(std::string const &eventName) {
         return TextInputEventType::TEXT_INPUT_ON_CHANGE;
     } else if (eventName == "onSubmitEditing") {
         return TextInputEventType::TEXT_INPUT_ON_SUBMIT_EDITING;
+    } else if (eventName == "onEndEditing") {
+        return TextInputEventType::TEXT_INPUT_ON_END_EDITING;
     } else if (eventName == "onFocus") {
         return TextInputEventType::TEXT_INPUT_ON_FOCUS;
     } else if (eventName == "onBlur") {
@@ -58,6 +61,9 @@ class TextInputEventEmitRequestHandler : public EventEmitRequestHandler {
             break;
         case TextInputEventType::TEXT_INPUT_ON_SUBMIT_EDITING:
             eventEmitter->onSubmitEditing(convertTextInputEvent(arkJs, ctx.payload));
+            break;
+        case TextInputEventType::TEXT_INPUT_ON_END_EDITING:
+            eventEmitter->onEndEditing(convertTextInputEvent(arkJs, ctx.payload));
             break;
         case TextInputEventType::TEXT_INPUT_ON_FOCUS:
             eventEmitter->onFocus(convertTextInputEvent(arkJs, ctx.payload));
