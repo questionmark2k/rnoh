@@ -367,6 +367,7 @@ napi_value ArkJS::convertIntermediaryValueToNapiValue(IntermediaryArg arg) {
     try {
         return this->createSingleUseCallback(std::move(std::get<IntermediaryCallback>(arg)));
     } catch (const std::bad_variant_access &e) {
+        return this->getUndefined();
     }
 }
 
