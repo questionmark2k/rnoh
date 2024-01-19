@@ -23,9 +23,9 @@ export class DeviceInfoTurboModule extends TurboModule {
     this.cleanUpCallbacks.push(
       this.ctx.rnInstance.subscribeToLifecycleEvents("CONFIGURATION_UPDATE", updateDisplayMetrics)
     )
-    this.cleanUpCallbacks.push(() => {
+    this.cleanUpCallbacks.push(
       this.ctx.rnInstance.subscribeToLifecycleEvents("WINDOW_SIZE_CHANGE", updateDisplayMetrics)
-    })
+    )
   }
 
   __onDestroy__() {
