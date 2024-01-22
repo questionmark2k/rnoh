@@ -1,5 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {
+  RefreshControl,
   Text,
   TouchableOpacity,
   View,
@@ -30,6 +31,12 @@ const getItemCountVirtualized = (_data: unknown): number => 50;
 const Item = ({title}: {title: string}) => (
   <View style={{height: 48, padding: 16, borderWidth: 1}}>
     <Text style={{width: '100%', height: 24}}>{title}</Text>
+  </View>
+);
+
+const HorizontalItem = ({title}: {title: string}) => (
+  <View style={{borderWidth: 1, width: 48, height: '100%'}}>
+    <Text style={{width: '100%', height: '100%'}}>{title}</Text>
   </View>
 );
 
@@ -230,6 +237,36 @@ export function VirtualizedListTest() {
         modal
         itShould='display "List Header Component" text on small lightgray background on red background at the start of the list'>
         <VirtualizedListListHeaderComponent />
+      </TestCase>
+      <TestCase itShould="display debugging scroll bars (debug = true)">
+        <VirtualizedListDebugTest />
+      </TestCase>
+      <TestCase
+        modal
+        itShould="change background color of selected items to red">
+        <VirtualizedListExtraDataTest />
+      </TestCase>
+      <TestCase modal itShould="display items horizontally">
+        <VirtualizedListHorizontalTest />
+      </TestCase>
+      <TestCase modal itShould="display items horizontally and invert the list">
+        <VirtualizedListHorizontalInvertedTest />
+      </TestCase>
+      <TestCase
+        modal
+        itShould="display 'refreshing' on red background when pulling down (onRefresh method)">
+        <VirtualizedListOnRefreshTest />
+      </TestCase>
+      <TestCase modal itShould="display persistent scrollbar">
+        <VirtualizedListPersistentScrollbarTest />
+      </TestCase>
+      <TestCase modal itShould="render cell in 2 second batches">
+        <VirtualizedListUpdateCellsBatchingPeriodTest />
+      </TestCase>
+      <TestCase
+        modal
+        itShould="display refreshing indicator when pulling down (refreshControl)">
+        <VirtualizedListRefreshControlTest />
       </TestCase>
     </TestSuite>
   );
@@ -925,6 +962,220 @@ function VirtualizedListListHeaderComponent() {
         borderBottomWidth: 1,
         justifyContent: 'center',
       }}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+    />
+  );
+}
+
+function VirtualizedListDebugTest() {
+  return (
+    <VirtualizedList
+      debug
+      disableVirtualization
+      style={{height: 256}}
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+    />
+  );
+}
+
+const CustomItem = ({
+  title,
+  isSelected,
+}: {
+  isSelected: boolean;
+  title: string;
+}) => {
+  return (
+    <TouchableOpacity
+      style={{
+        backgroundColor: isSelected ? 'red' : 'lightgray',
+      }}>
+      <Item title={title} />
+    </TouchableOpacity>
+  );
+};
+
+function VirtualizedListExtraDataTest() {
+  const [items] = useState(GENERATED_DATA);
+  const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
+
+  return (
+    <View>
+      <Button label="Select 5 item" onPress={() => setSelectedId('4')} />
+      <VirtualizedList
+        style={{height: 256}}
+        data={items}
+        getItem={(_, index: number) => items[index]}
+        getItemCount={() => items.length}
+        getItemLayout={(_, index: number) => ({
+          length: 48,
+          offset: 48 * index,
+          index,
+        })}
+        extraData={selectedId}
+        renderItem={({item}: {item: ItemData}) => (
+          <CustomItem isSelected={selectedId === item.id} title={item.title} />
+        )}
+        keyExtractor={(item: ItemData) => item.id}
+      />
+    </View>
+  );
+}
+
+function VirtualizedListHorizontalTest() {
+  return (
+    <VirtualizedList
+      style={{height: 256}}
+      horizontal
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      renderItem={({item}: {item: ItemData}) => (
+        <HorizontalItem title={item.title} />
+      )}
+      keyExtractor={(item: ItemData) => item.id}
+    />
+  );
+}
+
+function VirtualizedListHorizontalInvertedTest() {
+  return (
+    <VirtualizedList
+      style={{height: 256}}
+      horizontal
+      inverted
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      renderItem={({item}: {item: ItemData}) => (
+        <HorizontalItem title={item.title} />
+      )}
+      keyExtractor={(item: ItemData) => item.id}
+    />
+  );
+}
+
+function VirtualizedListOnRefreshTest() {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleOnRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  return (
+    <View>
+      <View
+        style={{
+          padding: 10,
+          backgroundColor: refreshing ? 'red' : 'transparent',
+        }}>
+        <Text>{refreshing ? 'isRefreshing' : 'Refresh!'}</Text>
+      </View>
+      <VirtualizedList
+        style={{height: 256}}
+        onRefresh={handleOnRefresh}
+        refreshing={refreshing}
+        data={GENERATED_DATA}
+        getItem={(_, index: number) => GENERATED_DATA[index]}
+        getItemCount={() => GENERATED_DATA.length}
+        getItemLayout={(_, index: number) => ({
+          length: 48,
+          offset: 48 * index,
+          index,
+        })}
+        renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+        keyExtractor={(item: ItemData) => item.id}
+      />
+    </View>
+  );
+}
+
+function VirtualizedListPersistentScrollbarTest() {
+  return (
+    <VirtualizedList
+      style={{height: 256}}
+      persistentScrollbar
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+    />
+  );
+}
+
+function VirtualizedListUpdateCellsBatchingPeriodTest() {
+  return (
+    <VirtualizedList
+      style={{height: 128}}
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
+      renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
+      keyExtractor={(item: ItemData) => item.id}
+      updateCellsBatchingPeriod={2000}
+      maxToRenderPerBatch={1}
+    />
+  );
+}
+
+function VirtualizedListRefreshControlTest() {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleOnRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  return (
+    <VirtualizedList
+      style={{height: 256}}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh} />
+      }
+      data={GENERATED_DATA}
+      getItem={(_, index: number) => GENERATED_DATA[index]}
+      getItemCount={() => GENERATED_DATA.length}
+      getItemLayout={(_, index: number) => ({
+        length: 48,
+        offset: 48 * index,
+        index,
+      })}
       renderItem={({item}: {item: ItemData}) => <Item title={item.title} />}
       keyExtractor={(item: ItemData) => item.id}
     />
