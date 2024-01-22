@@ -1,4 +1,6 @@
-export type BlobMetaData = {
+export type Blob = ArrayBuffer;
+
+export type BlobMetadata = {
   blobId: string,
   offset: number,
   size: number,
@@ -9,5 +11,5 @@ export type BlobMetaData = {
 
 export type BlobPart = {
   type: string,
-  data: string | BlobMetaData,
+  data: string | BlobMetadata,
 }
