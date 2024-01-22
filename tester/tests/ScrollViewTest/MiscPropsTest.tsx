@@ -153,6 +153,12 @@ export function MiscPropsTest() {
         itShould="scroll down on the btn press, but prevent scrolling by dragging (scrollEnabled)">
         <ScrollEnabledTestCase />
       </TestCase>
+      <TestCase
+        modal
+        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/499
+        itShould="render scroll view with different fading edge length (fadingEdgeLength)">
+        <ScrollViewFadingEdgeLengthTest />
+      </TestCase>
     </TestSuite>
   );
 }
@@ -273,6 +279,28 @@ function BackfaceVisibilityTestCase() {
         }}>
         {getScrollViewContent({})}
       </ScrollView>
+    </View>
+  );
+}
+
+function ScrollViewFadingEdgeLengthTest() {
+  return (
+    <View
+      style={{
+        width: '100%',
+        justifyContent: 'center',
+        backgroundColor: 'blue',
+      }}>
+      <View
+        style={{
+          height: 400,
+          marginTop: 50,
+          marginBottom: 50,
+        }}>
+        <ScrollView fadingEdgeLength={100}>
+          {getScrollViewContent({})}
+        </ScrollView>
+      </View>
     </View>
   );
 }
