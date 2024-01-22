@@ -1,5 +1,5 @@
 import type common from '@ohos.app.ability.common';
-import type { RNInstance } from './RNInstance';
+import type { RNInstance, RNInstanceOptions } from './RNInstance';
 import { RNInstanceImpl } from './RNInstance';
 import type { NapiBridge } from './NapiBridge';
 import type { RNOHContext } from './RNOHContext';
@@ -19,10 +19,8 @@ export class RNInstanceRegistry {
   }
 
   public async createInstance(
-    options: {
-      createRNPackages: (ctx: RNPackageContext) => RNPackage[],
+    options: RNInstanceOptions & {
       devToolsController: DevToolsController,
-      enableDebugger?: boolean,
     }
   ): Promise<RNInstance> {
     const id = this.napiBridge.getNextRNInstanceId();
@@ -34,7 +32,8 @@ export class RNInstanceRegistry {
       this.getDefaultProps(),
       options.devToolsController,
       this.createRNOHContext,
-      options.enableDebugger ?? false
+      options.enableDebugger ?? false,
+      options.enableBackgroundExecutor ?? false,
     )
     await instance.initialize(options.createRNPackages({}))
     this.instanceMap.set(id, instance)

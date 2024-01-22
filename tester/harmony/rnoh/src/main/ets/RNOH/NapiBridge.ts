@@ -30,7 +30,8 @@ export class NapiBridge {
                                                         commandName: string,
                                                         args: unknown) => void,
                             onCppMessage: (type: string, payload: any) => void,
-                            shouldEnableDebugger: boolean
+                            shouldEnableDebugger: boolean,
+                            shouldEnableBackgroundExecutor: boolean,
   ) {
     this.libRNOHApp?.createReactNativeInstance(
       instanceId,
@@ -49,7 +50,8 @@ export class NapiBridge {
           throw err
         }
       },
-      shouldEnableDebugger);
+      shouldEnableDebugger,
+      shouldEnableBackgroundExecutor);
   }
 
   destroyReactNativeInstance(instanceId: number) {

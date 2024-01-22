@@ -61,7 +61,7 @@ static napi_value getNextRNInstanceId(napi_env env, napi_callback_info info) {
 static napi_value createReactNativeInstance(napi_env env, napi_callback_info info) {
     LOG(INFO) << "createReactNativeInstance";
     ArkJS arkJs(env);
-    auto args = arkJs.getCallbackArgs(info, 7);
+    auto args = arkJs.getCallbackArgs(info, 8);
     size_t instanceId = arkJs.getDouble(args[0]);
     auto arkTsTurboModuleProviderRef = arkJs.createReference(args[1]);
     auto mutationsListenerRef = arkJs.createReference(args[2]);
@@ -69,6 +69,7 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
     auto eventDispatcherRef = arkJs.createReference(args[4]);
     auto measureTextFnRef = arkJs.createReference(args[5]);
     auto shouldEnableDebugger = arkJs.getBoolean(args[6]);
+    auto shouldEnableBackgroundExecutor = arkJs.getBoolean(args[7]);
     auto rnInstance = createRNInstance(
         instanceId,
         env,
@@ -104,7 +105,8 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
         measureTextFnRef,
         eventDispatcherRef,
         uiTicker,
-        shouldEnableDebugger);
+        shouldEnableDebugger,
+        shouldEnableBackgroundExecutor);
 
     auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
     if (rnInstanceById.find(instanceId) != rnInstanceById.end()) {
@@ -121,16 +123,16 @@ static napi_value destroyReactNativeInstance(napi_env env, napi_callback_info in
     auto args = arkJs.getCallbackArgs(info, 1);
     size_t rnInstanceId = arkJs.getDouble(args[0]);
     cleanupRunner->runAsyncTask([rnInstanceId] {
-                     std::unique_ptr<RNInstance> instance;
-                     {
-                         auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
-                         if (auto it = rnInstanceById.find(rnInstanceId); it != rnInstanceById.end()) {
-                             std::swap(it->second, instance);
-                             rnInstanceById.erase(rnInstanceId);
-                         }
-                     }
-                     instance.reset();
-                 });
+        std::unique_ptr<RNInstance> instance;
+        {
+            auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
+            if (auto it = rnInstanceById.find(rnInstanceId); it != rnInstanceById.end()) {
+                std::swap(it->second, instance);
+                rnInstanceById.erase(rnInstanceId);
+            }
+        }
+        instance.reset();
+    });
     return arkJs.getUndefined();
 }
 

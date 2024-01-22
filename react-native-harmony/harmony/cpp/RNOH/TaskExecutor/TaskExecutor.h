@@ -23,7 +23,7 @@ class TaskExecutor {
     using Shared = std::shared_ptr<TaskExecutor>;
     using Weak = std::weak_ptr<TaskExecutor>;
 
-    TaskExecutor(napi_env mainEnv);
+    TaskExecutor(napi_env mainEnv, bool shouldEnableBackground = false);
 
     void runTask(TaskThread thread, Task &&task);
     void runSyncTask(TaskThread thread, Task &&task);

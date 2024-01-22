@@ -66,18 +66,24 @@ void RNInstance::initializeScheduler() {
                 {eventDispatcher, contextContainer});
         };
 
-    auto backgroundExecutor = [executor = this->taskExecutor](std::function<void()> &&callback) {
-        executor->runTask(TaskThread::BACKGROUND, std::move(callback));
-    };
-
     react::SchedulerToolbox schedulerToolbox{
         .contextContainer = m_contextContainer,
         .componentRegistryFactory = componentRegistryFactory,
         .runtimeExecutor = this->instance->getRuntimeExecutor(),
         .asynchronousEventBeatFactory = eventBeatFactory,
         .synchronousEventBeatFactory = eventBeatFactory,
-        .backgroundExecutor = backgroundExecutor,
     };
+    
+    if (m_shouldEnableBackgroundExecutor) {
+        schedulerToolbox.backgroundExecutor = [executor = this->taskExecutor](std::function<void()> &&callback) {
+            if (executor->isOnTaskThread(TaskThread::MAIN)) {
+                callback();
+                return;
+            }
+
+            executor->runTask(TaskThread::BACKGROUND, std::move(callback));
+        };
+    }
 
     this->schedulerDelegate = std::make_unique<SchedulerDelegate>(MountingManager(
                                                                       taskExecutor,

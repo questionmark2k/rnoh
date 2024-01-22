@@ -47,7 +47,8 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
                ArkTSChannel::Shared arkTsChannel,
                UITicker::Shared uiTicker,
                ShadowViewRegistry::Shared shadowViewRegistry,
-               bool shouldEnableDebugger)
+               bool shouldEnableDebugger,
+               bool shouldEnableBackgroundExecutor)
         : m_id(id),
           instance(std::make_shared<facebook::react::Instance>()),
           m_contextContainer(contextContainer),
@@ -63,7 +64,8 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
           m_commandDispatcher(commandDispatcher),
           m_arkTsChannel(arkTsChannel),
           m_uiTicker(uiTicker),
-          m_shouldEnableDebugger(shouldEnableDebugger){
+          m_shouldEnableDebugger(shouldEnableDebugger),
+          m_shouldEnableBackgroundExecutor(shouldEnableBackgroundExecutor){
         this->unsubscribeUITickListener = this->m_uiTicker->subscribe(m_id, [this]() {
             this->taskExecutor->runTask(TaskThread::MAIN, [this]() {
                 this->onUITick();
@@ -118,13 +120,14 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
     std::atomic<bool> m_shouldRelayUITick;
     ArkTSChannel::Shared m_arkTsChannel;
     bool m_shouldEnableDebugger;
+    bool m_shouldEnableBackgroundExecutor;
 
     void initialize();
     void initializeScheduler();
     void onUITick();
 
-    virtual void onAnimationStarted() override;      // react::LayoutAnimationStatusDelegate
-    virtual void onAllAnimationsComplete() override; // react::LayoutAnimationStatusDelegate
+    void onAnimationStarted() override;      // react::LayoutAnimationStatusDelegate
+    void onAllAnimationsComplete() override; // react::LayoutAnimationStatusDelegate
 };
 
 } // namespace rnoh

@@ -28,7 +28,6 @@ AnimatedNodesManager::AnimatedNodesManager(std::function<void()> &&scheduleUpdat
       m_setNativePropsFn(std::move(setNativePropsFn)) {}
 
 void AnimatedNodesManager::createNode(facebook::react::Tag tag, folly::dynamic const &config) {
-    LOG(INFO) << "AnimatedNodesManager::createNode(" << tag <<", " << config << ")";
     auto type = config["type"].asString();
     std::unique_ptr<AnimatedNode> node;
 
@@ -98,7 +97,6 @@ void AnimatedNodesManager::disconnectNodeFromView(facebook::react::Tag nodeTag, 
 }
 
 void AnimatedNodesManager::addAnimatedEventToView(react::Tag viewTag, const std::string &eventName, const folly::dynamic &eventMapping) {
-    LOG(INFO) << "addAnimatedEventToView " << viewTag << " " << eventName << " " << eventMapping;
     auto nodeTag = eventMapping["animatedValueTag"].asInt();
     auto dynamicNativeEventPath = eventMapping["nativeEventPath"];
     std::vector<std::string> nativeEventPath;
@@ -109,7 +107,6 @@ void AnimatedNodesManager::addAnimatedEventToView(react::Tag viewTag, const std:
 }
 
 void AnimatedNodesManager::removeAnimatedEventFromView(facebook::react::Tag viewTag, std::string const &eventName, facebook::react::Tag animatedValueTag) {
-    LOG(INFO) << "removeAnimatedEventFromView " << viewTag << " " << eventName << " " << animatedValueTag;
     m_eventDrivers.erase(std::remove_if(m_eventDrivers.begin(), m_eventDrivers.end(), [&](auto &driver) {
         return driver->getViewTag() == viewTag && driver->getEventName() == eventName && driver->getNodeTag() == animatedValueTag;
     }));

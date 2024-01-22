@@ -133,7 +133,9 @@ export interface RNInstance {
 export type RNInstanceManager = RNInstance
 
 export type RNInstanceOptions = {
-  createRNPackages: (ctx: RNPackageContext) => RNPackage[]
+  createRNPackages: (ctx: RNPackageContext) => RNPackage[],
+  enableDebugger?: boolean,
+  enableBackgroundExecutor?: boolean,
 }
 
 
@@ -168,7 +170,8 @@ export class RNInstanceImpl implements RNInstance {
     private defaultProps: Record<string, any>,
     private devToolsController: DevToolsController,
     private createRNOHContext: (rnInstance: RNInstance) => RNOHContext,
-    private shouldEnableDebugger: boolean
+    private shouldEnableDebugger: boolean,
+    private shouldEnableBackgroundExecutor: boolean,
   ) {
     this.logger = injectedLogger.clone("RNInstance")
     this.onCreate()
@@ -246,7 +249,8 @@ export class RNInstanceImpl implements RNInstance {
       (type, payload) => {
         this.onCppMessage(type, payload)
       },
-      this.shouldEnableDebugger
+      this.shouldEnableDebugger,
+      this.shouldEnableBackgroundExecutor,
     )
     stopTracing()
   }

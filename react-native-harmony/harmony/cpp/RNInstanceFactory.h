@@ -33,7 +33,8 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
                                              napi_ref measureTextFnRef,
                                              napi_ref napiEventDispatcherRef,
                                              UITicker::Shared uiTicker,
-                                             bool shouldEnableDebugger) {
+                                             bool shouldEnableDebugger,
+                                             bool shouldEnableBackgroundExecutor) {
     std::shared_ptr<TaskExecutor> taskExecutor = std::make_shared<TaskExecutor>(env);
     auto mainThreadChannel = std::make_shared<ArkTSChannel>(taskExecutor, ArkJS(env), napiEventDispatcherRef);
 
@@ -115,5 +116,6 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
                                         mainThreadChannel,
                                         uiTicker,
                                         shadowViewRegistry,
-                                        shouldEnableDebugger);
+                                        shouldEnableDebugger,
+                                        shouldEnableBackgroundExecutor);
 }

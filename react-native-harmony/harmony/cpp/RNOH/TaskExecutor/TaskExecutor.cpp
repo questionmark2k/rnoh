@@ -7,15 +7,14 @@
 
 namespace rnoh {
 
-TaskExecutor::TaskExecutor(napi_env mainEnv) {
+TaskExecutor::TaskExecutor(napi_env mainEnv, bool shouldEnableBackground) {
     auto mainTaskRunner = std::make_shared<NapiTaskRunner>(mainEnv);
     auto jsTaskRunner = std::make_shared<ThreadTaskRunner>("RNOH_JS");
-    // NOTE: we merge MAIN and BG threads for now,
-    // to allow for calling MAIN->BG->MAIN synchronously without deadlocks
+    auto backgroundExecutor = shouldEnableBackground ? std::make_shared<ThreadTaskRunner>("RNOH_BACKGROUND") : nullptr;
     m_taskRunners = {
         mainTaskRunner,
         jsTaskRunner,
-        mainTaskRunner};
+        backgroundExecutor};
 }
 
 void TaskExecutor::runTask(TaskThread thread, Task &&task) {
@@ -38,7 +37,8 @@ void TaskExecutor::runSyncTask(TaskThread thread, Task &&task) {
 }
 
 bool TaskExecutor::isOnTaskThread(TaskThread thread) const {
-    return m_taskRunners[thread]->isOnCurrentThread();
+    auto runner = m_taskRunners[thread];
+    return runner && runner->isOnCurrentThread();
 }
 
 std::optional<TaskThread> TaskExecutor::getCurrentTaskThread() const {
@@ -55,7 +55,9 @@ std::optional<TaskThread> TaskExecutor::getCurrentTaskThread() const {
 
 void TaskExecutor::setExceptionHandler(ExceptionHandler handler) {
     for (auto &taskRunner : m_taskRunners) {
-        taskRunner->setExceptionHandler(handler);
+        if (taskRunner) {
+            taskRunner->setExceptionHandler(handler);
+        }
     }
 }
 
