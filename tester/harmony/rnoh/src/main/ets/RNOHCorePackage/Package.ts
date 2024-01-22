@@ -10,6 +10,7 @@ import {
   DevMenuTurboModule,
   DevSettingsTurboModule,
   ExceptionsManagerTurboModule,
+  FileReaderTurboModule,
   I18nManagerTurboModule,
   ImageLoaderTurboModule,
   KeyboardObserverTurboModule,
@@ -22,7 +23,7 @@ import {
   TimingTurboModule,
   WebSocketTurboModule,
   LogBoxTurboModule,
-  DevLoadingViewTurboModule
+  DevLoadingViewTurboModule,
 } from './turboModules';
 import { LinkingManagerTurboModule } from './turboModules/LinkingManagerTurboModule';
 import { ViewDescriptorWrapper } from './components/ts';
@@ -45,12 +46,12 @@ const TURBO_MODULE_CLASS_BY_NAME: Record<string, typeof TurboModule> = {
   [AlertManagerTurboModule.NAME]: AlertManagerTurboModule,
   [AppearanceTurboModule.NAME]: AppearanceTurboModule,
   [AppStateTurboModule.NAME]: AppStateTurboModule,
-  // commented out as BlobTurboModule isn't finished and it breaks things.
-  // [BlobTurboModule.NAME]: BlobTurboModule,
+  [BlobTurboModule.NAME]: BlobTurboModule,
   [DeviceEventManagerTurboModule.NAME]: DeviceEventManagerTurboModule,
   [DevSettingsTurboModule.NAME]: DevSettingsTurboModule,
   [DevMenuTurboModule.NAME]: DevMenuTurboModule,
   [ExceptionsManagerTurboModule.NAME]: ExceptionsManagerTurboModule,
+  [FileReaderTurboModule.NAME]: FileReaderTurboModule,
   [ImageLoaderTurboModule.NAME]: ImageLoaderTurboModule,
   [KeyboardObserverTurboModule.NAME]: KeyboardObserverTurboModule,
   [NativeAnimatedTurboModule.NAME]: NativeAnimatedTurboModule,

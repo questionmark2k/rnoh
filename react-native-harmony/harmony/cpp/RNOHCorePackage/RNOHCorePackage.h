@@ -17,6 +17,7 @@
 #include "RNOHCorePackage/TurboModules/DeviceEventManagerTurboModule.h"
 #include "RNOHCorePackage/TurboModules/DeviceInfoTurboModule.h"
 #include "RNOHCorePackage/TurboModules/ExceptionsManagerTurboModule.h"
+#include "RNOHCorePackage/TurboModules/FileReaderTurboModule.h"
 #include "RNOHCorePackage/TurboModules/ImageLoaderTurboModule.h"
 #include "RNOHCorePackage/TurboModules/LinkingManagerTurboModule.h"
 #include "RNOHCorePackage/TurboModules/NetworkingTurboModule.h"
@@ -69,15 +70,17 @@ class RNOHCoreTurboModuleFactoryDelegate : public TurboModuleFactoryDelegate {
             return std::make_shared<AppearanceTurboModule>(ctx, name);
         } else if (name == "AppState") {
             return std::make_shared<AppStateTurboModule>(ctx, name);
-        // } else if (name == "BlobModule") {
-        //     return std::make_shared<BlobTurboModule>(ctx, name);
+        } else if (name == "BlobModule") {
+            return std::make_shared<BlobTurboModule>(ctx, name);
         } else if (name == "DeviceEventManager") {
             return std::make_shared<DeviceEventManagerTurboModule>(ctx, name);
         } else if (name == "DeviceInfo") {
             return std::make_shared<DeviceInfoTurboModule>(ctx, name);
         } else if (name == "ExceptionsManager") {
             return std::make_shared<ExceptionsManagerTurboModule>(ctx, name);
-        } else if (name == "ImageLoader") {
+        } else if (name == "FileReaderModule") {
+            return std::make_shared<FileReaderTurboModule>(ctx, name);
+        }  else if (name == "ImageLoader") {
             return std::make_shared<ImageLoaderTurboModule>(ctx, name);
         } else if (name == "KeyboardObserver") {
             return std::make_shared<ArkTSTurboModule>(ctx, name);

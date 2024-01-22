@@ -2,9 +2,9 @@ import { TurboModule, TurboModuleContext } from '../../../RNOH/TurboModule';
 import util from '@ohos.util';
 import fs from '@ohos.file.fs';
 import { ContentHandler, WebSocketTurboModule } from '../WebSocketTurboModule';
-import { UriHandler } from '../Networking/index';
+import { NetworkingTurboModule, RequestBodyHandler, ResponseBodyHandler, UriHandler } from '../Networking/index';
 import uri from '@ohos.uri';
-import { BlobMetaData, BlobPart } from './types';
+import { Blob, BlobMetadata, BlobPart } from './types';
 import { BlobRegistry } from './BlobRegistry';
 
 
@@ -16,14 +16,14 @@ export class BlobTurboModule extends TurboModule {
     processMessage: (params) => {
       return params;
     },
-    processByteMessage: (bytes, params) => {
+    processByteMessage: (blob, params) => {
       return {
         id: params.id,
         type: "blob",
         data: {
-          blobId: this.blobRegistry.saveArrayBuffer(bytes),
+          blobId: this.blobRegistry.save(blob),
           offset: 0,
-          size: bytes.byteLength
+          size: blob.byteLength
         }
       }
     }
@@ -31,7 +31,7 @@ export class BlobTurboModule extends TurboModule {
   }
 
   private networkingUriHandler: UriHandler = {
-    supports(query) {
+    supports: (query) => {
       const parsedUri = new uri.URI(query.url)
       const remote = parsedUri.scheme === 'http' || parsedUri.scheme === 'https';
       if (!remote && query.responseType === 'blob') {
@@ -39,13 +39,13 @@ export class BlobTurboModule extends TurboModule {
       }
       return false;
     },
-    async fetch(query) {
+    fetch: async (query) => {
       const file = fs.openSync(query.url, fs.OpenMode.READ_WRITE);
       const stat = await fs.stat(query.url);
-      const arrayBuffer = new ArrayBuffer(stat.size);
-      await fs.read(file.fd, arrayBuffer);
+      const blob: Blob = new ArrayBuffer(stat.size);
+      await fs.read(file.fd, blob);
       return {
-        blobId: this.blobRegistry.store(arrayBuffer),
+        blobId: this.blobRegistry.save(blob),
         offset: 0,
         size: stat.size,
         type: undefined, //no way to find the type using Ark
@@ -55,21 +55,78 @@ export class BlobTurboModule extends TurboModule {
     }
   }
 
+  private requestBodyHandler: RequestBodyHandler = {
+    supports: (data) => {
+      if ('blob' in data) {
+        return true;
+      }
+      return false;
+    },
+
+    handleRequest: (data, contentType) => {
+      let type = contentType;
+      if (data.blob.type) {
+        type = data.blob.type;
+      }
+      if (type == null || type === '') {
+        type = 'application/octet-stream';
+      }
+
+      if ('blob' in data) {
+        const blobMetadata: BlobMetadata = data.blob;
+        const bytes = this.blobRegistry.findByMetadata(blobMetadata);
+
+        return { body: bytes, contentType: type }
+      }
+    }
+  }
+
+  private responseBodyHandler: ResponseBodyHandler = {
+    supports: (responseType) => {
+      return 'blob' === responseType;
+    },
+    handleResponse: (response) => {
+      if (response instanceof ArrayBuffer) {
+        return {
+          blobId: this.blobRegistry.save(response),
+          offset: 0,
+          size: response.byteLength
+        }
+      } else if (typeof response === 'string') {
+        const textEncoder = new util.TextEncoder();
+        const bytes: Blob = textEncoder.encodeInto(response).buffer;
+        return {
+          blobId: this.blobRegistry.save(bytes),
+          offset: 0,
+          size: bytes.byteLength
+        }
+      }
+
+    }
+  }
+
 
   private getWebSocketModule(): WebSocketTurboModule {
     return this.ctx.rnInstance.getTurboModule(WebSocketTurboModule.NAME);
   }
 
+  private getNetworkingModule(): NetworkingTurboModule {
+    return this.ctx.rnInstance.getTurboModule(NetworkingTurboModule.NAME);
+  }
 
-  /*
-   * The below methods are called by NAPI
-  */
+  findByUri(uri: string): Blob | null {
+    return this.blobRegistry.findByUri(uri);
+  }
+
+  findByMetaData(blob: BlobMetadata): Blob | null {
+    return this.blobRegistry.findByMetadata(blob);
+  }
 
   createFromParts(parts: Array<BlobPart>, blobId: string): void {
     this.blobRegistry.appendPartsToBlob(parts, blobId)
   }
 
-  sendOverSocket(blob: BlobMetaData, idDouble: number): void {
+  sendOverSocket(blob: BlobMetadata, idDouble: number): void {
     const id = Math.floor(idDouble);
     const webSocketModule = this.getWebSocketModule();
 
@@ -84,12 +141,20 @@ export class BlobTurboModule extends TurboModule {
     }
   }
 
-  addWebSocketHandler(socketID: number) {
-    const module = this.getWebSocketModule()
-    module.setContentHandler(socketID, this.contentHandler);
+  addNetworkingHandler(): void {
+    const networkingModule = this.getNetworkingModule();
+    networkingModule.addUriHandler(this.networkingUriHandler);
+    networkingModule.addRequestBodyHandler(this.requestBodyHandler);
+    networkingModule.addResponseBodyHandler(this.responseBodyHandler);
+
   }
 
-  removeWebSocketHandler(socketID: number) {
+  addWebSocketHandler(socketID: number): void {
+    const websocketModule = this.getWebSocketModule()
+    websocketModule.setContentHandler(socketID, this.contentHandler);
+  }
+
+  removeWebSocketHandler(socketID: number): void {
     const module = this.getWebSocketModule()
     module.setContentHandler(socketID, null);
   }

@@ -2,19 +2,19 @@ import webSocket from '@ohos.net.webSocket'
 import util from '@ohos.util'
 import { TurboModule, TurboModuleContext, RNOHLogger } from "../../RNOH/ts";
 import { BusinessError } from '@ohos.base';
-import { BlobMetaData } from './Blob';
+import { BlobMetadata as BlobMetadata } from './Blob';
 
 const WEB_SOCKET_SUPPORTED_EVENT_NAMES = ["websocketOpen", "websocketClosed", "websocketFailed", "websocketMessage"] as const;
 
 type MessageParams = {
   id: number,
   type: string,
-  data?: string | BlobMetaData,
+  data?: string | BlobMetadata,
 }
 
 export type ContentHandler = {
   processMessage: (params: MessageParams) => MessageParams;
-  processByteMessage: (byteString: ArrayBuffer, params: MessageParams) => MessageParams;
+  processByteMessage: (bytes: ArrayBuffer, params: MessageParams) => MessageParams;
 }
 
 export class WebSocketTurboModule extends TurboModule {

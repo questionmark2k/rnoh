@@ -86,7 +86,6 @@ export const NetworkingTest = () => {
       />
       <TestCase
         itShould="download data to a blob"
-        skip="BlobTurboModule support is not enabled"
         fn={async ({expect}) => {
           const response = await fetch('https://reactnative.dev/movies.json');
           const result = await response.blob();

@@ -381,6 +381,7 @@ target_compile_options(hermes_inspector PRIVATE ${folly_compile_options})
 
 add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOH/RNInstance.cpp"
+    "${RNOH_CPP_DIR}/RNOH/BlobCollector.cpp"
     "${RNOH_CPP_DIR}/RNOH/MessageQueueThread.cpp"
     "${RNOH_CPP_DIR}/RNOH/MutationsToNapiConverter.cpp"
     "${RNOH_CPP_DIR}/RNOH/LogSink.cpp"
@@ -407,6 +408,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/DeviceEventManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/DeviceInfoTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/ExceptionsManagerTurboModule.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/FileReaderTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/ImageLoaderTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/LogBoxTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/DevLoadingViewTurboModule.cpp"

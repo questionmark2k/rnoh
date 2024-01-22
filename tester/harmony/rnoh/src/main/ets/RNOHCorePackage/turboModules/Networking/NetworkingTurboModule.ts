@@ -4,6 +4,7 @@ import util from "@ohos.util";
 import { TurboModule } from "../../../RNOH/TurboModule";
 import { NetworkEventsDispatcher } from './NetworkEventDispatcher';
 import ArrayList from '@ohos.util.ArrayList';
+import { BlobMetadata } from '../Blob';
 
 type ResponseType =
 | 'base64'
@@ -26,6 +27,19 @@ export type UriHandler = {
   fetch: (query: Query) => Object;
 }
 
+export type RequestBodyHandler = {
+  supports: (data: Object) => boolean;
+  handleRequest: (data: { blob: BlobMetadata }, contentType?: string) => {
+    body: string | ArrayBuffer | Object,
+    contentType?: string
+  };
+}
+
+export type ResponseBodyHandler = {
+  supports: (responseType: ResponseType) => boolean,
+  handleResponse: (response: string | Object | ArrayBuffer) => BlobMetadata
+}
+
 export class NetworkingTurboModule extends TurboModule {
   public static readonly NAME = 'Networking';
   private nextId: number = 0
@@ -33,6 +47,8 @@ export class NetworkingTurboModule extends TurboModule {
   private networkEventDispatcher: NetworkEventsDispatcher = new NetworkEventsDispatcher(this.ctx.rnInstance)
   private base64Helper: util.Base64Helper = new util.Base64Helper();
   private uriHandlers: ArrayList<UriHandler> = new ArrayList();
+  private requestBodyHandlers: ArrayList<RequestBodyHandler> = new ArrayList();
+  private responseBodyHandlers: ArrayList<ResponseBodyHandler> = new ArrayList();
 
   private REQUEST_METHOD_BY_NAME: Record<string, http.RequestMethod> = {
     OPTIONS: http.RequestMethod.OPTIONS,
@@ -51,6 +67,22 @@ export class NetworkingTurboModule extends TurboModule {
 
   removeUriHandler(handler: UriHandler) {
     this.uriHandlers.remove(handler);
+  }
+
+  addRequestBodyHandler(handler: RequestBodyHandler) {
+    this.requestBodyHandlers.add(handler)
+  }
+
+  removeRequestBodyHandler(handler: RequestBodyHandler) {
+    this.requestBodyHandlers.remove(handler)
+  }
+
+  addResponseBodyHandler(handler: ResponseBodyHandler) {
+    this.responseBodyHandlers.add(handler)
+  }
+
+  removeResponseBodyHandler(handler: ResponseBodyHandler) {
+    this.responseBodyHandlers.remove(handler)
   }
 
   decodeBuffer(buf: ArrayBuffer): string {
@@ -112,7 +144,27 @@ export class NetworkingTurboModule extends TurboModule {
       }
     }
 
-    const extraData = this.encodeBody(query.data);
+    let requestBodyHandler: RequestBodyHandler = null;
+    if (query.data) {
+      for (const handler of this.requestBodyHandlers) {
+        if (handler.supports(query.data)) {
+          requestBodyHandler = handler;
+          break;
+        }
+      }
+    }
+
+    let extraData = null;
+    let headers: any = query.headers;
+
+
+    if (requestBodyHandler != null) {
+      const requestData = requestBodyHandler.handleRequest(query.data as { blob: BlobMetadata }, query.responseType);
+      extraData = requestData.body;
+      headers.contentType = requestData.contentType;
+    } else {
+      extraData = this.encodeBody(query.data);
+    }
 
     httpRequest.request(
       query.url,
@@ -126,6 +178,14 @@ export class NetworkingTurboModule extends TurboModule {
       async (err, data) => {
         if (!err) {
           this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, data.responseCode, query.headers, query.url);
+          for (const handler of this.responseBodyHandlers) {
+            if (handler.supports(query.responseType)) {
+
+              this.networkEventDispatcher.dispatchDidReceiveNetworkData(requestId, handler.handleResponse(data.result));
+              this.networkEventDispatcher.dispatchDidCompleteNetworkResponse(requestId);
+              return;
+            }
+          }
           this.networkEventDispatcher.dispatchDidReceiveNetworkData(requestId, await this.encodeResponse(data.result, query.responseType));
           this.networkEventDispatcher.dispatchDidCompleteNetworkResponse(requestId);
         } else {

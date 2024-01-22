@@ -1,11 +1,12 @@
 import Url from '@ohos.url'
 import util from '@ohos.util';
-import { BlobMetaData, BlobPart } from './types';
+import { Blob, BlobMetadata, BlobPart } from './types';
+
 
 export class BlobRegistry {
-  private blobById: Map<string, ArrayBuffer> = new Map();
+  private blobById: Map<string, Blob> = new Map();
 
-  findByUri(uri: string): ArrayBuffer | null {
+  findByUri(uri: string): Blob | null {
     const url = Url.URL.parseURL(uri);
     const urlParams = new Url.URLParams(url.search)
     const blobId: string | undefined = url.pathname.split("/").pop();
@@ -22,7 +23,7 @@ export class BlobRegistry {
     return this.findById(blobId ?? '', offset, size);
   }
 
-  findById(blobId: string, offset: number, size: number): ArrayBuffer | null {
+  findById(blobId: string, offset: number, size: number): Blob | null {
     const data = this.blobById.get(blobId);
     if (!data) {
       return null;
@@ -38,8 +39,8 @@ export class BlobRegistry {
     return data;
   }
 
-  findByMetaData(blob: BlobMetaData): ArrayBuffer | null {
-    return this.findById(blob.blobId, blob.offset, blob.size);
+  findByMetadata(blobMetadata: BlobMetadata): Blob | null {
+    return this.findById(blobMetadata.blobId, blobMetadata.offset, blobMetadata.size);
   }
 
   appendPartsToBlob(parts: Array<BlobPart>, blobId: string): void {
@@ -50,39 +51,39 @@ export class BlobRegistry {
       let part = parts[i];
       switch (part.type) {
         case "blob":
-          let blob = part.data as BlobMetaData;
-          totalBlobSize += blob.size;
-          partList[i] = this.findByMetaData(blob);
+          let blobMetadata = part.data as BlobMetadata;
+          totalBlobSize += blobMetadata.size;
+          partList[i] = this.findByMetadata(blobMetadata);
           break;
         case "string":
           let textEncoder = new util.TextEncoder();
-          let bytes: ArrayBuffer = textEncoder.encodeInto(part.data as string).buffer;
-          totalBlobSize += bytes.byteLength;
-          partList[i] = bytes;
+          let blob: Blob = textEncoder.encodeInto(part.data as string).buffer;
+          totalBlobSize += blob.byteLength;
+          partList[i] = blob;
           break;
         default:
           throw new Error("Invalid type for blob: " + part["type"]);
       }
     }
-    let buffer: ArrayBuffer = new ArrayBuffer(totalBlobSize);
-    let bufferView = new Uint8Array(buffer);
+    const blob: Blob = new ArrayBuffer(totalBlobSize);
+    const bufferView = new Uint8Array(blob);
     let pos = 0;
     for (let part of partList) {
       let partView = new Uint8Array(part);
       bufferView.set(partView, pos);
       pos += part.byteLength;
     }
-    this.saveArrayBufferWithId(buffer, blobId);
+    this.saveWithId(blob, blobId);
   }
 
-  saveArrayBuffer(data: ArrayBuffer): string {
+  save(blob: Blob): string {
     const blobId: string = util.generateRandomUUID();
-    this.saveArrayBufferWithId(data, blobId);
+    this.saveWithId(blob, blobId);
     return blobId;
   }
 
-  saveArrayBufferWithId(data: ArrayBuffer, blobId: string): void {
-    this.blobById.set(blobId, data);
+  saveWithId(blob: Blob, blobId: string): void {
+    this.blobById.set(blobId, blob);
   }
 
   deleteBlobById(blobId: string) {
