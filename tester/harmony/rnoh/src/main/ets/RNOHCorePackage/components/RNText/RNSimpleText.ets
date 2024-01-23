@@ -69,7 +69,7 @@ export struct RNSimpleText {
         .fontSize(getFontSize(this.fragment?.fontSize, this.descriptor.rawProps))
         .minFontSize(getMinFontSize(this.fragment?.fontSize, this.descriptor.rawProps))
         .maxFontSize(getFontSize(this.fragment?.fontSize, this.descriptor.rawProps))
-        .heightAdaptivePolicy(this.descriptor.rawProps.adjustsFontSizeToFit ? TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST : TextHeightAdaptivePolicy.MAX_LINES_FIRST)
+        .heightAdaptivePolicy(this.descriptor.rawProps.adjustsFontSizeToFit ? TextHeightAdaptivePolicy.MIN_FONT_SIZE_FIRST : TextHeightAdaptivePolicy.MAX_LINES_FIRST)
         .fontStyle(stringToFontStyle(this.fragment?.fontStyle))
         .decoration({
           type: getTextDecorationLine(this.fragment?.textDecorationLine),

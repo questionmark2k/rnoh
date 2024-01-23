@@ -1172,6 +1172,11 @@ export function TextTest() {
         <TestCase modal itShould="adjust text size to fit the container">
           <TextAdjustsFontSizeToFitTest />
         </TestCase>
+        <TestCase
+          modal
+          itShould="adjust text size with max height to fit the container">
+          <TextAdjustsFontSizeToFitIssueTest />
+        </TestCase>
         <TestCase modal itShould="render text with allowFontScaling">
           <Text allowFontScaling>Scaled</Text>
           <Text allowFontScaling={false}>Not scaled</Text>
@@ -1337,6 +1342,23 @@ const TextAdjustsFontSizeToFitTest = () => {
           </Text>
         </View>
       ))}
+    </View>
+  );
+};
+
+const TextAdjustsFontSizeToFitIssueTest = () => {
+  // this case crashed app when RNSimpleText used TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST
+  return (
+    <View style={{height: 150, marginTop: 50}}>
+      <Text adjustsFontSizeToFit style={{maxHeight: 50, backgroundColor: 'blue'}}>
+        {SAMPLE_PARAGRAPH_TEXT}
+      </Text>
+      <Text
+        adjustsFontSizeToFit
+        minimumFontScale={0.99}
+        style={{maxHeight: 50, backgroundColor: 'green'}}>
+        {SAMPLE_PARAGRAPH_TEXT}
+      </Text>
     </View>
   );
 };
