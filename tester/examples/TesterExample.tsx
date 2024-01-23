@@ -11,6 +11,13 @@ export function TesterExample({filter}: {filter: Filter}) {
       <ScrollView style={styles.container} ref={scrollRef}>
         {Object.keys(tests).map(testSuiteName => {
           const TestSuite = tests[testSuiteName as keyof typeof tests];
+          // these tests use SampleTurboModule which is not available in the tester
+          if (
+            testSuiteName === 'ErrorHandlingTest' ||
+            testSuiteName === 'TurboModuleTest'
+          ) {
+            return null;
+          }
           return <TestSuite key={testSuiteName} />;
         })}
       </ScrollView>
@@ -21,7 +28,6 @@ export function TesterExample({filter}: {filter: Filter}) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-
     backgroundColor: '#333',
   },
 });

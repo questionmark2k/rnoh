@@ -1,5 +1,6 @@
 import { RNInstance, JSBundleProvider, RNAbility, RNSurface } from 'rnoh'
 import { CustomComponentBuilder } from "rnoh/src/main/ets/RNOHCorePackage"
+import { SurfaceConfig2 } from 'rnoh/src/main/ets/RNSurface'
 
 
 @Component
@@ -62,7 +63,7 @@ export struct SurfaceDeadlockTest {
                 surfaceConfig: {
                   initialProps: {},
                   appKey: appKey,
-                },
+                } as SurfaceConfig2,
                 buildCustomComponent: this.buildCustomComponent,
               })
             }
