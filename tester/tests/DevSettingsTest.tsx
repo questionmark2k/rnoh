@@ -7,7 +7,6 @@ export const DevSettingsTest = () => {
   return (
     <TestSuite name="DevSettings">
       <TestCase
-        skip
         itShould="add custom DevMenu item and react to presses after opening DevMenu"
         initialState={false}
         arrange={({setState}) => <AddMenuItemTest setState={setState} />}

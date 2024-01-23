@@ -1,6 +1,6 @@
-import { RNInstanceRegistry } from "./RNInstanceRegistry"
-import { EventEmitter } from "./EventEmitter"
-import { DevServerHelper } from "./DevServerHelper"
+import { RNInstanceRegistry } from './RNInstanceRegistry'
+import { EventEmitter } from './EventEmitter'
+import { DevServerHelper } from './DevServerHelper'
 import { RNOHLogger } from './RNOHLogger'
 
 export class DevToolsController {
@@ -38,6 +38,12 @@ export class DevToolsController {
   emitDevMenuShown(): void {
     this.rnInstanceRegistry.forEach(rnInstance => {
       rnInstance.emitDeviceEvent("RCTDevMenuShown", {});
+    })
+  }
+
+  emitDidPressMenuItem(title: string): void {
+    this.rnInstanceRegistry.forEach(rnInstance => {
+      rnInstance.emitDeviceEvent("didPressMenuItem", { title: title });
     })
   }
 

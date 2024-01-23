@@ -43,7 +43,7 @@ export class DevSettingsTurboModule extends TurboModule {
   }
 
   public addMenuItem(title: string) {
-    this.logger.warn("DevSettings::addMenuItem is not supported");
+    this.ctx.rnAbility.devMenu.addMenuItem(title);
   }
 
   public addListener(eventName: string) {

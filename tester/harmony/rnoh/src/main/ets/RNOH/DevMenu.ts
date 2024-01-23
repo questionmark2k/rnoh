@@ -24,6 +24,16 @@ export class DevMenu {
     this.createDevMenuDefaultButtons()
   }
 
+  public addMenuItem(title: string): void {
+    this.devMenuButtons.push({
+      value: title,
+      action: () => {
+        this.devToolsController.emitDidPressMenuItem(title);
+        this.devMenuDialogVisible = false;
+      }
+    })
+  }
+
   private createDevMenuDefaultButtons() {
     this.devMenuButtons.push({
       value: "Reload",
