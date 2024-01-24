@@ -15,8 +15,8 @@ export class AbsolutePath implements ValueObject {
     return this.value;
   }
 
-  copyWithNewSegment(relativePath: string): AbsolutePath {
-    return new AbsolutePath(pathUtils.resolve(this.getValue(), relativePath));
+  copyWithNewSegment(...relativePath: string[]): AbsolutePath {
+    return new AbsolutePath(pathUtils.join(this.getValue(), ...relativePath));
   }
 
   getExtension(): string | null {

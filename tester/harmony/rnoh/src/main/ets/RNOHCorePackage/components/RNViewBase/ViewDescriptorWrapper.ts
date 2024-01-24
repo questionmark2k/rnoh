@@ -11,7 +11,8 @@ import {
   getTransformedVector,
   PointerEvents,
   ReadonlyTransformationMatrix,
-  TransformMatrix
+  TransformMatrix,
+  PropsSelectorBase
 } from '../../../RNOH/ts'
 import { AccessibilityLevel, ViewBaseProps, ViewRawProps } from './types'
 import matrix4 from '@ohos.matrix4'
@@ -27,10 +28,27 @@ function mapEdge<T, R>(edges: Edges<T>, cb: (value: T, key: keyof Edges<T>) => R
   }
 }
 
-export class ViewDescriptorWrapperBase<TType extends string = string, TProps extends ViewBaseProps = ViewBaseProps, TState extends Object = {}, TRawProps extends ViewRawProps = ViewRawProps> extends DescriptorWrapper<TType, TProps, TState, TRawProps> {
+export class ViewPropsSelector<TProps extends ViewBaseProps = ViewBaseProps, TRawProps extends ViewRawProps = ViewRawProps> extends PropsSelectorBase {
+  constructor(protected props: TProps, protected rawProps: TRawProps) {
+    super()
+  }
+}
+
+export class ViewDescriptorWrapperBase<
+  TType extends string = string,
+  TProps extends ViewBaseProps = ViewBaseProps,
+  TState extends Object = {},
+  TRawProps extends ViewRawProps = ViewRawProps,
+  TPropsSelector extends ViewPropsSelector<TProps, TRawProps> = ViewPropsSelector<TProps, TRawProps>
+> extends DescriptorWrapper<TType, TProps, TState, TRawProps, TPropsSelector> {
+
   public constructor(viewDescriptor: Descriptor) {
     // casting because ArkTS cannot infer types
     super(viewDescriptor as Descriptor<TType, TProps, TState, TRawProps>)
+  }
+
+  protected createPropsSelector() {
+    return new ViewPropsSelector(this.descriptor.props, this.descriptor.rawProps) as TPropsSelector
   }
 
   public get backgroundColor(): string | undefined {
@@ -135,13 +153,13 @@ export class ViewDescriptorWrapperBase<TType extends string = string, TProps ext
   }
 
   public get rawTransformationMatrix(): ReadonlyTransformationMatrix {
-    if (!('transform' in this.props)) {
+    if (!('transform' in this.cppProps)) {
       return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
     }
-    if (this.props.transform.length != 16) {
+    if (this.cppProps.transform.length != 16) {
       throw new Error("Transformation matrix must have a size of 16")
     }
-    return this.props.transform.slice() as TransformMatrix
+    return this.cppProps.transform.slice() as TransformMatrix
   }
 
   public get transformationMatrix(): matrix4.Matrix4Transit {

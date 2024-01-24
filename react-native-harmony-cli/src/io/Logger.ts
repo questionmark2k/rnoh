@@ -10,6 +10,10 @@ export class Logger {
     console.info(prefix, prepareMsg(chalk));
   }
 
+  debug(prepareMsg: (styles: typeof chalk) => string) {
+    console.debug(prepareMsg(chalk));
+  }
+
   descriptiveError(error: DescriptiveError) {
     const lines: string[] = [];
     if (error.isUnexpected() && error.stack) {

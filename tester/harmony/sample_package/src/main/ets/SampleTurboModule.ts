@@ -1,6 +1,25 @@
-import { TurboModule, RNOHError } from 'rnoh/ts';
+import { TurboModule, RNOHError, Tag } from 'rnoh/ts';
+import { TM } from "rnoh/generated/ts"
 
-export class SampleTurboModule extends TurboModule {
+
+export class SampleTurboModule extends TurboModule implements TM.GeneratedSampleTurboModule.Spec {
+  getUnionValue(arg: null | Object): Object {
+    return arg ?? {}
+  }
+
+  getRootTag(arg: Tag): Tag {
+    return arg
+  }
+
+  getEnum(enum1: TM.GeneratedSampleTurboModule.SomeEnum1, enum2: TM.GeneratedSampleTurboModule.SomeEnum2, enum3: TM.GeneratedSampleTurboModule.SomeEnum3): {
+    enum1: TM.GeneratedSampleTurboModule.SomeEnum1;
+    enum2: TM.GeneratedSampleTurboModule.SomeEnum2;
+    enum3: TM.GeneratedSampleTurboModule.SomeEnum3;
+    hardcodedEnum1: TM.GeneratedSampleTurboModule.SomeEnum1;
+  } {
+    return { enum1, enum2, enum3, hardcodedEnum1: TM.GeneratedSampleTurboModule.SomeEnum1.FOO }
+  }
+
   voidFunc() {
     console.log('RNOH SampleTurboModule::voidFunc');
   }
@@ -21,7 +40,7 @@ export class SampleTurboModule extends TurboModule {
   }
 
   getObject(arg: { x: { y: number } }): Object {
-    console.log(`RNOH SampleTurboModule::getString(${arg})`);
+    console.log(`RNOH SampleTurboModule::getObject(${arg})`);
     return arg;
   }
 
@@ -50,7 +69,7 @@ export class SampleTurboModule extends TurboModule {
   }
 
   getPromisedArray() {
-    return Promise.resolve([1,2,3])
+    return Promise.resolve([1, 2, 3])
   }
 
   displayRNOHError(data: {
@@ -64,5 +83,9 @@ export class SampleTurboModule extends TurboModule {
 
   throwExceptionArk() {
     throw new Error("Exception thrown from ArkTS")
+  }
+
+  getUnknown(arg: Object) {
+    return arg
   }
 }

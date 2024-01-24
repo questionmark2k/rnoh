@@ -1,4 +1,5 @@
 export * from './SampleComponent';
+export * from './GeneratedSampleComponent';
 import NativeSampleTurboModule from './NativeSampleTurboModule';
 import NativeGeneratedSampleTurboModule from './NativeGeneratedSampleTurboModule';
 

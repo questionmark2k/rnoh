@@ -16,9 +16,11 @@ export class CodegenConfig {
   ) {
     const SUPPORTED_SPEC_EXTENSIONS = ['js', 'jsx', 'ts', 'tsx'];
     const specPaths = (rawCodegenConfig.specPaths ?? []).map((rawSpecPath) => {
-      return packageRootPath.copyWithNewSegment(
-        rawSpecPath.replace('~', projectRootPath.getValue())
-      );
+      if (rawSpecPath.startsWith('~')) {
+        return projectRootPath.copyWithNewSegment(rawSpecPath.replace('~', ''));
+      } else {
+        return packageRootPath.copyWithNewSegment(rawSpecPath);
+      }
     });
     const specFilePaths = specPaths.flatMap((specPath) => {
       if (!fs.existsSync(specPath.getValue())) {

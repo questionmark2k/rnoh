@@ -1,20 +1,28 @@
 import { AbsolutePath } from '../../core';
 import fs from 'fs';
 import { CodegenConfig } from './CodegenConfig';
+import { CodegenError } from './CodegenError';
 
 export class PackageJSON {
   static fromProjectRootPath(
     packageRootPath: AbsolutePath,
     projectRootPath: AbsolutePath
   ) {
+    const packageJSONPath = packageRootPath.copyWithNewSegment('package.json');
+    if (!fs.existsSync(packageJSONPath.getValue())) {
+      throw new CodegenError({
+        whatHappened: "Couldn't find 'package.json'",
+        whatCanUserDo: {
+          default: [
+            'Check if the path to project root is correct',
+            'Try changing working directory to project root',
+          ],
+        },
+        extraData: packageJSONPath.getValue(),
+      });
+    }
     return new PackageJSON(
-      JSON.parse(
-        fs
-          .readFileSync(
-            packageRootPath.copyWithNewSegment('package.json').getValue()
-          )
-          .toString()
-      ),
+      JSON.parse(fs.readFileSync(packageJSONPath.getValue()).toString()),
       packageRootPath,
       projectRootPath
     );

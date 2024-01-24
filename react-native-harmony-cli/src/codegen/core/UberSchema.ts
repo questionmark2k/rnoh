@@ -9,6 +9,7 @@ import { CodegenConfig } from './CodegenConfig';
 import { ProjectDependenciesManager } from './ProjectDependenciesManager';
 // @ts-expect-error
 import extractUberSchemaFromSpecFilePaths_ from '@react-native/codegen/lib/cli/combine/combine-js-to-schema.js';
+import { CodegenError } from './CodegenError';
 
 function createRawUberSchemaFromSpecFilePaths(
   projectSourceFilePaths: AbsolutePath[]
@@ -20,6 +21,10 @@ function createRawUberSchemaFromSpecFilePaths(
 
 export type SpecSchema = ComponentSchema | NativeModuleSchema;
 export type SpecSchemaType = SpecSchema['type'];
+type FindSpecSchemaByType<
+  TType extends SpecSchemaType,
+  TSpecSchema = SpecSchema
+> = TSpecSchema extends { type: TType } ? TSpecSchema : never;
 
 export class UberSchema implements ValueObject {
   static fromProjectRootPath(projectRootPath: AbsolutePath): UberSchema {
@@ -38,13 +43,27 @@ export class UberSchema implements ValueObject {
         codegenConfigs.push(codegenConfig);
       }
     });
-    return new UberSchema(
-      createRawUberSchemaFromSpecFilePaths(
-        codegenConfigs.flatMap((codegenConfig) =>
-          codegenConfig.getSpecFilePaths()
+    try {
+      return new UberSchema(
+        createRawUberSchemaFromSpecFilePaths(
+          codegenConfigs.flatMap((codegenConfig) =>
+            codegenConfig.getSpecFilePaths()
+          )
         )
-      )
-    );
+      );
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new CodegenError({
+          whatHappened: "Couldn't create the schema",
+          whatCanUserDo: {
+            default: [
+              `There's probably at least one spec file defined in your project or in a third-party package that breaks some code generation restrictions. Please check the message below. If it's ambiguous, debug the problem with divide and conquer strategy.\n\n${err.message}`,
+            ],
+          },
+        });
+      }
+      throw err;
+    }
   }
 
   private constructor(private schemaValue: RawUberSchema) {}
@@ -53,13 +72,15 @@ export class UberSchema implements ValueObject {
     return this.schemaValue;
   }
 
-  getTurboModuleNames(): string[] {
+  findAllSpecSchemasByType<TSpecSchemaType extends SpecSchemaType>(
+    schemaType: TSpecSchemaType
+  ): FindSpecSchemaByType<TSpecSchemaType>[] {
     return Object.values(this.schemaValue.modules)
-      .filter((module) => module.type === 'NativeModule')
-      .map((module) => (module as NativeModuleSchema).moduleName);
+      .filter((module) => module.type === schemaType)
+      .map((module) => module as FindSpecSchemaByType<TSpecSchemaType>);
   }
 
-  getSchemaByFileName(): ReadonlyMap<string, SpecSchema> {
+  getSpecSchemaByFilenameMap(): ReadonlyMap<string, SpecSchema> {
     return Object.entries(this.schemaValue.modules).reduce(
       (acc, [moduleName, moduleSchema]) => {
         acc.set(moduleName, moduleSchema);

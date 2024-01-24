@@ -54,14 +54,26 @@ export enum OverflowMode {
   SCROLL = 2,
 }
 
+/**
+ * The purpose of this class is retrieving props in a collision free manner. Initially we did that in
+ * the descriptorWrapper, however that approach created a room for collisions, especially when codegen feature was used.
+ */
+export class PropsSelectorBase {
+}
 
 /**
  * (Component)DescriptorWrapper. Decouples "what" is received from React Native from "how".
  */
 export class DescriptorWrapper<TType = string,
 TProps extends PropsBase = PropsBase,
-TState extends StateBase = StateBase, TRawProps extends RawPropsBase = RawPropsBase> {
+TState extends StateBase = StateBase,
+TRawProps extends RawPropsBase = RawPropsBase,
+TPropsSelector extends PropsSelectorBase = PropsSelectorBase,
+> {
+  private propsSelector: TPropsSelector
+
   constructor(protected descriptor: Descriptor<TType, TProps, TState, TRawProps>) {
+    this.propsSelector = this.createPropsSelector()
   }
 
   public get type_(): TType {
@@ -103,11 +115,19 @@ TState extends StateBase = StateBase, TRawProps extends RawPropsBase = RawPropsB
     return this.descriptor.rawProps
   }
 
-  protected get props(): TProps | Object {
+  protected get cppProps(): TProps | Object {
     if (this.descriptor.isDynamicBinder) {
       return {}
     }
     return this.descriptor.props as TProps
+  }
+
+  protected createPropsSelector(): TPropsSelector {
+    return new PropsSelectorBase() as TPropsSelector
+  }
+
+  public get props(): TPropsSelector {
+    return this.propsSelector
   }
 
   public get childrenTags(): Tag[] {
@@ -145,12 +165,9 @@ export interface RawPropsBase {
   nativeID?: NativeId
 }
 
-export interface PropsBase {
-}
+export interface PropsBase {}
 
-export interface StateBase {
-
-}
+export interface StateBase {}
 
 /**
  * (Component)Descriptor

@@ -3,6 +3,8 @@ import mustache from 'mustache';
 const TEMPLATE = `
 #pragma once
 
+// This file was generated.
+
 #include "RNOH/ArkTSTurboModule.h"
 
 namespace rnoh {

@@ -97,7 +97,6 @@ it("should not generate code for packages that don't specify 'codegenConfig' in 
   });
 
   new ReactNativeFixture(tmpDir).codegenHarmony({
-    etsOutputPath: './harmony/entry/src/main/ets/generated',
     cppOutputPath: './harmony/entry/src/main/cpp/generated',
     projectRootPath: '.',
   });
@@ -111,7 +110,6 @@ it("should not generate code for packages that don't specify 'codegenConfig' in 
     'cpp',
     'generated'
   );
-
   expect(
     fs.existsSync(
       cppGeneratedDirPath
@@ -165,7 +163,6 @@ it('should allow specifying paths to specs in other packages', async () => {
   });
 
   new ReactNativeFixture(tmpDir).codegenHarmony({
-    etsOutputPath: './harmony/entry/src/main/ets/codegen',
     cppOutputPath: './harmony/entry/src/main/cpp/codegen',
     projectRootPath: '.',
   });
@@ -218,7 +215,6 @@ describe('module', () => {
     });
 
     new ReactNativeFixture(tmpDir).codegenHarmony({
-      etsOutputPath: './harmony/entry/src/main/ets/generated',
       cppOutputPath: './harmony/entry/src/main/cpp/generated',
       projectRootPath: '.',
     });
@@ -253,4 +249,76 @@ describe('module', () => {
       )
     ).toBeTruthy();
   });
+});
+
+function createViewComponentSpec(name: string) {
+  return `
+import { ViewProps, HostComponent } from 'react-native';
+import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+import type { Float } from 'react-native/Libraries/Types/CodegenTypes';
+
+export interface ${name}NativeProps extends ViewProps {
+  size: Float;
+}
+
+export default codegenNativeComponent<${name}NativeProps>(
+  '${name}'
+) as HostComponent<${name}NativeProps>;
+  `;
+}
+
+describe('component', () => {
+  it.each(['SampleView', 'someView'])(
+    `should generate glue layer for a fabric component (%p)`,
+    async (componentName: string) => {
+      createFileStructure(tmpDir, {
+        harmony: {
+          entry: {
+            src: {
+              main: {
+                ets: {
+                  generated: {},
+                },
+                cpp: {},
+              },
+            },
+          },
+        },
+        src: {
+          specs: {
+            'SampleNativeViewComponent.ts':
+              createViewComponentSpec(componentName),
+          },
+        },
+        'package.json': createPackageJSONContent({
+          codegenConfig: {
+            specPaths: ['./src/specs'],
+          },
+        }),
+      });
+
+      new ReactNativeFixture(tmpDir).codegenHarmony({
+        cppOutputPath: './harmony/entry/src/main/cpp/generated',
+        projectRootPath: '.',
+      });
+
+      const cppGeneratedDirPath = AbsolutePath.fromSegments(
+        tmpDir,
+        'harmony',
+        'entry',
+        'src',
+        'main',
+        'cpp',
+        'generated'
+      );
+
+      expect(
+        fs.existsSync(
+          cppGeneratedDirPath
+            .copyWithNewSegment(`${componentName}JSIBinder.h`)
+            .getValue()
+        )
+      ).toBeTruthy();
+    }
+  );
 });

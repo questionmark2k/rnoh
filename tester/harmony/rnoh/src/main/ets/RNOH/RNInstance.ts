@@ -95,7 +95,7 @@ export interface RNInstance {
 
   emitDeviceEvent(eventName: string, payload: any): void;
 
-  emitComponentEvent(tag: Tag, eventEmitRequestHandlerName: string, payload: any): void;
+  emitComponentEvent(tag: Tag, eventName: string, payload: any): void;
 
   getBundleExecutionStatus(bundleURL: string): BundleExecutionStatus | undefined
 

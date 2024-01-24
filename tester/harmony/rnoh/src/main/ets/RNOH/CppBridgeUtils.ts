@@ -60,6 +60,30 @@ export function getTintColorMatrix(colorSegments?: ColorSegments) {
   ]
 }
 
+/**
+ * 0-255
+ */
+type ColorChannel = number
+
+export class Color {
+  static fromColorValue(colorValue: ColorValue) {
+    const [r, g, b, a] = convertColorValueToColorSegments(colorValue)
+    return new Color({ r: r * 255, g: g * 255, b: b * 255, a: a * 255 })
+  }
+
+  constructor(private rgba: {
+    r: ColorChannel,
+    g: ColorChannel,
+    b: ColorChannel,
+    a: ColorChannel
+  }) {
+  }
+
+  toRGBAString() {
+    return `rgba(${this.rgba.r}, ${this.rgba.g}, ${this.rgba.b}, ${this.rgba.a / 255})`
+  }
+}
+
 export function convertColorValueToRGBA(colorValue: ColorValue | undefined, defaultColor: string = "rgba(0,0,0,0.0)") {
   if (colorValue === undefined) return defaultColor;
   const rgba = {
@@ -70,6 +94,7 @@ export function convertColorValueToRGBA(colorValue: ColorValue | undefined, defa
   }
   return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
 }
+
 export function convertColorValueToHex(colorValue: ColorValue | undefined, defaultColor: string = "#00000000") {
   if (colorValue === undefined) return defaultColor;
   const toHex = (num, padding) => num.toString(16).padStart(padding, '0');
@@ -140,7 +165,7 @@ export function resolveBorderMetrics(props: BorderMetrics, isRTL: boolean): Bord
   const colorProps = resolveBorderEdgeProps(props, BorderEdgePropsType.COLOR, isRTL);
   const widthProps = resolveBorderEdgeProps(props, BorderEdgePropsType.WIDTH, isRTL);
   const radiusProps = resolveBorderRadius(props);
-  return {...colorProps, ...widthProps, ...radiusProps, borderStyle: props.borderStyle};
+  return { ...colorProps, ...widthProps, ...radiusProps, borderStyle: props.borderStyle };
 }
 
 export function resolveBorderRadius(props: BorderMetrics): BorderMetrics {
@@ -177,11 +202,11 @@ export function resolveBorderEdgeProps(props: BorderMetrics, type: BorderEdgePro
   return resolvedProps;
 }
 
-export function getTransformedVector(transformMatrix: ReadonlyTransformationMatrix, vector: Array<number>): Array<number>{
+export function getTransformedVector(transformMatrix: ReadonlyTransformationMatrix, vector: Array<number>): Array<number> {
   const resultVector = [0, 0, 0, 0]
   for (let i = 0; i < 4; ++i) {
     for (let j = 0; j < 4; ++j) {
-      resultVector[i] += transformMatrix[i*4+j] * vector[j]
+      resultVector[i] += transformMatrix[i * 4+j] * vector[j]
     }
   }
   return resultVector

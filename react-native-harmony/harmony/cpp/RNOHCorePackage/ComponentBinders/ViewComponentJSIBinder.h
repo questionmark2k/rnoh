@@ -5,7 +5,7 @@
 namespace rnoh {
 class ViewComponentJSIBinder : public BaseComponentJSIBinder {
   protected:
-    virtual facebook::jsi::Object createBubblingEventTypes(facebook::jsi::Runtime &rt) {
+    facebook::jsi::Object createBubblingEventTypes(facebook::jsi::Runtime &rt) override {
         facebook::jsi::Object events(rt);
         events.setProperty(rt, "topTouchStart", createBubblingCapturedEvent(rt, "onTouchStart"));
         events.setProperty(rt, "topTouchMove", createBubblingCapturedEvent(rt, "onTouchMove"));
@@ -17,9 +17,7 @@ class ViewComponentJSIBinder : public BaseComponentJSIBinder {
     }
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
         facebook::jsi::Object events(rt);
-
         events.setProperty(rt, "topClick", createDirectEvent(rt, "onClick"));
-
         return events;
     }
 };

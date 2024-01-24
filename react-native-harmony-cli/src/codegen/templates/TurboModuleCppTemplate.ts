@@ -3,6 +3,8 @@ import mustache from 'mustache';
 const TEMPLATE = `
 #include "{{className}}.h"
 
+// This file was generated.
+
 namespace rnoh {
 using namespace facebook;
 

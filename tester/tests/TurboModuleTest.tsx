@@ -3,6 +3,11 @@ import {
   SampleTurboModule,
   GeneratedSampleTurboModule,
 } from 'react-native-harmony-sample-package';
+import {
+  SomeEnum1,
+  SomeEnum2,
+  SomeEnum3,
+} from 'react-native-harmony-sample-package/src/NativeGeneratedSampleTurboModule';
 
 export function TurboModuleTest() {
   return (
@@ -20,18 +25,51 @@ export function TurboModuleTest() {
             expect(SampleTurboModule.getArray([1, 2, 3])).to.eql([1, 2, 3]);
           }}
         />
-        <GeneratedTurboModuleTestCases sampleTurboModule={SampleTurboModule} />
+        <CommonTurboModuleTestCases sampleTurboModule={SampleTurboModule} />
       </TestSuite>
       <TestSuite name="generated">
-        <GeneratedTurboModuleTestCases
+        <CommonTurboModuleTestCases
           sampleTurboModule={GeneratedSampleTurboModule}
+        />
+        <TestCase
+          itShould="get an array asynchronously"
+          fn={async ({expect}) => {
+            expect(GeneratedSampleTurboModule.getUnionValue('foo')).to.be.eq(
+              'foo',
+            );
+          }}
+        />
+        <TestCase
+          itShould="support enums"
+          fn={async ({expect}) => {
+            const result = GeneratedSampleTurboModule.getEnum(
+              SomeEnum1.FOO,
+              SomeEnum2.FOO,
+              SomeEnum3.FOO,
+            );
+            expect(result.enum1).to.be.eq(SomeEnum1.FOO);
+            expect(result.enum2).to.be.eq(SomeEnum2.FOO);
+            expect(result.enum3).to.be.eq(SomeEnum3.FOO);
+          }}
+        />
+        <TestCase
+          itShould="handle enums without specified values correctly"
+          skip="RN codegen doesn't parse enums without explicit values correctly"
+          fn={async ({expect}) => {
+            const result = GeneratedSampleTurboModule.getEnum(
+              SomeEnum1.FOO,
+              SomeEnum2.FOO,
+              SomeEnum3.FOO,
+            );
+            expect(result.hardcodedEnum1 === SomeEnum1.FOO).to.be.true;
+          }}
         />
       </TestSuite>
     </TestSuite>
   );
 }
 
-function GeneratedTurboModuleTestCases({
+function CommonTurboModuleTestCases({
   sampleTurboModule,
 }: {
   sampleTurboModule: typeof GeneratedSampleTurboModule;

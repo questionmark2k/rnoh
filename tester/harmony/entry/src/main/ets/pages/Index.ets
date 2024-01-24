@@ -8,7 +8,7 @@ import {
   ResourceJSBundleProvider,
   TraceJSBundleProviderDecorator
 } from 'rnoh'
-import { SampleView, SAMPLE_VIEW_TYPE, PropsDisplayer } from "rnoh-sample-package"
+import { SampleView, SAMPLE_VIEW_TYPE, PropsDisplayer, GeneratedSampleView } from "rnoh-sample-package"
 import font from '@ohos.font';
 import { createRNPackages } from '../RNPackagesFactory'
 
@@ -16,13 +16,21 @@ import { createRNPackages } from '../RNPackagesFactory'
 export function CustomComponentBuilder(ctx: ComponentBuilderContext) {
   if (ctx.componentName === SAMPLE_VIEW_TYPE) {
     SampleView({
-      ctx: ctx.rnohContext,
+      ctx: ctx.rnComponentContext,
       tag: ctx.tag,
       buildCustomComponent: CustomComponentBuilder
     })
-  } else if (ctx.componentName === PropsDisplayer.NAME) {
+  }
+  if (ctx.componentName === GeneratedSampleView.NAME) {
+    GeneratedSampleView({
+      ctx: ctx.rnComponentContext,
+      tag: ctx.tag,
+      buildCustomComponent: CustomComponentBuilder
+    })
+  }
+  if (ctx.componentName === PropsDisplayer.NAME) {
     PropsDisplayer({
-      ctx: ctx.rnohContext,
+      ctx: ctx.rnComponentContext,
       tag: ctx.tag
     })
   }
@@ -87,7 +95,7 @@ struct Index {
               new MetroJSBundleProvider(),
               new ResourceJSBundleProvider(this.rnAbility.context.resourceManager, 'hermes_bundle.hbc'),
               new ResourceJSBundleProvider(this.rnAbility.context.resourceManager, 'bundle.harmony.js')
-              ]),
+            ]),
             this.rnAbility.getLogger()),
         })
       }

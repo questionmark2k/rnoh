@@ -1,12 +1,13 @@
 {
   "name": "@rnoh/react-native-harmony-cli",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "",
   "scripts": {
     "build": "tsc --outDir dist -p tsconfig.build.json",
     "prepack": "npm run build",
     "verify": "tsc --noEmit && npm run test",
     "test": "npm run build && jest",
+    "test:codegen": "jest ./src/codegen/.* && npm run build && jest tests/codegen.*",
     "rn": "npm run build && react-native",
     "prepublishOnly": "npm run verify"
   },
@@ -34,7 +35,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@react-native/codegen": "^0.72.8",
+    "@react-native/codegen": "^0.74.0",
     "@tsconfig/recommended": "^1.0.2",
     "chalk": "^4",
     "fs-extra": "^11.1.1",

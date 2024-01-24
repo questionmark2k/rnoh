@@ -2,14 +2,26 @@ import {TestCase, TestSuite} from '@rnoh/testerino';
 import {
   SampleComponent,
   SampleComponentRef,
+  GeneratedSampleComponent,
+  GeneratedSampleComponentRef,
 } from 'react-native-harmony-sample-package';
 import {useState} from 'react';
 import React from 'react';
-import {Button, Ref} from '../components';
+import {Button, Effect, Ref} from '../components';
+import {IncomingData} from 'react-native-harmony-sample-package/src/GeneratedSampleNativeComponent';
 
 export function CustomNativeComponentTest() {
   return (
     <TestSuite name="Custom Native Component">
+      <ManualCustomComponentImplementationTest />
+      <GeneratedCustomComponentTest />
+    </TestSuite>
+  );
+}
+
+function ManualCustomComponentImplementationTest() {
+  return (
+    <TestSuite name="no codegen">
       <TestCase itShould="render red rectangle">
         <SampleComponent backgroundColor="red" size={64} />
       </TestCase>
@@ -36,7 +48,7 @@ export function CustomNativeComponentTest() {
                     ref.current?.toggleFontSize();
                   }}
                 />
-                <SampleComponent ref={ref} backgroundColor="blue" size={32} />;
+                <SampleComponent ref={ref} backgroundColor="blue" size={32} />
               </>
             );
           }}
@@ -59,5 +71,62 @@ function Blinker({children}: any) {
       />
       {isVisible && children}
     </React.Fragment>
+  );
+}
+
+function GeneratedCustomComponentTest() {
+  return (
+    <TestSuite name="generated custom component">
+      <TestCase<IncomingData | undefined>
+        itShould="ensure equality between provided and received data"
+        initialState={undefined}
+        arrange={({setState}) => {
+          return (
+            <Ref<GeneratedSampleComponentRef>
+              render={ref => (
+                <GeneratedSampleComponent
+                  ref={ref}
+                  testProps={{
+                    booleanTest: true,
+                    intTest: 42,
+                    floatTest: 42.5,
+                    doubleTest: 42.5,
+                    stringTest: 'foobar',
+                    objectTest: {foo: {bar: 'baz'}},
+                    colorTest: 'red',
+                    arrayTest: ['foo', 'bar'],
+                    readOnlyArrayTest: ['foo', 'bar'],
+                    intEnumTest: 1,
+                  }}
+                  onDirectEvent={setState}>
+                  <Effect
+                    onMount={() => {
+                      ref.current?.emitNativeEvent('directEvent');
+                    }}
+                  />
+                </GeneratedSampleComponent>
+              )}
+            />
+          );
+        }}
+        assert={({expect, state}) => {
+          expect(state?.booleanTest).to.be.true;
+          expect(state?.booleanWithDefaultTest).to.be.true;
+          expect(state?.intTest).to.be.eq(42);
+          expect(state?.intWithDefault).to.be.eq(42);
+          expect(state?.floatTest).closeTo(42.5, 0.001);
+          expect(state?.floatWithDefaultTest).closeTo(42.5, 0.001);
+          expect(state?.doubleTest).closeTo(42.5, 0.001);
+          expect(state?.doubleWithDefaultTest).closeTo(42.5, 0.001);
+          expect(state?.stringTest).to.be.eq('foobar');
+          expect(state?.stringWithDefaultTest).to.be.eq('foobar');
+          expect(state?.objectTest).to.deep.eq({foo: {bar: 'baz'}});
+          expect(state?.arrayTest).to.deep.eq(['foo', 'bar']);
+          expect(state?.readOnlyArrayTest).to.deep.eq(['foo', 'bar']);
+          expect(state?.stringEnumTest).to.be.eq('foo');
+          expect(state?.intEnumTest).to.be.eq(1);
+        }}
+      />
+    </TestSuite>
   );
 }
