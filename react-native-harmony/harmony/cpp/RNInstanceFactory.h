@@ -35,7 +35,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
                                              UITicker::Shared uiTicker,
                                              bool shouldEnableDebugger,
                                              bool shouldEnableBackgroundExecutor) {
-    std::shared_ptr<TaskExecutor> taskExecutor = std::make_shared<TaskExecutor>(env);
+    std::shared_ptr<TaskExecutor> taskExecutor = std::make_shared<TaskExecutor>(env, shouldEnableBackgroundExecutor);
     auto mainThreadChannel = std::make_shared<ArkTSChannel>(taskExecutor, ArkJS(env), napiEventDispatcherRef);
 
     taskExecutor->setExceptionHandler([weakExecutor = std::weak_ptr(taskExecutor), weakChannel = std::weak_ptr(mainThreadChannel)](std::exception const &e) {
