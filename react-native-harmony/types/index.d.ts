@@ -60,7 +60,7 @@ export * from 'react-native/Libraries/ReactNative/RootTag';
 export * from 'react-native/Libraries/ReactNative/UIManager';
 export * from 'react-native/Libraries/ReactNative/requireNativeComponent';
 // export * from 'react-native/Libraries/Settings/Settings';
-// export * from 'react-native/Libraries/Share/Share';
+export * from 'react-native/Libraries/Share/Share';
 // export * from 'react-native/Libraries/StyleSheet/PlatformColorValueTypesIOS';
 // export * from 'react-native/Libraries/StyleSheet/PlatformColorValueTypes';
 export * from 'react-native/Libraries/StyleSheet/StyleSheet';
