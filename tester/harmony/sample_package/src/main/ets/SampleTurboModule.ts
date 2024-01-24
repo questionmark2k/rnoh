@@ -30,6 +30,40 @@ export class SampleTurboModule extends TurboModule {
     return args;
   }
 
+  getNumber(args: any[]): any[] {
+    console.log(`RNOH SampleTurboModule::getNumber(${args})`);
+    return args;
+  }
+
+  getValue(x: number, y: string, z: object): object {
+    console.log(`RNOH SampleTurboModule::getValue(${x},${y},${z})`);
+    return {x, y, z};
+  }
+
+  getValueWithPromise(error: boolean): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if(error) {
+        reject('intentional');
+      } else {
+        resolve('result!')
+      }
+    })
+  }
+
+  getValueWithCallback(callback: (value: string) => void): void {
+    callback('value from callback')
+  }
+
+  getConstants(): {const1: boolean, const2: number, const3: string} {
+    console.log(`RNOH SampleTurboModule::getConstants`);
+    return {const1: true, const2: 1228, const3: "something"};
+  }
+
+  getRootTag(args: number): number {
+    console.log(`RNOH SampleTurboModule::getRootTag(${args})`);
+    return args;
+  }
+
   registerFunction(onComplete: (value: string) => void): void {
     console.log(`RNOH SampleTurboModule::registerFunction + trigger`);
     setTimeout(() => {
