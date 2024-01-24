@@ -1350,7 +1350,9 @@ const TextAdjustsFontSizeToFitIssueTest = () => {
   // this case crashed app when RNSimpleText used TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST
   return (
     <View style={{height: 150, marginTop: 50}}>
-      <Text adjustsFontSizeToFit style={{maxHeight: 50, backgroundColor: 'blue'}}>
+      <Text
+        adjustsFontSizeToFit
+        style={{maxHeight: 50, backgroundColor: 'blue'}}>
         {SAMPLE_PARAGRAPH_TEXT}
       </Text>
       <Text
