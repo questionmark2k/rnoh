@@ -25,7 +25,7 @@ const RNOH_BANNER = '\n\n\n' +
   '██║  ██║██║ ╚████║╚██████╔╝██║  ██║' + '\n' +
   '╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝' + '\n\n'
 
-
+  
 
 export abstract class RNAbility extends UIAbility {
   public eventEmitter: EventEmitter<{ "NEW_ERROR": [RNOHError] }> = new EventEmitter()
@@ -42,13 +42,13 @@ export abstract class RNAbility extends UIAbility {
   protected isDebugModeEnabled_: boolean = true
   protected jsPackagerClient: JSPackagerClient | undefined = undefined
   protected displayMetricsManager: DisplayMetricsManager = undefined
-  private unregisterWindowListenerCallback: () => void;
+  private unregisterWindowListenerCallback: (() => void) | undefined = undefined;
 
   public devToolsController: DevToolsController
   public devMenu: DevMenu
   private inForeground: boolean = false;
 
-  onCreate(want, param) {
+  onCreate(_want, _param) {
     this.initializationDateTime = new Date()
     this.providedLogger = this.createLogger()
     this.providedLogger.info(RNOH_BANNER)
@@ -86,7 +86,7 @@ export abstract class RNAbility extends UIAbility {
     const stopTracing = this.logger.clone("onDestroy").startTracing()
     this.jsPackagerClient.onDestroy()
     this.rnInstanceRegistry.forEach(instance => instance.onDestroy())
-    this.unregisterWindowListenerCallback();
+    this.unregisterWindowListenerCallback?.();
     stopTracing()
   }
 
@@ -159,29 +159,32 @@ export abstract class RNAbility extends UIAbility {
     return this.providedLogger
   }
 
-  public async onWindowSetup(win: window.Window) {
-    const stopTracing = this.logger.clone("onWindowSetup").startTracing()
-    await win.setWindowLayoutFullScreen(true)
-    stopTracing()
-  }
-
-  onWindowStageCreate(windowStage: window.WindowStage) {
-    const logger = this.logger.clone("onWindowStageCreate")
+  public async onWindowSetup(windowStage: window.WindowStage, providedLogger: RNOHLogger) {
+    const logger = providedLogger.clone("onWindowSetup");
     const stopTracing = logger.startTracing()
-    const mainWindow = windowStage.getMainWindowSync()
-    mainWindow.on('windowSizeChange', (windowSize) => {
-      this.displayMetricsManager.updateWindowSize(windowSize);
-      this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onWindowSizeChange(windowSize))
-    })
-    this.unregisterWindowListenerCallback = () => {
-      try {
-        mainWindow.off("windowSizeChange",
-          (windowSize) => this.displayMetricsManager.updateWindowSize(windowSize))
-      } catch {
-        this.logger.error("Error when trying to unsubscribe from window size changes")
+
+    try {
+      const mainWindow = await windowStage.getMainWindow();
+
+      const onWindowSizeChange = (windowSize) => {
+        this.displayMetricsManager.updateWindowSize(windowSize);
+        this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onWindowSizeChange(windowSize))
       }
-    }
-    this.onWindowSetup(mainWindow).then(async () => {
+
+      // subscribe to window size changes
+      mainWindow.on('windowSizeChange', onWindowSizeChange)
+      // unregister the previous callback, if present
+      this.unregisterWindowListenerCallback?.()
+      this.unregisterWindowListenerCallback = () => {
+        try {
+          mainWindow.off("windowSizeChange", onWindowSizeChange)
+        } catch {
+          this.logger.error("Error when trying to unsubscribe from window size changes")
+        }
+      }
+
+      await mainWindow.setWindowLayoutFullScreen(true)
+
       windowStage.loadContent(this.getPagePath(), (err, data) => {
         if (err.code) {
           logger.error("Failed to load the content", err.code)
@@ -189,16 +192,23 @@ export abstract class RNAbility extends UIAbility {
         }
         logger.info("Succeeded in loading the content", JSON.stringify(data))
       });
-    }).catch((err: Error) => {
+
+      this.displayMetricsManager.updateDisplayMetrics(mainWindow.getWindowProperties().windowRect)
+    } catch (err) {
       logger.error("Failed to setup window", JSON.stringify(err))
-    }).finally(() => {
+    } finally {
       stopTracing()
-    })
-    this.displayMetricsManager.updateDisplayMetrics(mainWindow.getWindowProperties().windowRect)
+    }
+  }
+
+  onWindowStageCreate(windowStage: window.WindowStage) {
+    const logger = this.logger.clone("onWindowStageCreate")
+    const stopTracing = logger.startTracing()
+    this.onWindowSetup(windowStage, logger).finally(stopTracing)
   }
 
   onMemoryLevel(level) {
-    const stopTracing = this.logger.clone("onWindowStageCreate").startTracing()
+    const stopTracing = this.logger.clone("onMemoryLevel").startTracing()
     const MEMORY_LEVEL_NAMES = ["MEMORY_LEVEL_MODERATE", "MEMORY_LEVEL_LOW", "MEMORY_LEVEL_CRITICAL"]
     this.logger?.debug("Received memory level event: " + MEMORY_LEVEL_NAMES[level])
     this.napiBridge.onMemoryLevel(level)
