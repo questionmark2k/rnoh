@@ -362,6 +362,7 @@ export class RNInstanceImpl implements RNInstance {
   public async runJSBundle(jsBundleProvider: JSBundleProvider) {
     const stopTracing = this.logger.clone("runJSBundle").startTracing()
     const bundleURL = jsBundleProvider.getURL()
+    const isMetroServer = jsBundleProvider.getHotReloadConfig() !== null
     try {
       this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id, `Loading from ${jsBundleProvider.getHumanFriendlyURL()}...`)
       this.bundleExecutionStatusByBundleURL.set(bundleURL, "RUNNING")
@@ -389,9 +390,14 @@ export class RNInstanceImpl implements RNInstance {
       if (err instanceof JSBundleProviderError) {
         this.logger.error(err)
       } else {
+        const suggestions: string[] = []
+        if (isMetroServer) {
+          suggestions.push("Please check your Metro Server console. Likely, the error details you need are displayed there.")
+        }
+        suggestions.push("Please revise your application code. It may contain syntax errors or unhandled exceptions at the top level that could be causing runtime failures.")
         this.logger.error(new RNOHError({
           whatHappened: "Couldn't run a JS bundle",
-          howCanItBeFixed: ["Fix your application code. It probably can't be compiled or an error was thrown at the top-level."],
+          howCanItBeFixed: suggestions,
           extraData: err,
         }))
       }

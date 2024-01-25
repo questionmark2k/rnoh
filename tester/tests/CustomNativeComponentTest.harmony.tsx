@@ -4,7 +4,7 @@ import {
   SampleComponentRef,
   GeneratedSampleComponent,
   GeneratedSampleComponentRef,
-} from 'react-native-harmony-sample-package';
+} from 'react-native-sample-package';
 import {useState} from 'react';
 import React from 'react';
 import {Button, Effect, Ref} from '../components';

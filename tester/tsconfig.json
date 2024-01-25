@@ -9,6 +9,9 @@
       "react-native-sample-package": [
         "./node_modules/react-native-harmony-sample-package"
       ],
+      "react-native-sample-package/*": [
+        "./node_modules/react-native-harmony-sample-package/*"
+      ],
     },
   },
   "exclude": [

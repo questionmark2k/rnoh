@@ -2,12 +2,12 @@ import {TestCase, TestSuite} from '@rnoh/testerino';
 import {
   SampleTurboModule,
   GeneratedSampleTurboModule,
-} from 'react-native-harmony-sample-package';
+} from 'react-native-sample-package';
 import {
   SomeEnum1,
   SomeEnum2,
   SomeEnum3,
-} from 'react-native-harmony-sample-package/src/NativeGeneratedSampleTurboModule';
+} from 'react-native-sample-package/src/NativeGeneratedSampleTurboModule';
 
 export function TurboModuleTest() {
   return (
@@ -32,7 +32,7 @@ export function TurboModuleTest() {
           sampleTurboModule={GeneratedSampleTurboModule}
         />
         <TestCase
-          itShould="get an array asynchronously"
+          itShould="get union value"
           fn={async ({expect}) => {
             expect(GeneratedSampleTurboModule.getUnionValue('foo')).to.be.eq(
               'foo',
