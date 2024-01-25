@@ -17,7 +17,6 @@ using namespace facebook;
 using IntermediaryArg = ArkJS::IntermediaryArg;
 using IntermediaryCallback = ArkJS::IntermediaryCallback;
 
-std::vector<IntermediaryArg> convertJSIValuesToIntermediaryValues(facebook::jsi::Runtime &runtime, std::shared_ptr<facebook::react::CallInvoker> jsInvoker, const facebook::jsi::Value *jsiArgs, size_t argsCount);
 IntermediaryCallback createIntermediaryCallback(std::weak_ptr<facebook::react::CallbackWrapper>);
 const std::vector<facebook::jsi::Value> convertDynamicsToJSIValues(facebook::jsi::Runtime &rt, const std::vector<folly::dynamic> &dynamics);
 facebook::jsi::Value preparePromiseResolverResult(facebook::jsi::Runtime &rt, const std::vector<folly::dynamic> args);
@@ -114,7 +113,7 @@ jsi::Value ArkTSTurboModule::callAsync(jsi::Runtime &runtime, const std::string 
         });
 }
 
-std::vector<IntermediaryArg> convertJSIValuesToIntermediaryValues(jsi::Runtime &runtime, std::shared_ptr<react::CallInvoker> jsInvoker, const jsi::Value *jsiArgs, size_t argsCount) {
+std::vector<IntermediaryArg> ArkTSTurboModule::convertJSIValuesToIntermediaryValues(jsi::Runtime &runtime, std::shared_ptr<react::CallInvoker> jsInvoker, const jsi::Value *jsiArgs, size_t argsCount) {
     std::vector<IntermediaryArg> args(argsCount);
     for (int argIdx = 0; argIdx < argsCount; argIdx++) {
         if (jsiArgs[argIdx].isObject()) {

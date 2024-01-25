@@ -23,6 +23,7 @@
 #include "RNOH/SchedulerDelegate.h"
 #include "RNOH/ShadowViewRegistry.h"
 #include "RNOH/TurboModuleFactory.h"
+#include "RNOH/TurboModuleProvider.h"
 #include "RNOH/EventDispatcher.h"
 #include "RNOH/EventEmitRequestHandler.h"
 #include "RNOH/TaskExecutor/TaskExecutor.h"
@@ -121,7 +122,7 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
     std::map<facebook::react::Tag, std::shared_ptr<facebook::react::SurfaceHandler>> surfaceHandlers;
     MutationsListener m_mutationsListener;
     MountingManager::CommandDispatcher m_commandDispatcher;
-    std::unique_ptr<facebook::react::Scheduler> scheduler;
+    std::shared_ptr<facebook::react::Scheduler> scheduler;
     std::unique_ptr<SchedulerDelegate> schedulerDelegate;
     std::shared_ptr<facebook::react::ComponentDescriptorProviderRegistry> m_componentDescriptorProviderRegistry;
     ShadowViewRegistry::Shared m_shadowViewRegistry;
@@ -134,11 +135,13 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
     std::function<void()> unsubscribeUITickListener = nullptr;
     std::atomic<bool> m_shouldRelayUITick;
     ArkTSChannel::Shared m_arkTsChannel;
+    std::shared_ptr<MessageQueueThread> m_jsQueue;
     bool m_shouldEnableDebugger;
     bool m_shouldEnableBackgroundExecutor;
 
     void initialize();
-    void initializeScheduler();
+    void initializeScheduler(std::shared_ptr<TurboModuleProvider> &&turboModuleProvider);
+    std::shared_ptr<TurboModuleProvider> createTurboModuleProvider();
     void onUITick();
 
     void onAnimationStarted() override;      // react::LayoutAnimationStatusDelegate

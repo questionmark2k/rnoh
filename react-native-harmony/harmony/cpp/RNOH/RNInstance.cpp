@@ -19,7 +19,8 @@ using namespace rnoh;
 
 void RNInstance::start() {
     this->initialize();
-    this->initializeScheduler();
+    auto turboModuleProvider = this->createTurboModuleProvider();
+    this->initializeScheduler(std::move(turboModuleProvider));
 }
 
 void RNInstance::initialize() {
@@ -36,22 +37,16 @@ void RNInstance::initialize() {
             react::bindNativeLogger(rt, nativeLogger);
         });
     jsExecutorFactory->setEnableDebugger(m_shouldEnableDebugger);
-    auto jsQueue = std::make_shared<MessageQueueThread>(this->taskExecutor);
+    m_jsQueue = std::make_shared<MessageQueueThread>(this->taskExecutor);
     auto moduleRegistry = std::make_shared<react::ModuleRegistry>(std::move(modules));
     this->instance->initializeBridge(
         std::move(instanceCallback),
         std::move(jsExecutorFactory),
-        std::move(jsQueue),
+        m_jsQueue,
         std::move(moduleRegistry));
-
-    std::make_shared<TurboModuleProvider>(
-        this->instance->getJSCallInvoker(),
-        std::move(m_turboModuleFactory),
-        m_eventDispatcher)
-        ->installJSBindings(this->instance->getRuntimeExecutor());
 }
 
-void RNInstance::initializeScheduler() {
+void RNInstance::initializeScheduler(std::shared_ptr<TurboModuleProvider> &&turboModuleProvider) {
     auto reactConfig = std::make_shared<react::EmptyReactNativeConfig>();
     m_contextContainer->insert("ReactNativeConfig", std::move(reactConfig));
 
@@ -101,7 +96,18 @@ void RNInstance::initializeScheduler() {
                                                                   m_arkTsChannel);
     m_animationDriver = std::make_shared<react::LayoutAnimationDriver>(
         this->instance->getRuntimeExecutor(), m_contextContainer, this);
-    this->scheduler = std::make_unique<react::Scheduler>(schedulerToolbox, m_animationDriver.get(), schedulerDelegate.get());
+    this->scheduler = std::make_shared<react::Scheduler>(
+        schedulerToolbox, m_animationDriver.get(), schedulerDelegate.get());
+    turboModuleProvider->setScheduler(this->scheduler);
+}
+
+std::shared_ptr<TurboModuleProvider> RNInstance::createTurboModuleProvider() {
+    auto turboModuleProvider = std::make_shared<TurboModuleProvider>(
+        this->instance->getJSCallInvoker(), std::move(m_turboModuleFactory),
+        m_eventDispatcher, std::move(m_jsQueue));
+    turboModuleProvider->installJSBindings(
+        this->instance->getRuntimeExecutor());
+    return turboModuleProvider;
 }
 
 void RNInstance::loadScript(std::vector<uint8_t> &&bundle, std::string const sourceURL, std::function<void(const std::string)> &&onFinish) {

@@ -5,9 +5,11 @@
 #include <jsi/JSIDynamic.h>
 #include <ReactCommon/CallbackWrapper.h>
 #include <ReactCommon/TurboModuleUtils.h>
+#include <react/renderer/scheduler/Scheduler.h>
 
 #include "ArkJS.h"
 #include "RNOH/EventDispatcher.h"
+#include "RNOH/MessageQueueThread.h"
 #include "RNOH/TurboModule.h"
 #include "RNOH/TaskExecutor/TaskExecutor.h"
 
@@ -48,6 +50,8 @@ class ArkTSTurboModule : public TurboModule {
         napi_ref arkTsTurboModuleInstanceRef;
         std::shared_ptr<TaskExecutor> taskExecutor;
         std::shared_ptr<EventDispatcher> eventDispatcher;
+        std::shared_ptr<MessageQueueThread> jsQueue;
+        std::shared_ptr<facebook::react::Scheduler> scheduler;
     };
 
     ArkTSTurboModule(Context ctx, std::string name);
@@ -66,6 +70,8 @@ class ArkTSTurboModule : public TurboModule {
                                    const std::string &methodName,
                                    const facebook::jsi::Value *args,
                                    size_t argsCount);
+
+    static std::vector<ArkJS::IntermediaryArg> convertJSIValuesToIntermediaryValues(facebook::jsi::Runtime &runtime, std::shared_ptr<facebook::react::CallInvoker> jsInvoker, const facebook::jsi::Value *jsiArgs, size_t argsCount);
 
   protected:
     Context m_ctx;

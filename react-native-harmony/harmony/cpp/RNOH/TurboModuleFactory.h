@@ -30,7 +30,9 @@ class TurboModuleFactory {
 
     virtual SharedTurboModule create(std::shared_ptr<facebook::react::CallInvoker> jsInvoker,
                                      const std::string &name,
-                                     std::shared_ptr<EventDispatcher> eventDispatcher) const;
+                                     std::shared_ptr<EventDispatcher> eventDispatcher,
+                                     std::shared_ptr<MessageQueueThread> jsQueue,
+                                     std::shared_ptr<facebook::react::Scheduler> scheduler) const;
 
   protected:
     SharedTurboModule delegateCreatingTurboModule(Context ctx, const std::string &name) const;
