@@ -40,12 +40,11 @@ export class ResponderLockDispatcher {
     return Array.from(isLockedByOrigin.values()).filter(isLocked => isLocked).length
   }
 
-  public onUnblockResponder(tag: Tag, origin: Origin) {
-    const tags = this.componentManagerRegistry.getComponentManagerLineage(tag).map(d => d.getTag())
-    tags.forEach((tag) => {
+  public onUnblockResponder(origin: Origin) {
+    for (const tag of this.isLockedByOriginByTag.keys()) {
       const currentNumberOfLocks = this.getTotalNumberOfLocks(tag)
       if (currentNumberOfLocks === 0) {
-        return;
+        continue;
       }
       this.isLockedByOriginByTag.get(tag).set(origin, false)
       const newNumberOfLocks = this.getTotalNumberOfLocks(tag)
@@ -53,6 +52,6 @@ export class ResponderLockDispatcher {
         this.componentCommandHub.dispatchCommand(tag, RNOHComponentCommand.UNBLOCK_NATIVE_RESPONDER, undefined)
         this.isLockedByOriginByTag.delete(tag)
       }
-    })
+    }
   }
 }

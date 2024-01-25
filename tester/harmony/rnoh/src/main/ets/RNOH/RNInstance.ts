@@ -262,7 +262,7 @@ export class RNInstanceImpl implements RNInstance {
           if (payload.blockNativeResponder) {
             this.responderLockDispatcher.onBlockResponder(payload.tag, "REACT_NATIVE")
           } else {
-            this.responderLockDispatcher.onUnblockResponder(payload.tag, "REACT_NATIVE")
+            this.responderLockDispatcher.onUnblockResponder("REACT_NATIVE")
           }
           break;
         }
@@ -290,7 +290,7 @@ export class RNInstanceImpl implements RNInstance {
   public blockComponentsGestures(tag: Tag) {
     this.responderLockDispatcher.onBlockResponder(tag, "EXTERNAL")
     return () => {
-      this.responderLockDispatcher.onUnblockResponder(tag, "EXTERNAL")
+      this.responderLockDispatcher.onUnblockResponder("EXTERNAL")
     }
   }
 
