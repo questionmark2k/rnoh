@@ -200,13 +200,13 @@ export abstract class RNAbility extends UIAbility {
   onMemoryLevel(level) {
     const stopTracing = this.logger.clone("onWindowStageCreate").startTracing()
     const MEMORY_LEVEL_NAMES = ["MEMORY_LEVEL_MODERATE", "MEMORY_LEVEL_LOW", "MEMORY_LEVEL_CRITICAL"]
-    this.logger.debug("Received memory level event: " + MEMORY_LEVEL_NAMES[level])
+    this.logger?.debug("Received memory level event: " + MEMORY_LEVEL_NAMES[level])
     this.napiBridge.onMemoryLevel(level)
     stopTracing()
   }
 
   onConfigurationUpdate(config) {
-    const stopTracing = this.logger.clone("onConfigurationUpdate").startTracing()
+    const stopTracing = this.logger?.clone("onConfigurationUpdate").startTracing()
     this.displayMetricsManager.updateDisplayMetrics()
     this.rnInstanceRegistry?.forEach((rnInstance) => rnInstance.onConfigurationUpdate(config))
     stopTracing()
