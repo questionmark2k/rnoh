@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.72.14
+
+- added `DevSettings::addMenuItem` support
+- added `TextInput::onEndEditing` support
+- added Codegen support
+- added `BlobTurboModule` support
+- added JS debugger and profiler support
+- disabled background thread by default
+- fixed crashes in `Image`
+- fixed scrolling issues when `ScrollView` contains a collapsable `PanResponder`
+- fixed crashes connected to TextHeightAdaptivePolicy
+- fixed crashes upon `RNInstance` destroying
+- fixed deadlocks related to text measurements when shutting down surface
+- fixed `View::pointerEvents::box-only`
+- fixed `Modal` component not adapting to window size changes
+
 ## v0.72.13
 - added `View::focusable` support
 - added `DevLoadingView` support
