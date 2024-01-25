@@ -113,12 +113,13 @@ export struct RNTextInput {
   }
 
   onDescriptorChange(newDescriptor: TextInputDescriptor) {
-    this.descriptor = newDescriptor;
-    this.descriptorWrapper = new TextInputDescriptorWrapper(this.descriptor);
-    if (this.descriptor.props.text !== this.value) {
-      this.value = this.descriptor.props.text ?? '';
+    // only set the text value from props if it changed since the last time
+    if (this.descriptor.props?.text !== newDescriptor.props.text) {
+      this.value = newDescriptor.props.text ?? '';
       this.shouldIgnoreNextValueChange = true;
     }
+    this.descriptor = newDescriptor;
+    this.descriptorWrapper = new TextInputDescriptorWrapper(this.descriptor);
     if (this.componentManager) {
       this.componentManager?.setIsEnabled(newDescriptor.props.editable ?? true);
     }
@@ -126,7 +127,6 @@ export struct RNTextInput {
 
   aboutToAppear() {
     const newDescriptor = this.ctx.descriptorRegistry.getDescriptor<TextInputDescriptor>(this.tag);
-    this.value = newDescriptor.props.text ?? '';
     this.onDescriptorChange(newDescriptor);
     this.cleanUpCallbacks.push(this.ctx.descriptorRegistry.subscribeToDescriptorChanges(this.tag,
       (newDescriptor) => {
