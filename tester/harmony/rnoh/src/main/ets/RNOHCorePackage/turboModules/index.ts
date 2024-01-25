@@ -31,3 +31,4 @@ export * from "./I18nManagerTurboModule";
 export * from "./DevSettingsTurboModule";
 export * from "./DevMenuTurboModule";
 export * from "./DevLoadingViewTurboModule"
+export * from "./VibrationTurboModule";

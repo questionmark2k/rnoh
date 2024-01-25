@@ -170,7 +170,7 @@ module.exports = {
     return require('react-native/Libraries/Lists/SectionList').default;
   },
   get Vibration() {
-    return require('react-native/Libraries/Vibration/Vibration');
+    return require('./Libraries/Vibration/Vibration');
   },
   get VirtualizedList() {
     return require('react-native/Libraries/Lists/VirtualizedList');

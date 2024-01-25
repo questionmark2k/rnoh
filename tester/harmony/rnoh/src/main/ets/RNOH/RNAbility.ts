@@ -16,6 +16,7 @@ import { RNOHError } from './RNOHError';
 import { EventEmitter } from './EventEmitter';
 import { DisplayMetrics } from './types';
 import { DisplayMetricsManager } from './DisplayMetricsManager';
+import { Vibration } from "./Vibration"
 
 const RNOH_BANNER = '\n\n\n' +
   '██████╗ ███╗   ██╗ ██████╗ ██╗  ██╗' + '\n' +
@@ -47,6 +48,7 @@ export abstract class RNAbility extends UIAbility {
   public devToolsController: DevToolsController
   public devMenu: DevMenu
   private inForeground: boolean = false;
+  public vibration: Vibration
 
   onCreate(_want, _param) {
     this.initializationDateTime = new Date()
@@ -78,6 +80,7 @@ export abstract class RNAbility extends UIAbility {
       this.jsPackagerClient.connectToMetroMessages(jsPackagerClientConfig)
     }
     this.displayMetricsManager = new DisplayMetricsManager(this.logger);
+    this.vibration = new Vibration(this.providedLogger);
     AppStorage.setOrCreate('RNAbility', this)
     stopTracing()
   }

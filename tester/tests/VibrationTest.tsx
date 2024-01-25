@@ -23,7 +23,7 @@ export const VibrationTest = () => {
           onPress={() => {
             Vibration.vibrate();
           }}
-          label={'Vibrate once'}
+          label="Vibrate once"
         />
       </TestCase>
       <TestCase itShould="vibrate for five seconds after button press">
@@ -31,7 +31,7 @@ export const VibrationTest = () => {
           onPress={() => {
             Vibration.vibrate(ONE_SECOND_IN_MS * 5);
           }}
-          label={'Vibrate for five seconds'}
+          label="Vibrate for five seconds"
         />
       </TestCase>
       <TestCase itShould="vibrate with pattern in increasing multiples of one second with a one second pause">
@@ -39,7 +39,7 @@ export const VibrationTest = () => {
           onPress={() => {
             Vibration.vibrate(PATTERN);
           }}
-          label={'vibrate with pattern'}
+          label="vibrate with pattern"
         />
       </TestCase>
       <TestCase itShould="vibrate until cancelled">
@@ -47,15 +47,13 @@ export const VibrationTest = () => {
           onPress={() => {
             Vibration.vibrate([500, ONE_SECOND_IN_MS], true);
           }}
-          label={
-            'vibrate for one second with a 0,5 s gap between each repetition until cancelled'
-          }
+          label="vibrate for one second with a 0,5 s gap between each repetition until cancelled"
         />
         <Button
           onPress={() => {
             Vibration.cancel();
           }}
-          label={'cancel vibration'}
+          label="cancel vibration"
         />
       </TestCase>
     </TestSuite>

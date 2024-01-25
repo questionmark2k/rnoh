@@ -33,6 +33,7 @@
 #include "RNOHCorePackage/TurboModules/DevMenuTurboModule.h"
 #include "RNOHCorePackage/TurboModules/LogBoxTurboModule.h"
 #include "RNOHCorePackage/TurboModules/DevLoadingViewTurboModule.h"
+#include "RNOHCorePackage/TurboModules/VibrationTurboModule.h"
 #include "RNOHCorePackage/ComponentBinders/ViewComponentJSIBinder.h"
 #include "RNOHCorePackage/ComponentBinders/ViewComponentNapiBinder.h"
 #include "RNOHCorePackage/ComponentBinders/ImageComponentJSIBinder.h"
@@ -112,6 +113,8 @@ class RNOHCoreTurboModuleFactoryDelegate : public TurboModuleFactoryDelegate {
             return std::make_shared<LogBoxTurboModule>(ctx, name);
         } else if (name == "DevLoadingView") {
             return std::make_shared<DevLoadingViewTurboModule>(ctx, name);
+        } else if (name == "Vibration") {
+            return std::make_shared<VibrationTurboModule>(ctx, name);
         }
         return nullptr;
     };
