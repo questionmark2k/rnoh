@@ -53,6 +53,15 @@ export class ProjectDependenciesManager {
             directoryPath.copyWithNewSegment(dirOrFileName)
           );
         } else {
+          if (
+            !fs.existsSync(
+              potentialDependencyRootPath
+                .copyWithNewSegment('package.json')
+                .getValue()
+            )
+          ) {
+            return;
+          }
           cb(
             new ProjectDependency(
               potentialDependencyRootPath,
