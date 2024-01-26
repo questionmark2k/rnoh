@@ -140,6 +140,14 @@ export function UIManagerTest() {
           expect(state.y).to.be.equal(20);
         }}
       />
+      <TestCase
+        itShould="not crash when calling view is descendant of"
+        initialState={undefined as boolean | undefined}
+        arrange={({setState}) => <ViewIsDescendantOfTest setState={setState} />}
+        assert={({state, expect}) => {
+          expect(state).to.be.true;
+        }}
+      />
     </TestSuite>
   );
 }
@@ -235,6 +243,48 @@ function DispatchCommandTest() {
             'scrollToEnd',
             [true],
           );
+        }}
+      />
+    </View>
+  );
+}
+
+function ViewIsDescendantOfTest({
+  setState,
+}: {
+  setState: React.Dispatch<React.SetStateAction<boolean | undefined>>;
+}) {
+  const parentRef = useRef<View>(null);
+  const childRef = useRef<View>(null);
+
+  return (
+    <View>
+      <View
+        ref={parentRef}
+        collapsable={false}
+        style={{height: 100, width: 100, backgroundColor: 'blue'}}>
+        <View
+          ref={childRef}
+          collapsable={false}
+          style={[styles.box, {backgroundColor: 'red'}]}
+        />
+      </View>
+      <Button
+        label="call viewIsDescendantOf"
+        onPress={() => {
+          // the method is not exported in the interface
+          try {
+            (UIManager as any).viewIsDescendantOf(
+              findNodeHandle(childRef.current),
+              findNodeHandle(parentRef.current),
+              (isDescendantOf: boolean) => {
+                console.log(isDescendantOf);
+              },
+            );
+          } catch {
+            setState(false);
+          }
+          setState(true);
         }}
       />
     </View>

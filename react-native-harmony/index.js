@@ -142,7 +142,7 @@ module.exports = {
     return require('react-native/Libraries/TurboModule/TurboModuleRegistry');
   },
   get UIManager() {
-    return require('react-native/Libraries/ReactNative/UIManager');
+    return require('./Libraries/ReactNative/UIManager');
   },
   get useAnimatedValue() {
     return require('react-native/Libraries/Animated/useAnimatedValue').default;
