@@ -321,9 +321,7 @@ void AnimatedNodesManager::stopAnimationsForNode(facebook::react::Tag tag) {
 
 void AnimatedNodesManager::maybeStartAnimations() {
     if (!m_isRunningAnimations) {
-        auto now = std::chrono::high_resolution_clock::now();
-        auto frameTime = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch());
-        runUpdates(frameTime.count());
+        m_scheduleUpdateFn();
     }
 }
 

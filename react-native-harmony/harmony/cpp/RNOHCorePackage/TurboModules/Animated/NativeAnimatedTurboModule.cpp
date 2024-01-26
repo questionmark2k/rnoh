@@ -117,7 +117,7 @@ jsi::Value startAnimatingNode(
     auto endCallback = [&rt, callback = std::move(callback)](bool finished) {
         auto result = jsi::Object(rt);
         result.setProperty(rt, "finished", jsi::Value(finished));
-        callback->call(rt, { std::move(result) });
+        callback->call(rt, {std::move(result)});
     };
     self->startAnimatingNode(args[0].getNumber(), args[1].getNumber(), config, std::move(endCallback));
     return facebook::jsi::Value::undefined();
@@ -244,13 +244,13 @@ NativeAnimatedTurboModule::NativeAnimatedTurboModule(const ArkTSTurboModule::Con
       m_vsyncHandle("AnimatedTurboModule"),
       m_animatedNodesManager(
           [this] {
-              m_ctx.taskExecutor->runTask(TaskThread::MAIN, [this] { m_vsyncHandle.requestFrame(rnoh::scheduleUpdate, this); });
+              m_vsyncHandle.requestFrame(rnoh::scheduleUpdate, this);
           },
           [this](auto tag, auto props) {
               if (m_ctx.taskExecutor->isOnTaskThread(TaskThread::MAIN)) {
-                this->setNativeProps(tag, props);
+                  this->setNativeProps(tag, props);
               } else {
-                m_ctx.taskExecutor->runTask(TaskThread::MAIN, [this, tag, props] { this->setNativeProps(tag, props); });
+                  m_ctx.taskExecutor->runTask(TaskThread::MAIN, [this, tag, props] { this->setNativeProps(tag, props); });
               }
           }) {
     methodMap_ = {
