@@ -19,6 +19,7 @@ protected:
         nativeProps.setProperty(rt, "transparent", "boolean");
         nativeProps.setProperty(rt, "visible", "boolean");
         nativeProps.setProperty(rt, "identifier", "number");
+        nativeProps.setProperty(rt, "animationType", "string");
         return nativeProps;
     }
 };

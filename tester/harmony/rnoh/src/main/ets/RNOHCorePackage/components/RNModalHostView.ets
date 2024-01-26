@@ -12,14 +12,18 @@ interface ModalHostViewProps extends ViewBaseProps {
   identifier: number;
 };
 
+type AnimationType = 'fade' | 'slide' | 'none'
+
+interface ModalHostViewRawProps extends ViewBaseProps {
+  animationType?: AnimationType
+};
+
 interface ModalHostViewState {
   screenSize: Size
 };
-type ModalHostViewDescriptor = Descriptor<"ModalHostView", ModalHostViewProps, ModalHostViewState>;
+type ModalHostViewDescriptor = Descriptor<"ModalHostView", ModalHostViewProps, ModalHostViewState, ModalHostViewRawProps>;
 
-function closeTo(a: number, b: number) {
-  return Math.abs(a - b) < 0.1
-}
+const MODAL_ANIMATION_DURATION = 500;
 
 @CustomDialog
 struct ModalHostViewDialog {
@@ -29,6 +33,8 @@ struct ModalHostViewDialog {
   @State descriptor: ModalHostViewDescriptor = Object() as ModalHostViewDescriptor
   controller: CustomDialogController
   @State showContent: boolean = false
+  registerCloseModalFunction: (close: () => void) => void = () => {
+  }
   unsubscribeFromDescriptorChanges: () => void | undefined = () => {
   }
   private cleanUpCallbacks: (() => void)[] = []
@@ -51,6 +57,9 @@ struct ModalHostViewDialog {
 
   aboutToAppear() {
     this.emitComponentEvent("onShow")
+    this.registerCloseModalFunction(() => {
+      this.showContent = false;
+    })
     this.componentManager = new RNModalHostViewManager(this.tag, this.ctx);
     this.ctx.componentManagerRegistry.registerComponentManager(this.tag, this.componentManager);
     this.descriptor = this.ctx.descriptorRegistry.getDescriptor<ModalHostViewDescriptor>(this.tag)
@@ -76,6 +85,32 @@ struct ModalHostViewDialog {
     this.cleanUpCallbacks.forEach(cb => cb())
   }
 
+  getTransitionEffect() {
+    if (this.descriptor.rawProps.animationType === 'slide') {
+      return TransitionEffect.move(TransitionEdge.BOTTOM)
+        .animation({ duration: MODAL_ANIMATION_DURATION })
+    } else if (this.descriptor.rawProps.animationType === 'fade') {
+      return TransitionEffect.OPACITY.animation({ duration: MODAL_ANIMATION_DURATION });
+    } else {
+      return TransitionEffect.IDENTITY;
+    }
+  }
+
+  isModalAnimated() {
+    const animationType = this.descriptor.rawProps.animationType;
+    return animationType === 'slide' || animationType === 'fade';
+  }
+
+  closeModalAfterAnimation() {
+    if (this.isModalAnimated()) {
+      setTimeout(() => {
+        this.controller.close();
+      }, MODAL_ANIMATION_DURATION);
+    } else {
+      this.controller.close()
+    }
+  }
+
   build() {
     if (this.showContent) {
       Stack() {
@@ -88,7 +123,13 @@ struct ModalHostViewDialog {
             RNComponentFactory({ ctx: this.ctx, tag: childrenTag, buildCustomComponent: this.buildCustomComponent })
           }, (childrenTag: Tag) => childrenTag.toString())
         }
-      }.onTouch((touchEvent) => this.touchDispatcher.handleTouchEvent(touchEvent))
+      }.onTouch((touchEvent) => {
+        if (this.showContent) {
+          this.touchDispatcher.handleTouchEvent(touchEvent)
+        }
+      })
+      .transition(this.getTransitionEffect())
+      .onDisAppear(() => this.closeModalAfterAnimation())
     }
   }
 }
@@ -99,17 +140,24 @@ export struct RNModalHostView {
   public tag: number = 0
   @BuilderParam public buildCustomComponent!: CustomComponentBuilder
   private dialogController!: CustomDialogController
+  private closeModalFunction: (() => void) | undefined;
 
   aboutToAppear() {
     this.dialogController = new CustomDialogController({
       builder: ModalHostViewDialog({
         ctx: this.ctx,
         tag: this.tag,
-        buildCustomComponent: this.buildCustomComponent
+        buildCustomComponent: this.buildCustomComponent,
+        registerCloseModalFunction: (closeFunction) => {
+          this.closeModalFunction = closeFunction
+        },
       }),
       alignment: DialogAlignment.TopStart,
       customStyle: true,
-      maskColor: Color.Transparent
+      maskColor: Color.Transparent,
+      closeAnimation: { duration: 0 },
+      openAnimation: { duration: 0 },
+      autoCancel: false,
     })
 
     // on the JS side, the native ModalHostView is rendered _only_ if the `visible` prop is set to true,
@@ -118,7 +166,7 @@ export struct RNModalHostView {
   }
 
   aboutToDisappear() {
-    this.dialogController?.close()
+    this.closeModalFunction?.();
   }
 
   build() {

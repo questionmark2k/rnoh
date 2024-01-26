@@ -23,6 +23,36 @@ export function ModalTest() {
           expect(state).to.be.true;
         }}
       />
+      <TestCase
+        itShould="show modal with slide animation"
+        initialState={false}
+        arrange={({setState}) => (
+          <ModalExample
+            animationType='slide'
+            onShow={() => {
+              setState(true);
+            }}
+          />
+        )}
+        assert={({state, expect}) => {
+          expect(state).to.be.true;
+        }}
+      />
+      <TestCase
+        itShould="show modal with fade animation"
+        initialState={false}
+        arrange={({setState}) => (
+          <ModalExample
+            animationType='fade'
+            onShow={() => {
+              setState(true);
+            }}
+          />
+        )}
+        assert={({state, expect}) => {
+          expect(state).to.be.true;
+        }}
+      />
     </TestSuite>
   );
 }
@@ -36,7 +66,6 @@ const ModalExample = (props: ModalProps) => {
       </Text>
       <Modal
         {...props}
-        animationType="none"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
