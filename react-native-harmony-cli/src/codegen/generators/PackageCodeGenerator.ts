@@ -18,7 +18,7 @@ export class PackageCodeGenerator implements CodeGenerator<UberSchema> {
     const components_indexTS = new IndexTSTemplate();
     const turboModules_indexTS = new IndexTSTemplate();
     const generated_indexETS = new IndexTSTemplate();
-    generated_indexETS.addReexport('ts');
+    generated_indexETS.addReexport({ from: './ts' });
 
     uberSchema
       .findAllSpecSchemasByType('NativeModule')
@@ -26,14 +26,16 @@ export class PackageCodeGenerator implements CodeGenerator<UberSchema> {
         generatedPackageH.addTurboModule({
           name: nativeModuleSchema.moduleName,
         });
-        turboModules_indexTS.addReexport(`${nativeModuleSchema.moduleName}`);
+        turboModules_indexTS.addReexport({
+          from: `./${nativeModuleSchema.moduleName}`,
+        });
       });
     uberSchema
       .findAllSpecSchemasByType('Component')
       .forEach((componentSchema) => {
         Object.entries(componentSchema.components).forEach(
           ([name, componentShape]) => {
-            components_indexTS.addReexport(name);
+            components_indexTS.addReexport({ from: `./${name}` });
             generatedPackageH.addComponent({
               name: name,
               supportedEventNames: componentShape.events.map((e) => {
@@ -50,8 +52,8 @@ export class PackageCodeGenerator implements CodeGenerator<UberSchema> {
     result.set(
       this.etsOutputPath.copyWithNewSegment('ts.ts'),
       new IndexTSTemplate()
-        .addReexport('components/ts')
-        .addReexport('turboModules/ts')
+        .addReexport({ from: './components/ts', as: 'RNC' })
+        .addReexport({ from: './turboModules/ts', as: 'TM' })
         .build()
     );
     result.set(

@@ -4,30 +4,28 @@ const TEMPLATE = `
 // This file was generated.
 import { Tag } from "../../ts"
 
-/** TM = Turbo Module */
-export namespace TM {
-  export namespace {{name}} {
-    {{#enums}}
-    export enum {{name}} {
-      {{#members}}
-      {{name}} = {{{value}}},
-      {{/members}}
-    }
+export namespace {{name}} {
+  export const NAME = '{{name}}' as const
 
-    {{/enums}}
-    {{#aliases}}
-    export type {{name}} = {{{type}}}
-    
-    {{/aliases}}
-    export interface Spec {
-      {{#methods}}
-      {{name}}({{{stringifiedArgs}}}): {{{returnType}}};
-    
-      {{/methods}}
-    }
+  {{#enums}}
+  export enum {{name}} {
+    {{#members}}
+    {{name}} = {{{value}}},
+    {{/members}}
+  }
+
+  {{/enums}}
+  {{#aliases}}
+  export type {{name}} = {{{type}}}
+  
+  {{/aliases}}
+  export interface Spec {
+    {{#methods}}
+    {{name}}({{{stringifiedArgs}}}): {{{returnType}}};
+  
+    {{/methods}}
   }
 }
-
 `;
 
 type Alias = {

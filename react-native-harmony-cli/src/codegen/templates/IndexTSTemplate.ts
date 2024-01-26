@@ -2,24 +2,32 @@ import mustache from 'mustache';
 
 const TEMPLATE = `
 // This file was generated.
-{{#components}}
-export * from "./{{{name}}}"
-{{/components}}
+{{#reexports}}
+export * {{as}}from "{{{from}}}"
+{{/reexports}}
 `;
 
+type Reexport = {
+  from: string;
+  as?: string;
+};
+
 export class IndexTSTemplate {
-  private importName: string[] = [];
+  private reexports: Reexport[] = [];
 
   constructor() {}
 
-  addReexport(name: string) {
-    this.importName.push(name);
+  addReexport(reexport: Reexport) {
+    this.reexports.push(reexport);
     return this;
   }
 
   build(): string {
     return mustache.render(TEMPLATE.trimStart(), {
-      components: this.importName.map((name) => ({ name })),
+      reexports: this.reexports.map((reexport) => ({
+        from: reexport.from,
+        as: reexport.as ? `as ${reexport.as} ` : '',
+      })),
     });
   }
 }

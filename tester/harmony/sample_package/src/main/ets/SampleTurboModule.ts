@@ -2,7 +2,7 @@ import { TurboModule, RNOHError, Tag } from 'rnoh/ts';
 import { TM } from "rnoh/generated/ts"
 
 
-export class SampleTurboModule extends TurboModule implements TM.GeneratedSampleTurboModule.Spec {
+export class SampleTurboModule extends TurboModule implements TM.GeneratedSampleTurboModule.Spec, TM.GeneratedSampleTurboModule2.Spec {
   getUnionValue(arg: null | Object): Object {
     return arg ?? {}
   }

@@ -9,7 +9,7 @@ import { ValidationError } from '../core';
 
 export const commandUnpackHarmony: Command = {
   name: 'unpack-harmony',
-  description: 'Pack native code. Used for package development.',
+  description: 'Unpacks native code.',
   options: [
     {
       name: '--node-modules-path <string>',
