@@ -28,7 +28,7 @@ export function ModalTest() {
         initialState={false}
         arrange={({setState}) => (
           <ModalExample
-            animationType='slide'
+            animationType="slide"
             onShow={() => {
               setState(true);
             }}
@@ -43,7 +43,7 @@ export function ModalTest() {
         initialState={false}
         arrange={({setState}) => (
           <ModalExample
-            animationType='fade'
+            animationType="fade"
             onShow={() => {
               setState(true);
             }}
