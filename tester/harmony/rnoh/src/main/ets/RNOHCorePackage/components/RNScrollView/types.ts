@@ -26,6 +26,7 @@ export interface ScrollViewRawProps extends ViewRawProps {
   disableIntervalMomentum?: boolean
   inverted?: boolean
   maintainVisibleContentPosition?: MaintainVisibleContentPosition
+  scrollToOverflowEnabled?: boolean
 }
 
 export interface ScrollViewState {

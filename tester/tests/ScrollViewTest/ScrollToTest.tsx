@@ -1,7 +1,13 @@
 import {TestSuite, TestCase} from '@rnoh/testerino';
-import {View, ScrollView, StyleSheet, ScrollViewProps} from 'react-native';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  ScrollViewProps,
+  Text,
+} from 'react-native';
 import {COMMON_PROPS} from './fixtures';
-import React from 'react';
+import React, {useRef} from 'react';
 import {Button} from '../../components';
 
 export function ScrollToTest() {
@@ -36,6 +42,20 @@ export function ScrollToTest() {
           expect(state).to.be.greaterThan(10);
         }}
       />
+      <TestCase
+        modal
+        itShould="scroll overflow top/bottom when clicking a button"
+        skip // iOS only - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/315
+      >
+        <ScrollToOverflowEnabledBasicTest />
+      </TestCase>
+      <TestCase
+        modal
+        itShould="scroll overflow left/right when clicking a button"
+        skip // iOS only - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/315
+      >
+        <ScrollToOverflowEnabledHorizontalTest />
+      </TestCase>
     </TestSuite>
   );
 }
@@ -87,9 +107,108 @@ function AnimatedScrollToEventCountTestCase({
   );
 }
 
+function ScrollToOverflowEnabledBasicTest() {
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const scrollToY = (y: number) => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({y, animated: true});
+    }
+  };
+
+  return (
+    <View style={{height: 500, backgroundColor: 'deepskyblue'}}>
+      <ScrollView
+        ref={scrollViewRef}
+        scrollToOverflowEnabled={true}
+        contentContainerStyle={{padding: 10}}>
+        <View style={[styles.contentView, {backgroundColor: 'lightgreen'}]}>
+          <Text style={{textAlign: 'center'}}>Some other content</Text>
+        </View>
+        <View style={[styles.contentView, {backgroundColor: 'lightblue'}]}>
+          <Text style={{textAlign: 'center'}}>Some other content</Text>
+        </View>
+      </ScrollView>
+      <View style={{flexDirection: 'column'}}>
+        <Button
+          label="Scroll to overflow top by 100px"
+          onPress={() => scrollToY(-100)}
+        />
+        <Button
+          label="Scroll to overlow bottom by 500px"
+          onPress={() => scrollToY(500)}
+        />
+        <Button
+          label="Scroll to Reset (starting point)"
+          onPress={() => scrollToY(0)}
+        />
+      </View>
+    </View>
+  );
+}
+
+function ScrollToOverflowEnabledHorizontalTest() {
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const scrollToX = (x: number) => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({x, animated: true});
+    }
+  };
+
+  return (
+    <View style={{height: 500, backgroundColor: 'deepskyblue'}}>
+      <ScrollView
+        ref={scrollViewRef}
+        horizontal
+        scrollToOverflowEnabled={true}
+        contentContainerStyle={{padding: 10}}>
+        <View
+          style={[
+            styles.horizontalContentView,
+            {backgroundColor: 'lightgreen'},
+          ]}>
+          <Text style={{textAlign: 'center'}}>Some other content</Text>
+        </View>
+        <View
+          style={[
+            styles.horizontalContentView,
+            {backgroundColor: 'lightblue'},
+          ]}>
+          <Text style={{textAlign: 'center'}}>Some other content</Text>
+        </View>
+      </ScrollView>
+      <View style={{flexDirection: 'column'}}>
+        <Button
+          label="Scroll to overflow left by 100px"
+          onPress={() => scrollToX(-100)}
+        />
+        <Button
+          label="Scroll to overflow right by 1000px"
+          onPress={() => scrollToX(100)}
+        />
+        <Button
+          label="Scroll to Reset (starting point)"
+          onPress={() => scrollToX(0)}
+        />
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   wrapperView: {
     height: 300,
     flexDirection: 'row',
+  },
+  contentView: {
+    width: '100%',
+    height: 250,
+    justifyContent: 'center',
+  },
+  horizontalContentView: {
+    height: 250,
+    width: 500,
+    justifyContent: 'center',
   },
 });
