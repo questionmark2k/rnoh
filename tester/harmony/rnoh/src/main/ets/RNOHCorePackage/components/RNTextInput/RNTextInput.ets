@@ -1,6 +1,6 @@
 import { convertColorSegmentsToString, Descriptor, RNOHContext } from '../../../RNOH';
 import { RNViewBase } from '../RNViewBase';
-import { TextInputProps, TextInputRawProps, TextInputState } from './types';
+import { TextInputEvent, TextInputProps, TextInputRawProps, TextInputState } from './types';
 import { TextInputDescriptorWrapper } from './TextInputDescriptorWrapper';
 import { stringToFontStyle } from '../RNText/conversions';
 import { RNOHEventEmitRequestHandlerName, RNViewManager } from '../..';
@@ -76,6 +76,8 @@ function getInputType(keyboardType?: string, secureTextEntry?: boolean): InputTy
 }
 
 
+
+
 @Component
 export struct RNTextInput {
   ctx!: RNOHContext
@@ -88,6 +90,15 @@ export struct RNTextInput {
   private cleanUpCallbacks: (() => void)[] = []
   private shouldIgnoreNextValueChange: boolean = false
   private componentManager!: RNViewManager
+  private nativeEventCount: number = 0
+
+  createTextInputEvent(): TextInputEvent {
+    const event: TextInputEvent = {
+      text: this.value,
+      eventCount: ++this.nativeEventCount,
+    };
+    return event;
+  }
 
   handleChangeEvent(value: string) {
     this.value = value
@@ -95,7 +106,7 @@ export struct RNTextInput {
       this.shouldIgnoreNextValueChange = false;
     }
     else {
-      this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, RNOHEventEmitRequestHandlerName.TextInputChange, this.value)
+      this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, RNOHEventEmitRequestHandlerName.TextInputChange, this.createTextInputEvent())
     }
   }
 
@@ -104,19 +115,29 @@ export struct RNTextInput {
       this.value = "";
       this.shouldIgnoreNextValueChange = true;
     }
-    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onFocus", this.value)
+    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onFocus", this.createTextInputEvent());
   }
 
   onBlurEvent() {
-    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onEndEditing", this.value)
-    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onBlur", this.value)
+    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onEndEditing", this.createTextInputEvent());
+    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onBlur", this.createTextInputEvent());
+  }
+
+  canUpdateWithEventCount(eventCount: number | undefined): boolean {
+    return eventCount !== undefined && eventCount >= this.nativeEventCount;
+  }
+
+  maybeSetValue(newValue: string, mostRecentEventCount?: number): void {
+    if (this.canUpdateWithEventCount(mostRecentEventCount)) {
+      this.value = newValue;
+      this.shouldIgnoreNextValueChange = true;
+    }
   }
 
   onDescriptorChange(newDescriptor: TextInputDescriptor) {
     // only set the text value from props if it changed since the last time
     if (this.descriptor.props?.text !== newDescriptor.props.text) {
-      this.value = newDescriptor.props.text ?? '';
-      this.shouldIgnoreNextValueChange = true;
+      this.maybeSetValue(newDescriptor.props.text ?? "", this.descriptor.rawProps?.mostRecentEventCount);
     }
     this.descriptor = newDescriptor;
     this.descriptorWrapper = new TextInputDescriptorWrapper(this.descriptor);
@@ -140,7 +161,7 @@ export struct RNTextInput {
       this.tag,
       (command, args: Object[]) => {
         if (command === 'blur') {
-          if (this.descriptor.props.multiline) {
+          if (this.descriptor.props?.multiline) {
             this.areaController.stopEditing();
           }
           else {
@@ -149,8 +170,7 @@ export struct RNTextInput {
         } else if (command === 'setTextAndSelection') {
           const parsedArgs = parseSetTextAndSelectionCommandCallback(args);
           if (parsedArgs.value !== undefined) {
-            this.value = parsedArgs.value;
-            this.shouldIgnoreNextValueChange = true;
+            this.maybeSetValue(parsedArgs.value, parsedArgs.mostRecentEventCount);
           }
         } else if (command === 'focus') {
           focusControl.requestFocus(`TextInput@${this.tag}`)
@@ -163,7 +183,7 @@ export struct RNTextInput {
   }
 
   onSubmitEditing(): void {
-    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onSubmitEditing", this.value)
+    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onSubmitEditing", this.createTextInputEvent());
   }
 
   maybeFocusOnAppear(): void {

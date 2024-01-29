@@ -5,7 +5,9 @@
 namespace rnoh {
 
 facebook::react::TextInputMetrics convertTextInputEvent(ArkJS &arkJs, napi_value eventObject) {
-    facebook::react::TextInputMetrics textInputMetrics{.text = arkJs.getString(eventObject)};    
+    auto text = arkJs.getString(arkJs.getObjectProperty(eventObject, "text"));
+    auto eventCount = arkJs.getInteger(arkJs.getObjectProperty(eventObject, "eventCount"));
+    facebook::react::TextInputMetrics textInputMetrics{.text = text, .eventCount = eventCount};
     return textInputMetrics;
 }
 

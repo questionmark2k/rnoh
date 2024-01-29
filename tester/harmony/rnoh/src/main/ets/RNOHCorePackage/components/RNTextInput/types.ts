@@ -25,6 +25,7 @@ export interface TextInputRawProps extends ViewRawProps {
   autoFocus?: boolean
   allowFontScaling?: boolean
   clearTextOnFocus?: boolean
+  mostRecentEventCount?: number
 }
 
 export interface TextInputState {
@@ -34,4 +35,9 @@ export interface TextInputState {
 export interface Selection {
   start: number,
   end: number,
+}
+
+export interface TextInputEvent {
+  text: string,
+  eventCount: number,
 }
