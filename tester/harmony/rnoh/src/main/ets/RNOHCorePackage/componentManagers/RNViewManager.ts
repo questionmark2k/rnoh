@@ -135,12 +135,13 @@ export class RNViewManager extends ComponentManager implements TouchTargetHelper
     if (!descriptorWrapper) {
       return { left: 0, right: 0, top: 0, bottom: 0 };
     }
+    const hitSlop = this.getHitSlop()
     const origin = descriptorWrapper.positionRelativeToParent;
     let newBoundingBox: BoundingBox = {
-      left: origin.x,
-      right: origin.x + descriptorWrapper.width,
-      top: origin.y,
-      bottom: origin.y + descriptorWrapper.height
+      left: origin.x - hitSlop.left,
+      right: origin.x + descriptorWrapper.width + hitSlop.right,
+      top: origin.y - hitSlop.top,
+      bottom: origin.y + descriptorWrapper.height + hitSlop.bottom
     };
 
     if (!descriptorWrapper.isClipping) {

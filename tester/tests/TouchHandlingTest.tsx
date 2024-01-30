@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {Button} from '../components';
 import React from 'react';
+import {PALETTE} from '../components/palette';
 
 export function TouchHandlingTest() {
   return (
@@ -122,6 +123,46 @@ export function TouchHandlingTest() {
         itShould="allow vertical scroll when flinging fast after horizontal swipe on gray area">
         <ScrollViewLockedIssue />
       </TestCase>
+      <TestCase
+        itShould="pass after tapping cyan area but not red area (child's hitSlop)"
+        initialState={false}
+        arrange={({setState}) => {
+          return (
+            <View style={{alignItems: 'center', backgroundColor: 'black'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  padding: 48,
+                  backgroundColor: PALETTE.REACT_CYAN_LIGHT,
+                  justifyContent: 'center',
+                  width: 48 * 3,
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setState(true);
+                  }}>
+                  <View
+                    style={{backgroundColor: 'purple', width: 48, height: 48}}
+                    hitSlop={{top: 48, bottom: 48, left: 48, right: 48}}
+                  />
+                </TouchableOpacity>
+                <View
+                  style={{
+                    backgroundColor: 'red',
+                    width: 48,
+                    height: 48,
+                    position: 'absolute',
+                    top: 48,
+                  }}
+                />
+              </View>
+            </View>
+          );
+        }}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
     </TestSuite>
   );
 }
