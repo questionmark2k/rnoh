@@ -1,7 +1,7 @@
 import { ColorSegments, Descriptor, getTintColorMatrix, RNOHContext } from '../../RNOH';
 import { ImageLoaderTurboModule } from '../turboModules/ImageLoaderTurboModule';
 import { RNViewBase, ViewBaseProps, ViewDescriptorWrapperBase, ViewRawProps } from './RNViewBase';
-
+import { RemoteImageLoaderError } from '../../RemoteImageLoader/RemoteImageLoaderError';
 export interface ImageProps extends ViewBaseProps {
   uri: string,
   resizeMode: number,
@@ -112,6 +112,8 @@ export struct RNImage {
       } catch (error) {
         this.dispatchOnError(error.message);
       }
+    }).catch((error: RemoteImageLoaderError) => {
+      this.dispatchOnError(error.message)
     })
   }
 
