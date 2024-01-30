@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {StyleSheet, StatusBar, Text, View, StatusBarStyle} from 'react-native';
 
@@ -38,6 +38,12 @@ function StatusBarView() {
       ];
     });
   };
+
+  useEffect(() => {
+    return () => {
+      setStatusBarStyle('dark-content');
+    };
+  }, []);
 
   return (
     <View>

@@ -35,7 +35,7 @@ export class StatusBarTurboModule extends TurboModule {
 
       const scaledStatusBarHeight = px2vp(statusBarHeight);
       this.constants = {
-        DEFAULT_BACKGROUND_COLOR: '#0x66000000',
+        DEFAULT_BACKGROUND_COLOR: '#66000000',
         HEIGHT: scaledStatusBarHeight,
       }
     } catch (exception) {

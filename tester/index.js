@@ -1,6 +1,5 @@
 // @ts-check
-
-import {AppRegistry, View, Text, SafeAreaView} from 'react-native';
+import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import {AppParamsContext} from './contexts';
@@ -22,23 +21,9 @@ import {
 } from './examples';
 
 AppRegistry.setWrapperComponentProvider(appParams => {
-  return ({children, ...otherProps}) => (
+  return ({children, ..._otherProps}) => (
     <AppParamsContext.Provider value={appParams}>
-      <SafeAreaView
-        style={{width: '100%', height: '100%', backgroundColor: '#CCC'}}
-        {...otherProps}>
-        <View style={{width: '100%', height: 24, borderBottomWidth: 1}}>
-          <Text
-            style={{
-              width: '100%',
-              height: '100%',
-              fontSize: 10,
-            }}>
-            {JSON.stringify(appParams)}
-          </Text>
-        </View>
-        {children}
-      </SafeAreaView>
+      {children}
     </AppParamsContext.Provider>
   );
 });

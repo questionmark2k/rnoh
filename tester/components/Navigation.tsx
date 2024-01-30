@@ -1,5 +1,13 @@
 import React, {useEffect} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {PALETTE} from './palette';
 
 const NavigationContext = React.createContext<
   | {
@@ -64,12 +72,17 @@ export function Page({name, children}: {name: string; children: any}) {
   return name === currentPageName ? (
     <View style={{width: '100%', height: '100%'}}>
       {name !== 'INDEX' && (
-        <TouchableOpacity
-          onPress={() => {
-            navigateTo('INDEX');
-          }}>
-          <Text style={styles.buttonText}>{'‹ Back'}</Text>
-        </TouchableOpacity>
+        <View style={{backgroundColor: PALETTE.REACT_CYAN_DARK}}>
+          <TouchableOpacity
+            onPress={() => {
+              navigateTo('INDEX');
+            }}>
+            <Text
+              style={[styles.buttonText, {color: PALETTE.REACT_CYAN_LIGHT}]}>
+              {'‹ Back'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
       <View style={{width: '100%', flex: 1}}>{children}</View>
     </View>
@@ -82,18 +95,46 @@ export function IndexPage() {
   return (
     <FlatList
       data={registeredPageNames}
+      ListHeaderComponent={
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 16,
+            paddingVertical: 16,
+          }}>
+          <Image
+            style={{width: 32, height: 32}}
+            resizeMode="contain"
+            source={require('../assets/react-native-logo.png')}
+          />
+          <Text
+            style={{
+              color: '#EEE',
+              fontSize: 24,
+              fontWeight: 'bold',
+              padding: 16,
+            }}>
+            RN Tester
+          </Text>
+        </View>
+      }
       renderItem={({item}) => {
         return (
-          <TouchableOpacity
-            onPress={() => {
-              navigateTo(item);
-            }}>
-            <Text style={styles.buttonText}>{item}</Text>
-          </TouchableOpacity>
+          <View style={{backgroundColor: PALETTE.REACT_CYAN_DARK}}>
+            <TouchableOpacity
+              onPress={() => {
+                navigateTo(item);
+              }}>
+              <Text style={styles.buttonText}>{item}</Text>
+            </TouchableOpacity>
+          </View>
         );
       }}
       ItemSeparatorComponent={() => (
-        <View style={{height: 1, backgroundColor: 'silver'}} />
+        <View
+          style={{height: StyleSheet.hairlineWidth, backgroundColor: '#666'}}
+        />
       )}
     />
   );
@@ -103,13 +144,14 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#333',
+    backgroundColor: '#888',
   },
   buttonText: {
     width: '100%',
     fontWeight: 'bold',
     paddingHorizontal: 16,
     paddingVertical: 24,
-    color: 'blue',
+    color: 'white',
+    backgroundColor: 'black',
   },
 });
