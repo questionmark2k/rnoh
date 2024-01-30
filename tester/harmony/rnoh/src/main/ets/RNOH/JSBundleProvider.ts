@@ -1,4 +1,5 @@
 import type resmgr from '@ohos.resourceManager';
+import util from '@ohos.util';
 import { RNOHError } from "./RNOHError"
 import { RNOHLogger } from './RNOHLogger';
 import urlUtils from '@ohos.url';
@@ -31,6 +32,7 @@ export abstract class JSBundleProvider {
 export class JSBundleProviderError extends RNOHError {
 }
 
+export class MetroJSBundleProviderError extends JSBundleProviderError {}
 
 export class ResourceJSBundleProvider extends JSBundleProvider {
   constructor(private resourceManager: resmgr.ResourceManager, private path: string = "bundle.harmony.js", private appKeys: string[] = []) {
@@ -96,8 +98,17 @@ export class MetroJSBundleProvider extends JSBundleProvider {
   async getBundle(onProgress?: (progress: number) => void): Promise<ArrayBuffer> {
     try {
       const response = await fetchDataFromUrl(this.bundleUrl, { headers: { 'Content-Type': 'text/javascript' } }, onProgress);
+      /**
+       * When the responseCode is 500, instead of building a bundle, Metro will report an error which should be thrown and displayed on the phone.
+       */
+      if (response.responseCode === 500) {
+        this.throwMetroError(response.result)
+      }
       return response.result;
     } catch (err) {
+      if (err instanceof MetroJSBundleProviderError) {
+        throw err
+      }
       const suggestions = ["Is Metro server running? Did you run `react-native start`?"]
       const hotReloadConfig = this.getHotReloadConfig()
       if (hotReloadConfig) {
@@ -120,6 +131,28 @@ export class MetroJSBundleProvider extends JSBundleProvider {
   getHumanFriendlyURL(): string {
     const hotReloadConfig = this.getHotReloadConfig()!
     return `${hotReloadConfig.host}:${hotReloadConfig.port}`
+  }
+
+  throwMetroError(result: ArrayBuffer) {
+    const processChunk = (text: string | undefined) => {
+      let content = text ?? ""
+      const matches = text?.match(/^([!\x3c-\x3f]*)([\d;]*)([\x20-\x2c]*[\x40-\x7e])([\s\S]*)/m)
+      return !matches ? content : matches[4]
+    }
+    const ansiToText = (txt: string) => {
+      const rawTextChunks = txt.split(/\033\[/);
+      const firstChunk = rawTextChunks.shift() ?? "";
+      const colorChunks = rawTextChunks.map(processChunk);
+      colorChunks.unshift(firstChunk);
+      return colorChunks.join("");
+    }
+    const textDecoder = util.TextDecoder.create();
+    const err: { message: string, stack: string } = JSON.parse(textDecoder.decodeWithStream(new Uint8Array(result)));
+    throw new MetroJSBundleProviderError({
+      whatHappened: ansiToText(err.message),
+      customStack: err.stack.replace(err.message, ""),
+      howCanItBeFixed: []
+    })
   }
 }
 
@@ -161,6 +194,9 @@ export class AnyJSBundleProvider extends JSBundleProvider {
         this.pickedJSBundleProvider = jsBundleProvider;
         return bundle;
       } catch (err) {
+        if (err instanceof MetroJSBundleProviderError) {
+          throw err
+        }
         if (err instanceof JSBundleProviderError) {
           errors.push(err)
         }

@@ -8,6 +8,7 @@ export type FetchOptions = {
 export type FetchResult = {
   headers: Object,
   result: ArrayBuffer,
+  responseCode?: number
 }
 
 export async function fetchDataFromUrl(url: string, options: FetchOptions = { usingCache: true }, onProgress?: (progress: number) => void): Promise<FetchResult> {
@@ -16,6 +17,7 @@ export async function fetchDataFromUrl(url: string, options: FetchOptions = { us
     const dataChunks: ArrayBuffer[] = [];
     let result: ArrayBuffer | undefined;
     let headers: Object | undefined;
+    let responseCode: number | undefined;
 
     function cleanUp() {
       httpRequest.destroy();
@@ -23,7 +25,7 @@ export async function fetchDataFromUrl(url: string, options: FetchOptions = { us
 
     function maybeResolve() {
       if (result !== undefined && headers !== undefined) {
-        resolve({ headers, result });
+        resolve({ headers, result, responseCode });
         cleanUp();
       }
     }
@@ -62,6 +64,7 @@ export async function fetchDataFromUrl(url: string, options: FetchOptions = { us
           usingCache: options.usingCache
         },
         (err, data) => {
+          responseCode = data
           if (err) {
             reject(new Error(`Couldn't fetch data from ${url}, ${err.message}`));
             cleanUp();
