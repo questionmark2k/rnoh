@@ -369,7 +369,7 @@ export class RNInstanceImpl implements RNInstance {
       const jsBundle = await jsBundleProvider.getBundle((progress) => {
         this.devToolsController.eventEmitter.emit("SHOW_DEV_LOADING_VIEW", this.id, `Loading from ${jsBundleProvider.getHumanFriendlyURL()} (${Math.round(progress * 100)}%)`)
       })
-      this.initialBundleUrl = this.initialBundleUrl ?? bundleURL
+      this.initialBundleUrl = this.initialBundleUrl ?? jsBundleProvider.getURL()
       await this.napiBridge.loadScript(this.id, jsBundle, bundleURL)
       this.lifecycleState = LifecycleState.READY
       const hotReloadConfig = jsBundleProvider.getHotReloadConfig()
@@ -377,8 +377,9 @@ export class RNInstanceImpl implements RNInstance {
         this.callRNFunction("HMRClient", "setup", ["harmony", hotReloadConfig.bundleEntry, hotReloadConfig.host, hotReloadConfig.port, true])
         this.logger.info("Configured hot reloading")
       }
-      if (this.shouldEnableDebugger) {
-        DevServerHelper.connectToDevServer(bundleURL, this.logger, this.napiBridge.getInspectorWrapper());
+      const isRemoteBundle = bundleURL.startsWith("http")
+      if (this.shouldEnableDebugger && isRemoteBundle) {
+          DevServerHelper.connectToDevServer(bundleURL, this.logger, this.napiBridge.getInspectorWrapper());
       }
       this.bundleExecutionStatusByBundleURL.set(bundleURL, "DONE")
       this.lifecycleEventEmitter.emit("JS_BUNDLE_EXECUTION_FINISH", {
