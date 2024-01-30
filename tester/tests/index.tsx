@@ -40,7 +40,7 @@ export * from './StatusBarTest';
 export * from './StyleSheetTest';
 export * from './SwitchTest';
 export * from './TextInputTest';
-export * from './TextTest';
+export * from './TextTest/TextTest';
 export * from './TimerTest';
 export * from './TouchHandlingTest';
 export * from './TouchableOpacityTest';
