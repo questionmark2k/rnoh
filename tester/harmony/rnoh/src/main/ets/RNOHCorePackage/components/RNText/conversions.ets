@@ -98,7 +98,7 @@ export function getMaxLines(maximumNumberOfLines?: number) {
 
 export function getTextShadow(textShadowProps: TextShadowProps | undefined): ShadowOptions | undefined {
   const shadowRadius = textShadowProps?.textShadowRadius
-  if (shadowRadius === undefined || shadowRadius === 0)
+  if (shadowRadius === undefined)
     return undefined
   const result: ShadowOptions = {
     radius: shadowRadius,
