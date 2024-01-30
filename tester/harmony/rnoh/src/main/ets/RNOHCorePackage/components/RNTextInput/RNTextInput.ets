@@ -219,6 +219,7 @@ export struct RNTextInput {
           .padding(0)
           .borderRadius(0)
           .backgroundColor(Color.Transparent)
+          .caretColor(convertColorSegmentsToString(this.descriptor.props.selectionColor))
           .onFocus(() => this.onFocusEvent())
           .defaultFocus(false)
           .onBlur(() => this.onBlurEvent())/*
@@ -253,6 +254,7 @@ export struct RNTextInput {
           .type(getInputType(this.descriptor.props.keyboardType, this.descriptor.props.secureTextEntry))
           .maxLength(this.descriptor.rawProps.maxLength)
           .selectedBackgroundColor(convertColorSegmentsToString(this.descriptor.props.selectionColor))
+          .caretColor(convertColorSegmentsToString(this.descriptor.props.selectionColor))
           .showPasswordIcon(false)
           .placeholderColor(convertColorSegmentsToString(this.descriptor.props.placeholderTextColor))
           .placeholderFont({
