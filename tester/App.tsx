@@ -92,17 +92,15 @@ function App() {
                 )}
               />
             </Page>
-            {Object.keys(remainingExampleByName).map(exampleName => {
-              return (
-                <Page key={exampleName} name={`EXAMPLE: ${exampleName}`}>
-                  {
-                    remainingExampleByName[
-                      exampleName as keyof typeof remainingExampleByName
-                    ]
-                  }
-                </Page>
-              );
-            })}
+            {Object.entries(remainingExampleByName).map(
+              ([exampleName, Example]) => {
+                return (
+                  <Page key={exampleName} name={`EXAMPLE: ${exampleName}`}>
+                    <Example />
+                  </Page>
+                );
+              },
+            )}
             <View
               style={[
                 StyleSheet.absoluteFill,

@@ -16,9 +16,9 @@ import {
   StickyHeadersExample,
   TesterExample,
   TextScrollExample,
-  TextTestsExample,
   TogglingComponentExample,
 } from './examples';
+import { TextTestsExample } from './examples/TestTextsExample';
 
 AppRegistry.setWrapperComponentProvider(appParams => {
   return ({children, ..._otherProps}) => (
