@@ -2,13 +2,12 @@ import { Descriptor, Position, RNOHComponentCommand, RNOHContext, Size, Tag } fr
 import { _RNScrollViewManager } from './RNScrollViewManager';
 import { RNViewBase, ViewDescriptorWrapperBase } from '../RNViewBase';
 import { RN_PULL_TO_REFRESH_VIEW_NAME, RNPullToRefreshView } from '../RNPullToRefreshView';
-import { CustomComponentBuilder, RNComponentFactory, buildRNComponent } from '../RNComponentFactory';
+import { buildRNComponent, CustomComponentBuilder, RNComponentFactory } from '../RNComponentFactory';
 import {
   CurrentOffset,
   FirstVisibleView,
   IndicatorStyle,
   ScrollEvent,
-  ScrollPosition,
   ScrollViewProps,
   ScrollViewRawProps,
   ScrollViewState
@@ -36,15 +35,6 @@ function getScrollSnapAlign(snapToAlignment: string | undefined): ScrollSnapAlig
   } else {
     return ScrollSnapAlign.START;
   }
-}
-
-function isEdgeStart(edge: Edge) {
-  /*
-   * The Edge type value names do not correspond with values returned by the onScrollEdge callback.
-   * This is needed to avoid confusion, as normally scrolling to start edge of horizontal scroll would return Edge.Center
-   * which is not only a bad name but is also deprecated.
-   * */
-  return edge === 0 || edge === 1;
 }
 
 export type ScrollViewDescriptor = Descriptor<"ScrollView", ScrollViewProps, ScrollViewState, ScrollViewRawProps>;
@@ -81,11 +71,11 @@ export struct RNScrollView {
     ))
     this.cleanUpCallbacks.push(this.ctx.componentCommandReceiver.registerCommandCallback(
       this.tag,
-      (command, args: [number, number, boolean]) => {
+      (command, args: Object[]) => {
         if (command === 'scrollTo') {
-          this.scrollTo(args[0], args[1], args[2]);
+          this.scrollTo(args[0] as number, args[1] as number, args[2] as boolean);
         } else if (command === 'scrollToEnd') {
-          this.scrollToEnd(args[0]);
+          this.scrollToEnd(args[0] as boolean);
         } else if (command === 'flashScrollIndicators') {
           this.flashScrollIndicators()
         } else if (command === RNOHComponentCommand.BLOCK_NATIVE_RESPONDER) {
@@ -217,15 +207,13 @@ export struct RNScrollView {
     this.contentOffset = { x: xOffset, y: yOffset };
   }
 
-  scrollToEnd(animated: number) {
-    if (animated) {
-      this.scroller.scrollEdge(this.descriptor.rawProps.inverted ? Edge.Start : Edge.End);
-    } else if (this.descriptor.rawProps.inverted) {
-      this.scrollTo(0, 0)
+  scrollToEnd(animated: boolean) {
+    if (this.descriptor.rawProps.inverted) {
+      this.scrollTo(0, 0, animated);
     } else {
-      const xOffset = this.props.flexDirection === 2 ? this.contentSize.width - this.descriptor.layoutMetrics.frame.size.width : 0;
-      const yOffset = this.props.flexDirection === 2 ? 0 : this.contentSize.height - this.descriptor.layoutMetrics.frame.size.height;
-      this.scrollTo(xOffset, yOffset)
+      const xOffset = this.props.flexDirection === 2 ? this.contentSize.width : 0;
+      const yOffset = this.props.flexDirection === 2 ? 0 : this.contentSize.height;
+      this.scrollTo(xOffset, yOffset, animated);
     }
   }
 
