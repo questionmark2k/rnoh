@@ -162,7 +162,11 @@ export class StandardRNOHLogger implements RNOHLogger {
   }
 
   public fatal(...args: any[]): void {
-    this.log("fatal", this.getCurrentOffset(), ...args)
+    if (args[0] instanceof RNOHError) {
+      hilog.fatal(this.getDomain(), this.getTag(), `█__ %{public}s`, args[0].getMessage())
+    } else {
+      hilog.fatal(this.getDomain(), this.getTag(), `█__ %{public}s`, ...args)
+    }
     this.maybeHandleRNOHError(args)
   }
 

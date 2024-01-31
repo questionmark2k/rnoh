@@ -6,6 +6,7 @@ import { measureParagraph } from "./TextLayoutManager"
 import type { DisplayMode } from './CppBridgeUtils'
 import { RNOHLogger } from "./RNOHLogger"
 import type { InspectorInstance } from './types'
+import { FatalRNOHError } from "./RNOHError"
 
 
 export class NapiBridge {
@@ -16,6 +17,14 @@ export class NapiBridge {
   }
 
   onInit(shouldCleanUpRNInstances: boolean): { isDebugModeEnabled: boolean } {
+    if (!this.libRNOHApp) {
+      const err = new FatalRNOHError({
+        whatHappened: "Couldn't create bindings between ETS and CPP. libRNOHApp is undefined.",
+        howCanItBeFixed: []
+      })
+      this.logger.fatal(err)
+      throw err
+    }
     return this.libRNOHApp?.onInit(shouldCleanUpRNInstances)
   }
 
