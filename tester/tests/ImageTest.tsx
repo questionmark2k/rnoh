@@ -1,4 +1,11 @@
-import {Image, ImageSourcePropType, ScrollView, Text, View} from 'react-native';
+import {
+  Image,
+  ImageSourcePropType,
+  Platform,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import {TestCase, TestSuite} from '@rnoh/testerino';
 import React from 'react';
 import {Button} from '../components';
@@ -13,6 +20,7 @@ const REMOTE_GIF_URL =
   'https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif';
 const DATA_URI =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
+const FILE_URI = 'file:///data/storage/el2/base/files/pravatar-131.jpg';
 
 export const ImageTest = () => {
   return (
@@ -69,6 +77,7 @@ export const ImageTest = () => {
           });
         }}
       />
+      <FileExampleCase />
       <TestCase
         itShould="retrieve local image size"
         fn={({expect}) => {
@@ -400,6 +409,33 @@ const ImageExampleCase = ({
     />
   </TestCase>
 );
+
+const FileExampleCase = () => {
+  const [error, setError] = React.useState<string | undefined>(undefined);
+
+  return (
+    <TestCase
+      skip={Platform.OS !== 'harmony'}
+      itShould="load image from local file">
+      {error !== undefined ? (
+        <Text>{error}</Text>
+      ) : (
+        <Image
+          style={{borderRadius: 8, borderWidth: 1, height: 150}}
+          source={{uri: FILE_URI}}
+          onError={_e =>
+            setError(
+              'To load the image, place it as' +
+                '`/data/app/el2/100/base/com.rnoh.tester/files/pravatar-131.jpg`' +
+                ' on your phone',
+            )
+          }
+          // resizeMode="contain"
+        />
+      )}
+    </TestCase>
+  );
+};
 
 const SwitchSourceTest = () => {
   const SOURCES = [
