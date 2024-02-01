@@ -13,6 +13,8 @@ class ScrollViewComponentJSIBinder : public ViewComponentJSIBinder {
         object.setProperty(rt, "persistentScrollbar", "boolean");
         object.setProperty(rt, "contentOffset", "Object");
         object.setProperty(rt, "indicatorStyle", "number");
+        object.setProperty(rt, "alwaysBounceHorizontal", "boolean");
+        object.setProperty(rt, "alwaysBounceVertical", "boolean");
         object.setProperty(rt, "bounces", "boolean");
         object.setProperty(rt, "decelerationRate", "number");
         object.setProperty(rt, "scrollEventThrottle", "number");

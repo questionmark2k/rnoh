@@ -24,6 +24,8 @@ class ScrollViewComponentNapiBinder : public ViewComponentNapiBinder {
                 .addProperty("contentOffsetX", props->contentOffset.x)
                 .addProperty("contentOffsetY", props->contentOffset.y)
                 .addProperty("scrollEnabled", props->scrollEnabled)
+                .addProperty("alwaysBounceHorizontal", props->alwaysBounceHorizontal)
+                .addProperty("alwaysBounceVertical", props->alwaysBounceVertical)
                 .addProperty("bounces", props->bounces)
                 .addProperty("showsHorizontalScrollIndicator", props->showsHorizontalScrollIndicator)
                 .addProperty("showsVerticalScrollIndicator", props->showsVerticalScrollIndicator)

@@ -62,6 +62,8 @@ export struct RNScrollView {
   @State shouldDisableSnapping: boolean = false
   @State shouldPreventScrolling: boolean = false
   private firstVisibleView: FirstVisibleView | undefined = undefined
+  private positionBeforeScrolling: Position | undefined = undefined
+  private isScrolling: boolean = false
 
   aboutToAppear() {
     const descriptor = this.ctx.descriptorRegistry.getDescriptor<ScrollViewDescriptor>(this.tag)
@@ -203,8 +205,19 @@ export struct RNScrollView {
 
   scrollTo(xOffset: number, yOffset: number, animated: boolean = false) {
     const animation: Animation | undefined = animated ? { duration: 1000, curve: Curve.Smooth } : undefined;
+    // When animation === undefined,onScrollStart and
+    // onScrollStop will not be triggered,so we need to
+    // initialize and destruct the parameters here.
+    if(!animation){
+      this.positionBeforeScrolling = { x : this.scroller.currentOffset().xOffset, y : this.scroller.currentOffset().yOffset };
+      this.isScrolling = false
+    }
     this.scroller.scrollTo({ xOffset, yOffset, animation })
     this.contentOffset = { x: xOffset, y: yOffset };
+    if(!animation){
+      this.positionBeforeScrolling = undefined;
+      this.isScrolling = false;
+    }
   }
 
   scrollToEnd(animated: boolean) {
@@ -354,6 +367,15 @@ export struct RNScrollView {
       // the view was unmounted while scrolling - don't report the event in that case
       return;
     }
+
+    if(!this.isScrolling && (this.positionBeforeScrolling) !==undefined){
+      // The offset precision has a bug. Sometimes, there is a slight deviation,
+      // After the problem is solved in the os, change the values to strict equal,
+      if(Math.abs(this.positionBeforeScrolling.x - currentOffset.xOffset) > 1 || Math.abs(this.positionBeforeScrolling.y - currentOffset.yOffset) >  1){
+        this.isScrolling = true;
+      }
+    }
+
     descriptor.state.contentOffsetX = currentOffset.xOffset;
     descriptor.state.contentOffsetY = currentOffset.yOffset;
     this.contentOffset = {
@@ -362,7 +384,7 @@ export struct RNScrollView {
     }
 
     const now = Date.now();
-    if (this.allowNextScrollEvent || descriptor.props.scrollEventThrottle < now - this.lastScrollDispatchTime) {
+    if (this.isScrolling && (this.allowNextScrollEvent || descriptor.props.scrollEventThrottle < now - this.lastScrollDispatchTime)) {
       this.lastScrollDispatchTime = now
       this.ctx.rnInstance.emitComponentEvent(
         this.tag,
@@ -435,6 +457,11 @@ export struct RNScrollView {
   }
 
   onScrollBegin() {
+    // this.positionBeforeScrolling = { x : this.descriptor.state.contentOffsetX, y : this.descriptor.state.contentOffsetY };
+    if(!this.positionBeforeScrolling){
+      this.positionBeforeScrolling = { x : this.scroller.currentOffset().xOffset, y : this.scroller.currentOffset().yOffset }
+    }
+    this.isScrolling = false;
     this.componentManager.setScrolling(true);
     this.allowNextScrollEvent = false;
   }
@@ -464,6 +491,8 @@ export struct RNScrollView {
     descriptor.state.contentOffsetY = currentOffset.yOffset;
     this.contentOffset = { x: currentOffset.xOffset, y: currentOffset.yOffset }
     this.ctx.descriptorRegistry.setState<ScrollViewState>(this.tag, descriptor.state);
+    this.positionBeforeScrolling = undefined;
+    this.isScrolling = false;
   }
 
   private shouldWrapWithPullToRefresh() {
@@ -478,8 +507,23 @@ export struct RNScrollView {
     return true
   }
 
+  shouldBounce(): boolean{
+    let alwaysBounces = this.scrollDirection() === ScrollDirection.Vertical ? this.descriptor.rawProps.alwaysBounceVertical : this.descriptor.rawProps.alwaysBounceHorizontal;
+    if(alwaysBounces === undefined){
+      alwaysBounces = true
+    }
+    const hasLittleContent = this.scrollDirection() === ScrollDirection.Vertical ?
+          this.contentSize.height <= this.descriptor.layoutMetrics.frame.size.height : this.contentSize.width <= this.descriptor.layoutMetrics.frame.size.width;
+    if (this.props.bounces && (!hasLittleContent || alwaysBounces)) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+
   getEdgeEffect(): EdgeEffect {
-    if (this.props.bounces) {
+    if (this.shouldBounce()) {
       return EdgeEffect.Spring;
     }
     else {

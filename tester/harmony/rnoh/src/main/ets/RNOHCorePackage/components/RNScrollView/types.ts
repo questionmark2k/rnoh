@@ -7,6 +7,8 @@ export interface ScrollViewProps extends ViewBaseProps {
   contentOffsetX: number
   contentOffsetY: number
   flexDirection: number
+  alwaysBounceHorizontal?:boolean
+  alwaysBounceVertical?:boolean
   bounces: boolean
   persistentScrollbar: boolean
   showsHorizontalScrollIndicator: boolean
@@ -17,6 +19,8 @@ export interface ScrollViewProps extends ViewBaseProps {
 }
 
 export interface ScrollViewRawProps extends ViewRawProps {
+  alwaysBounceHorizontal?:boolean
+  alwaysBounceVertical?:boolean
   snapToInterval?: number
   snapToOffsets?: number[]
   snapToStart?: boolean
