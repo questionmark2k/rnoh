@@ -1,10 +1,15 @@
-import { RNOHContext, convertColorSegmentsToString, Tag } from '../../../RNOH'
+import {
+  RNComponentContext,
+  RNOHContext,
+  convertColorSegmentsToString,
+  Tag,
+  CustomComponentBuilder
+} from '../../../RNOH'
 import { RNViewBase } from '../RNViewBase'
 import { PositionedFragment } from '../../../ParagraphMeasurer';
 import { PositionedLine, Size, } from '../../../ParagraphMeasurer'
 import { RNParagraphManager } from './RNParagraphManager'
-import { CustomComponentBuilder } from '../RNComponentFactory'
-import { RNComponentFactory, buildRNComponent } from '../RNComponentFactory'
+import { RNComponentFactory } from '../RNComponentFactory'
 import { TextDescriptor, TextFragmentExtraData } from './types'
 import { ViewDescriptorWrapper } from "../RNViewBase"
 import {
@@ -20,7 +25,8 @@ import {
 export struct RNParagraph {
   public ctx!: RNOHContext
   public tag: number = 0
-  @BuilderParam buildCustomComponent!: CustomComponentBuilder
+  /** @deprecated  */
+  @BuilderParam public buildCustomComponent: CustomComponentBuilder
   //--------------------------------------------------------------------------------------------------------------------
   @State descriptor: TextDescriptor = {} as TextDescriptor
   @State positionedLines: PositionedLine<TextFragmentExtraData>[] = []
@@ -101,9 +107,9 @@ export struct RNParagraph {
           }
         })
       })
-      if (this.ctx.rnInstance.isFeatureFlagEnabled("USE_BUILD_RN_COMPONENT")) {
+      if (this.ctx instanceof RNComponentContext) {
         ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
-          buildRNComponent(this.ctx, this.ctx.descriptorRegistry.findDescriptorWrapperByTag(childrenTag)!)
+          (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), childrenTag)
         }, (childrenTag: Tag) => childrenTag.toString())
       } else {
         ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {

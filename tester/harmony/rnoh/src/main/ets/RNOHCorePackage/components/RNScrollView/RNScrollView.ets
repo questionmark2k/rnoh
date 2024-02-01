@@ -1,8 +1,17 @@
-import { Descriptor, Position, RNOHComponentCommand, RNOHContext, Size, Tag } from '../../../RNOH';
+import {
+  Descriptor,
+  Position,
+  RNOHComponentCommand,
+  RNComponentContext,
+  Size,
+  Tag,
+  CustomComponentBuilder,
+  RNOHContext,
+} from '../../../RNOH';
 import { _RNScrollViewManager } from './RNScrollViewManager';
 import { RNViewBase, ViewDescriptorWrapperBase } from '../RNViewBase';
 import { RN_PULL_TO_REFRESH_VIEW_NAME, RNPullToRefreshView } from '../RNPullToRefreshView';
-import { buildRNComponent, CustomComponentBuilder, RNComponentFactory } from '../RNComponentFactory';
+import { RNComponentFactory } from '../RNComponentFactory';
 import {
   CurrentOffset,
   FirstVisibleView,
@@ -41,8 +50,9 @@ export type ScrollViewDescriptor = Descriptor<"ScrollView", ScrollViewProps, Scr
 
 @Component
 export struct RNScrollView {
-  ctx!: RNOHContext
-  tag: number = 0
+  public ctx!: RNOHContext
+  public tag: number = 0
+  /** @deprecated  */
   @BuilderParam public buildCustomComponent!: CustomComponentBuilder
   @State props: ScrollViewProps = {} as ScrollViewProps
   @State contentSize: Size = {} as Size
@@ -539,12 +549,12 @@ export struct RNScrollView {
   buildScrollCore() {
     Scroll(this.scroller) {
       Stack() {
-        if (this.ctx.rnInstance.isFeatureFlagEnabled("USE_BUILD_RN_COMPONENT")) {
-          ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
-            buildRNComponent(this.ctx, this.ctx.descriptorRegistry.findDescriptorWrapperByTag(childrenTag)!)
+        if (this.ctx instanceof RNComponentContext) {
+          ForEach(this.childrenTags, (childrenTag: Tag) => {
+            (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), childrenTag)
           }, (childrenTag: Tag) => childrenTag.toString())
         } else {
-          ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
+          ForEach(this.childrenTags, (childrenTag: Tag) => {
             RNComponentFactory({ ctx: this.ctx, tag: childrenTag, buildCustomComponent: this.buildCustomComponent })
           }, (childrenTag: Tag) => childrenTag.toString())
         }

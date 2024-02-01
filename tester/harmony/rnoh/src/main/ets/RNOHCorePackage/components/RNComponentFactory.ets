@@ -1,4 +1,11 @@
-import { Tag, RNOHContext, RNComponentContext, DescriptorWrapper } from "../../RNOH"
+import {
+  Tag,
+  RNOHContext,
+  RNComponentContext,
+  DescriptorWrapper,
+  CustomComponentBuilder,
+  ComponentBuilderContext
+} from "../../RNOH"
 import { RNView } from "./RNView"
 import { RNImage } from "./RNImage"
 import { RNTextInput } from "./RNTextInput"
@@ -9,32 +16,16 @@ import { RNModalHostView } from './RNModalHostView'
 import { RNSwitch } from './RNSwitch'
 import { RNActivityIndicator } from './RNActivityIndicator'
 
-export interface ComponentBuilderContext {
-  /**
-   * @deprecated Use `rnComponentContext` instead.
-   */
-  rnohContext: RNOHContext
-  /**
-   * @deprecated: Use tag and componentName instead
-   */
-  descriptor: DescriptorEssence
-  tag: Tag
-  componentName: string
-  /**
-   * rnComponentContext will replace rnohContext in the future
-   */
-  rnComponentContext: RNComponentContext
-}
-
+/** @deprecated */
 interface DescriptorEssence {
   tag: Tag,
   type: string
 }
 
-export type CustomComponentBuilder = (ctx: ComponentBuilderContext) => void
 
 class ComponentBuilderContextImpl implements ComponentBuilderContext {
   public rnComponentContext: RNComponentContext
+  /** @deprecated: use rnComponentContext instead  */
   public rnohContext: RNOHContext
   public tag: Tag
   public componentName: string
@@ -49,14 +40,6 @@ class ComponentBuilderContextImpl implements ComponentBuilderContext {
   }
 }
 
-@Builder
-function buildCustomComponent(ctx: ComponentBuilderContext) {
-  /**
-   * If you want to improve the performance, you can tell RNOH to use buildRNComponent instead of RNComponentFactory.
-   * However, there's no official way to inject your custom components into that builder, therefore you need to specify
-   * those component here and enable feature flag 'USE_BUILD_RN_COMPONENT' by calling `RNInstance::enableFeatureFlag`.
-   */
-}
 
 @Builder
 export function buildRNComponent(ctx: RNComponentContext, descriptorWrapper: DescriptorWrapper) {
@@ -64,14 +47,22 @@ export function buildRNComponent(ctx: RNComponentContext, descriptorWrapper: Des
     RNView({
       ctx: ctx,
       tag: descriptorWrapper.tag,
-      buildCustomComponent: buildCustomComponent
     })
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "Image") {
-    RNImage({ ctx: ctx, tag: descriptorWrapper.tag })
+    RNImage({
+      ctx: ctx,
+      tag: descriptorWrapper.tag,
+    })
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "TextInput") {
-    RNTextInput({ ctx: ctx, tag: descriptorWrapper.tag })
+    RNTextInput({
+      ctx: ctx,
+      tag: descriptorWrapper.tag,
+    })
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "Paragraph") {
-    RNText({ ctx: ctx, tag: descriptorWrapper.tag, buildCustomComponent: buildCustomComponent })
+    RNText({
+      ctx: ctx,
+      tag: descriptorWrapper.tag,
+    })
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "PullToRefreshView") {
     /**
      * RNScrollView displays Refresh component if PullToRefreshView is its direct parent.
@@ -83,7 +74,6 @@ export function buildRNComponent(ctx: RNComponentContext, descriptorWrapper: Des
     RNScrollView({
       ctx: ctx,
       tag: descriptorWrapper.tag,
-      buildCustomComponent: buildCustomComponent,
     })
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "Switch") {
     RNSwitch({
@@ -94,7 +84,6 @@ export function buildRNComponent(ctx: RNComponentContext, descriptorWrapper: Des
     RNModalHostView({
       ctx: ctx,
       tag: descriptorWrapper.tag,
-      buildCustomComponent: buildCustomComponent
     })
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "ActivityIndicatorView") {
     RNActivityIndicator({
@@ -102,7 +91,7 @@ export function buildRNComponent(ctx: RNComponentContext, descriptorWrapper: Des
       tag: descriptorWrapper.tag,
     })
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) !== '') {
-    buildCustomComponent(new ComponentBuilderContextImpl(
+    ctx.wrappedCustomRNComponentBuilder.builder(new ComponentBuilderContextImpl(
       ctx,
       ctx,
       descriptorWrapper.tag,
@@ -112,7 +101,9 @@ export function buildRNComponent(ctx: RNComponentContext, descriptorWrapper: Des
   }
 }
 
-
+/**
+ * @deprecated: Use one of  builder wrappers in `RNComponentContext` instead.
+ */
 @Component
 export struct RNComponentFactory {
   public ctx!: RNOHContext
@@ -147,7 +138,7 @@ export struct RNComponentFactory {
       RNView({
         ctx: this.ctx,
         tag: this.tag,
-        buildCustomComponent: this.buildCustomComponent
+        buildCustomComponent: this.buildCustomComponent,
       })
     } else if (this.componentName === "Image") {
       RNImage({ ctx: this.ctx, tag: this.tag })
@@ -188,14 +179,14 @@ export struct RNComponentFactory {
         ctx: this.ctx,
         tag: this.tag,
       })
-    } else if (this.componentName !== '') {
-      this.buildCustomComponent({
-        rnohContext: this.ctx,
-        rnComponentContext: this.ctx,
-        descriptor: this.ctx.descriptorRegistry.getDescriptor<Descriptor>(this.tag) as DescriptorEssence,
-        tag: this.tag,
-        componentName: this.componentName
-      })
+    } else if (this.componentName !== '' && this.ctx instanceof RNComponentContext) {
+      this.buildCustomComponent(new ComponentBuilderContextImpl(
+        this.ctx,
+        this.ctx,
+        this.tag,
+        this.componentName,
+        this.ctx.descriptorRegistry.getDescriptor<Descriptor>(this.tag) as DescriptorEssence,
+      ))
     }
   }
 }

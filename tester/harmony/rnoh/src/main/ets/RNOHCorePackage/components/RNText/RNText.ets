@@ -1,15 +1,15 @@
-import { RNOHContext, PLACEHOLDER_SYMBOL } from '../../../RNOH'
+import { RNOHContext, PLACEHOLDER_SYMBOL, CustomComponentBuilder } from '../../../RNOH'
 import { RNSimpleText } from './RNSimpleText'
 import { RNParagraph } from './RNParagraph'
 import { TextDescriptor } from './types'
-import { CustomComponentBuilder } from '../RNComponentFactory'
 import { RNParagraphManager } from './RNParagraphManager'
 
 @Component
 export struct RNText {
   public ctx!: RNOHContext
   public tag: number = 0
-  @BuilderParam public buildCustomComponent!: CustomComponentBuilder
+  /** @deprecated  */
+  @BuilderParam public buildCustomComponent: CustomComponentBuilder
   // -------------------------------------------------------------------------------------------------------------------
   @State descriptor: TextDescriptor = {} as TextDescriptor
   private componentManager!: RNParagraphManager

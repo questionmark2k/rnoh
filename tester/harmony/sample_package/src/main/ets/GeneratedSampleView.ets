@@ -1,16 +1,14 @@
-import { ComponentBuilderContext, Tag, RNComponentFactory, RNOHContext, RNViewBase, } from 'rnoh';
+import { RNComponentContext, RNViewBase } from 'rnoh';
 import { RNC } from "rnoh/generated"
 import { getDirectProps } from "./GeneratedSampleViewUtils"
 
-
 @Component
 export struct GeneratedSampleView {
-  static readonly NAME = RNC.GeneratedSampleView.NAME
-  ctx!: RNOHContext
-  tag: number = 0
-  @BuilderParam buildCustomComponent: (componentBuilderContext: ComponentBuilderContext) => void
-  @State descriptorWrapper: RNC.GeneratedSampleView.DescriptorWrapper = {} as RNC.GeneratedSampleView.DescriptorWrapper
-  @State fontSize: number | undefined = undefined
+  public static readonly NAME = RNC.GeneratedSampleView.NAME
+  public ctx!: RNComponentContext
+  public tag: number = 0
+
+  @State private descriptorWrapper: RNC.GeneratedSampleView.DescriptorWrapper = {} as RNC.GeneratedSampleView.DescriptorWrapper
   private eventEmitter: RNC.GeneratedSampleView.EventEmitter | undefined = undefined
   private cleanUpCallbacks: (() => void)[] = []
 
@@ -46,10 +44,7 @@ export struct GeneratedSampleView {
       Column() {
         Text(JSON.stringify(this.getDirectProps(), null, 2)).width("100%").fontSize(8)
       }.width("100%").height("100%").backgroundColor(this.descriptorWrapper.props.colorTest.toRGBAString())
-
-      ForEach(this.descriptorWrapper.childrenTags, (tag: Tag) => {
-        RNComponentFactory({ ctx: this.ctx, tag: tag, buildCustomComponent: this.buildCustomComponent })
-      }, (tag: Tag) => tag.toString())
+      this.ctx.wrappedRNChildrenBuilder.builder(this.ctx, this.tag)
     }
   }
 }

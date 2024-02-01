@@ -1,9 +1,10 @@
-import { RNAbility, RNInstance } from "./RNOH"
+import { RNAbility, RNInstance, RNComponentContext, CustomComponentBuilder } from "./RNOH"
 import { RNSurface, SurfaceConfig2 } from "./RNSurface"
-import { CustomComponentBuilder } from './RNOHCorePackage';
+
 
 @CustomDialog
 export struct LogBoxDialog {
+  public ctx!: RNComponentContext
   public controller: CustomDialogController
   public rnInstance!: RNInstance
   public initialProps: Record<string, string> = {}
@@ -12,7 +13,7 @@ export struct LogBoxDialog {
 
   build() {
     RNSurface({
-      ctx: this.rnAbility.createRNOHContext({ rnInstance: this.rnInstance }),
+      ctx: this.ctx!,
       surfaceConfig: {
         initialProps: this.initialProps ?? {},
         appKey: "LogBox",

@@ -1,28 +1,22 @@
 import {
   Descriptor,
-  ComponentBuilderContext,
-  ViewDynamicProps,
-  Tag,
-  RNComponentFactory,
-  RNOHContext,
-  RNViewBase
+  ViewBaseProps,
+  RNViewBase,
+  RNComponentContext
 } from 'rnoh';
 
 
-export const SAMPLE_VIEW_TYPE: string = "SampleView"
-
-interface SampleViewProps extends ViewDynamicProps {
+interface SampleViewProps extends ViewBaseProps {
   size: number
 }
 
 export type SampleViewDescriptor = Descriptor<"SampleView", SampleViewProps>
 
-
 @Component
 export struct SampleView {
-  ctx!: RNOHContext
-  tag: number = 0
-  @BuilderParam buildCustomComponent: (componentBuilderContext: ComponentBuilderContext) => void
+  public static readonly NAME = "SampleView"
+  public ctx!: RNComponentContext
+  public tag: number = 0
   @State descriptor: SampleViewDescriptor = {} as SampleViewDescriptor
   @State fontSize: number | undefined = undefined
   private cleanUpCallbacks: (() => void)[] = []
@@ -48,9 +42,7 @@ export struct SampleView {
   build() {
     RNViewBase({ ctx: this.ctx, tag: this.tag }) {
       Text(this.descriptor.tag.toString()).fontColor("white").fontSize(this.fontSize ?? 12)
-      ForEach(this.descriptor.childrenTags, (tag: Tag) => {
-        RNComponentFactory({ ctx: this.ctx, tag: tag, buildCustomComponent: this.buildCustomComponent })
-      }, (tag: Tag) => tag.toString())
+      this.ctx.wrappedRNChildrenBuilder.builder(this.ctx, this.tag)
     }
   }
 }

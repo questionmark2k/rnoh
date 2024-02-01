@@ -1,6 +1,13 @@
-import { ComponentBuilderContext } from './RNOHCorePackage/components/RNComponentFactory';
-import { RNComponentFactory } from './RNOHCorePackage';
-import { Descriptor, DisplayMode, RNOHContext, RNOHLogger } from './RNOH';
+import { RNComponentFactory, buildRNComponent } from './RNOHCorePackage';
+import {
+  Descriptor,
+  DisplayMode,
+  RNComponentContext,
+  ComponentBuilderContext,
+  RNOHLogger,
+  RNOHContext,
+  RNOHError
+} from './RNOH';
 import {
   ViewBaseProps,
   ViewDescriptorWrapper,
@@ -27,8 +34,11 @@ export interface SurfaceConfig2 extends SurfaceConfig {
 
 @Component
 export struct RNSurface {
-  ctx!: RNOHContext;
-  surfaceConfig!: SurfaceConfig;
+  public ctx!: RNOHContext | RNComponentContext;
+  public surfaceConfig!: SurfaceConfig;
+  /**
+   * @deprecated: provide RNComponentContext to RNSurface::ctx instead
+   */
   @BuilderParam buildCustomComponent: (ctx: ComponentBuilderContext) => void;
   surfaceWidth: number = 0;
   surfaceHeight: number = 0;
@@ -46,6 +56,12 @@ export struct RNSurface {
 
   aboutToAppear() {
     this.logger = this.ctx.logger.clone("RNSurface")
+    if (!(this.ctx instanceof RNComponentContext)) {
+      this.logger.error(new RNOHError({
+        whatHappened: "RNSurface received RNOHContext instead of RNComponentContext. Custom RN components won't be visible.",
+        howCanItBeFixed: ["Provide RNComponentContext instead of RNOHContext"]
+      }))
+    }
     const stopTracing = this.logger.clone("aboutToAppear").startTracing()
     if (Object.keys(this.surfaceConfig).includes("surfaceHandle")) {
       this.surfaceHandle = (this.surfaceConfig as SurfaceConfig1).surfaceHandle;
@@ -129,11 +145,15 @@ export struct RNSurface {
 
   build() {
     Stack() {
-      RNComponentFactory({
-        ctx: this.ctx,
-        tag: this.surfaceHandle.getTag(),
-        buildCustomComponent: this.buildCustomComponent
-      })
+      if (this.ctx instanceof RNComponentContext) {
+        buildRNComponent(this.ctx, this.ctx.descriptorRegistry.findDescriptorWrapperByTag(this.surfaceHandle.getTag())!)
+      } else {
+        RNComponentFactory({
+          ctx: this.ctx,
+          tag: this.surfaceHandle.getTag(),
+          buildCustomComponent: this.buildCustomComponent
+        })
+      }
     }
     .width("100%")
     .height("100%")

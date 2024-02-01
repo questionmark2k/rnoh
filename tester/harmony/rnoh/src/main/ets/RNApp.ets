@@ -1,21 +1,31 @@
-import { CustomComponentBuilder, LogBoxTurboModule } from './RNOHCorePackage';
+import { LogBoxTurboModule, buildRNComponent } from './RNOHCorePackage';
 import {
+  Tag,
+  RNOHError,
   JSBundleProvider,
   RNAbility,
   RNInstance,
   RNInstanceOptions,
   RNOHLogger,
-  RNOHContext,
-  RNDevLoadingView
+  CustomComponentBuilder,
+  RNDevLoadingView,
+  RNComponentContext,
+  WrappedCustomRNComponentBuilder,
 } from './RNOH';
 import { RNSurface, SurfaceConfig2 } from './RNSurface';
 import { LogBoxDialog } from "./LogBoxDialog"
+
 
 interface CustomRNInstance {
   rnInstance: RNInstance
 }
 
 export type RNInstanceConfig = CustomRNInstance | RNInstanceOptions
+
+@Builder
+export function buildRNComponentForTag(ctx: RNComponentContext, tag: Tag) {
+  buildRNComponent(ctx, ctx.descriptorRegistry.findDescriptorWrapperByTag(tag)!)
+}
 
 @Component
 @Preview
@@ -39,8 +49,13 @@ export struct RNApp {
   public initialProps: Record<string, string> = {}
   /**
    * Builds a custom fabric component.
+   * @deprecated: use wrappedCustomRNComponentBuilder instead
    */
   @BuilderParam public buildCustomComponent!: CustomComponentBuilder
+  /**
+   * Builds custom fabric components.
+   */
+  public wrappedCustomRNComponentBuilder: WrappedCustomRNComponentBuilder | undefined = undefined
   /**
    * Called before a surface is visible, and rnInstance is available.
    */
@@ -53,7 +68,7 @@ export struct RNApp {
   private shouldDestroyRNInstance: boolean = false
   private cleanUpCallbacks: (() => void)[] = []
   private logger!: RNOHLogger
-  private ctx!: RNOHContext
+  private ctx!: RNComponentContext
 
   aboutToAppear() {
     this.init()
@@ -66,16 +81,31 @@ export struct RNApp {
   private async init() {
     this.logger = this.rnAbility.getLogger().clone("RNApp")
     const stopTracing = this.logger.clone("init").startTracing()
+
     try {
       await (async () => {
+        if (!this.wrappedCustomRNComponentBuilder) {
+          this.logger.error(new RNOHError({
+            whatHappened: "RNApp::wrappedCustomRNComponentBuilder is undefined",
+            howCanItBeFixed: ["Please provide a wrapped custom component builder. Use ArkUI's \"wrapBuilder\" to create the wrapper."]
+          }))
+          return
+        }
         this.rnInstance = await this.getOrCreateRNInstance()
-        this.ctx = this.rnAbility.createRNOHContext({ rnInstance: this.rnInstance })
+        this.ctx = new RNComponentContext(
+          this.rnAbility.createRNOHContext({
+            rnInstance: this.rnInstance
+          }),
+          this.wrappedCustomRNComponentBuilder,
+          wrapBuilder(buildRNComponentForTag),
+        )
         this.logBoxDialogController = new CustomDialogController({
           cornerRadius: 0,
           customStyle: true,
           alignment: DialogAlignment.TopStart,
           backgroundColor: Color.Transparent,
           builder: LogBoxDialog({
+            ctx: this.ctx,
             rnInstance: this.rnInstance,
             initialProps: this.initialProps,
             buildCustomComponent: this.buildCustomComponent,
@@ -150,11 +180,10 @@ export struct RNApp {
             initialProps: this.initialProps ?? {},
             appKey: this.appKey,
           } as SurfaceConfig2,
-          buildCustomComponent: this.buildCustomComponent,
         })
       }
       if (this.rnAbility!.isDebugModeEnabled()) {
-        RNDevLoadingView({ useSafeAreaInsets: true }).position({x: 0, y: 0})
+        RNDevLoadingView({ useSafeAreaInsets: true }).position({ x: 0, y: 0 })
       }
     }.width("100%")
     .height("100%")

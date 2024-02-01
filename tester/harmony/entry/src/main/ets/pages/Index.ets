@@ -8,24 +8,22 @@ import {
   ResourceJSBundleProvider,
   TraceJSBundleProviderDecorator
 } from 'rnoh'
-import { SampleView, SAMPLE_VIEW_TYPE, PropsDisplayer, GeneratedSampleView } from "rnoh-sample-package"
+import { SampleView, PropsDisplayer, GeneratedSampleView } from "rnoh-sample-package"
 import font from '@ohos.font';
 import { createRNPackages } from '../RNPackagesFactory'
 
 @Builder
-export function CustomComponentBuilder(ctx: ComponentBuilderContext) {
-  if (ctx.componentName === SAMPLE_VIEW_TYPE) {
+export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
+  if (ctx.componentName === SampleView.NAME) {
     SampleView({
       ctx: ctx.rnComponentContext,
       tag: ctx.tag,
-      buildCustomComponent: CustomComponentBuilder
     })
   }
   if (ctx.componentName === GeneratedSampleView.NAME) {
     GeneratedSampleView({
       ctx: ctx.rnComponentContext,
       tag: ctx.tag,
-      buildCustomComponent: CustomComponentBuilder
     })
   }
   if (ctx.componentName === PropsDisplayer.NAME) {
@@ -35,6 +33,8 @@ export function CustomComponentBuilder(ctx: ComponentBuilderContext) {
     })
   }
 }
+
+const wrappedCustomRNComponentBuilder = wrapBuilder(buildCustomRNComponent)
 
 /**
  * If you want to use custom fonts, you need to register them here.
@@ -86,7 +86,7 @@ struct Index {
           rnInstanceConfig: { createRNPackages },
           initialProps: { "foo": "bar" } as Record<string, string>,
           appKey: "app_name",
-          buildCustomComponent: CustomComponentBuilder,
+          wrappedCustomRNComponentBuilder: wrappedCustomRNComponentBuilder,
           onSetUp: (rnInstance) => {
             rnInstance.enableFeatureFlag("ENABLE_RN_INSTANCE_CLEAN_UP")
           },

@@ -72,7 +72,7 @@ const rootDescriptor = {
   }
 }
 
-type FeatureFlagName = "USE_BUILD_RN_COMPONENT" | "ENABLE_RN_INSTANCE_CLEAN_UP"
+type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP"
 
 export interface RNInstance {
   descriptorRegistry: DescriptorRegistry;

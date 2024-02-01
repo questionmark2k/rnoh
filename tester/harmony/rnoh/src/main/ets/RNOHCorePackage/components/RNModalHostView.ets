@@ -1,10 +1,9 @@
-import { Size } from '../../RNOH';
+import { Size, RNComponentContext, RNOHContext, CustomComponentBuilder } from '../../RNOH';
 import { Descriptor, Tag } from '../../RNOH/DescriptorBase';
-import { RNOHContext } from '../../RNOH/RNOHContext';
 import { ViewBaseProps } from './RNViewBase';
 import { TouchDispatcher } from '../../RNOH/TouchDispatcher';
 import { RNModalHostViewManager } from '../componentManagers/RNModalHostViewManager';
-import { buildRNComponent, CustomComponentBuilder, RNComponentFactory } from './RNComponentFactory';
+import { RNComponentFactory } from './RNComponentFactory';
 
 interface ModalHostViewProps extends ViewBaseProps {
   transparent: boolean;
@@ -29,7 +28,9 @@ const MODAL_ANIMATION_DURATION = 500;
 struct ModalHostViewDialog {
   public ctx!: RNOHContext
   public tag!: Tag
+  /** @deprecated  */
   @BuilderParam public buildCustomComponent!: CustomComponentBuilder
+  // ----------------------------------------------------
   @State descriptor: ModalHostViewDescriptor = Object() as ModalHostViewDescriptor
   controller: CustomDialogController
   @State showContent: boolean = false
@@ -42,7 +43,7 @@ struct ModalHostViewDialog {
   componentManager!: RNModalHostViewManager;
 
   emitComponentEvent(eventName: string) {
-    this.ctx.rnInstanceManager.emitComponentEvent(this.tag, eventName, {});
+    this.ctx.rnInstance.emitComponentEvent(this.tag, eventName, {});
   }
 
   updateState() {
@@ -114,9 +115,9 @@ struct ModalHostViewDialog {
   build() {
     if (this.showContent) {
       Stack() {
-        if (this.ctx.rnInstance.isFeatureFlagEnabled("USE_BUILD_RN_COMPONENT")) {
+        if (this.ctx instanceof RNComponentContext) {
           ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
-            buildRNComponent(this.ctx, this.ctx.descriptorRegistry.findDescriptorWrapperByTag(childrenTag)!)
+            (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), childrenTag)
           }, (childrenTag: Tag) => childrenTag.toString())
         } else {
           ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
@@ -138,6 +139,7 @@ struct ModalHostViewDialog {
 export struct RNModalHostView {
   public ctx!: RNOHContext
   public tag: number = 0
+  /** @deprecated  */
   @BuilderParam public buildCustomComponent!: CustomComponentBuilder
   private dialogController!: CustomDialogController
   private closeModalFunction: (() => void) | undefined;

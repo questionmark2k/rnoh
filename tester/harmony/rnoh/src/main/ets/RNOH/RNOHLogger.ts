@@ -54,15 +54,19 @@ export class StandardRNOHLogger implements RNOHLogger {
         cls.flushScheduledLog()
       } else if (cls.hasLogChanged(newScheduledLog)) {
         cls.flushScheduledLog()
-        cls.scheduledLog = { ...newScheduledLog, timer: setTimeout(() => {
-          cls.flushScheduledLog()
-        }, cls.THROTTLE_IN_MS) }
+        cls.scheduledLog = {
+          ...newScheduledLog, timer: setTimeout(() => {
+            cls.flushScheduledLog()
+          }, cls.THROTTLE_IN_MS)
+        }
       } else if ((new Date().getTime() - cls.THROTTLE_IN_MS) < (cls.scheduledLog?.createdAt?.getTime() ?? 0)) {
         cls.recentThrottlesCount++
       } else {
-        cls.scheduledLog = { ...newScheduledLog, timer: setTimeout(() => {
-          cls.flushScheduledLog()
-        }, cls.THROTTLE_IN_MS) }
+        cls.scheduledLog = {
+          ...newScheduledLog, timer: setTimeout(() => {
+            cls.flushScheduledLog()
+          }, cls.THROTTLE_IN_MS)
+        }
       }
     } else {
       cls.scheduledLog = newScheduledLog
@@ -148,8 +152,16 @@ export class StandardRNOHLogger implements RNOHLogger {
   }
 
   public error(...args: any[]): void {
-    this.log("error", this.getCurrentOffset(), ...args)
+    if (args[0] instanceof RNOHError) {
+      this.log("error", this.getCurrentOffset(), this.stringifyRNOHError(args[0]))
+    } else {
+      this.log("error", this.getCurrentOffset(), ...args)
+    }
     this.maybeHandleRNOHError(args)
+  }
+
+  private stringifyRNOHError(rnohError: RNOHError): string {
+    return rnohError.getMessage()
   }
 
   private maybeHandleRNOHError(args: any[]) {
@@ -163,7 +175,7 @@ export class StandardRNOHLogger implements RNOHLogger {
 
   public fatal(...args: any[]): void {
     if (args[0] instanceof RNOHError) {
-      hilog.fatal(this.getDomain(), this.getTag(), `█__ %{public}s`, args[0].getMessage())
+      hilog.fatal(this.getDomain(), this.getTag(), `█__ %{public}s`, this.stringifyRNOHError(args[0]))
     } else {
       hilog.fatal(this.getDomain(), this.getTag(), `█__ %{public}s`, ...args)
     }
