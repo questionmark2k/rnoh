@@ -29,6 +29,7 @@ class TextInputComponentJSIBinder : public ViewComponentJSIBinder {
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
         facebook::jsi::Object events(rt);
 
+        events.setProperty(rt, "topChange", createDirectEvent(rt, "onChange"));
         events.setProperty(rt, "topSubmitEditing", createDirectEvent(rt, "onSubmitEditing"));
         events.setProperty(rt, "topEndEditing", createDirectEvent(rt, "onEndEditing"));
         events.setProperty(rt, "topKeyPress", createDirectEvent(rt, "onKeyPress"));

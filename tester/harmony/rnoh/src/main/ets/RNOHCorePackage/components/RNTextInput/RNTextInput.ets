@@ -132,14 +132,13 @@ export struct RNTextInput {
   maybeSetValue(newValue: string, mostRecentEventCount?: number): void {
     if (this.canUpdateWithEventCount(mostRecentEventCount)) {
       this.value = newValue;
-      this.shouldIgnoreNextValueChange = true;
     }
   }
 
   onDescriptorChange(newDescriptor: TextInputDescriptor) {
     // only set the text value from props if it changed since the last time
     if (this.descriptor.props?.text !== newDescriptor.props.text) {
-      this.maybeSetValue(newDescriptor.props.text ?? "", this.descriptor.rawProps?.mostRecentEventCount);
+      this.maybeSetValue(newDescriptor.props.text ?? "", newDescriptor.rawProps?.mostRecentEventCount);
     }
     this.descriptor = newDescriptor;
     this.descriptorWrapper = new TextInputDescriptorWrapper(this.descriptor);

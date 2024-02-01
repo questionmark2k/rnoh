@@ -229,8 +229,15 @@ export function TextInputTest() {
           expect(state).to.be.eq('A');
         }}
       />
-      <TestCase modal itShould="show text input with default value">
+      <TestCase
+        modal
+        itShould="show text input with default value (defaultProps)">
         <DefaultProps />
+      </TestCase>
+      <TestCase
+        modal
+        itShould="show text input with default value (defaultValue)">
+        <TextInput style={styles.textInput} defaultValue="defaultText" />
       </TestCase>
       <TestCase
         modal
