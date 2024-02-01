@@ -75,8 +75,10 @@ function getInputType(keyboardType?: string, secureTextEntry?: boolean): InputTy
   }
 }
 
-
-
+interface CancelButtonOptions {
+  style?: CancelButtonStyle;
+  icon?: IconOptions;
+};
 
 @Component
 export struct RNTextInput {
@@ -193,6 +195,14 @@ export struct RNTextInput {
     this.descriptor.state.wasAlreadyRendered = true
   }
 
+  getCancelButton(): CancelButtonOptions {
+    const clearButtonMode = this.descriptorWrapper?.clearButtonMode;
+    if (clearButtonMode === 'always') {
+      return {style: CancelButtonStyle.INPUT};
+    }
+    return {style: CancelButtonStyle.INVISIBLE};
+  }
+
   build() {
     RNViewBase({ ctx: this.ctx, tag: this.tag, componentManager: this.componentManager, controlsFocus: false }) {
       if (this.descriptor.props.multiline) {
@@ -289,6 +299,7 @@ export struct RNTextInput {
           .key(`TextInput@${this.tag}`)
           .onAppear(() => this.maybeFocusOnAppear())
           .focusable(this.descriptorWrapper?.focusable ?? true)
+          .cancelButton(this.getCancelButton())
       }
     }
   }

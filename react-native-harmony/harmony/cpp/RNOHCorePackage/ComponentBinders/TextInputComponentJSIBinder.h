@@ -22,6 +22,7 @@ class TextInputComponentJSIBinder : public ViewComponentJSIBinder {
         nativeProps.setProperty(rt, "allowFontScaling", "boolean");
         nativeProps.setProperty(rt, "clearTextOnFocus", "boolean");
         nativeProps.setProperty(rt, "mostRecentEventCount", "number");
+        nativeProps.setProperty(rt, "clearButtonMode", "string");
 
         return nativeProps;
     };

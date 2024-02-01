@@ -1,4 +1,5 @@
 import {
+  Platform,
   ReturnKeyType,
   ReturnKeyTypeAndroid,
   StyleSheet,
@@ -338,6 +339,29 @@ export function TextInputTest() {
       <TestCase modal itShould="clear text on focus">
         {/* iOS only */}
         <TextInputWithText style={styles.textInput} clearTextOnFocus />
+      </TestCase>
+      <TestCase modal itShould="use different clearButtonMode values">
+        <TextInputWithText style={styles.textInput} clearButtonMode="always" />
+        <Text>clearButtonMode="always"</Text>
+        {
+          /* iOS only */
+          Platform.OS === 'ios' && (
+            <>
+              <TextInputWithText
+                style={styles.textInput}
+                clearButtonMode="while-editing"
+              />
+              <Text>clearButtonMode="while-editing"</Text>
+              <TextInputWithText
+                style={styles.textInput}
+                clearButtonMode="unless-editing"
+              />
+              <Text>clearButtonMode="unless-editing"</Text>
+            </>
+          )
+        }
+        <TextInputWithText style={styles.textInput} clearButtonMode="never" />
+        <Text>clearButtonMode="never"</Text>
       </TestCase>
     </TestSuite>
   );

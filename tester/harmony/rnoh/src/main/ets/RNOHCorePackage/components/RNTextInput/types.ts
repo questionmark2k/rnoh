@@ -1,6 +1,8 @@
 import type { ColorSegments } from '../../../RNOH/DescriptorBase'
 import type { ViewBaseProps, ViewRawProps } from '../ts'
 
+export type ClearButtonMode = 'never' | 'while-editing' | 'unless-editing' | 'always'
+
 export interface TextInputProps extends ViewBaseProps {
   text?: string
   multiline?: boolean
@@ -26,6 +28,7 @@ export interface TextInputRawProps extends ViewRawProps {
   allowFontScaling?: boolean
   clearTextOnFocus?: boolean
   mostRecentEventCount?: number
+  clearButtonMode?: ClearButtonMode
 }
 
 export interface TextInputState {
