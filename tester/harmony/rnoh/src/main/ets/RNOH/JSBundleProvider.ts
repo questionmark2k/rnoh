@@ -4,6 +4,7 @@ import { RNOHError } from "./RNOHError"
 import { RNOHLogger } from './RNOHLogger';
 import urlUtils from '@ohos.url';
 import { fetchDataFromUrl } from './HttpRequestHelper';
+import fs from '@ohos.file.fs';
 
 export interface HotReloadConfig {
   bundleEntry: string,
@@ -33,6 +34,36 @@ export class JSBundleProviderError extends RNOHError {
 }
 
 export class MetroJSBundleProviderError extends JSBundleProviderError {}
+
+export class FileJSBundleProvider extends JSBundleProvider {
+  constructor(private path: string, private appKeys: string[] = []) {
+    super()
+  }
+
+  getURL(): string {
+    return this.path
+  }
+
+  getAppKeys(): string[] {
+    return this.appKeys
+  }
+
+  async getBundle(onProgress?: (progress: number) => void): Promise<ArrayBuffer> {
+    try {
+      const file = await fs.open(this.path, fs.OpenMode.READ_ONLY);
+      const { size } = await fs.stat(file.fd);
+      const buffer = new ArrayBuffer(size);
+      await fs.read(file.fd, buffer, { length: size });
+      return buffer;
+    } catch (err) {
+      throw new JSBundleProviderError({
+        whatHappened: `Couldn't load JSBundle from ${this.path}`,
+        extraData: err,
+        howCanItBeFixed: [`Check if a bundle exists at "${this.path}" on your device.`]
+      })
+    }
+  }
+}
 
 export class ResourceJSBundleProvider extends JSBundleProvider {
   constructor(private resourceManager: resmgr.ResourceManager, private path: string = "bundle.harmony.js", private appKeys: string[] = []) {
