@@ -185,7 +185,9 @@ export struct RNApp {
       if (this.rnAbility!.isDebugModeEnabled()) {
         RNDevLoadingView({ useSafeAreaInsets: true }).position({ x: 0, y: 0 })
       }
-    }.width("100%")
+    }
+    .expandSafeArea([SafeAreaType.KEYBOARD])
+    .width("100%")
     .height("100%")
   }
 }
