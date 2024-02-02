@@ -185,6 +185,7 @@ export struct RNImage {
         Image(this.imageSource.source)
           .accessibilityText(this.descriptor.rawProps.alt)
           .interpolation(ImageInterpolation.High)
+          .draggable(false)
           .width(this.descriptorWrapper?.width)
           .height(this.descriptorWrapper?.height)
           .position({
