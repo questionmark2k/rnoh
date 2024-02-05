@@ -1,7 +1,8 @@
-import { Descriptor, RNOHContext, TransformMatrix } from '../../../RNOH';
+import { Descriptor, RNOHContext, TransformMatrix, Edges, Corners, RNComponentContext } from '../../../RNOH';
 import { ViewBaseProps, ViewRawProps } from './types';
 import { ViewDescriptorWrapperBase } from './ViewDescriptorWrapper';
 import { RNViewManager } from '../../componentManagers';
+import { areFirstLevelPropsEqual, areFirstLevelElementsEqual } from "./etsHacks"
 import matrix4 from '@ohos.matrix4';
 
 export interface ViewBaseState {}
@@ -11,10 +12,99 @@ TProps extends ViewBaseProps = ViewBaseProps,
 TState extends ViewBaseState = ViewBaseState,
 TRawProps extends ViewRawProps = ViewRawProps> = Descriptor<TType, TProps, TState, TRawProps>;
 
+
 /**
  * @deprecated: Use ViewBaseDescriptor instead.
  */
 export type ViewDynamicDescriptor = Descriptor<string, ViewRawProps>
+
+
+export class RNViewBaseAttributeModifierBase<TViewDescriptorWrapper extends ViewDescriptorWrapperBase = ViewDescriptorWrapperBase> implements AttributeModifier<CommonAttribute> {
+  protected descriptorWrapper: TViewDescriptorWrapper
+
+  constructor(ctx: RNComponentContext, descriptorWrapper: TViewDescriptorWrapper) {
+    this.descriptorWrapper = descriptorWrapper
+  }
+
+  applyNormalAttribute(instance: CommonAttribute): void {
+    this.maybeAssignAttribute((dw => dw.width), (val) => instance.width(val), 0)
+    this.maybeAssignAttribute((dw => dw.height), (val) => instance.height(val), 0)
+    this.maybeAssignAttribute((dw => dw.backgroundColor), (val) => instance.backgroundColor(val), "#00000000")
+    this.maybeAssignAttribute<Position>((dw => dw.positionRelativeToParent), (val) => instance.position(val), {
+      x: 0,
+      y: 0
+    })
+    this.maybeAssignAttribute<Edges<number | undefined>>((dw => dw.borderWidth), (val) => instance.borderWidth(val), {
+      top: undefined,
+      left: undefined,
+      right: undefined,
+      bottom: undefined,
+    })
+    this.maybeAssignAttribute((dw => dw.borderColor), (val) => instance.borderColor(val), {
+      top: "#FF000000",
+      left: "#FF000000",
+      right: "#FF000000",
+      bottom: "#FF000000"
+    })
+    this.maybeAssignAttribute<Corners<number | undefined>>((dw => dw.borderRadius), (val) => instance.borderRadius(val), {
+      topLeft: undefined,
+      topRight: undefined,
+      bottomLeft: undefined,
+      bottomRight: undefined
+    })
+    this.maybeAssignAttribute((dw => dw.borderStyle), (val) => {
+      let borderStyle: BorderStyle = BorderStyle.Solid
+      switch (val) {
+        case "dashed":
+          borderStyle = BorderStyle.Dashed
+          break;
+        case "dotted":
+          borderStyle = BorderStyle.Dotted
+          break;
+        default:
+          borderStyle = BorderStyle.Solid
+          break;
+      }
+      instance.borderStyle(borderStyle)
+    }, "solid")
+    this.maybeAssignAttribute(dw => dw.opacity, val => instance.opacity(val), 1)
+    this.maybeAssignAttribute(dw => dw.rawTransformationMatrix, val => {
+      const rawTransformationMatrix = val.slice()
+      rawTransformationMatrix[12] = vp2px(rawTransformationMatrix[12]);
+      rawTransformationMatrix[13] = vp2px(rawTransformationMatrix[13]);
+      rawTransformationMatrix[14] = vp2px(rawTransformationMatrix[14]);
+      instance.transform(matrix4.init(rawTransformationMatrix as TransformMatrix))
+    }, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
+    this.maybeAssignAttribute(dw => dw.pointerEvents, val => {
+      instance.hitTestBehavior(["box-none", "none"].includes(val) ? HitTestMode.None : HitTestMode.Default)
+    }, "auto")
+    this.maybeAssignAttribute(dw => dw.isClipping, val => instance.clip(val), false)
+    this.maybeAssignAttribute(dw => dw.shadow, val => instance.shadow(val), undefined)
+    this.maybeAssignAttribute(dw => dw.accessibilityGroup, val => instance.accessibilityGroup(val), false)
+    this.maybeAssignAttribute(dw => dw.accessibilityText, val => instance.accessibilityText(val), undefined)
+    this.maybeAssignAttribute(dw => dw.accessibilityLevel, val => instance.accessibilityLevel(val), "auto")
+    this.maybeAssignAttribute(dw => dw.accessibilityDescription, val => instance.accessibilityDescription(val), undefined)
+
+  }
+
+
+  protected maybeAssignAttribute<TPropertyValue>(
+    extractPropertyValue: (descriptorWrapper: ViewDescriptorWrapperBase) => TPropertyValue,
+    assign: (propertyValue: TPropertyValue) => void,
+    defaultValue: TPropertyValue,
+  ): void {
+    const newPropertyValue = extractPropertyValue(this.descriptorWrapper)
+    let isNewPropertyValueEqualToDefault = newPropertyValue === defaultValue
+    if (Array.isArray(defaultValue) && Array.isArray(newPropertyValue)) {
+      isNewPropertyValueEqualToDefault = areFirstLevelElementsEqual(newPropertyValue, defaultValue)
+    } else if (typeof defaultValue === "object" && typeof newPropertyValue === "object") {
+      isNewPropertyValueEqualToDefault = areFirstLevelPropsEqual(newPropertyValue, defaultValue)
+    }
+    if (!isNewPropertyValueEqualToDefault) {
+      assign(newPropertyValue)
+    }
+  }
+}
 
 @Component
 export struct RNViewBase {
@@ -25,6 +115,7 @@ export struct RNViewBase {
   @Prop public controlsFocus: boolean = true;
   @BuilderParam public renderChildren: () => void
   @State private descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
+  @State private rnViewAttributeModifier: RNViewBaseAttributeModifierBase | undefined = undefined
   private unregisterDescriptorChangesListener?: () => void = undefined
   private unregisterComponentManager?: () => void = undefined
   private unregisterCommandCallback?: () => void = undefined
@@ -51,6 +142,9 @@ export struct RNViewBase {
     if (!descriptorWrapper || !(descriptorWrapper instanceof ViewDescriptorWrapperBase)) {
       descriptorWrapper = new ViewDescriptorWrapperBase(descriptor)
     }
+    if (this.ctx instanceof RNComponentContext) {
+      this.rnViewAttributeModifier = new RNViewBaseAttributeModifierBase(this.ctx, descriptorWrapper)
+    }
     this.descriptorWrapper = descriptorWrapper
   }
 
@@ -64,40 +158,6 @@ export struct RNViewBase {
     this.unregisterDescriptorChangesListener?.()
     this.unregisterComponentManager?.()
     this.unregisterCommandCallback?.()
-  }
-
-  getHitTestMode() {
-    switch (this.descriptorWrapper?.pointerEvents) {
-      case "none":
-        return HitTestMode.None
-      case "box-none":
-        return HitTestMode.None
-      default:
-        return HitTestMode.Default
-    }
-  }
-
-  getBorderStyle(): BorderStyle {
-    switch (this.descriptorWrapper?.borderStyle) {
-      case "dashed":
-        return BorderStyle.Dashed
-      case "dotted":
-        return BorderStyle.Dotted
-      default:
-        return BorderStyle.Solid
-    }
-  }
-
-  getTransform(): undefined | matrix4.Matrix4Transit {
-    const descriptorWrapper = this.descriptorWrapper
-    if (!descriptorWrapper) {
-      return undefined
-    }
-    const rawTransformationMatrix = descriptorWrapper.rawTransformationMatrix.slice()
-    rawTransformationMatrix[12] = vp2px(rawTransformationMatrix[12]);
-    rawTransformationMatrix[13] = vp2px(rawTransformationMatrix[13]);
-    rawTransformationMatrix[14] = vp2px(rawTransformationMatrix[14]);
-    return matrix4.init(rawTransformationMatrix as TransformMatrix)
   }
 
   onClickEvent(event: ClickEvent): void {
@@ -118,24 +178,8 @@ export struct RNViewBase {
       this.renderChildren()
     }
     .align(this.customAlign)
-    .width(this.descriptorWrapper?.width)
-    .height(this.descriptorWrapper?.height)
-    .backgroundColor(this.descriptorWrapper?.backgroundColor)
-    .position(this.descriptorWrapper?.positionRelativeToParent)
-    .borderWidth(this.descriptorWrapper?.borderWidth)
-    .borderColor(this.descriptorWrapper?.borderColor)
-    .borderRadius(this.descriptorWrapper?.borderRadius)
-    .borderStyle(this.getBorderStyle())
-    .opacity(this.descriptorWrapper?.opacity)
-    .transform(this.getTransform())
-    .clip(this.descriptorWrapper?.isClipping)
-    .hitTestBehavior(this.getHitTestMode())
-    .shadow(this.descriptorWrapper?.shadow)
     .id(this.tag.toString())
-    .accessibilityGroup(this.descriptorWrapper?.accessibilityGroup)
-    .accessibilityText(this.descriptorWrapper?.accessibilityText)
-    .accessibilityLevel(this.descriptorWrapper?.accessibilityLevel)
-    .accessibilityDescription(this.descriptorWrapper?.accessibilityDescription)
     .onClick((event: ClickEvent) => this.onClickEvent(event))
+    .attributeModifier(this.rnViewAttributeModifier)
   }
 }

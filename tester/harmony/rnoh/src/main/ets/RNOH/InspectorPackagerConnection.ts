@@ -135,12 +135,11 @@ export class InspectorPackagerConnection {
     }
   }
 
-  private onError(err: BusinessError) {
+  private onError(_err: BusinessError) {
     if (this.socket) {
       this.abort();
     }
     if (!this.isClosed) {
-      this.logger.debug(JSON.stringify(err, null, 2));
       this.reconnect();
     }
   }
