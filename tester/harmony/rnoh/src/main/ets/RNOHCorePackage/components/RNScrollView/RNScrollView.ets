@@ -225,7 +225,6 @@ export struct RNScrollView {
     this.scroller.scrollTo({ xOffset, yOffset, animation })
     this.contentOffset = { x: xOffset, y: yOffset };
     if(!animation){
-      this.positionBeforeScrolling = undefined;
       this.isScrolling = false;
     }
   }
@@ -468,9 +467,7 @@ export struct RNScrollView {
 
   onScrollBegin() {
     // this.positionBeforeScrolling = { x : this.descriptor.state.contentOffsetX, y : this.descriptor.state.contentOffsetY };
-    if(!this.positionBeforeScrolling){
-      this.positionBeforeScrolling = { x : this.scroller.currentOffset().xOffset, y : this.scroller.currentOffset().yOffset }
-    }
+    this.positionBeforeScrolling = { x : this.scroller.currentOffset().xOffset, y : this.scroller.currentOffset().yOffset };
     this.isScrolling = false;
     this.componentManager.setScrolling(true);
     this.allowNextScrollEvent = false;
@@ -501,7 +498,6 @@ export struct RNScrollView {
     descriptor.state.contentOffsetY = currentOffset.yOffset;
     this.contentOffset = { x: currentOffset.xOffset, y: currentOffset.yOffset }
     this.ctx.descriptorRegistry.setState<ScrollViewState>(this.tag, descriptor.state);
-    this.positionBeforeScrolling = undefined;
     this.isScrolling = false;
   }
 
