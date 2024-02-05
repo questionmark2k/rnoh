@@ -7,7 +7,8 @@ type RootDescriptor = Descriptor<"RootView", any>
 
 type SubtreeListener = () => void;
 type SetNativeStateFn = (componentName: string, tag: Tag, state: unknown) => void
-export type DescriptorWrapperFactory = (ctx: {descriptor: Descriptor}) => DescriptorWrapper
+
+export type DescriptorWrapperFactory = (ctx: { descriptor: Descriptor }) => DescriptorWrapper
 
 export class DescriptorRegistry {
   static readonly ANIMATED_NON_RAW_PROP_KEYS = ['transform'];
@@ -27,7 +28,7 @@ export class DescriptorRegistry {
     private setNativeStateFn: SetNativeStateFn,
     private rnInstance: RNInstanceImpl,
     private descriptorWrapperFactoryByDescriptorType: Map<string, DescriptorWrapperFactory>,
-  logger: RNOHLogger,
+    logger: RNOHLogger,
   ) {
     this.logger = logger.clone("DescriptorRegistry")
     const stopTracing = this.logger.clone("constructor").startTracing()
@@ -354,4 +355,59 @@ export class DescriptorRegistry {
   public getDescriptorByTagMap() {
     return this.descriptorByTag
   }
+
+  public getStats() {
+    const stats = new DescriptorRegistryStats()
+    for (const descriptor of this.descriptorByTag.values()) {
+      if (!stats.countByDescriptorType.has(descriptor.type)) {
+        stats.countByDescriptorType.set(descriptor.type, 0)
+      }
+      const currentCount = stats.countByDescriptorType.get(descriptor.type)
+      stats.countByDescriptorType.set(descriptor.type, currentCount + 1)
+    }
+    return stats
+  }
+}
+
+export class DescriptorRegistryStats {
+  countByDescriptorType = new Map<string, number>()
+
+  get totalDescriptorsCount() {
+    return Array.from(this.countByDescriptorType.values()).reduce((acc, val) => (acc + val), 0)
+  }
+
+  get shareInPctByDescriptorType() {
+    const result = new Map<string, number>()
+    this.countByDescriptorType.forEach((count, descriptorType) => {
+      result.set(descriptorType, count / (this.totalDescriptorsCount || 1))
+    })
+    return result
+  }
+
+  toDebugString() {
+    const lines: string[] = []
+    lines.push(`TOTAL ${this.totalDescriptorsCount}`)
+    sortMapByValue(this.shareInPctByDescriptorType, (a, b) => b - a).forEach((shareInPct, descriptorType) => {
+      lines.push(`${descriptorType} ${Math.round(shareInPct * 100)}%`)
+    })
+    return lines.join("\n")
+  }
+}
+
+function sortMapByValue<K, V>(map: Map<K, V>, compareFn?: (a: V, b: V) => number): Map<K, V> {
+  const mapEntries = Array.from(map.entries());
+  mapEntries.sort((a, b) => {
+    if (compareFn) {
+      return compareFn(a[1], b[1]);
+    } else {
+      if (a[1] > b[1]) {
+        return 1;
+      } else if (a[1] < b[1]) {
+        return -1;
+      } else {
+        return 0;
+      }
+    }
+  });
+  return new Map<K, V>(mapEntries);
 }
