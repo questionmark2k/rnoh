@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.72.15
+
+- BREAKING: deprecated `RNComponentFactory` in favour of `wrappedCustomRNComponentBuilder` 
+which must now be provided to `RNApp` ([!797](https://gl.swmansion.com/rnoh/react-native-harmony/-/merge_requests/797))
+- BREAKING: `RNSurface` expects `RNComponentContext` instead of `RNOHContext` ([!797](https://gl.swmansion.com/rnoh/react-native-harmony/-/merge_requests/797))
+- BREAKING: asset file names in HAP resources are now hashes of the asset path instead of encoded asset paths ([!810](https://gl.swmansion.com/rnoh/react-native-harmony/-/merge_requests/810))
+- added imports hijacking support for packages with no harmony native code
+- added `Modal::animationType` support
+- added support for loading assets from Metro dev server
+- added partial `TextInput::clearButtonMode` support
+- added `FileJSBundleProvider` for loading bundles from device filesystem
+- fixed errors when trying to access unimplemented `UIManager` functions
+- fixed issues with `TextInput` updates not applying correctly
+- fixed `Text::textShadowRadius` not being applied correctly
+- fixed `Image` errors not being reported correctly
+- fixed `Dimensions` display metrics not updating on window size changes
+- fixed `ScrolLView::scrollToEnd` not scrolling when called after `onLayout`
+- fixed `TextInput::value` and `TextInput::defaultValue` no applying correctly
+- fixed `RNApp` not being covered by the virtual keyboard
+
 ## v0.72.14
 
 - added `DevSettings::addMenuItem` support

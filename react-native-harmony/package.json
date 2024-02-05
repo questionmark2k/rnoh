@@ -1,6 +1,6 @@
 {
   "name": "@rnoh/react-native-harmony",
-  "version": "0.72.14",
+  "version": "0.72.15",
   "description": "",
   "scripts": {
     "install:local-cli": "cd ../react-native-harmony-cli && npm pack && cd ../react-native-harmony && npm i ../react-native-harmony-cli/rnoh-react-native-harmony-cli-0.0.17.tgz && cd ../react-native-harmony",
@@ -32,7 +32,7 @@
     "./*.json"
   ],
   "dependencies": {
-    "@rnoh/react-native-harmony-cli": "^0.0.20",
+    "@rnoh/react-native-harmony-cli": "^0.0.21",
     "colors": "^1.4.0",
     "fs-extra": "^11.1.1",
     "metro": "^0.76.3",
