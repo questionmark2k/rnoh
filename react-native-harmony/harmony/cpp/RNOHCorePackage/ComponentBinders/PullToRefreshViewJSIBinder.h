@@ -11,7 +11,7 @@ class PullToRefreshViewJSIBinder : public ViewComponentJSIBinder {
         return nativeProps;
     }
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
-        facebook::jsi::Object events(rt);
+        facebook::jsi::Object events = ViewComponentJSIBinder::createDirectEventTypes(rt);
 
         events.setProperty(rt, "topRefresh", createDirectEvent(rt, "onRefresh"));
 

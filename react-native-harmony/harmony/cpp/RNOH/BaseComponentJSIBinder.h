@@ -39,7 +39,9 @@ class BaseComponentJSIBinder : public ComponentJSIBinder {
     }
 
     virtual facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) {
-        return facebook::jsi::Object(rt);
+        facebook::jsi::Object events(rt);
+        events.setProperty(rt, "topLayout", createDirectEvent(rt, "onLayout"));
+        return events;
     }
 
     static facebook::jsi::Object createBubblingCapturedEvent(facebook::jsi::Runtime &runtime, std::string name) {

@@ -16,7 +16,7 @@ class ViewComponentJSIBinder : public BaseComponentJSIBinder {
         return events;
     }
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
-        facebook::jsi::Object events(rt);
+        facebook::jsi::Object events = BaseComponentJSIBinder::createDirectEventTypes(rt);
         events.setProperty(rt, "topClick", createDirectEvent(rt, "onClick"));
         return events;
     }

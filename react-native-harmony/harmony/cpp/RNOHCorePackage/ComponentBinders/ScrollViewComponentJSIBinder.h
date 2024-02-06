@@ -37,7 +37,7 @@ class ScrollViewComponentJSIBinder : public ViewComponentJSIBinder {
     }
 
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
-        facebook::jsi::Object events(rt);
+        facebook::jsi::Object events = ViewComponentJSIBinder::createDirectEventTypes(rt);
 
         events.setProperty(rt, "topScroll", createDirectEvent(rt, "onScroll"));
         events.setProperty(rt, "topScrollBeginDrag", createDirectEvent(rt, "onScrollBeginDrag"));
