@@ -1,39 +1,71 @@
-import { RNComponentContext, RNOHContext, Tag, ComponentBuilderContext } from '../../RNOH'
-import { RNViewBase, ViewBaseDescriptor } from './RNViewBase'
+import { RNComponentContext, RNOHContext, Tag, CustomComponentBuilder } from '../../RNOH'
+import { ViewBaseDescriptor, ViewDescriptorWrapperBase, RNViewBaseAttributeModifierBase } from './RNViewBase'
 import { RNComponentFactory } from "./RNComponentFactory"
+import { RNViewManager } from '../componentManagers';
 
 @Component
 export struct RNView {
   public ctx!: RNOHContext
   public tag: number = 0
-  @BuilderParam public buildCustomComponent: (ctx: ComponentBuilderContext) => void
+  @BuilderParam public buildCustomComponent: CustomComponentBuilder
+
+  private componentManager!: RNViewManager;
   @State private childrenTags: Tag[] = []
-  private cleanupCallback?: () => void = undefined
+  @State private descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
+  @State private rnViewAttributeModifier: RNViewBaseAttributeModifierBase | undefined = undefined
+  private cleanUpCallbacks: (() => void)[] = []
 
   aboutToAppear() {
+    this.componentManager = new RNViewManager(this.tag, this.ctx)
+    this.cleanUpCallbacks.push(this.ctx.componentManagerRegistry.registerComponentManager(this.tag, this.componentManager))
     const descriptor = this.ctx.descriptorRegistry.getDescriptor<ViewBaseDescriptor>(this.tag)
-    if (descriptor) {
-      this.updateDescriptor(descriptor)
-    }
-    this.cleanupCallback = this.ctx.descriptorRegistry.subscribeToDescriptorChanges(
-      this.tag,
-      (newDescriptor) => this.updateDescriptor(newDescriptor)
-    )
+    this.onDescriptorChange(descriptor)
+    this.maybeLogStartUpTime()
+    this.componentManager.setParentTag(descriptor.parentTag);
+    this.cleanUpCallbacks.push(this.ctx.descriptorRegistry.subscribeToDescriptorChanges(this.tag,
+      (newDescriptor) => {
+        this.onDescriptorChange(newDescriptor)
+      }
+    ))
   }
 
-  updateDescriptor(descriptor: ViewBaseDescriptor) {
-    this.childrenTags = descriptor.childrenTags;
+  private onDescriptorChange(descriptor: ViewBaseDescriptor) {
+    let descriptorWrapper = this.ctx.descriptorRegistry.findDescriptorWrapperByTag<ViewDescriptorWrapperBase>(descriptor.tag)
+    if (!descriptorWrapper || !(descriptorWrapper instanceof ViewDescriptorWrapperBase)) {
+      descriptorWrapper = new ViewDescriptorWrapperBase(descriptor)
+    }
+    if (this.ctx instanceof RNComponentContext) {
+      this.rnViewAttributeModifier = new RNViewBaseAttributeModifierBase(this.ctx, descriptorWrapper)
+    }
+    this.descriptorWrapper = descriptorWrapper
+    this.childrenTags = descriptorWrapper.childrenTags
+  }
+
+  private maybeLogStartUpTime() {
+    if ((this.descriptorWrapper?.hints ?? []).includes("ready")) {
+      this.ctx.rnAbility.markReadiness()
+    }
   }
 
   aboutToDisappear() {
-    this.cleanupCallback?.()
+    this.cleanUpCallbacks.forEach(cb => cb())
+  }
+
+  onClickEvent(event: ClickEvent): void {
+    if (event.source !== SourceType.TouchScreen) {
+      this.ctx.rnInstance.emitComponentEvent(this.tag, "onClick", {})
+    }
   }
 
   build() {
-    RNViewBase({
-      ctx: this.ctx,
-      tag: this.tag,
-    }) {
+    Stack() {
+      /**
+       * Focus hack: container components cannot be focused if they don't contain focusable children.
+       * An invisible button is added to a focusable View to avoid this problem.
+       */
+      if (this.descriptorWrapper?.focusable) {
+        Button().width(0).height(0).padding(0).margin(0)
+      }
       if (this.ctx instanceof RNComponentContext) {
         ForEach(this.childrenTags, (childrenTag: Tag) => {
           (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), childrenTag)
@@ -44,6 +76,10 @@ export struct RNView {
         }, (childrenTag: Tag) => childrenTag.toString())
       }
     }
+    .id(this.tag.toString())
+    .onClick((event: ClickEvent) => this.onClickEvent(event))
+    .attributeModifier(this.rnViewAttributeModifier)
+    .align(Alignment.TopStart);
   }
 }
 
