@@ -539,7 +539,11 @@ export struct RNScrollView {
   }
 
   getNestedScroll(): NestedScrollOptions {
-    return { scrollForward: NestedScrollMode.SELF_FIRST, scrollBackward: NestedScrollMode.SELF_FIRST };
+    const isNestedInRefreshControl = this.shouldWrapWithPullToRefresh();
+    if (isNestedInRefreshControl) {
+      return { scrollForward: NestedScrollMode.SELF_ONLY, scrollBackward: NestedScrollMode.SELF_ONLY };
+    }
+    return { scrollForward: NestedScrollMode.SELF_FIRST, scrollBackward: NestedScrollMode.SELF_FIRST }
   }
 
   @Builder

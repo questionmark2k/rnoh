@@ -74,16 +74,19 @@ export const RefreshControlTest = () => {
         <PullToRefreshProgressViewOffset progressViewOffset={100} />
       </TestCase>
       <TestCase
-        itShould="display double refresh control for 2 seconds in nested scroll view"
-        modal
-        skip={Platform.select({harmony: true, android: false})} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/770
-      >
+        itShould="Refresh control in nested scroll view - one source of truth for both RefreshControl (one state)"
+        modal>
         <PullToRefreshInNestedScrollViews />
       </TestCase>
       <TestCase
-        itShould="display one refresh control - for 3 seconds in nested scroll view"
+        itShould="Refresh control in nested scroll view - two sources of truth - one for each RefreshControl (two states)"
         modal>
         <PullToRefreshInNestedScrollViewsDifferentSource />
+      </TestCase>
+      <TestCase
+        itShould="Refresh control in nested scroll view - two sources of truth - one for each RefreshControl (two states) - with the content between"
+        modal>
+        <PullToRefreshInNestedScrollViewsDifferentSourceContentBetween />
       </TestCase>
     </TestSuite>
   );
@@ -165,143 +168,221 @@ const PullToRefreshInNestedScrollViews = () => {
 
   return (
     <ScrollView
-      contentContainerStyle={styles.scrollView}
+      style={{width: '100%'}}
+      contentContainerStyle={[styles.scrollView]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
+      <View
+        style={{
+          backgroundColor: 'lightblue',
+          width: '100%',
+          height: 250,
+        }}>
+        {Array.from({length: 5}).map((_, index) => (
+          <Text
+            key={index}
+            style={{textAlign: 'center', height: 50, borderWidth: 1}}>
+            {`Parent ScrollView Item ${index + 1}`}
+          </Text>
+        ))}
+      </View>
       <ScrollView
+        style={{width: '100%', height: 248}}
         contentContainerStyle={{
-          ...styles.scrollView,
-          backgroundColor: 'white',
+          width: '100%',
         }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
-        <Text style={styles.text}>
-          inner-scrollView Press and hold down the area to refresh. The refresh
-          label does not bounce back
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView Press and hold down the area to refresh. The refresh
-          label does not bounce back
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView Press and hold down the area to refresh. The refresh
-          label does not bounce back
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView Press and hold down the area to refresh. The refresh
-          label does not bounce back
-        </Text>
+        <View
+          style={{
+            backgroundColor: 'pink',
+            width: '100%',
+          }}>
+          {Array.from({length: 15}).map((_, index) => (
+            <Text
+              key={index}
+              style={{textAlign: 'center', height: 50, borderWidth: 1}}>
+              {`Child ScrollView Item ${index + 1}`}
+            </Text>
+          ))}
+        </View>
       </ScrollView>
     </ScrollView>
   );
 };
 
 const PullToRefreshInNestedScrollViewsDifferentSource = () => {
-  const [firstRefreshing, setFirstRefrehing] = useState(false);
-  const [secondRefreshing, setSecondRefrehing] = useState(false);
+  const [isRefreshingOne, setIsRefreshingOne] = useState(false);
+  const [isRefreshingTwo, setIsRefreshingTwo] = useState(false);
 
-  const onFirstsRefresh = () => {
-    setFirstRefrehing(true);
-    wait(3000).then(() => {
-      setFirstRefrehing(false);
+  const onFirstRefresh = () => {
+    setIsRefreshingOne(true);
+    wait(2000).then(() => {
+      setIsRefreshingOne(false);
     });
   };
 
   const onSecondRefresh = () => {
-    setSecondRefrehing(true);
-    wait(4000).then(() => {
-      setSecondRefrehing(false);
+    setIsRefreshingTwo(true);
+    wait(5000).then(() => {
+      setIsRefreshingTwo(false);
     });
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollView}
-      refreshControl={
-        <RefreshControl
-          refreshing={firstRefreshing}
-          onRefresh={onFirstsRefresh}
-        />
-      }>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
-      <Text>outer-scrollView</Text>
+    <View>
       <ScrollView
-        contentContainerStyle={{
-          ...styles.scrollView,
-          backgroundColor: 'white',
-        }}
+        style={{width: '100%'}}
+        contentContainerStyle={[styles.scrollView]}
         refreshControl={
           <RefreshControl
-            refreshing={secondRefreshing}
-            onRefresh={onSecondRefresh}
+            refreshing={isRefreshingOne}
+            onRefresh={onFirstRefresh}
           />
         }>
-        <Text style={styles.text}>
-          inner-scrollView Press and hold down the area to refresh. The refresh
-          label does not bounce back
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView Press and hold down the area to refresh. The refresh
-          label does not bounce back
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView Press and hold down the area to refresh. The refresh
-          label does not bounce back
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView 按住该区域下拉刷新，刷新标识不回弹回
-        </Text>
-        <Text style={styles.text}>
-          inner-scrollView Press and hold down the area to refresh. The refresh
-          label does not bounce back
-        </Text>
+        <View
+          style={{
+            backgroundColor: 'lightblue',
+            width: '100%',
+            height: 250,
+          }}>
+          {Array.from({length: 5}).map((_, index) => (
+            <Text
+              key={index}
+              style={{textAlign: 'center', height: 50, borderWidth: 1}}>
+              {`Parent ScrollView Item ${index + 1}`}
+            </Text>
+          ))}
+        </View>
+        <ScrollView
+          style={{width: '100%', height: 248}}
+          contentContainerStyle={{
+            width: '100%',
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshingTwo}
+              onRefresh={onSecondRefresh}
+            />
+          }>
+          <View
+            style={{
+              backgroundColor: 'pink',
+              width: '100%',
+            }}>
+            {Array.from({length: 15}).map((_, index) => (
+              <Text
+                key={index}
+                style={{textAlign: 'center', height: 50, borderWidth: 1}}>
+                {`Child ScrollView Item ${index + 1}`}
+              </Text>
+            ))}
+          </View>
+        </ScrollView>
       </ScrollView>
-    </ScrollView>
+    </View>
+  );
+};
+
+const PullToRefreshInNestedScrollViewsDifferentSourceContentBetween = () => {
+  const [isRefreshingOne, setIsRefreshingOne] = useState(false);
+  const [isRefreshingTwo, setIsRefreshingTwo] = useState(false);
+
+  const onFirstRefresh = () => {
+    setIsRefreshingOne(true);
+    wait(2000).then(() => {
+      setIsRefreshingOne(false);
+    });
+  };
+
+  const onSecondRefresh = () => {
+    setIsRefreshingTwo(true);
+    wait(5000).then(() => {
+      setIsRefreshingTwo(false);
+    });
+  };
+
+  return (
+    <View>
+      <ScrollView
+        style={{width: '100%'}}
+        contentContainerStyle={[styles.scrollView]}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshingOne}
+            onRefresh={onFirstRefresh}
+          />
+        }>
+        <View
+          style={{
+            backgroundColor: 'lightblue',
+            width: '100%',
+            height: 250,
+          }}>
+          {Array.from({length: 5}).map((_, index) => (
+            <Text
+              key={index}
+              style={{textAlign: 'center', height: 50, borderWidth: 1}}>
+              {`Parent ScrollView Item ${index + 1}`}
+            </Text>
+          ))}
+        </View>
+        <View
+          style={{
+            backgroundColor: 'red',
+            width: '100%',
+            height: 250,
+            justifyContent: 'center',
+          }}>
+          <Text style={{textAlign: 'center'}}>Some other content</Text>
+        </View>
+        <ScrollView
+          style={{width: '100%', height: 248}}
+          contentContainerStyle={{
+            width: '100%',
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshingTwo}
+              onRefresh={onSecondRefresh}
+            />
+          }>
+          <View
+            style={{
+              backgroundColor: 'pink',
+              width: '100%',
+            }}>
+            {Array.from({length: 15}).map((_, index) => (
+              <Text
+                key={index}
+                style={{textAlign: 'center', height: 50, borderWidth: 1}}>
+                {`Child ScrollView Item ${index + 1}`}
+              </Text>
+            ))}
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            backgroundColor: 'red',
+            width: '100%',
+            height: 250,
+            justifyContent: 'center',
+          }}>
+          <Text style={{textAlign: 'center'}}>Some other content</Text>
+        </View>
+        <View
+          style={{
+            backgroundColor: 'blue',
+            width: '100%',
+            height: 250,
+            justifyContent: 'center',
+          }}>
+          <Text style={{textAlign: 'center'}}>Some other content</Text>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -311,7 +392,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    backgroundColor: 'pink',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },

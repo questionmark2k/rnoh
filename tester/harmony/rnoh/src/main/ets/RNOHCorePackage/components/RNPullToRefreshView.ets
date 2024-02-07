@@ -100,7 +100,7 @@ export struct RNPullToRefreshView {
     .onStateChange((refreshStatus) => {
       this.prevAndCurrentRefreshStatus = [this.prevAndCurrentRefreshStatus[1], refreshStatus]
       if (refreshStatus === RefreshStatus.Drag || refreshStatus === RefreshStatus.OverDrag || refreshStatus === RefreshStatus.Refresh) {
-        this.loadingOpacity = 1
+        this.loadingOpacity = 1;
       }
       if (refreshStatus === RefreshStatus.Inactive || refreshStatus === RefreshStatus.Done) {
         this.loadingOpacity = 0;
