@@ -1,32 +1,37 @@
 import { Command } from '@react-native-community/cli-types';
+import { Logger } from '../io';
 
 import pathUtils from 'path';
 import fs from 'fs';
 import zlib from 'zlib';
 import tar from 'tar';
 import JSON5 from 'json5';
-import { ValidationError } from '../core';
+import {
+  ValidationError,
+  AbsolutePath,
+  ProjectDependenciesManager,
+} from '../core';
 
 export const commandUnpackHarmony: Command = {
   name: 'unpack-harmony',
   description: 'Unpacks native code.',
   options: [
     {
-      name: '--node-modules-path <string>',
-      description: 'Path to node_modules directory',
-      default: './node_modules',
+      name: '--project-root-path <path>',
+      description: 'Relative path to package root',
+      default: '.',
     },
     {
       name: '--output-dir <string>',
       description: 'Output directory to which OH modules should be unpacked to',
-      default: './harmony/react_native_modules',
+      default: './harmony/rnoh_modules',
     },
   ],
   func: async (argv, config, args: any) => {
     try {
       await unpack(
-        pathUtils.resolve(args.nodeModulesPath),
-        pathUtils.resolve(args.outputDir)
+        new AbsolutePath(args.projectRootPath),
+        new AbsolutePath(args.outputDir)
       );
     } catch (err) {
       if (err instanceof ValidationError) {
@@ -39,50 +44,124 @@ export const commandUnpackHarmony: Command = {
   },
 };
 
-async function unpack(nodeModulesPath: string, outputDirPath: string) {
-  const nodeModuleNames = fs.readdirSync(nodeModulesPath);
-  for (const nodeModuleName of nodeModuleNames) {
-    const nodeModulePath = pathUtils.join(nodeModulesPath, nodeModuleName);
-    const nodePackageVersion = getNodePackageVersion(nodeModulePath);
-    const harmonyArchivePath = pathUtils.join(nodeModulePath, 'harmony.tar.gz');
-    const pkgHarmonyDirPath = pathUtils.join(nodeModulePath, 'harmony');
-    const ohModulesInfo = getOhModulesInfo(pkgHarmonyDirPath, outputDirPath);
+async function unpack(
+  projectRootPath: AbsolutePath,
+  outputDirPath: AbsolutePath
+) {
+  const logger = new Logger();
+  const projectDependenciesManager = new ProjectDependenciesManager(
+    projectRootPath
+  );
+  logger.info((styles) => styles.bold(`Unpacking RNOH modules`), {
+    prefix: true,
+  });
+  let unpackedArchivesCount = 0;
+  let skippedArchivesCount = 0;
+  await projectDependenciesManager.forEachAsync(async (dependency) => {
+    const packageJSON = dependency.readPackageJSON();
+    const harmonyArchivePath = dependency
+      .getRootPath()
+      .copyWithNewSegment('harmony.tar.gz');
+    const pkgHarmonyDirPath = dependency
+      .getRootPath()
+      .copyWithNewSegment('harmony');
+    const harmonyTarGzPathStr = dependency
+      .getRootPath()
+      .copyWithNewSegment('harmony.tar.gz')
+      .relativeTo(projectRootPath)
+      .getValue();
     if (
-      nodePackageVersion &&
-      shouldUnpackHarmonyArchive(
+      packageJSON.version &&
+      shouldUnpack(
         harmonyArchivePath,
         pkgHarmonyDirPath,
         outputDirPath,
-        nodePackageVersion
+        packageJSON.version
       )
     ) {
-      console.log(`[UNPACKING] ${nodeModuleName}/harmony.tar.gz`);
-      await unpackTarGz(harmonyArchivePath, pkgHarmonyDirPath);
-      for (const ohModuleInfo of ohModulesInfo) {
-        console.log(
-          `[UNPACKING] ${nodeModuleName}/harmony/${ohModuleInfo.archiveFileName}`
+      if (!fs.existsSync(pkgHarmonyDirPath.getValue())) {
+        /**
+         * After fresh install, harmony.tar.gz wasn't unpacked to harmony. Updating npm package should remove unpacked harmony dir.
+         */
+        logger.info(
+          (styles) =>
+            `[${styles.cyan('unpacking')}] ${styles.gray(harmonyTarGzPathStr)}`
         );
+        await unpackTarGz(harmonyArchivePath, pkgHarmonyDirPath);
+        unpackedArchivesCount++;
+      } else {
+        skippedArchivesCount++;
+        logger.info(
+          (styles) =>
+            `[${styles.yellow('skipped')}]   ${styles.gray(
+              harmonyTarGzPathStr
+            )}`
+        );
+      }
+      const ohModulesInfo = getOhModulesInfo(pkgHarmonyDirPath, outputDirPath);
+      for (const ohModuleInfo of ohModulesInfo) {
+        const moduleArchivePathStr = dependency
+          .getRootPath()
+          .copyWithNewSegment('harmony', ohModuleInfo.archiveFileName)
+          .relativeTo(projectRootPath)
+          .getValue();
+        logger.info(
+          (styles) =>
+            `[${styles.cyan('unpacking')}] ${styles.gray(moduleArchivePathStr)}`
+        );
+        unpackedArchivesCount++;
         await unpackTarGz(
           ohModuleInfo.archivePath,
           ohModuleInfo.computedModulePath
         );
       }
+    } else {
+      if (fs.existsSync(harmonyArchivePath.getValue())) {
+        skippedArchivesCount++;
+        logger.info(
+          (styles) =>
+            `[${styles.yellow('skipped')}]   ${styles.gray(
+              harmonyTarGzPathStr
+            )}`
+        );
+      }
+      const ohModulesInfo = getOhModulesInfo(pkgHarmonyDirPath, outputDirPath);
+      for (const ohModuleInfo of ohModulesInfo) {
+        const moduleArchivePathStr = dependency
+          .getRootPath()
+          .copyWithNewSegment('harmony', ohModuleInfo.archiveFileName)
+          .relativeTo(projectRootPath)
+          .getValue();
+        skippedArchivesCount++;
+        logger.info(
+          (styles) =>
+            `[${styles.yellow('skipped')}]   ${styles.gray(
+              moduleArchivePathStr
+            )}`
+        );
+      }
     }
-  }
+  });
+  logger.info(
+    (styles) =>
+      `\nUnpacked: ${styles.cyan(
+        unpackedArchivesCount
+      )}, Skipped: ${styles.yellow(skippedArchivesCount)}`
+  );
 }
 
-function shouldUnpackHarmonyArchive(
-  harmonyArchivePath: string,
-  pkgHarmonyDirPath: string,
-  outputDirPath: string,
+function shouldUnpack(
+  harmonyArchivePath: AbsolutePath,
+  pkgHarmonyDirPath: AbsolutePath,
+  outputDirPath: AbsolutePath,
   nodePackageVersion: string
 ) {
-  if (!fs.existsSync(harmonyArchivePath)) return false;
-  if (!fs.existsSync(pkgHarmonyDirPath)) return true;
+  if (!fs.existsSync(harmonyArchivePath.getValue())) return false;
+  if (!fs.existsSync(pkgHarmonyDirPath.getValue())) return true;
   const ohModulesInfo = getOhModulesInfo(pkgHarmonyDirPath, outputDirPath);
   for (const ohModuleInfo of ohModulesInfo) {
     if (
-      !fs.existsSync(ohModuleInfo.computedModulePath) ||
+      !fs.existsSync(ohModuleInfo.computedModulePath.getValue()) ||
       getOhPackageVersion(ohModuleInfo.computedModulePath) !==
         nodePackageVersion
     ) {
@@ -92,39 +171,35 @@ function shouldUnpackHarmonyArchive(
   return false;
 }
 
-function getNodePackageVersion(nodeModulePath: string) {
-  const packageJSONPath = pathUtils.join(nodeModulePath, 'package.json');
-  if (!fs.existsSync(packageJSONPath)) return null;
-  const content = fs.readFileSync(packageJSONPath, { encoding: 'utf-8' });
-  return JSON.parse(content)['version'];
-}
-
-function getOhPackageVersion(modulePath: string) {
-  const ohPackagePath = pathUtils.join(modulePath, 'oh-package.json5');
-  if (!fs.existsSync(ohPackagePath)) return null;
-  const content = fs.readFileSync(ohPackagePath, { encoding: 'utf-8' });
+function getOhPackageVersion(modulePath: AbsolutePath) {
+  const ohPackagePath = modulePath.copyWithNewSegment('oh-package.json5');
+  if (!fs.existsSync(ohPackagePath.getValue())) return null;
+  const content = fs.readFileSync(ohPackagePath.getValue(), {
+    encoding: 'utf-8',
+  });
   return JSON5.parse(content)['version'];
 }
 
-function getOhModulesInfo(pkgHarmonyDirPath: string, outputDirPath: string) {
+function getOhModulesInfo(
+  pkgHarmonyDirPath: AbsolutePath,
+  outputDirPath: AbsolutePath
+) {
   const results: {
-    archivePath: string;
+    archivePath: AbsolutePath;
     archiveFileName: string;
-    computedModulePath: string;
+    computedModulePath: AbsolutePath;
     computedModuleName: string;
   }[] = [];
-  if (!fs.existsSync(pkgHarmonyDirPath)) return [];
-  const names = fs.readdirSync(pkgHarmonyDirPath);
+  if (!fs.existsSync(pkgHarmonyDirPath.getValue())) return [];
+  const names = fs.readdirSync(pkgHarmonyDirPath.getValue());
   for (const name of names) {
     if (name.endsWith('.tar.gz')) {
-      const archivePath = pathUtils.join(pkgHarmonyDirPath, name);
+      const archivePath = pkgHarmonyDirPath.copyWithNewSegment(name);
       const computedModuleName = pathUtils
-        .parse(archivePath)
+        .parse(archivePath.getValue())
         .name.split('.')[0];
-      const computedModulePath = pathUtils.join(
-        outputDirPath,
-        computedModuleName
-      );
+      const computedModulePath =
+        outputDirPath.copyWithNewSegment(computedModuleName);
       results.push({
         archivePath,
         archiveFileName: name,
@@ -136,13 +211,13 @@ function getOhModulesInfo(pkgHarmonyDirPath: string, outputDirPath: string) {
   return results;
 }
 
-function unpackTarGz(archivePath: string, outputDirPath: string) {
-  if (!fs.existsSync(outputDirPath)) {
-    fs.mkdirSync(outputDirPath, { recursive: true });
+function unpackTarGz(archivePath: AbsolutePath, outputDirPath: AbsolutePath) {
+  if (!fs.existsSync(outputDirPath.getValue())) {
+    fs.mkdirSync(outputDirPath.getValue(), { recursive: true });
   }
-  const readStream = fs.createReadStream(archivePath);
+  const readStream = fs.createReadStream(archivePath.getValue());
   const writeStream = tar.extract({
-    cwd: outputDirPath,
+    cwd: outputDirPath.getValue(),
   });
   readStream.pipe(zlib.createGunzip()).pipe(writeStream);
   return new Promise((resolve, reject) => {

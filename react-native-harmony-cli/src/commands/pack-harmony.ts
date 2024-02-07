@@ -51,6 +51,9 @@ async function pack(
     packageJSONPath,
     pathUtils.join(ohModuleDirPath, 'oh-package.json5')
   );
+  if (!fs.existsSync(harmonyDirPath)) {
+    fs.mkdirSync(harmonyDirPath, { recursive: true });
+  }
   await createTGZFromDir(
     ohModuleDirPath,
     pathUtils.join(

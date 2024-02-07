@@ -7,7 +7,11 @@ export class Logger {
     options?: { prefix?: boolean }
   ) {
     const prefix = options?.prefix ? `[${chalk.bold(chalk.cyan('INFO'))}]` : '';
-    console.info(prefix, prepareMsg(chalk));
+    if (prefix) {
+      console.info(prefix, prepareMsg(chalk));
+    } else {
+      console.info(prepareMsg(chalk));
+    }
   }
 
   debug(prepareMsg: (styles: typeof chalk) => string) {

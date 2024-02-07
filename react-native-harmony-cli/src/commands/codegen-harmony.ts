@@ -52,7 +52,7 @@ export const commandCodegenHarmony: Command = {
       const cppOutputPath = new AbsolutePath(args.cppOutputPath);
       const projectRootPath = new AbsolutePath(args.projectRootPath);
       const codegen = createCodegen(cppOutputPath, etsOutputPath);
-      const uberSchema = UberSchema.fromProjectRootPath(
+      const uberSchema = await UberSchema.fromProjectRootPath(
         new AbsolutePath(args.projectRootPath)
       );
       const fileContentByPath = codegen.generate(uberSchema);

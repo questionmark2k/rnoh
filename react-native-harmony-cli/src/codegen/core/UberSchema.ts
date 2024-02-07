@@ -3,10 +3,13 @@ import {
   NativeModuleSchema,
   SchemaType as RawUberSchema,
 } from '@react-native/codegen/lib/CodegenSchema';
-import { AbsolutePath, ValueObject } from '../../core';
-import { PackageJSON } from './PackageJSON';
-import { CodegenConfig } from './CodegenConfig';
-import { ProjectDependenciesManager } from './ProjectDependenciesManager';
+import {
+  AbsolutePath,
+  ValueObject,
+  PackageJSON,
+  ProjectDependenciesManager,
+  CodegenConfig,
+} from '../../core';
 // @ts-expect-error
 import extractUberSchemaFromSpecFilePaths_ from '@react-native/codegen/lib/cli/combine/combine-js-to-schema.js';
 import { CodegenError } from './CodegenError';
@@ -27,7 +30,9 @@ type FindSpecSchemaByType<
 > = TSpecSchema extends { type: TType } ? TSpecSchema : never;
 
 export class UberSchema implements ValueObject {
-  static fromProjectRootPath(projectRootPath: AbsolutePath): UberSchema {
+  static async fromProjectRootPath(
+    projectRootPath: AbsolutePath
+  ): Promise<UberSchema> {
     const packageJSON = PackageJSON.fromProjectRootPath(
       projectRootPath,
       projectRootPath
@@ -37,12 +42,14 @@ export class UberSchema implements ValueObject {
     if (appCodegenConfig) {
       codegenConfigs.push(appCodegenConfig);
     }
-    new ProjectDependenciesManager(projectRootPath).forEach((dependency) => {
-      const codegenConfig = dependency.maybeCreateCodegenConfig();
-      if (codegenConfig) {
-        codegenConfigs.push(codegenConfig);
+    await new ProjectDependenciesManager(projectRootPath).forEachAsync(
+      (dependency) => {
+        const codegenConfig = dependency.maybeCreateCodegenConfig();
+        if (codegenConfig) {
+          codegenConfigs.push(codegenConfig);
+        }
       }
-    });
+    );
     try {
       return new UberSchema(
         createRawUberSchemaFromSpecFilePaths(

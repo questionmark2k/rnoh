@@ -1,5 +1,5 @@
 import tmp from 'tmp';
-import { ProjectDependenciesManager } from '../src/codegen/core/ProjectDependenciesManager';
+import { ProjectDependenciesManager } from '../src/core/ProjectDependenciesManager';
 import { createFileStructure } from './fsUtils';
 import { AbsolutePath } from '../src/core';
 
@@ -10,7 +10,7 @@ beforeEach(async () => {
   tmpDir = dir.name;
 });
 
-it('should not recognize a dependency if package.json is not defined', () => {
+it('should not recognize a dependency if package.json is not defined', async () => {
   createFileStructure(tmpDir, {
     node_modules: {
       '@types': {
@@ -28,7 +28,7 @@ it('should not recognize a dependency if package.json is not defined', () => {
   );
 
   const dependencyRootPaths: AbsolutePath[] = [];
-  projectDependenciesManager.forEach((dependency) => {
+  await projectDependenciesManager.forEachAsync((dependency) => {
     dependencyRootPaths.push(dependency.getRootPath());
   });
 

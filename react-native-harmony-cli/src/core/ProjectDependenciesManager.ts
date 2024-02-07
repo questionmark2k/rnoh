@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { AbsolutePath } from '../../core';
+import { AbsolutePath } from './AbsolutePath';
 import { PackageJSON } from './PackageJSON';
 
 export class ProjectDependency {
@@ -16,7 +16,7 @@ export class ProjectDependency {
     return this.readPackageJSON().maybeCreateCodegenConfig();
   }
 
-  private readPackageJSON() {
+  readPackageJSON() {
     return PackageJSON.fromProjectRootPath(
       this.packageRootPath,
       this.projectRootPath
@@ -27,28 +27,30 @@ export class ProjectDependency {
 export class ProjectDependenciesManager {
   constructor(private projectRootPath: AbsolutePath) {}
 
-  forEach(cb: (dependency: ProjectDependency) => void) {
-    this.forEachDependencyInDirectory(
+  async forEachAsync(
+    cb: (dependency: ProjectDependency) => Promise<void> | void
+  ) {
+    await this.forEachDependencyInDirectory(
       cb,
       this.projectRootPath.copyWithNewSegment('node_modules')
     );
   }
 
-  private forEachDependencyInDirectory(
-    cb: (dependency: ProjectDependency) => void,
+  private async forEachDependencyInDirectory(
+    cb: (dependency: ProjectDependency) => Promise<void> | void,
     directoryPath: AbsolutePath
   ) {
     if (!fs.existsSync(directoryPath.getValue())) {
       return;
     }
-    fs.readdirSync(directoryPath.getValue()).map((dirOrFileName) => {
+    for (let dirOrFileName of fs.readdirSync(directoryPath.getValue())) {
       const potentialDependencyRootPath =
         directoryPath.copyWithNewSegment(dirOrFileName);
       if (fs.lstatSync(potentialDependencyRootPath.getValue()).isDirectory()) {
         if (dirOrFileName.startsWith('.')) {
-          return;
+          continue;
         } else if (dirOrFileName.startsWith('@')) {
-          this.forEachDependencyInDirectory(
+          await this.forEachDependencyInDirectory(
             cb,
             directoryPath.copyWithNewSegment(dirOrFileName)
           );
@@ -60,9 +62,9 @@ export class ProjectDependenciesManager {
                 .getValue()
             )
           ) {
-            return;
+            continue;
           }
-          cb(
+          await cb(
             new ProjectDependency(
               potentialDependencyRootPath,
               this.projectRootPath
@@ -70,6 +72,6 @@ export class ProjectDependenciesManager {
           );
         }
       }
-    });
+    }
   }
 }

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
-import { AbsolutePath } from '../../core';
-import { findFilePathsWithExtensions } from '../../io';
-import { CodegenError } from './CodegenError';
+import { AbsolutePath } from './AbsolutePath';
+import { findFilePathsWithExtensions } from '../io';
+import { DescriptiveError } from './DescriptiveError';
 
 export type RawCodegenConfig = {
   specPaths: string[];
@@ -24,7 +24,7 @@ export class CodegenConfig {
     });
     const specFilePaths = specPaths.flatMap((specPath) => {
       if (!fs.existsSync(specPath.getValue())) {
-        throw new CodegenError({
+        throw new DescriptiveError({
           whatHappened: `No such file or directory: ${specPath.getValue()}`,
           whatCanUserDo: {
             default: [

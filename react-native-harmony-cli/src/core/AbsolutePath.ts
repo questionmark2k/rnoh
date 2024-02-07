@@ -26,4 +26,18 @@ export class AbsolutePath implements ValueObject {
     }
     return null;
   }
+
+  relativeTo(absolutePath: AbsolutePath): RelativePath {
+    return new RelativePath(
+      pathUtils.relative(absolutePath.getValue(), this.value)
+    );
+  }
+}
+
+class RelativePath implements ValueObject {
+  constructor(private value: string) {}
+
+  getValue() {
+    return this.value;
+  }
 }

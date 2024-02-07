@@ -1,4 +1,4 @@
-import { execaCommandSync } from 'execa';
+import { execaCommandSync, execa, execaSync } from 'execa';
 import pathUtils from 'path';
 export class ReactNativeFixture {
   constructor(private cwd: string) {}
@@ -16,11 +16,20 @@ export class ReactNativeFixture {
       )} --package-json-path ${this.useCwd(args.packageJSONPath)}`
     ).stdout;
   }
-  unpackHarmony(args: { nodeModulesPath: string; outputDir: string }) {
-    return execaCommandSync(
-      `react-native unpack-harmony --node-modules-path ${this.useCwd(
-        args.nodeModulesPath
-      )} --output-dir ${this.useCwd(args.outputDir)}`
+  unpackHarmony(args: { projectRootPath: string; outputDir: string }) {
+    return execaSync(
+      'react-native',
+      [
+        'unpack-harmony',
+        '--project-root-path',
+        this.useCwd(args.projectRootPath),
+        '--output-dir',
+        this.useCwd(args.outputDir),
+      ],
+      {
+        env: { FORCE_COLOR: '0' },
+        shell: true,
+      }
     ).stdout;
   }
 

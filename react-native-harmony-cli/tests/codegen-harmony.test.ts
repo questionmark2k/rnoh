@@ -2,8 +2,7 @@ import tmp from 'tmp';
 import { ReactNativeFixture } from './ReactNativeFixture';
 import fs from 'fs';
 import { buildDirTree, createFileStructure } from './fsUtils';
-import { AbsolutePath } from '../src/core';
-import { RawCodegenConfig } from '../src/codegen';
+import { AbsolutePath, RawCodegenConfig } from '../src/core';
 
 let tmpDir: string = '';
 

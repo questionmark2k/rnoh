@@ -1,7 +1,7 @@
-import { AbsolutePath } from '../../core';
 import fs from 'fs';
+import { AbsolutePath } from './AbsolutePath';
 import { CodegenConfig } from './CodegenConfig';
-import { CodegenError } from './CodegenError';
+import { DescriptiveError } from './DescriptiveError';
 
 export class PackageJSON {
   static fromProjectRootPath(
@@ -10,7 +10,7 @@ export class PackageJSON {
   ) {
     const packageJSONPath = packageRootPath.copyWithNewSegment('package.json');
     if (!fs.existsSync(packageJSONPath.getValue())) {
-      throw new CodegenError({
+      throw new DescriptiveError({
         whatHappened: "Couldn't find 'package.json'",
         whatCanUserDo: {
           default: [
@@ -34,8 +34,12 @@ export class PackageJSON {
     private projectRootPath: AbsolutePath
   ) {}
 
-  getName(): string {
+  get name(): string {
     return this.rawPackageJSON.name;
+  }
+
+  get version(): string {
+    return this.rawPackageJSON.version;
   }
 
   maybeCreateCodegenConfig(): CodegenConfig | null {
@@ -53,7 +57,7 @@ export class PackageJSON {
       rawCodegenConfig,
       this.packageRootPath,
       this.projectRootPath,
-      this.getName()
+      this.name
     );
   }
 }
