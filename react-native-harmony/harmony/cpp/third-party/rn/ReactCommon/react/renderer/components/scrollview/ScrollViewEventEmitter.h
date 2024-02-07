@@ -23,6 +23,7 @@ class ScrollViewMetrics {
   EdgeInsets contentInset;
   Size containerSize;
   Float zoomScale;
+  bool responderIgnoreScroll;
 };
 
 class ScrollViewEventEmitter : public ViewEventEmitter {

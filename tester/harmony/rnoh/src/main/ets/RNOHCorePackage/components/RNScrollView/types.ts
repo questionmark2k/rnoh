@@ -71,6 +71,7 @@ export interface ScrollEvent {
   contentOffset: Coordinates;
   containerSize: Dimensions;
   zoomScale: number;
+  responderIgnoreScroll: boolean;
 }
 
 export interface MaintainVisibleContentPosition {

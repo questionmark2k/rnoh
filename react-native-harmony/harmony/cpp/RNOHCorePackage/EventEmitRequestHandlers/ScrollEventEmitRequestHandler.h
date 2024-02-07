@@ -31,13 +31,15 @@ facebook::react::ScrollViewMetrics convertScrollEvent(ArkJS &arkJs, napi_value e
         (float)arkJs.getDouble(arkJs.getObjectProperty(arkContainerSize, "height"))};
 
     float zoomScale = (float)arkJs.getDouble(arkJs.getObjectProperty(eventObject, "zoomScale"));
+    bool responderIgnoreScroll = (bool)arkJs.getBoolean(arkJs.getObjectProperty(eventObject, "responderIgnoreScroll"));
 
     return {
         contentSize,
         contentOffset,
         {},
         containerSize,
-        zoomScale};
+        zoomScale,
+        responderIgnoreScroll};
 }
 
 ScrollEventType getScrollEventType(std::string const &eventType) {

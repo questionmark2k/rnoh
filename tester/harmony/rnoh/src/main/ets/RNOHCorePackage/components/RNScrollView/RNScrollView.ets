@@ -344,6 +344,7 @@ export struct RNScrollView {
         height: this.descriptor.layoutMetrics.frame.size.height,
       },
       zoomScale: 1,
+      responderIgnoreScroll: true,
     }
   }
 

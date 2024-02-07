@@ -53,6 +53,7 @@ static jsi::Value scrollViewMetricsPayload(
   }
 
   payload.setProperty(runtime, "zoomScale", scrollViewMetrics.zoomScale);
+  payload.setProperty(runtime, "responderIgnoreScroll", scrollViewMetrics.responderIgnoreScroll);
 
   return payload;
 }

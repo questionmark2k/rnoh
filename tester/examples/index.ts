@@ -12,4 +12,5 @@ export * from './TogglingComponentExample';
 export * from './StickyHeadersExample';
 export * from './TabsAndScrollViewExample';
 export * from './NestedScrollingExample';
+export * from './NestedScrollWithTouchableExample';
 export * from './ScrollToEndOnLayoutExample';
