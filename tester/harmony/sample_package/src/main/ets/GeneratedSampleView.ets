@@ -7,17 +7,17 @@ export struct GeneratedSampleView {
   public static readonly NAME = RNC.GeneratedSampleView.NAME
   public ctx!: RNComponentContext
   public tag: number = 0
-
-  @State private descriptorWrapper: RNC.GeneratedSampleView.DescriptorWrapper = {} as RNC.GeneratedSampleView.DescriptorWrapper
+  @State private descriptorWrapper: RNC.GeneratedSampleView.DescriptorWrapper = {
+  } as RNC.GeneratedSampleView.DescriptorWrapper
   private eventEmitter: RNC.GeneratedSampleView.EventEmitter | undefined = undefined
   private cleanUpCallbacks: (() => void)[] = []
 
   aboutToAppear() {
     this.eventEmitter = new RNC.GeneratedSampleView.EventEmitter(this.ctx.rnInstance, this.tag)
-    this.onDescriptorChange(this.ctx.descriptorRegistry.getDescriptor<RNC.GeneratedSampleView.Descriptor>(this.tag))
+    this.onDescriptorWrapperChange(this.ctx.descriptorRegistry.findDescriptorWrapperByTag<RNC.GeneratedSampleView.DescriptorWrapper>(this.tag)!)
     this.cleanUpCallbacks.push(this.ctx.descriptorRegistry.subscribeToDescriptorChanges(this.tag,
-      (newDescriptor) => {
-        this.onDescriptorChange(newDescriptor as RNC.GeneratedSampleView.Descriptor)
+      (_descriptor, newDescriptorWrapper) => {
+        this.onDescriptorWrapperChange(newDescriptorWrapper! as RNC.GeneratedSampleView.DescriptorWrapper)
       }
     ))
 
@@ -27,8 +27,8 @@ export struct GeneratedSampleView {
     }))
   }
 
-  private onDescriptorChange(descriptor: RNC.GeneratedSampleView.Descriptor) {
-    this.descriptorWrapper = new RNC.GeneratedSampleView.DescriptorWrapper(descriptor)
+  private onDescriptorWrapperChange(descriptorWrapper: RNC.GeneratedSampleView.DescriptorWrapper) {
+    this.descriptorWrapper = descriptorWrapper
   }
 
   private getDirectProps() {
@@ -44,6 +44,7 @@ export struct GeneratedSampleView {
       Column() {
         Text(JSON.stringify(this.getDirectProps(), null, 2)).width("100%").fontSize(8)
       }.width("100%").height("100%").backgroundColor(this.descriptorWrapper.props.colorTest.toRGBAString())
+
       this.ctx.wrappedRNChildrenBuilder.builder(this.ctx, this.tag)
     }
   }

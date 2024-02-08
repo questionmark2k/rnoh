@@ -1,6 +1,11 @@
 import { RNPackage, TurboModulesFactory } from 'rnoh/ts';
-import type { TurboModule, TurboModuleContext } from 'rnoh/ts';
-import { TM } from "rnoh/generated/ts"
+import type {
+  TurboModule,
+  TurboModuleContext,
+  DescriptorWrapperFactoryByDescriptorTypeCtx,
+  DescriptorWrapperFactoryByDescriptorType
+} from 'rnoh/ts';
+import { TM, RNC } from "rnoh/generated/ts"
 import { SampleTurboModule } from './SampleTurboModule';
 
 class SampleTurboModulesFactory extends TurboModulesFactory {
@@ -19,5 +24,11 @@ class SampleTurboModulesFactory extends TurboModulesFactory {
 export class SamplePackage extends RNPackage {
   createTurboModulesFactory(ctx: TurboModuleContext): TurboModulesFactory {
     return new SampleTurboModulesFactory(ctx);
+  }
+
+  createDescriptorWrapperFactoryByDescriptorType(ctx: DescriptorWrapperFactoryByDescriptorTypeCtx): DescriptorWrapperFactoryByDescriptorType {
+    return {
+      [RNC.GeneratedSampleView.NAME]: (ctx) => new RNC.GeneratedSampleView.DescriptorWrapper(ctx.descriptor)
+    }
   }
 }

@@ -10,13 +10,15 @@ type SetNativeStateFn = (componentName: string, tag: Tag, state: unknown) => voi
 
 export type DescriptorWrapperFactory = (ctx: { descriptor: Descriptor }) => DescriptorWrapper
 
+type DescriptorChangeListener = (descriptor: Descriptor, descriptorWrapper: DescriptorWrapper | null) => void
+
 export class DescriptorRegistry {
   static readonly ANIMATED_NON_RAW_PROP_KEYS = ['transform'];
 
   private descriptorByTag: Map<Tag, Descriptor> = new Map();
   private descriptorWrapperByTag: Map<Tag, DescriptorWrapper> = new Map();
   private descriptorTagById: Map<NativeId, Tag> = new Map();
-  private descriptorListenersSetByTag: Map<Tag, Set<(descriptor: Descriptor) => void>> = new Map();
+  private descriptorListenersSetByTag: Map<Tag, Set<DescriptorChangeListener>> = new Map();
   private subtreeListenersSetByTag: Map<Tag, Set<SubtreeListener>> = new Map();
   private animatedRawPropsByTag: Map<Tag, Set<string>> = new Map();
   private updatedUnnotifiedTags = new Set<Tag>()
@@ -144,7 +146,7 @@ export class DescriptorRegistry {
     const updatedDescriptor = { ...descriptor };
     this.saveDescriptor(updatedDescriptor)
 
-    this.descriptorListenersSetByTag.get(tag)?.forEach(cb => cb(updatedDescriptor));
+    this.descriptorListenersSetByTag.get(tag)?.forEach(cb => cb(updatedDescriptor, this.findDescriptorWrapperByTag(tag)));
     this.callSubtreeListeners(new Set([tag]));
   }
 
@@ -177,7 +179,7 @@ export class DescriptorRegistry {
       const updatedDescriptor = this.getDescriptor(tag);
       if (!updatedDescriptor) return;
       this.descriptorListenersSetByTag.get(tag)?.forEach(cb => {
-        cb(updatedDescriptor)
+        cb(updatedDescriptor, this.findDescriptorWrapperByTag(tag))
       });
     });
     this.callSubtreeListeners(tags);
@@ -208,7 +210,7 @@ export class DescriptorRegistry {
 
   public subscribeToDescriptorChanges(
     tag: Tag,
-    listener: (descriptor: Descriptor) => void,
+    listener: DescriptorChangeListener,
   ) {
     if (!this.descriptorListenersSetByTag.has(tag)) {
       this.descriptorListenersSetByTag.set(tag, new Set());
@@ -221,7 +223,7 @@ export class DescriptorRegistry {
 
   private removeDescriptorChangesListener(
     tag: Tag,
-    listener: (descriptor: Descriptor) => void,
+    listener: DescriptorChangeListener,
   ) {
     const callbacksSet = this.descriptorListenersSetByTag.get(tag);
     callbacksSet?.delete(listener);
