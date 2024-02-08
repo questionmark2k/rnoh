@@ -1,6 +1,13 @@
 import {TestCase, TestSuite} from '@rnoh/testerino';
 import React, {useState} from 'react';
-import {Modal, StyleSheet, Text, View, ModalProps} from 'react-native';
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  View,
+  ModalProps,
+  TextInput,
+} from 'react-native';
 import {Button} from '../components';
 
 export function ModalTest() {
@@ -53,11 +60,14 @@ export function ModalTest() {
           expect(state).to.be.true;
         }}
       />
+      <TestCase itShould="soft keyboard should cover modal">
+        <ModalExample withTextInput />
+      </TestCase>
     </TestSuite>
   );
 }
 
-const ModalExample = (props: ModalProps) => {
+const ModalExample = (props: ModalProps & {withTextInput?: boolean}) => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <View>
@@ -74,6 +84,7 @@ const ModalExample = (props: ModalProps) => {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Hello World!</Text>
+            {props.withTextInput && <TextInput style={styles.textInput} />}
             <Button label="Hide Modal" onPress={() => setModalVisible(false)} />
           </View>
         </View>
@@ -126,5 +137,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
     height: 20,
+  },
+  textInput: {
+    width: 150,
+    height: 40,
+    backgroundColor: 'rgb(200,200,200)',
+    borderRadius: 12,
+    marginVertical: 4,
   },
 });

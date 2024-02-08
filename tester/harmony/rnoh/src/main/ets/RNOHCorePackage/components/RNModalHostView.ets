@@ -1,4 +1,4 @@
-import { Size, RNComponentContext, RNOHContext, CustomComponentBuilder } from '../../RNOH';
+import { CustomComponentBuilder, RNComponentContext, RNOHContext, Size } from '../../RNOH';
 import { Descriptor, Tag } from '../../RNOH/DescriptorBase';
 import { ViewBaseProps } from './RNViewBase';
 import { TouchDispatcher } from '../../RNOH/TouchDispatcher';
@@ -131,6 +131,7 @@ struct ModalHostViewDialog {
       })
       .transition(this.getTransitionEffect())
       .onDisAppear(() => this.closeModalAfterAnimation())
+      .position({ x: 0, y: 0 })
     }
   }
 }
