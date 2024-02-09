@@ -117,7 +117,7 @@ export struct RNApp {
         this.cleanUpCallbacks.push(this.rnInstance.getTurboModule<LogBoxTurboModule>(LogBoxTurboModule.NAME).eventEmitter.subscribe("HIDE", () => {
           this.logBoxDialogController.close()
         }))
-        this.cleanUpCallbacks.push(this.rnAbility.devToolsController.eventEmitter.subscribe("RELOAD", async () => {
+        this.cleanUpCallbacks.push(this.ctx.devToolsController.eventEmitter.subscribe("RELOAD", async () => {
           await this.cleanUp()
           this.init()
         }))
@@ -183,7 +183,7 @@ export struct RNApp {
         })
       }
       if (this.rnAbility!.isDebugModeEnabled()) {
-        RNDevLoadingView({ useSafeAreaInsets: true }).position({ x: 0, y: 0 })
+        RNDevLoadingView({ useSafeAreaInsets: true, ctx: this.rnAbility.rnohCoreContext }).position({ x: 0, y: 0 })
       }
     }
     .expandSafeArea([SafeAreaType.KEYBOARD])

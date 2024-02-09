@@ -24,5 +24,5 @@ export * from "./CompactValue"
 export * from "./RNOHLogger"
 export * from "./RNOHError"
 export * from './JSPackagerClient'
-export * from "./SafeAreaInsets"
+export * from "./SafeAreaInsetsProvider"
 export * from "./DisplayMetricsManager"

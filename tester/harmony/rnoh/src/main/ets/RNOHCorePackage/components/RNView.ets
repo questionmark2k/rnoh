@@ -43,7 +43,7 @@ export struct RNView {
 
   private maybeLogStartUpTime() {
     if ((this.descriptorWrapper?.hints ?? []).includes("ready")) {
-      this.ctx.rnAbility.markReadiness()
+      this.ctx.markReadiness()
     }
   }
 

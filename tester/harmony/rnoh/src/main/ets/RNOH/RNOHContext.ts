@@ -4,9 +4,9 @@ import type { RNComponentCommandHub, RNComponentCommandReceiver } from './RNComp
 import type { RNOHLogger } from './RNOHLogger';
 import type { RNInstance, RNInstanceImpl } from './RNInstance';
 import type { ComponentManagerRegistry } from './ComponentManagerRegistry';
-import type { RNAbility } from "./RNAbility"
+import { RNOHCoreContext } from './RNOHCoreContext';
 
-export class RNOHContext {
+export class RNOHContext extends RNOHCoreContext {
   public get descriptorRegistry(): DescriptorRegistry {
     return this.rnInstance.descriptorRegistry;
   }
@@ -44,13 +44,24 @@ export class RNOHContext {
   constructor(
     public reactNativeVersion: string,
     private rnInstanceImpl: RNInstanceImpl,
-    public logger: RNOHLogger,
-    public rnAbility: RNAbility
+    public coreContext: RNOHCoreContext
   ) {
+    super(
+      coreContext.logger,
+      coreContext.getDisplayMetrics,
+      coreContext.getUIAbilityState,
+      coreContext.markReadiness,
+      coreContext.devToolsController,
+      coreContext.devMenu,
+      coreContext.safeAreaInsetsProvider,
+      coreContext.launchUri,
+    )
+    this.devToolsController = coreContext.devToolsController
+    this.devMenu = coreContext.devMenu
+    this.safeAreaInsetsProvider = coreContext.safeAreaInsetsProvider
+    this.launchUri = coreContext.launchUri
+    this.getDisplayMetrics = () => coreContext.getDisplayMetrics()
+    this.getUIAbilityState = () => coreContext.getUIAbilityState()
+    this.markReadiness = () => coreContext.markReadiness()
   }
 }
-
-/**
- * RNOHContext might be deprecated in the future. Use RNComponentContext only in ets files.
- */
-export type RNComponentContext = RNOHContext

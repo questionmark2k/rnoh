@@ -1,7 +1,11 @@
-import { RNInstanceRegistry } from './RNInstanceRegistry'
 import { EventEmitter } from './EventEmitter'
 import { DevServerHelper } from './DevServerHelper'
 import { RNOHLogger } from './RNOHLogger'
+import { RNOHError } from './RNOHError'
+
+interface DevMenuItem {
+  title: string
+}
 
 export class DevToolsController {
   public eventEmitter = new EventEmitter<{
@@ -14,12 +18,18 @@ export class DevToolsController {
       backgroundColor?: number
     ],
     "HIDE_DEV_LOADING_VIEW": [rnInstanceId: number,
-    ]
+    ],
+    "NEW_ERROR": [RNOHError],
+    "TOGGLE_ELEMENT_INSPECTOR",
+    "DEV_MENU_SHOWN",
+    "DID_PRESS_MENU_ITEM": [item: DevMenuItem],
+    "OPEN_URL": [url: string, onError: () => void],
   }>()
 
   private logger: RNOHLogger;
+  protected lastError: RNOHError | null = null
 
-  constructor(private rnInstanceRegistry: RNInstanceRegistry, logger: RNOHLogger) {
+  constructor(logger: RNOHLogger) {
     this.logger = logger.clone("DevMenu");
   }
 
@@ -30,21 +40,15 @@ export class DevToolsController {
   }
 
   toggleElementInspector(): void {
-    this.rnInstanceRegistry.forEach(rnInstance => {
-      rnInstance.emitDeviceEvent("toggleElementInspector", {});
-    })
+    this.eventEmitter.emit("TOGGLE_ELEMENT_INSPECTOR");
   }
 
   emitDevMenuShown(): void {
-    this.rnInstanceRegistry.forEach(rnInstance => {
-      rnInstance.emitDeviceEvent("RCTDevMenuShown", {});
-    })
+    this.eventEmitter.emit("DEV_MENU_SHOWN");
   }
 
   emitDidPressMenuItem(title: string): void {
-    this.rnInstanceRegistry.forEach(rnInstance => {
-      rnInstance.emitDeviceEvent("didPressMenuItem", { title: title });
-    })
+    this.eventEmitter.emit("DID_PRESS_MENU_ITEM", { title })
   }
 
   dismissRNOHErrorDialog(): void {
@@ -52,22 +56,22 @@ export class DevToolsController {
   }
 
   openDebugger(): void {
-    this.rnInstanceRegistry.forEach(instance => {
-      DevServerHelper.openUrl(
-        "flipper://null/Hermesdebuggerrn?device=React%20Native",
-        instance.getInitialBundleUrl(),
-        () => this.logger.error("Failed to open Flipper. Please check that Metro is running.")
-      );
-    })
+    this.eventEmitter.emit(
+      "OPEN_URL",
+      "flipper://null/Hermesdebuggerrn?device=React%20Native",
+      () => this.logger.error("Failed to open Flipper. Please check that Metro is running.")
+    )
   }
 
   openDevTools(): void {
-    this.rnInstanceRegistry.forEach(instance => {
-      DevServerHelper.openUrl(
-        "flipper://null/React?device=React%20Native",
-        instance.getInitialBundleUrl(),
-        () => this.logger.error("Failed to open Flipper. Please check that Metro is running.")
-      );
-    })
+    this.eventEmitter.emit(
+      "OPEN_URL",
+      "flipper://null/React?device=React%20Native",
+      () => this.logger.error("Failed to open Flipper. Please check that Metro is running.")
+    )
+  }
+
+  getLastError(): RNOHError | null {
+    return this.lastError
   }
 }

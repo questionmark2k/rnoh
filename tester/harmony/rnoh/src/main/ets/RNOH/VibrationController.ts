@@ -1,7 +1,7 @@
 import vibrator from '@ohos.vibrator'
 import { RNOHLogger } from "./RNOHLogger"
 
-export class Vibration {
+export class VibrationController {
   private logger: RNOHLogger
 
   constructor(logger: RNOHLogger) {

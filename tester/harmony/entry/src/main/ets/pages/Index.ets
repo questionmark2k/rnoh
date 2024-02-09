@@ -80,7 +80,7 @@ struct Index {
     Column() {
       if (this.rnAbility && this.shouldShow) {
         if (this.rnAbility.isDebugModeEnabled()) {
-          RNOHErrorDialog()
+          RNOHErrorDialog({ ctx: this.rnAbility.rnohCoreContext })
         }
         RNApp({
           rnInstanceConfig: { createRNPackages },

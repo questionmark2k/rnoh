@@ -47,7 +47,7 @@ struct ModalHostViewDialog {
   }
 
   updateState() {
-    const windowPhysicalPixels = this.ctx.rnAbility.getDisplayMetrics()
+    const windowPhysicalPixels = this.ctx.getDisplayMetrics()
       .windowPhysicalPixels;
     const height = px2vp(windowPhysicalPixels.height);
     const width = px2vp(windowPhysicalPixels.width);

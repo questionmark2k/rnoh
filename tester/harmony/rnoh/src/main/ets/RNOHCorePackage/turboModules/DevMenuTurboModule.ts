@@ -13,11 +13,11 @@ export class DevMenuTurboModule extends TurboModule {
   }
 
   public show() {
-    this.ctx.rnAbility.devMenu.show()
+    this.ctx.devMenu.show()
   }
 
   public reload() {
-    this.ctx.rnAbility.devToolsController.reload(undefined)
+    this.ctx.devToolsController.reload(undefined)
   }
 
   public debugRemotely(enableDebug: boolean) {

@@ -14,12 +14,12 @@ export class DevSettingsTurboModule extends TurboModule {
 
   public reload() {
     this.ctx.logger.clone("reload").debug()
-    this.ctx.rnAbility.devToolsController.reload(undefined)
+    this.ctx.devToolsController.reload(undefined)
   }
 
   public reloadWithReason(reason: string) {
     this.ctx.logger.clone("reloadWithReason").debug(reason)
-    this.ctx.rnAbility.devToolsController.reload(reason)
+    this.ctx.devToolsController.reload(reason)
   }
 
   public onFastRefresh() {
@@ -43,7 +43,7 @@ export class DevSettingsTurboModule extends TurboModule {
   }
 
   public addMenuItem(title: string) {
-    this.ctx.rnAbility.devMenu.addMenuItem(title);
+    this.ctx.devMenu.addMenuItem(title);
   }
 
   public addListener(eventName: string) {

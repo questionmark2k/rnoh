@@ -1,18 +1,16 @@
-import { RNAbility, Edges, RNOHError, FatalRNOHError, createSafeAreaInsets } from "./RNOH"
+import { Edges, RNOHError, FatalRNOHError, SafeAreaInsetsProvider } from "./RNOH"
+import { RNOHCoreContext } from './RNOH/RNOHCoreContext'
+import { DevToolsController } from './RNOH/DevToolsController'
 
 
 @Component
 export struct RNOHErrorDialog {
   public controller!: CustomDialogController
+  public ctx!: RNOHCoreContext
   private isOpened: boolean = false
   private cleanUpListeners: (() => void)[] = []
-  @StorageLink('RNAbility') private rnAbility: RNAbility | undefined = undefined
 
   aboutToAppear(): void {
-    if (!this.rnAbility) {
-      console.error("#RNOH", "RNOHErrorDialog couldn't find RNAbility. Did your Ability extends RNAbility?")
-      return;
-    }
     this.controller = new CustomDialogController({
       cornerRadius: 0,
       customStyle: true,
@@ -22,22 +20,27 @@ export struct RNOHErrorDialog {
       alignment: DialogAlignment.TopStart,
       backgroundColor: Color.Transparent,
       builder: RNOHErrorCustomDialog({
-        rnAbility: this.rnAbility!,
+        devToolsController: this.ctx.devToolsController,
+        safeAreaInsetsProvider: this.ctx.safeAreaInsetsProvider,
         onClose: () => {
           this.isOpened = false
         }
       })
     })
-    this.cleanUpListeners.push(this.rnAbility!.eventEmitter.subscribe("NEW_ERROR", (err) => {
-      if (!this.isOpened) {
-        this.controller.open()
-        this.isOpened = true
-      }
-    }))
-    this.cleanUpListeners.push(this.rnAbility.devToolsController.eventEmitter.subscribe("DISMISS_RNOH_ERROR_DIALOG", () => {
-      this.controller.close()
-      this.isOpened = false
-    }))
+    this.cleanUpListeners.push(this.ctx.devToolsController.eventEmitter.subscribe(
+      "NEW_ERROR",
+      (_err) => {
+        if (!this.isOpened) {
+          this.controller.open()
+          this.isOpened = true
+        }
+      }))
+    this.cleanUpListeners.push(this.ctx.devToolsController.eventEmitter.subscribe(
+      "DISMISS_RNOH_ERROR_DIALOG",
+      () => {
+        this.controller.close()
+        this.isOpened = false
+      }))
   }
 
   aboutToDisappear(): void {
@@ -53,7 +56,8 @@ const GUTTER = 16
 @CustomDialog
 struct RNOHErrorCustomDialog {
   public controller!: CustomDialogController
-  public rnAbility!: RNAbility
+  public devToolsController!: DevToolsController
+  public safeAreaInsetsProvider!: SafeAreaInsetsProvider
   public onClose: () => void = () => {
   }
   private cleanUpListeners: (() => void)[] = []
@@ -61,16 +65,21 @@ struct RNOHErrorCustomDialog {
   @State private lastError: RNOHError | null = null
 
   aboutToAppear(): void {
-    const lastError = this.rnAbility.getLastError()
+    const lastError = this.devToolsController.getLastError()
     if (lastError) {
       this.handleError(lastError)
     }
-    this.cleanUpListeners.push(this.rnAbility.eventEmitter.subscribe("NEW_ERROR", (err: RNOHError) => {
-      this.handleError(err)
-    }))
-    createSafeAreaInsets(this.rnAbility.context, false).then((insets) => {
-      this.insets = insets
-    })
+    this.cleanUpListeners.push(this.devToolsController.eventEmitter.subscribe(
+      "NEW_ERROR",
+      (err: RNOHError) => {
+        this.handleError(err)
+      }))
+    this.insets = this.safeAreaInsetsProvider.safeAreaInsets
+    this.cleanUpListeners.push(this.safeAreaInsetsProvider.eventEmitter.subscribe(
+      "SAFE_AREA_INSETS_CHANGE",
+      (insets) => {
+        this.insets = insets
+      }))
   }
 
   aboutToDisappear(): void {
@@ -203,7 +212,7 @@ struct RNOHErrorCustomDialog {
           this.buildButton("Dismiss", () => {
           })
           this.buildButton("Reload", () => {
-            this.rnAbility.devToolsController.reload()
+            this.devToolsController.reload()
           })
         }
         .width("100%")

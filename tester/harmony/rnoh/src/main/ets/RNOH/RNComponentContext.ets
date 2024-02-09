@@ -45,8 +45,7 @@ export class RNComponentContext extends RNOHContext {
     super(
       rnohContext.reactNativeVersion,
       rnohContext.rnInstance as RNInstanceImpl,
-      rnohContext.logger,
-      rnohContext.rnAbility,
+      rnohContext,
     )
     this.wrappedCustomRNComponentBuilder = wrappedCustomRNComponentBuilder
     this.wrappedRNChildrenBuilder = wrapBuilder(buildRNChildren)

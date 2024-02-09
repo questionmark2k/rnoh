@@ -1,5 +1,4 @@
 import hilog from '@ohos.hilog';
-import type { RNAbility } from "./RNAbility"
 import { RNOHError } from "./RNOHError"
 
 export interface RNOHLogger {
@@ -129,7 +128,12 @@ export class StandardRNOHLogger implements RNOHLogger {
     fatal: 4,
   }
 
-  constructor(private rnAbility: RNAbility, private minSeverity: Severity = "debug", protected pathSegments: string[] = [], protected tracer: Tracer | undefined = undefined) {
+  constructor(
+    private onRNOHError: (error: RNOHError) => void = () => {
+    },
+    private minSeverity: Severity = "debug",
+    protected pathSegments: string[] = [],
+    protected tracer: Tracer | undefined = undefined) {
     const formattedPath = this.formatPathSegments(pathSegments)
     if (formattedPath) {
       this.formattedPath = `${formattedPath} `
@@ -167,7 +171,7 @@ export class StandardRNOHLogger implements RNOHLogger {
   private maybeHandleRNOHError(args: any[]) {
     for (let arg of args) {
       if (arg instanceof RNOHError) {
-        this.rnAbility.reportError(arg)
+        this.onRNOHError(arg)
       }
       return;
     }
@@ -225,7 +229,7 @@ export class StandardRNOHLogger implements RNOHLogger {
 
   public clone(pathSegment: string | string[]): RNOHLogger {
     const newPathSegments = Array.isArray(pathSegment) ? pathSegment : [pathSegment]
-    return new StandardRNOHLogger(this.rnAbility, this.minSeverity, [...this.pathSegments, ...newPathSegments], this.tracer)
+    return new StandardRNOHLogger(this.onRNOHError, this.minSeverity, [...this.pathSegments, ...newPathSegments], this.tracer)
   }
 
   private formatPathSegments(pathSegments: string[]): string | null {

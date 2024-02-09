@@ -6,7 +6,7 @@ export class DeviceInfoTurboModule extends TurboModule {
   public static readonly NAME = 'DeviceInfo';
 
   static async create(ctx: TurboModuleContext) {
-    const initialDisplayMetrics = ctx.rnAbility.getDisplayMetrics();
+    const initialDisplayMetrics = ctx.getDisplayMetrics();
     return new DeviceInfoTurboModule(ctx, initialDisplayMetrics)
   }
 
@@ -17,7 +17,7 @@ export class DeviceInfoTurboModule extends TurboModule {
     super(ctx);
     this.displayMetrics = initialDisplayMetrics;
     const updateDisplayMetrics = () => {
-      this.displayMetrics = this.ctx.rnAbility.getDisplayMetrics();
+      this.displayMetrics = this.ctx.getDisplayMetrics();
       this.ctx.rnInstance.emitDeviceEvent("didUpdateDimensions", this.displayMetrics);
     }
     this.cleanUpCallbacks.push(

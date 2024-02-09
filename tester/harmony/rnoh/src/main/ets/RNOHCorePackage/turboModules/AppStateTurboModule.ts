@@ -1,4 +1,3 @@
-import { LifecycleState } from '../../RNOH/ts';
 import type { TurboModuleContext } from "../../RNOH/TurboModule";
 import { TurboModule } from "../../RNOH/TurboModule";
 
@@ -20,7 +19,7 @@ export class AppStateTurboModule extends TurboModule {
   }
 
   private getAppState() {
-    const isActive = this.ctx.rnAbility.getAbilityState();
+    const isActive = this.ctx.getUIAbilityState();
 
     return isActive === "FOREGROUND" ? 'active' : 'background';
   }

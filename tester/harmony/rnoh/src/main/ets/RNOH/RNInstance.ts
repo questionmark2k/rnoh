@@ -181,6 +181,7 @@ export class RNInstanceImpl implements RNInstance {
     this.componentManagerRegistry = new ComponentManagerRegistry(this.injectedLogger);
     this.componentCommandHub = new RNComponentCommandHub();
     this.responderLockDispatcher = new ResponderLockDispatcher(this.componentManagerRegistry, this.componentCommandHub, this.injectedLogger)
+    this.subscribeToDevTools();
   }
 
   public async onDestroy() {
@@ -379,7 +380,7 @@ export class RNInstanceImpl implements RNInstance {
       }
       const isRemoteBundle = bundleURL.startsWith("http")
       if (this.shouldEnableDebugger && isRemoteBundle) {
-          DevServerHelper.connectToDevServer(bundleURL, this.logger, this.napiBridge.getInspectorWrapper());
+        DevServerHelper.connectToDevServer(bundleURL, this.logger, this.napiBridge.getInspectorWrapper());
       }
       this.bundleExecutionStatusByBundleURL.set(bundleURL, "DONE")
       this.lifecycleEventEmitter.emit("JS_BUNDLE_EXECUTION_FINISH", {
@@ -470,8 +471,18 @@ export class RNInstanceImpl implements RNInstance {
     return descriptorType
   }
 
-  getInitialBundleUrl(): string | undefined {
+  public getInitialBundleUrl(): string | undefined {
     return this.initialBundleUrl
+  }
+
+  private subscribeToDevTools() {
+    const emitter = this.devToolsController.eventEmitter;
+    emitter.subscribe("TOGGLE_ELEMENT_INSPECTOR", () => this.emitDeviceEvent("toggleElementInspector", {}))
+    emitter.subscribe("DEV_MENU_SHOWN", () => this.emitDeviceEvent("RCTDevMenuShown", {}))
+    emitter.subscribe("DID_PRESS_MENU_ITEM", (item) => this.emitDeviceEvent("didPressMenuItem", item))
+    emitter.subscribe("OPEN_URL", (url, onError) => {
+      DevServerHelper.openUrl(url, this.getInitialBundleUrl(), onError);
+    })
   }
 }
 

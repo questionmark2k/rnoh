@@ -69,7 +69,7 @@ export class ExceptionsManagerTurboModule extends TurboModule {
   }
 
   dismissRedbox(): void {
-    this.ctx.rnAbility.devToolsController.dismissRNOHErrorDialog()
+    this.ctx.devToolsController.dismissRNOHErrorDialog()
   }
 }
 

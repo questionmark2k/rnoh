@@ -1,22 +1,38 @@
-import { RNAbility } from "./RNAbility"
-import { SafeAreaInsets, createSafeAreaInsets } from "./SafeAreaInsets"
+import { RNOHCoreContext } from './RNOHCoreContext'
+import { SafeAreaInsets } from "./SafeAreaInsetsProvider"
 
 @Component
 export struct RNDevLoadingView {
   public useSafeAreaInsets: boolean = false
-  @StorageLink('RNAbility') private rnAbility: RNAbility = {} as RNAbility
+  public ctx!: RNOHCoreContext
   private cleanUpCallbacks: (() => void)[] = []
   @State private message: string = ""
   @State private safeAreaInsets: SafeAreaInsets | undefined = undefined
 
   aboutToAppear() {
-    createSafeAreaInsets(this.rnAbility.context, false).then(safeAreaInsets => this.safeAreaInsets = safeAreaInsets)
-    this.cleanUpCallbacks.push(this.rnAbility.devToolsController.eventEmitter.subscribe("SHOW_DEV_LOADING_VIEW", (_rnInstanceId, msg) => {
-      this.message = msg
-    }))
-    this.cleanUpCallbacks.push(this.rnAbility.devToolsController.eventEmitter.subscribe("HIDE_DEV_LOADING_VIEW", () => {
-      this.message = ""
-    }))
+    if (this.ctx.safeAreaInsetsProvider !== undefined) {
+      this.safeAreaInsets = this.ctx.safeAreaInsetsProvider.safeAreaInsets
+      this.cleanUpCallbacks.push(
+        this.ctx.safeAreaInsetsProvider.eventEmitter.subscribe(
+          "SAFE_AREA_INSETS_CHANGE",
+          (insets) => {
+            this.safeAreaInsets = insets
+          }))
+    } else {
+      this.safeAreaInsets = { top: 0, bottom: 0, left: 0, right: 0 }
+    }
+    this.cleanUpCallbacks.push(
+      this.ctx.devToolsController.eventEmitter.subscribe(
+        "SHOW_DEV_LOADING_VIEW",
+        (_rnInstanceId, msg) => {
+          this.message = msg
+        }))
+    this.cleanUpCallbacks.push(
+      this.ctx.devToolsController.eventEmitter.subscribe(
+        "HIDE_DEV_LOADING_VIEW",
+        () => {
+          this.message = ""
+        }))
   }
 
   aboutToDisappear(): void {

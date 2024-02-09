@@ -2,8 +2,6 @@ import uri from '@ohos.uri';
 import call from '@ohos.telephony.call';
 import type { TurboModuleContext } from "../../RNOH/TurboModule";
 import { TurboModule } from "../../RNOH/TurboModule";
-import type { RNAbility } from '../../RNOH/RNAbility';
-import bundleManager from '@ohos.bundle.bundleManager';
 import type Want from '@ohos.app.ability.Want';
 
 export class LinkingManagerTurboModule extends TurboModule {
@@ -15,8 +13,7 @@ export class LinkingManagerTurboModule extends TurboModule {
 
   constructor(ctx: TurboModuleContext) {
     super(ctx);
-    const rnAbility = AppStorage.get<RNAbility>("RNAbility");
-    this.initialUrl = rnAbility.launchWant.uri;
+    this.initialUrl = ctx.launchUri;
   }
 
   async getInitialURL(): Promise<string | undefined> {

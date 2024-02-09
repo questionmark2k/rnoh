@@ -9,14 +9,12 @@ import type { TurboModuleProvider } from './TurboModuleProvider';
 import { RNInstanceRegistry } from './RNInstanceRegistry';
 import { RNInstance, RNInstanceImpl, RNInstanceOptions } from './RNInstance';
 import { RNOHContext } from './RNOHContext';
-import { DevToolsController } from './DevToolsController';
-import { DevMenu } from './DevMenu';
 import { JSPackagerClient, JSPackagerClientConfig } from './JSPackagerClient';
 import { RNOHError } from './RNOHError';
-import { EventEmitter } from './EventEmitter';
 import { DisplayMetrics } from './types';
 import { DisplayMetricsManager } from './DisplayMetricsManager';
-import { Vibration } from "./Vibration"
+import Want from '@ohos.app.ability.Want';
+import { RNOHCoreContext } from './RNOHCoreContext';
 
 const RNOH_BANNER = '\n\n\n' +
   '██████╗ ███╗   ██╗ ██████╗ ██╗  ██╗' + '\n' +
@@ -26,11 +24,9 @@ const RNOH_BANNER = '\n\n\n' +
   '██║  ██║██║ ╚████║╚██████╔╝██║  ██║' + '\n' +
   '╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝' + '\n\n'
 
-  
 
 export abstract class RNAbility extends UIAbility {
-  public eventEmitter: EventEmitter<{ "NEW_ERROR": [RNOHError] }> = new EventEmitter()
-  protected lastError: RNOHError | null = null
+  public launchUri?: string
   protected storage: LocalStorage
   protected napiBridge: NapiBridge = null
   protected turboModuleProvider: TurboModuleProvider
@@ -45,17 +41,16 @@ export abstract class RNAbility extends UIAbility {
   protected displayMetricsManager: DisplayMetricsManager = undefined
   private unregisterWindowListenerCallback: (() => void) | undefined = undefined;
 
-  public devToolsController: DevToolsController
-  public devMenu: DevMenu
+  public rnohCoreContext: RNOHCoreContext;
   private inForeground: boolean = false;
-  public vibration: Vibration
 
-  onCreate(_want, _param) {
+  onCreate(want: Want, _param) {
     this.initializationDateTime = new Date()
     this.providedLogger = this.createLogger()
     this.providedLogger.info(RNOH_BANNER)
     this.logger = this.providedLogger.clone("RNAbility")
     const stopTracing = this.logger.clone("onCreate").startTracing()
+    this.launchUri = want.uri
     this.napiBridge = new NapiBridge(libRNOHApp, this.providedLogger)
     const { isDebugModeEnabled } = this.napiBridge.onInit(this.shouldCleanUpRNInstance__hack())
     this.isDebugModeEnabled_ = isDebugModeEnabled
@@ -72,15 +67,24 @@ export abstract class RNAbility extends UIAbility {
       (rnInstance) => this.createRNOHContext({
         rnInstance
       }))
-    this.devToolsController = new DevToolsController(this.rnInstanceRegistry, this.providedLogger)
-    this.devMenu = new DevMenu(this.devToolsController, this.context, this.providedLogger)
-    this.jsPackagerClient = new JSPackagerClient(this.providedLogger, this.devToolsController, this.devMenu)
+    this.rnohCoreContext = RNOHCoreContext.create(
+      this.getDisplayMetrics.bind(this),
+      this.getUIAbilityState.bind(this),
+      this.markReadiness.bind(this),
+      this.launchUri,
+      this.providedLogger,
+      this.context
+    );
+    this.jsPackagerClient = new JSPackagerClient(
+      this.providedLogger,
+      this.rnohCoreContext.devToolsController,
+      this.rnohCoreContext.devMenu
+    )
     const jsPackagerClientConfig = this.getJSPackagerClientConfig()
     if (jsPackagerClientConfig) {
       this.jsPackagerClient.connectToMetroMessages(jsPackagerClientConfig)
     }
     this.displayMetricsManager = new DisplayMetricsManager(this.logger);
-    this.vibration = new Vibration(this.providedLogger);
     AppStorage.setOrCreate('RNAbility', this)
     stopTracing()
   }
@@ -93,17 +97,12 @@ export abstract class RNAbility extends UIAbility {
     stopTracing()
   }
 
-  public getLastError(): RNOHError | null {
-    return this.lastError
-  }
-
   public isDebugModeEnabled() {
     return this.isDebugModeEnabled_
   }
 
   public reportError(err: RNOHError) {
-    this.lastError = err
-    this.eventEmitter.emit("NEW_ERROR", err)
+    this.rnohCoreContext.devToolsController.eventEmitter.emit("NEW_ERROR", err)
   }
 
   protected getJSPackagerClientConfig(): JSPackagerClientConfig | null {
@@ -131,7 +130,7 @@ export abstract class RNAbility extends UIAbility {
     const stopTracing = this.logger.clone("createAndRegisterRNInstance").startTracing()
     const result = await this.rnInstanceRegistry.createInstance({
       enableDebugger: this.isDebugModeEnabled_,
-      devToolsController: this.devToolsController,
+      devToolsController: this.rnohCoreContext.devToolsController,
       ...options,
     })
     stopTracing()
@@ -151,11 +150,14 @@ export abstract class RNAbility extends UIAbility {
     if (!(rnInstance instanceof RNInstanceImpl)) {
       throw new Error("RNInstance must extend RNInstanceImpl")
     }
-    return new RNOHContext("0.72.5", rnInstance, this.providedLogger, this)
+    return new RNOHContext(
+      "0.72.5",
+      rnInstance,
+      this.rnohCoreContext)
   }
 
   protected createLogger(): RNOHLogger {
-    return new StandardRNOHLogger(this);
+    return new StandardRNOHLogger(this.reportError.bind(this));
   }
 
   public getLogger(): RNOHLogger {
@@ -239,7 +241,7 @@ export abstract class RNAbility extends UIAbility {
     stopTracing()
   }
 
-  public getAbilityState(): "FOREGROUND" | "BACKGROUND" {
+  public getUIAbilityState(): "FOREGROUND" | "BACKGROUND" {
     return this.inForeground ? "FOREGROUND" : "BACKGROUND";
   }
 

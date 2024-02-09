@@ -1,6 +1,5 @@
-import WindowUtils from '@ohos.window';
 import type { TurboModuleContext, SafeAreaInsets } from "../../RNOH/ts";
-import { TurboModule, createSafeAreaInsets } from "../../RNOH/ts";
+import { TurboModule } from "../../RNOH/ts";
 import { StatusBarTurboModule } from "./StatusBarTurboModule"
 
 
@@ -11,30 +10,25 @@ export interface StatusBarStatusProvider {
 export class SafeAreaTurboModule extends TurboModule {
   public static readonly NAME = 'SafeAreaTurboModule';
 
+  private initialInsets: SafeAreaInsets
+
   static async create(ctx: TurboModuleContext, statusBarTurboModule: StatusBarTurboModule) {
-    const initialInsets = await createSafeAreaInsets(ctx.uiAbilityContext, statusBarTurboModule.isStatusBarHidden())
-    const window = await WindowUtils.getLastWindow(ctx.uiAbilityContext)
-    return new SafeAreaTurboModule(ctx, initialInsets, window, statusBarTurboModule)
+    return new SafeAreaTurboModule(ctx, statusBarTurboModule)
   }
 
-
-  constructor(ctx: TurboModuleContext, private initialInsets: SafeAreaInsets, private window: WindowUtils.Window, statusBarTurboModule: StatusBarTurboModule) {
+  constructor(ctx: TurboModuleContext, statusBarTurboModule: StatusBarTurboModule) {
     super(ctx)
-    window.on("avoidAreaChange", this.onSafeAreaChange.bind(this))
+    this.initialInsets = ctx.safeAreaInsetsProvider.safeAreaInsets;
+    ctx.safeAreaInsetsProvider.eventEmitter.subscribe("SAFE_AREA_INSETS_CHANGE", this.onSafeAreaChange.bind(this))
     // Hiding/Showing StatusBar is reflected immediately in SafeAreaView
-    statusBarTurboModule.subscribe("SYSTEM_BAR_VISIBILITY_CHANGE", this.onSafeAreaChange.bind(this))
+    statusBarTurboModule.subscribe("SYSTEM_BAR_VISIBILITY_CHANGE", () => ctx.safeAreaInsetsProvider.onSafeAreaChange())
   }
 
-  private onSafeAreaChange() {
-    createSafeAreaInsets(this.ctx.uiAbilityContext, this.ctx.rnInstance.getTurboModule<StatusBarTurboModule>(StatusBarTurboModule.NAME).isStatusBarHidden()).then((insets) => {
-      this.ctx.rnInstance.emitDeviceEvent("SAFE_AREA_INSETS_CHANGE", insets);
-    })
+  private onSafeAreaChange(insets: SafeAreaInsets) {
+    this.ctx.rnInstance.emitDeviceEvent("SAFE_AREA_INSETS_CHANGE", insets);
   }
 
   public getInitialInsets(): SafeAreaInsets {
     return this.initialInsets
   }
 }
-
-
-
