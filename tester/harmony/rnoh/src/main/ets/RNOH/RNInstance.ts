@@ -7,7 +7,7 @@ import { SurfaceHandle } from './SurfaceHandle'
 import { TurboModuleProvider } from './TurboModuleProvider'
 import { EventEmitter } from './EventEmitter'
 import type { RNOHLogger } from './RNOHLogger'
-import type { NapiBridge } from './NapiBridge'
+import type { NapiBridge, CppFeatureFlag } from './NapiBridge'
 import type { RNOHContext } from './RNOHContext'
 import { RNOHCorePackage } from '../RNOHCorePackage/ts'
 import type { JSBundleProvider } from './JSBundleProvider'
@@ -72,7 +72,7 @@ const rootDescriptor = {
   }
 }
 
-type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP"
+type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS"
 
 export interface RNInstance {
   descriptorRegistry: DescriptorRegistry;
@@ -136,6 +136,7 @@ export type RNInstanceOptions = {
   createRNPackages: (ctx: RNPackageContext) => RNPackage[],
   enableDebugger?: boolean,
   enableBackgroundExecutor?: boolean,
+  enableNDKTextMeasuring?: boolean,
 }
 
 
@@ -172,8 +173,12 @@ export class RNInstanceImpl implements RNInstance {
     private createRNOHContext: (rnInstance: RNInstance) => RNOHContext,
     private shouldEnableDebugger: boolean,
     private shouldEnableBackgroundExecutor: boolean,
+    private shouldUseNDKToMeasureText: boolean,
   ) {
     this.logger = injectedLogger.clone("RNInstance")
+    if (this.shouldUseNDKToMeasureText) {
+      this.enableFeatureFlag("NDK_TEXT_MEASUREMENTS")
+    }
     this.onCreate()
   }
 
@@ -225,6 +230,10 @@ export class RNInstanceImpl implements RNInstance {
       descriptorWrapperFactoryByDescriptorType,
       this.logger,
     );
+    const cppFeatureFlags: CppFeatureFlag[] = []
+    if (this.shouldUseNDKToMeasureText) {
+      cppFeatureFlags.push("ENABLE_NDK_TEXT_MEASURING")
+    }
     this.napiBridge.createReactNativeInstance(
       this.id,
       this.turboModuleProvider,
@@ -252,6 +261,7 @@ export class RNInstanceImpl implements RNInstance {
       },
       this.shouldEnableDebugger,
       this.shouldEnableBackgroundExecutor,
+      this.shouldUseNDKToMeasureText ? ["ENABLE_NDK_TEXT_MEASURING"] : [],
     )
     stopTracing()
   }

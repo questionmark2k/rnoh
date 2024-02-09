@@ -61,7 +61,7 @@ static napi_value getNextRNInstanceId(napi_env env, napi_callback_info info) {
 static napi_value createReactNativeInstance(napi_env env, napi_callback_info info) {
     LOG(INFO) << "createReactNativeInstance";
     ArkJS arkJs(env);
-    auto args = arkJs.getCallbackArgs(info, 8);
+    auto args = arkJs.getCallbackArgs(info, 9);
     size_t instanceId = arkJs.getDouble(args[0]);
     auto arkTsTurboModuleProviderRef = arkJs.createReference(args[1]);
     auto mutationsListenerRef = arkJs.createReference(args[2]);
@@ -70,6 +70,10 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
     auto measureTextFnRef = arkJs.createReference(args[5]);
     auto shouldEnableDebugger = arkJs.getBoolean(args[6]);
     auto shouldEnableBackgroundExecutor = arkJs.getBoolean(args[7]);
+    auto featureFlagRegistry = std::make_shared<FeatureFlagRegistry>();
+    for (auto featureFlagNameAndStatus : arkJs.getObjectProperties(args[8])) {
+        featureFlagRegistry->setFeatureFlagStatus(arkJs.getString(featureFlagNameAndStatus.first), arkJs.getBoolean(featureFlagNameAndStatus.second));
+    }
     auto rnInstance = createRNInstance(
         instanceId,
         env,
@@ -104,6 +108,7 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
         },
         measureTextFnRef,
         eventDispatcherRef,
+        featureFlagRegistry,
         uiTicker,
         shouldEnableDebugger,
         shouldEnableBackgroundExecutor);

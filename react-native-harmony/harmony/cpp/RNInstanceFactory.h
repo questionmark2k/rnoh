@@ -22,6 +22,7 @@
 #include "RNOH/TextMeasurer.h"
 #include "RNOH/UITicker.h"
 #include "RNOH/ArkTSChannel.h"
+#include "RNOH/FeatureFlagRegistry.h"
 
 using namespace rnoh;
 
@@ -32,6 +33,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
                                              MountingManager::CommandDispatcher &&commandDispatcher,
                                              napi_ref measureTextFnRef,
                                              napi_ref napiEventDispatcherRef,
+                                             FeatureFlagRegistry::Shared featureFlagRegistry,
                                              UITicker::Shared uiTicker,
                                              bool shouldEnableDebugger,
                                              bool shouldEnableBackgroundExecutor) {
@@ -66,7 +68,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
     });
 
     auto contextContainer = std::make_shared<facebook::react::ContextContainer>();
-    auto textMeasurer = std::make_shared<TextMeasurer>(env, measureTextFnRef, taskExecutor);
+    auto textMeasurer = std::make_shared<TextMeasurer>(env, measureTextFnRef, taskExecutor, featureFlagRegistry);
     auto shadowViewRegistry = std::make_shared<ShadowViewRegistry>();
     contextContainer->insert("textLayoutManagerDelegate", textMeasurer);
     PackageProvider packageProvider;

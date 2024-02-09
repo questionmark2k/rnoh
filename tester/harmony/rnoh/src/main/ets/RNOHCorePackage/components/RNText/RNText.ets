@@ -1,6 +1,7 @@
 import { RNOHContext, PLACEHOLDER_SYMBOL, CustomComponentBuilder } from '../../../RNOH'
 import { RNSimpleText } from './RNSimpleText'
 import { RNParagraph } from './RNParagraph'
+import { RNParagraphExperimental } from './RNParagraphExperimental'
 import { TextDescriptor } from './types'
 import { RNParagraphManager } from './RNParagraphManager'
 
@@ -39,7 +40,21 @@ export struct RNText {
     if (this.descriptor.props.fragments.length <= 1 && !this.descriptor.props.fragments.some(fragment => fragment.text === PLACEHOLDER_SYMBOL)) {
       RNSimpleText({ ctx: this.ctx, tag: this.tag, componentManager: this.componentManager })
     } else {
-      RNParagraph({ ctx: this.ctx, tag: this.tag, componentManager: this.componentManager, buildCustomComponent: this.buildCustomComponent })
+      if (this.ctx.rnInstance.isFeatureFlagEnabled("NDK_TEXT_MEASUREMENTS")) {
+        RNParagraphExperimental({
+          ctx: this.ctx,
+          tag: this.tag,
+          componentManager: this.componentManager,
+          buildCustomComponent: this.buildCustomComponent
+        })
+      } else {
+        RNParagraph({
+          ctx: this.ctx,
+          tag: this.tag,
+          componentManager: this.componentManager,
+          buildCustomComponent: this.buildCustomComponent
+        })
+      }
     }
   }
 }

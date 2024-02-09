@@ -33,6 +33,7 @@ export class RNInstanceRegistry {
       this.createRNOHContext,
       options.enableDebugger ?? false,
       options.enableBackgroundExecutor ?? false,
+      options.enableNDKTextMeasuring ?? false,
     )
     await instance.initialize(options.createRNPackages({}))
     this.instanceMap.set(id, instance)

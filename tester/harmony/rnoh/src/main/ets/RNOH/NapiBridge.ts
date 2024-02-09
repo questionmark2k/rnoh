@@ -8,6 +8,7 @@ import { RNOHLogger } from "./RNOHLogger"
 import type { InspectorInstance } from './types'
 import { FatalRNOHError } from "./RNOHError"
 
+export type CppFeatureFlag = "ENABLE_NDK_TEXT_MEASURING"
 
 export class NapiBridge {
   private logger: RNOHLogger
@@ -41,7 +42,12 @@ export class NapiBridge {
                             onCppMessage: (type: string, payload: any) => void,
                             shouldEnableDebugger: boolean,
                             shouldEnableBackgroundExecutor: boolean,
+                            cppFeatureFlags: CppFeatureFlag[]
   ) {
+    const cppFeatureFlagStatusByName = cppFeatureFlags.reduce((acc, cppFeatureFlag) => {
+      acc[cppFeatureFlag] = true
+      return acc
+    }, {} as Record<CppFeatureFlag, boolean>)
     this.libRNOHApp?.createReactNativeInstance(
       instanceId,
       turboModuleProvider,
@@ -60,7 +66,9 @@ export class NapiBridge {
         }
       },
       shouldEnableDebugger,
-      shouldEnableBackgroundExecutor);
+      shouldEnableBackgroundExecutor,
+      cppFeatureFlagStatusByName,
+    );
   }
 
   destroyReactNativeInstance(instanceId: number) {
