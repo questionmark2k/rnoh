@@ -1,6 +1,13 @@
 import { convertColorSegmentsToString, Descriptor, RNOHContext } from '../../../RNOH';
 import { RNViewBase } from '../RNViewBase';
-import { TextInputEvent, TextInputProps, TextInputRawProps, TextInputState } from './types';
+import {
+  Selection,
+  TextInputEvent,
+  TextInputKeyEvent,
+  TextInputProps,
+  TextInputRawProps,
+  TextInputState
+} from './types';
 import { TextInputDescriptorWrapper } from './TextInputDescriptorWrapper';
 import { stringToFontStyle } from '../RNText/conversions';
 import { RNOHEventEmitRequestHandlerName, RNViewManager } from '../..';
@@ -93,10 +100,21 @@ export struct RNTextInput {
   private shouldIgnoreNextValueChange: boolean = false
   private componentManager!: RNViewManager
   private nativeEventCount: number = 0
+  private textWasPastedOrCut: boolean = false
+  private selection: Selection = { start: 0, end: 0 }
+  private valueChanged: boolean = false
 
   createTextInputEvent(): TextInputEvent {
     const event: TextInputEvent = {
       text: this.value,
+      eventCount: ++this.nativeEventCount,
+    };
+    return event;
+  }
+
+  createTextInputKeyEvent(key: string): TextInputKeyEvent {
+    const event: TextInputKeyEvent = {
+      key,
       eventCount: ++this.nativeEventCount,
     };
     return event;
@@ -108,7 +126,7 @@ export struct RNTextInput {
       this.shouldIgnoreNextValueChange = false;
     }
     else {
-      this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, RNOHEventEmitRequestHandlerName.TextInputChange, this.createTextInputEvent())
+      this.valueChanged = true;
     }
   }
 
@@ -197,9 +215,52 @@ export struct RNTextInput {
   getCancelButton(): CancelButtonOptions {
     const clearButtonMode = this.descriptorWrapper?.clearButtonMode;
     if (clearButtonMode === 'always') {
-      return {style: CancelButtonStyle.INPUT};
+      return { style: CancelButtonStyle.INPUT };
     }
-    return {style: CancelButtonStyle.INVISIBLE};
+    return { style: CancelButtonStyle.INVISIBLE };
+  }
+
+  onPaste(): void {
+    this.textWasPastedOrCut = true;
+  }
+
+  dispatchKeyEvent(currentSelection: Selection): void {
+    if (this.textWasPastedOrCut) {
+      this.textWasPastedOrCut = false;
+    }
+    else if (this.valueChanged) {
+      const noPreviousSelection = this.selection.start === this.selection.end;
+      const cursorDidNotMove = currentSelection.start === this.selection.start;
+      const cursorMovedBackwardsOrAtBeginningOfInput = (currentSelection.start < this.selection.start) || currentSelection.start <= 0;
+      if (!cursorMovedBackwardsOrAtBeginningOfInput && (noPreviousSelection || !cursorDidNotMove)) {
+        /**
+         * Currently the onTextSelectionChange callback is delivered before onCut
+         * making it impossible to determine whether text was cut or [backspace] was clicked.
+         * Because of that we do not emit the backspace event.
+         * */
+        const key = this.value.charAt(currentSelection.start - 1);
+        this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onKeyPress", this.createTextInputKeyEvent(key));
+      }
+    }
+  }
+
+  dispatchChangeEvent(): void {
+    if (this.valueChanged) {
+      this.valueChanged = false;
+      this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, RNOHEventEmitRequestHandlerName.TextInputChange, this.createTextInputEvent());
+    }
+  }
+
+  textSelectionChange(currentSelectionStart: number, currentSelectionEnd: number): void {
+    /**
+     * New values of selection are needed to determine what key was pressed, so this.dispatchKeyEvent needs to be
+     * invoked after this callback fires. OnChange callback fires earlier than OnTextSelectionChange, so all this logic
+     * needs to be handled here rather than in this.handleChangeEvent. According to RN the keyPress event should fire
+     * before changeEvent, so dispatching change event needs to be handled here as well.
+     * */
+    this.dispatchKeyEvent({ start: currentSelectionStart, end: currentSelectionEnd });
+    this.selection = { start: currentSelectionStart, end: currentSelectionEnd };
+    this.dispatchChangeEvent();
   }
 
   build() {
@@ -246,6 +307,8 @@ export struct RNTextInput {
           .key(`TextInput@${this.tag}`)
           .onAppear(() => this.maybeFocusOnAppear())
           .focusable(this.descriptorWrapper?.focusable ?? true)
+          .onPaste(() => this.onPaste())
+          .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
       } else {
         TextInput({
           controller: this.inputController,
@@ -299,6 +362,8 @@ export struct RNTextInput {
           .onAppear(() => this.maybeFocusOnAppear())
           .focusable(this.descriptorWrapper?.focusable ?? true)
           .cancelButton(this.getCancelButton())
+          .onPaste(() => this.onPaste())
+          .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
       }
     }
   }

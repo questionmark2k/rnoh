@@ -214,8 +214,6 @@ export function TextInputTest() {
       </TestCase>
       <TestCase
         modal
-        skip
-        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/736
         itShould="trigger onKeyPress event after pressing key (press 'A' to pass)"
         initialState={''}
         arrange={({setState}) => (
@@ -227,6 +225,23 @@ export function TextInputTest() {
         )}
         assert={({expect, state}) => {
           expect(state).to.be.eq('A');
+        }}
+      />
+      <TestCase
+        modal
+        skip
+        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/736
+        itShould="trigger onKeyPress event after pressing backspace"
+        initialState={''}
+        arrange={({setState}) => (
+          <TextInputWithText
+            style={styles.textInput}
+            autoFocus
+            onKeyPress={event => setState(event.nativeEvent.key)}
+          />
+        )}
+        assert={({expect, state}) => {
+          expect(state).to.be.eq('Backspace');
         }}
       />
       <TestCase

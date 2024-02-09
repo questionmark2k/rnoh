@@ -44,3 +44,8 @@ export interface TextInputEvent {
   text: string,
   eventCount: number,
 }
+
+export interface TextInputKeyEvent {
+  key: string,
+  eventCount: number,
+}

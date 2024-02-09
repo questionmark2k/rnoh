@@ -12,7 +12,9 @@ facebook::react::TextInputMetrics convertTextInputEvent(ArkJS &arkJs, napi_value
 }
 
 facebook::react::KeyPressMetrics convertKeyPressEvent(ArkJS &arkJs, napi_value eventObject) {
-    facebook::react::KeyPressMetrics keyPressMetrics{.text = arkJs.getString(eventObject)};
+    auto key = arkJs.getString(arkJs.getObjectProperty(eventObject, "key"));
+    auto eventCount = arkJs.getInteger(arkJs.getObjectProperty(eventObject, "eventCount"));
+    facebook::react::KeyPressMetrics keyPressMetrics{.text = key, .eventCount = eventCount};
     return keyPressMetrics;
 }
 
