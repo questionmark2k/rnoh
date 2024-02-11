@@ -78,6 +78,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
     auto componentDescriptorProviderRegistry = std::make_shared<facebook::react::ComponentDescriptorProviderRegistry>();
     std::vector<std::shared_ptr<TurboModuleFactoryDelegate>> turboModuleFactoryDelegates;
     ComponentJSIBinderByString componentJSIBinderByName = {};
+    GlobalJSIBinders globalJSIBinders = {};
     ComponentNapiBinderByString componentNapiBinderByName = {};
     EventEmitRequestHandlers eventEmitRequestHandlers = {};
 
@@ -95,11 +96,14 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
         for (auto [name, componentNapiBinder] : package->createComponentNapiBinderByName()) {
             componentNapiBinderByName.insert({name, componentNapiBinder});
         };
+        auto packageGlobalJSIBinders = package->createGlobalJSIBinders();
+        globalJSIBinders.insert(globalJSIBinders.end(),
+                                        std::make_move_iterator(packageGlobalJSIBinders.begin()),
+                                        std::make_move_iterator(packageGlobalJSIBinders.end()));
         auto packageEventEmitRequestHandlers = package->createEventEmitRequestHandlers();
-        eventEmitRequestHandlers.insert(
-            eventEmitRequestHandlers.end(),
-            std::make_move_iterator(packageEventEmitRequestHandlers.begin()),
-            std::make_move_iterator(packageEventEmitRequestHandlers.end()));
+        eventEmitRequestHandlers.insert(eventEmitRequestHandlers.end(),
+                                        std::make_move_iterator(packageEventEmitRequestHandlers.begin()),
+                                        std::make_move_iterator(packageEventEmitRequestHandlers.end()));
     }
 
     auto turboModuleFactory = TurboModuleFactory(env, arkTsTurboModuleProviderRef,
@@ -113,6 +117,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
                                         componentDescriptorProviderRegistry,
                                         MutationsToNapiConverter(std::move(componentNapiBinderByName)),
                                         eventEmitRequestHandlers,
+                                        globalJSIBinders,
                                         std::move(mutationsListener),
                                         std::move(commandDispatcher),
                                         mainThreadChannel,

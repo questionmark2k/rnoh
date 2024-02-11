@@ -14,13 +14,8 @@ namespace rnoh {
             ARK_METHOD_METADATA(addWebSocketHandler, 1),
             ARK_METHOD_METADATA(addNetworkingHandler, 0),
             ARK_METHOD_METADATA(removeWebSocketHandler, 1),
-            // this is a hack needed to install blobCollector,
-            {"createFromParts",
-             {2, [](facebook::jsi::Runtime &rt, facebook::react::TurboModule &turboModule,
-                    const facebook::jsi::Value *args, size_t count) {
-                  BlobCollector::install(rt, turboModule, args, count);
-                  return static_cast<ArkTSTurboModule &>(turboModule).call(rt, "createFromParts", args, count);
-              }}}};
+            ARK_METHOD_METADATA(createFromParts, 2)
+        };
     }
 
     void BlobTurboModule::release(std::string blobId) {

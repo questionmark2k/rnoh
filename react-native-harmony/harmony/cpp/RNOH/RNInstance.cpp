@@ -20,7 +20,14 @@ using namespace rnoh;
 void RNInstance::start() {
     this->initialize();
     auto turboModuleProvider = this->createTurboModuleProvider();
-    this->initializeScheduler(std::move(turboModuleProvider));
+    this->initializeScheduler(turboModuleProvider);
+    this->instance->getRuntimeExecutor()(
+        [binders = this->m_globalJSIBinders,turboModuleProvider](facebook::jsi::Runtime &rt) { 
+            for (auto &binder : binders) {
+                binder->createBindings(rt, turboModuleProvider);
+            }
+        }
+    );
 }
 
 void RNInstance::initialize() {
@@ -46,7 +53,7 @@ void RNInstance::initialize() {
         std::move(moduleRegistry));
 }
 
-void RNInstance::initializeScheduler(std::shared_ptr<TurboModuleProvider> &&turboModuleProvider) {
+void RNInstance::initializeScheduler(std::shared_ptr<TurboModuleProvider> turboModuleProvider) {
     auto reactConfig = std::make_shared<react::EmptyReactNativeConfig>();
     m_contextContainer->insert("ReactNativeConfig", std::move(reactConfig));
 

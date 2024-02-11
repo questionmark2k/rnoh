@@ -59,6 +59,8 @@
 #include "RNOHCorePackage/EventEmitRequestHandlers/SwitchEventEmitRequestHandler.h"
 #include "RNOHCorePackage/EventEmitRequestHandlers/ImageEventEmitRequestHandler.h"
 #include "RNOHCorePackage/EventEmitRequestHandlers/ViewEventEmitRequestHandler.h"
+#include "RNOHCorePackage/GlobalBinders/BlobCollectorJSIBinder.h"
+
 
 namespace rnoh {
 
@@ -182,6 +184,10 @@ class RNOHCorePackage : public Package {
                 std::make_shared<PullToRefreshViewEventEmitRequestHandler>(),
                 std::make_shared<ImageEventEmitRequestHandler>(),
                 std::make_shared<ViewEventEmitRequestHandler>()};
+    }
+
+    GlobalJSIBinders createGlobalJSIBinders() override {
+        return {std::make_shared<rnoh::BlobCollectorJSIBinder>(GlobalJSIBinder::Context{})};
     }
 };
 

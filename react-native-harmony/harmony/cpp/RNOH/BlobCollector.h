@@ -10,8 +10,7 @@ namespace rnoh {
         BlobCollector(facebook::react::TurboModule &turboModule, const std::string &blobId);
         ~BlobCollector();
 
-        static void install(facebook::jsi::Runtime &rt, facebook::react::TurboModule &turboModule,
-                            const facebook::jsi::Value *args, size_t count);
+        static void install(facebook::jsi::Runtime &rt, facebook::react::TurboModule &turboModule);
 
     private:
         const std::string blobId_;

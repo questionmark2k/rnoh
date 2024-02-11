@@ -12,8 +12,7 @@ namespace rnoh {
     BlobCollector::BlobCollector(facebook::react::TurboModule &turboModule, const std::string &blobId)
         : turboModule_(turboModule), blobId_(blobId){};
 
-    void BlobCollector::install(facebook::jsi::Runtime &rt, facebook::react::TurboModule &turboModule,
-                        const facebook::jsi::Value *args, size_t count) {
+    void BlobCollector::install(facebook::jsi::Runtime &rt, facebook::react::TurboModule &turboModule) {
         rt.global().setProperty(
             rt, "__blobCollectorProvider",
             facebook::jsi::Function::createFromHostFunction(

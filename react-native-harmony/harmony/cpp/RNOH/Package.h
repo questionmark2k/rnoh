@@ -1,5 +1,6 @@
 #pragma once
 #include <react/renderer/componentregistry/ComponentDescriptorProvider.h>
+#include "RNOH/GlobalJSIBinder.h"
 #include "RNOH/TurboModule.h"
 #include "RNOH/ShadowViewRegistry.h"
 #include "RNOH/TurboModuleFactory.h"
@@ -8,6 +9,8 @@
 #include "RNOH/EventEmitRequestHandler.h"
 
 namespace rnoh {
+
+
 
 class Package {
   public:
@@ -19,6 +22,8 @@ class Package {
     virtual ~Package(){};
 
     virtual std::unique_ptr<TurboModuleFactoryDelegate> createTurboModuleFactoryDelegate();
+
+    virtual GlobalJSIBinders createGlobalJSIBinders();
 
     virtual std::vector<facebook::react::ComponentDescriptorProvider> createComponentDescriptorProviders();
 

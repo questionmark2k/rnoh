@@ -15,6 +15,10 @@ std::vector<react::ComponentDescriptorProvider> Package::createComponentDescript
     return {};
 }
 
+GlobalJSIBinders rnoh::Package::createGlobalJSIBinders() {
+    return {};
+}
+
 ComponentJSIBinderByString rnoh::Package::createComponentJSIBinderByName() {
     return {};
 }

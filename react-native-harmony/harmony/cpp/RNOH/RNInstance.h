@@ -4,7 +4,6 @@
 #include <utility>
 #include <thread>
 #include <functional>
-#include <napi/native_api.h>
 #include <js_native_api.h>
 #include <js_native_api_types.h>
 #include <atomic>
@@ -17,8 +16,8 @@
 #include <react/renderer/animations/LayoutAnimationDriver.h>
 #include <react/renderer/uimanager/LayoutAnimationStatusDelegate.h>
 #include <react/renderer/componentregistry/ComponentDescriptorProviderRegistry.h>
-#include <ReactCommon/LongLivedObject.h>
 
+#include "RNOH/GlobalJSIBinder.h"
 #include "RNOH/MessageQueueThread.h"
 #include "RNOH/SchedulerDelegate.h"
 #include "RNOH/ShadowViewRegistry.h"
@@ -43,6 +42,7 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
                std::shared_ptr<facebook::react::ComponentDescriptorProviderRegistry> componentDescriptorProviderRegistry,
                MutationsToNapiConverter mutationsToNapiConverter,
                EventEmitRequestHandlers eventEmitRequestHandlers,
+               GlobalJSIBinders globalJSIBinders,
                MutationsListener &&mutationsListener,
                MountingManager::CommandDispatcher &&commandDispatcher,
                ArkTSChannel::Shared arkTsChannel,
@@ -60,6 +60,7 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
           m_componentDescriptorProviderRegistry(componentDescriptorProviderRegistry),
           m_mutationsToNapiConverter(mutationsToNapiConverter),
           m_eventEmitRequestHandlers(eventEmitRequestHandlers),
+          m_globalJSIBinders(globalJSIBinders),
           m_shouldRelayUITick(false),
           m_mutationsListener(mutationsListener),
           m_commandDispatcher(commandDispatcher),
@@ -130,6 +131,7 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
     std::shared_ptr<EventDispatcher> m_eventDispatcher;
     MutationsToNapiConverter m_mutationsToNapiConverter;
     EventEmitRequestHandlers m_eventEmitRequestHandlers;
+    GlobalJSIBinders m_globalJSIBinders;
     std::shared_ptr<facebook::react::LayoutAnimationDriver> m_animationDriver;
     UITicker::Shared m_uiTicker;
     std::function<void()> unsubscribeUITickListener = nullptr;
@@ -140,7 +142,7 @@ class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
     bool m_shouldEnableBackgroundExecutor;
 
     void initialize();
-    void initializeScheduler(std::shared_ptr<TurboModuleProvider> &&turboModuleProvider);
+    void initializeScheduler(std::shared_ptr<TurboModuleProvider> turboModuleProvider);
     std::shared_ptr<TurboModuleProvider> createTurboModuleProvider();
     void onUITick();
 
