@@ -55,7 +55,7 @@ TurboModuleFactory::SharedTurboModule TurboModuleFactory::delegateCreatingTurboM
 }
 
 napi_ref TurboModuleFactory::maybeGetArkTsTurboModuleInstanceRef(const std::string &name) const {
-    napi_ref result;
+    napi_ref result = nullptr;
     m_taskExecutor->runSyncTask(TaskThread::MAIN, [env = m_env, arkTsTurboModuleProviderRef = m_arkTsTurboModuleProviderRef, name, &result]() {
         ArkJS arkJs(env);
         {

@@ -26,6 +26,11 @@ ArkTSTurboModule::ArkTSTurboModule(Context ctx, std::string name) : m_ctx(ctx), 
 
 // calls a TurboModule method and blocks until it returns, returning its result
 jsi::Value ArkTSTurboModule::call(jsi::Runtime &runtime, const std::string &methodName, const jsi::Value *jsiArgs, size_t argsCount) {
+    if (!m_ctx.arkTsTurboModuleInstanceRef) {
+        auto errorMsg = "Couldn't find turbo module '" + name_ + "' on ArkUI side. Did you link RNPackage that provides this turbo module?";
+        LOG(FATAL) << errorMsg;
+        throw std::runtime_error(errorMsg);
+    }
     folly::dynamic result;
     std::optional<std::exception> thrownError = std::nullopt;
     auto args = convertJSIValuesToIntermediaryValues(runtime, m_ctx.jsInvoker, jsiArgs, argsCount);
@@ -48,6 +53,11 @@ jsi::Value ArkTSTurboModule::call(jsi::Runtime &runtime, const std::string &meth
 
 // calls a TurboModule method without blocking and ignores its result
 void rnoh::ArkTSTurboModule::scheduleCall(facebook::jsi::Runtime &runtime, const std::string &methodName, const facebook::jsi::Value *jsiArgs, size_t argsCount) {
+    if (!m_ctx.arkTsTurboModuleInstanceRef) {
+        auto errorMsg = "Couldn't find turbo module '" + name_ + "' on ArkUI side. Did you link RNPackage that provides this turbo module?";
+        LOG(FATAL) << errorMsg;
+        throw std::runtime_error(errorMsg);
+    }
     auto args = convertJSIValuesToIntermediaryValues(runtime, m_ctx.jsInvoker, jsiArgs, argsCount);
     m_ctx.taskExecutor->runTask(TaskThread::MAIN, [ctx = m_ctx, name = name_, methodName, args = std::move(args), &runtime]() {
         try {
@@ -56,17 +66,22 @@ void rnoh::ArkTSTurboModule::scheduleCall(facebook::jsi::Runtime &runtime, const
             auto napiTurboModuleObject = arkJs.getObject(ctx.arkTsTurboModuleInstanceRef);
             napiTurboModuleObject.call(methodName, napiArgs);
         } catch (const std::exception &e) {
-            LOG(ERROR) << "Exception thrown while calling " << name << " TurboModule method "<< methodName << ": " << e.what();
+            LOG(ERROR) << "Exception thrown while calling " << name << " TurboModule method " << methodName << ": " << e.what();
         }
     });
 }
 
 // calls an async TurboModule method and returns a Promise
 jsi::Value ArkTSTurboModule::callAsync(jsi::Runtime &runtime, const std::string &methodName, const jsi::Value *jsiArgs, size_t argsCount) {
+    if (!m_ctx.arkTsTurboModuleInstanceRef) {
+        auto errorMsg = "Couldn't find turbo module '" + name_ + "' on ArkUI side. Did you link RNPackage that provides this turbo module?";
+        LOG(FATAL) << errorMsg;
+        throw std::runtime_error(errorMsg);
+    }
     auto args = convertJSIValuesToIntermediaryValues(runtime, m_ctx.jsInvoker, jsiArgs, argsCount);
     napi_ref napiResultRef;
     std::optional<std::exception> thrownError = std::nullopt;
-    m_ctx.taskExecutor->runSyncTask(TaskThread::MAIN, [ctx = m_ctx, &thrownError, &methodName, &args, &runtime, &napiResultRef]() {
+    m_ctx.taskExecutor->runSyncTask(TaskThread::MAIN, [ctx = m_ctx, name = name_, &thrownError, &methodName, &args, &runtime, &napiResultRef]() {
         ArkJS arkJs(ctx.env);
         auto napiArgs = arkJs.convertIntermediaryValuesToNapiValues(args);
         auto napiTurboModuleObject = arkJs.getObject(ctx.arkTsTurboModuleInstanceRef);
@@ -77,7 +92,7 @@ jsi::Value ArkTSTurboModule::callAsync(jsi::Runtime &runtime, const std::string 
             thrownError = e;
         }
     });
-    
+
     if (thrownError.has_value()) {
         return react::createPromiseAsJSIValue(runtime, [ctx = m_ctx, message = thrownError->what()](auto &rt, auto jsiPromise) {
             ctx.jsInvoker->invokeAsync([message, jsiPromise] {
@@ -86,7 +101,7 @@ jsi::Value ArkTSTurboModule::callAsync(jsi::Runtime &runtime, const std::string 
             });
         });
     }
-    
+
     return react::createPromiseAsJSIValue(
         runtime, [ctx = m_ctx, napiResultRef](jsi::Runtime &rt2, std::shared_ptr<react::Promise> jsiPromise) {
             ctx.taskExecutor->runTask(TaskThread::MAIN, [ctx, napiResultRef, &rt2, jsiPromise]() {
@@ -172,15 +187,14 @@ std::string preparePromiseRejectionResult(const std::vector<folly::dynamic> args
     if (args.size() > 1) {
         throw std::invalid_argument("`reject` accepts only one argument");
     }
-    
+
     auto error = args[0];
     if (error.isObject()) {
         auto message = error["message"];
         if (message.isString()) {
             return message.getString();
         }
-    }
-    else if (error.isString()) {
+    } else if (error.isString()) {
         return error.getString();
     }
     throw std::invalid_argument("The type of argument provided `reject` must be string or contain a string 'message' field. It's going to be used as an error message");
