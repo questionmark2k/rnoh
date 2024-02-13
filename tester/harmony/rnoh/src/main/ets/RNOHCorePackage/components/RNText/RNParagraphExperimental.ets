@@ -3,7 +3,8 @@ import {
   RNOHContext,
   convertColorSegmentsToString,
   Tag,
-  CustomComponentBuilder
+  CustomComponentBuilder,
+  DEFAULT_LINE_SPACING
 } from '../../../RNOH'
 import { RNViewBase } from '../RNViewBase'
 import { PLACEHOLDER_SYMBOL } from '../../../ParagraphMeasurer';
@@ -20,6 +21,10 @@ import {
   stringToAlignment,
   stringToVerticalAlign,
   ellipsizeModeToTextOverflow,
+  stringToStackAlignment,
+  stringToFontStyle,
+  getFontSize,
+  stringToTextTransform,
 } from './conversions'
 
 @Component
@@ -77,10 +82,10 @@ export struct RNParagraphExperimental {
           if (fragment.text !== PLACEHOLDER_SYMBOL) {
             Span(fragment.text)
               .fontColor(convertColorSegmentsToString(fragment.fontColor))
-              .fontSize(fragment.fontSize)
+              .fontSize(getFontSize(fragment.fontSize, this.descriptor.rawProps))
               .fontFamily(fragment.fontFamily)
               .fontWeight(fragment.fontWeight)
-              .fontStyle(fragment.fontStyle === "italic" ? FontStyle.Italic : FontStyle.Normal)
+              .fontStyle(stringToFontStyle(fragment.fontStyle))
               .decoration({
                 type: getTextDecorationLine(fragment.textDecorationLine),
                 color: fragment.textDecorationColor
@@ -92,6 +97,7 @@ export struct RNParagraphExperimental {
               .textShadow(getTextShadow(fragment.textShadowProps))
                 // somehow backgroundColor doesn't work, set it using textBackgroundStyle
               .textBackgroundStyle({ color:convertColorSegmentsToString(fragment.backgroundColor) })
+              .textCase(stringToTextTransform(fragment.textTransform))
           } else {
             ImageSpan('')
               .width(fragment.parentShadowView?.layoutMetrics.frame.size.width)

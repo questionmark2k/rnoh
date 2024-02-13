@@ -64,10 +64,10 @@ react::TextMeasurement TextMeasurer::measure(react::AttributedString attributedS
                 if (!isnan(fragment.textAttributes.letterSpacing)) {
                     OH_Drawing_SetTextStyleLetterSpacing(textStyle, fragment.textAttributes.letterSpacing);
                 }
-                if (!isnan(fragment.textAttributes.lineHeight)) {
-                    // fontSize * fontHeight = lineHeight + 1, no direct ndk for setting lineHeight so do it
+                if (!isnan(fragment.textAttributes.lineHeight) && fragment.textAttributes.lineHeight > 0) {
+                    // fontSize * fontHeight = lineHeight, no direct ndk for setting lineHeight so do it
                     // in this weird way
-                    fontHeight = (fragment.textAttributes.lineHeight - 1) / fragment.textAttributes.fontSize;
+                    fontHeight = fragment.textAttributes.lineHeight / fragment.textAttributes.fontSize;
                     OH_Drawing_SetTextStyleFontHeight(textStyle, fontHeight);
                 }
                 if (fragment.textAttributes.fontWeight.has_value()) {
