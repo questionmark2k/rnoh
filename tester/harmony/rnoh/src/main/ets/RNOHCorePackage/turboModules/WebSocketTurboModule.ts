@@ -68,6 +68,12 @@ export class WebSocketTurboModule extends TurboModule {
     this.logger.clone("connect").debug(url)
     const ws = webSocket.createWebSocket();
 
+    // `ws.connect` fails for `http:`-scheme urls,
+    // so we do this instead
+    if (url.startsWith('http')) {
+      url = url.replace('http', 'ws')
+    }
+
     ws.on('open', (data) => {
       this.ctx.rnInstanceManager.emitDeviceEvent("websocketOpen", {
         id: socketID,
