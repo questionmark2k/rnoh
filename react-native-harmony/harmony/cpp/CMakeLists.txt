@@ -423,6 +423,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/DevSettingsTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/DevMenuTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/VibrationTurboModule.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/ToastAndroidTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/Animated/NativeAnimatedTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/Animated/AnimatedNodesManager.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/Animated/Nodes/AnimatedNode.cpp"

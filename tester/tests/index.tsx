@@ -42,6 +42,7 @@ export * from './SwitchTest';
 export * from './TextInputTest';
 export * from './TextTest/TextTest';
 export * from './TimerTest';
+export * from './ToastAndroidTest';
 export * from './TouchHandlingTest';
 export * from './TouchableOpacityTest';
 export * from './TouchablesTest';

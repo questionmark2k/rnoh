@@ -123,6 +123,9 @@ module.exports = {
   get TextInput() {
     return require('./Libraries/Components/TextInput/TextInput.harmony');
   },
+  get ToastAndroid() {
+    return require('react-native/Libraries/Components/ToastAndroid/ToastAndroid.android');
+  },
   get Touchable() {
     return require('react-native/Libraries/Components/Touchable/Touchable');
   },

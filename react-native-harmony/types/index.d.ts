@@ -24,7 +24,7 @@ export * from 'react-native/Libraries/Components/StatusBar/StatusBar';
 export * from 'react-native/Libraries/Components/Switch/Switch';
 // export * from 'react-native/Libraries/Components/TextInput/InputAccessoryView';
 export * from 'react-native/Libraries/Components/TextInput/TextInput';
-// export * from 'react-native/Libraries/Components/ToastAndroid/ToastAndroid';
+export * from 'react-native/Libraries/Components/ToastAndroid/ToastAndroid';
 export * from 'react-native/Libraries/Components/Touchable/Touchable';
 export * from 'react-native/Libraries/Components/Touchable/TouchableHighlight';
 export * from 'react-native/Libraries/Components/Touchable/TouchableNativeFeedback';

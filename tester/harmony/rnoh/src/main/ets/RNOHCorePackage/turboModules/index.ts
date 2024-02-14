@@ -32,3 +32,5 @@ export * from "./DevSettingsTurboModule";
 export * from "./DevMenuTurboModule";
 export * from "./DevLoadingViewTurboModule"
 export * from "./VibrationTurboModule";
+
+export * from "./ToastAndroidTurboModule";

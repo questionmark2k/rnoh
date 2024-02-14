@@ -7,6 +7,7 @@ import {
   BlobTurboModule,
   DeviceEventManagerTurboModule,
   DeviceInfoTurboModule,
+  DevLoadingViewTurboModule,
   DevMenuTurboModule,
   DevSettingsTurboModule,
   ExceptionsManagerTurboModule,
@@ -14,6 +15,7 @@ import {
   I18nManagerTurboModule,
   ImageLoaderTurboModule,
   KeyboardObserverTurboModule,
+  LogBoxTurboModule,
   NativeAnimatedTurboModule,
   NetworkingTurboModule,
   PlatformConstantsTurboModule,
@@ -21,10 +23,9 @@ import {
   SourceCodeTurboModule,
   StatusBarTurboModule,
   TimingTurboModule,
-  WebSocketTurboModule,
-  LogBoxTurboModule,
-  DevLoadingViewTurboModule,
-  VibrationTurboModule
+  ToastAndroidTurboModule,
+  VibrationTurboModule,
+  WebSocketTurboModule
 } from './turboModules';
 import { LinkingManagerTurboModule } from './turboModules/LinkingManagerTurboModule';
 import { ViewDescriptorWrapper } from './components/ts';
@@ -66,6 +67,7 @@ const TURBO_MODULE_CLASS_BY_NAME: Record<string, typeof TurboModule> = {
   [LogBoxTurboModule.NAME]: LogBoxTurboModule,
   [DevLoadingViewTurboModule.NAME]: DevLoadingViewTurboModule,
   [VibrationTurboModule.NAME]: VibrationTurboModule,
+  [ToastAndroidTurboModule.NAME]: ToastAndroidTurboModule,
 };
 
 const EAGER_TURBO_MODULE_CLASS_BY_NAME = {
