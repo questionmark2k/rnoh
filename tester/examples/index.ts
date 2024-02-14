@@ -6,6 +6,7 @@ export * from './CheckerboardExample';
 export * from './TextScrollExample';
 export * from './CursorExample';
 export * from './ImageGalleryExample';
+export * from './ImageGalleryWithMultipleSourcesExample';
 export * from './FlatListVsScrollViewExample';
 export * from './LargeImageScrollExample';
 export * from './TogglingComponentExample';
