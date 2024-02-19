@@ -1316,7 +1316,8 @@ class ScrollView extends React.Component<Props, State> {
     FrameRateLogger.beginScroll(); // TODO: track all scrolls after implementing onScrollEndAnimation
 
     if (
-      Platform.OS === "android" &&
+      // RNOH: patch - add support for OpenHarmony
+      (Platform.OS === "android" || Platform.OS === "harmony") &&
       this.props.keyboardDismissMode === "on-drag"
     ) {
       dismissKeyboard();
@@ -1809,10 +1810,10 @@ class ScrollView extends React.Component<Props, State> {
       // default to true
       snapToEnd: this.props.snapToEnd !== false,
       // pagingEnabled is overridden by snapToInterval / snapToOffsets
-      pagingEnabled: 
-          this.props.pagingEnabled === true &&
-          this.props.snapToInterval == null &&
-          this.props.snapToOffsets == null, 
+      pagingEnabled:
+        this.props.pagingEnabled === true &&
+        this.props.snapToInterval == null &&
+        this.props.snapToOffsets == null,
     };
 
     const { decelerationRate } = this.props;
