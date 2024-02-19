@@ -14,6 +14,7 @@ export * from './CustomNativeComponentTest';
 export * from './DimensionsTest';
 export * from './DevSettingsTest';
 export * from './ErrorHandlingTest';
+export * from './FileTest';
 export * from './FlatListTest';
 export * from './I18nManagerTest';
 export * from './ImageBackgroundTest';
