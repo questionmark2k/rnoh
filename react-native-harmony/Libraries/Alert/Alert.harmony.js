@@ -41,7 +41,7 @@ class Alert {
     }
 
     // At most two buttons. Ignore rest.
-    const validButtons: Buttons = buttons.slice(0, 2);
+    const validButtons: Buttons = (buttons ?? [{text: "OK"}]).slice(0, 2)
     const secondaryButton = validButtons.pop();
     const primaryButton = validButtons.pop();
 

@@ -57,6 +57,38 @@ export function AlertTest() {
           expect(state).to.be.true;
         }}
       />
+      <TestCase itShould="show an alert with OK button (when a developer doesn't declare any buttons)">
+        <Button
+          label="show alert"
+          onPress={() => {
+            Alert.alert('Test Alert');
+          }}
+        />
+      </TestCase>
+      <TestCase
+        initialState={false}
+        itShould="pass after pressing the OK button in the Alert Box"
+        arrange={({setState}) => {
+          return (
+            <Button
+              label="show alert"
+              onPress={() => {
+                Alert.alert('Test Alert', undefined, [
+                  {
+                    text: 'OK',
+                    onPress: () => {
+                      setState(true);
+                    },
+                  },
+                ]);
+              }}
+            />
+          );
+        }}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
     </TestSuite>
   );
 }
