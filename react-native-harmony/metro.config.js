@@ -67,6 +67,42 @@ function createHarmonyMetroConfig(options) {
               } catch (err) {}
             }
             return ctx.resolveRequest(ctx, moduleName, 'ios');
+          } else if(isHarmonyPackageInternalImport(ctx.originModulePath, moduleName)) {
+            /**
+             * Replace internal imports in `react-native-foo` with equivalent files from `react-native-harmony-foo` 
+             * if a package has internal import redirection enabled in its package.json configuration e.g.
+             *
+             * react-native-harmony-foo/package.json:
+             *  "harmony": {
+             *     "alias": "react-native-foo"
+             *     "redirectInternalImports": true,
+             *  }
+             */
+            const alias = getPackageNameFromOriginModulePath(ctx.originModulePath);
+            if (alias) {
+              const harmonyPackage = getHarmonyPackageByAliasMap(".");
+              const harmonyPackageName = harmonyPackage[alias]?.name;
+              const redirectInternalImports = harmonyPackage[alias]?.redirectInternalImports;
+              if (harmonyPackageName && !isRequestFromHarmonyPackage(ctx.originModulePath, harmonyPackageName) && redirectInternalImports) {
+                const moduleAbsPath = pathUtils.resolve(
+                  pathUtils.dirname(ctx.originModulePath),
+                  moduleName,
+                );
+                const [_, modulePathRelativeToOriginalPackage] = moduleAbsPath.split(
+                  `${pathUtils.sep}node_modules${pathUtils.sep}${alias}${pathUtils.sep}`,
+                );
+                const backslashes = new RegExp('\\\\', 'g');
+                const pathToHarmonyModule = `${harmonyPackageName}/${modulePathRelativeToOriginalPackage.replace(backslashes, "/")}`;
+                try {
+                  return ctx.resolveRequest(
+                    ctx,
+                    pathToHarmonyModule,
+                    'harmony',
+                  );
+                } catch (err) {
+                }
+              }
+            }
           } else {
             /**
              * Replace `react-native-foo` with `react-native-harmony-foo` if a package has harmony directory and proper package.json configuration e.g.
@@ -76,10 +112,10 @@ function createHarmonyMetroConfig(options) {
              *     "alias": "react-native-foo"
              *  }
              */
-            const harmonyPackageNameByAlias = getHarmonyPackageNameByAlias('.');
+            const harmonyPackageByAlias = getHarmonyPackageByAliasMap(".");
             const alias = getPackageName(moduleName);
             if (alias) {
-              const harmonyPackageName = harmonyPackageNameByAlias[alias];
+              const harmonyPackageName = harmonyPackageByAlias[alias]?.name;
               if (
                 harmonyPackageName &&
                 !isRequestFromHarmonyPackage(
@@ -130,6 +166,49 @@ function getPackageName(moduleName) {
 
 /**
  * @param originModulePath {string}
+ * @returns {string}
+ */
+function getPackageNameFromOriginModulePath(originModulePath) {
+  const nodeModulesPosition = originModulePath.search("node_modules");
+  const pathRelativeToNodeModules = originModulePath.substring(nodeModulesPosition);
+  const pathSegments = pathRelativeToNodeModules.split(pathUtils.sep);
+  const module = pathSegments[1];
+  if (module.startsWith('@')) {
+    return `${pathSegments[1]}/${pathSegments[2]}`;
+  }
+  else {
+    return pathSegments[1];
+  }
+}
+
+/**
+ * @param originModulePath {string}
+ * @param moduleName {string}
+ * @returns {boolean}
+ */
+function isHarmonyPackageInternalImport(originModulePath, moduleName) {
+  if (moduleName.startsWith(".")) {
+    const alias = getPackageNameFromOriginModulePath(originModulePath);
+    const slashes = new RegExp('/', 'g');
+    if (alias && originModulePath.includes(`${pathUtils.sep}node_modules${pathUtils.sep}${alias.replace(slashes, pathUtils.sep)}${pathUtils.sep}`)) {
+      const harmonyPackage = getHarmonyPackageByAliasMap(".");
+      const harmonyPackageName = harmonyPackage[alias]?.name;
+      if (
+        harmonyPackageName &&
+        !isRequestFromHarmonyPackage(
+          originModulePath,
+          harmonyPackageName,
+        )
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * @param originModulePath {string}
  * @returns {boolean}
  */
 function isInternalReactNativeRelativeImport(originModulePath) {
@@ -152,26 +231,26 @@ function isRequestFromHarmonyPackage(originModulePath, harmonyPackageName) {
 }
 
 /**
- * @type {Record<string, string> | undefined}
+ * @type {Record<string, {name: string, redirectInternalImports: boolean}> | undefined}
  */
-let cachedHarmonyPackageAliasByName = undefined;
+let cachedHarmonyPackageByAliasMap = undefined;
 
 /**
  * @param projectRootPath {string}
  */
-function getHarmonyPackageNameByAlias(projectRootPath) {
+function getHarmonyPackageByAliasMap(projectRootPath) {
   /**
-   * @type {Record<string, string>}
+   * @type {Record<string, {name: string, redirectInternalImports: boolean}>}
    */
   const initialAcc = {};
-  if (cachedHarmonyPackageAliasByName) {
-    return cachedHarmonyPackageAliasByName;
+  if (cachedHarmonyPackageByAliasMap) {
+    return cachedHarmonyPackageByAliasMap;
   }
-  cachedHarmonyPackageAliasByName = findHarmonyNodeModulePaths(
-    findHarmonyNodeModuleSearchPaths(projectRootPath)
+  cachedHarmonyPackageByAliasMap = findHarmonyNodeModulePaths(
+    findHarmonyNodeModuleSearchPaths(projectRootPath),
   ).reduce((acc, harmonyNodeModulePath) => {
     const harmonyNodeModulePathSegments = harmonyNodeModulePath.split(
-      pathUtils.sep
+      pathUtils.sep,
     );
     let harmonyNodeModuleName =
       harmonyNodeModulePathSegments[harmonyNodeModulePathSegments.length - 1];
@@ -185,38 +264,41 @@ function getHarmonyPackageNameByAlias(projectRootPath) {
     const packageJSONPath = `${harmonyNodeModulePath}${pathUtils.sep}package.json`;
     const packageJSON = readHarmonyModulePackageJSON(packageJSONPath);
     const alias = packageJSON.harmony?.alias;
+    const redirectInternalImports = packageJSON?.harmony?.redirectInternalImports ?? false;
     if (alias) {
-      acc[alias] = harmonyNodeModuleName;
+      acc[alias] ={
+        name: harmonyNodeModuleName,
+        redirectInternalImports: redirectInternalImports
+      }
     }
     return acc;
   }, initialAcc);
   const harmonyPackagesCount = Object.keys(
-    cachedHarmonyPackageAliasByName
+    cachedHarmonyPackageByAliasMap,
   ).length;
   if (harmonyPackagesCount > 0) {
     const prettyHarmonyPackagesCount = colors.bold(
       harmonyPackagesCount > 0
         ? colors.green(harmonyPackagesCount.toString())
-        : harmonyPackagesCount.toString()
+        : harmonyPackagesCount.toString(),
     );
     info(
-      `Redirected imports to ${prettyHarmonyPackagesCount} harmony-specific third-party package(s):`
+      `Redirected imports to ${prettyHarmonyPackagesCount} harmony-specific third-party package(s):`,
     );
     if (harmonyPackagesCount > 0) {
-      Object.entries(cachedHarmonyPackageAliasByName).forEach(
-        ([original, alias]) => {
+      Object.entries(cachedHarmonyPackageByAliasMap).forEach(
+        ([original, {name: alias}]) => {
           info(
-            `• ${colors.bold(colors.gray(original))} → ${colors.bold(alias)}`
+            `• ${colors.bold(colors.gray(original))} → ${colors.bold(alias)}`,
           );
-        }
+        },
       );
     }
   } else {
     info('No harmony-specific third-party packages have been detected');
   }
   console.log('');
-
-  return cachedHarmonyPackageAliasByName;
+  return cachedHarmonyPackageByAliasMap;
 }
 
 /**
@@ -260,7 +342,7 @@ function hasPackageJSON(nodeModulePath) {
 
 /**
  * @param packageJSONPath {string}
- * @returns {{name: string, harmony?: {alias?: string}}}
+ * @returns {{name: string, harmony?: {alias?: string, redirectInternalImports?: boolean}}}
  */
 function readHarmonyModulePackageJSON(packageJSONPath) {
   return JSON.parse(fs.readFileSync(packageJSONPath).toString());
