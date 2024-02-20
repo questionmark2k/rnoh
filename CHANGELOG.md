@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.72.16
+- BREAKING: removed dependencies on RNAbility in RNOHContext
+- added internal import resolving for harmony packages with `redirectInternalImports: true`
+- added support for `ToastAndroid`
+- added `enableNDKTextMeasuring` feature flag which allows optional faster text measuring using NDK
+- added support for Appearance API
+- restored partial support for `TextInput::onKeyPress`
+- fixed `Alert` breaking when created without any buttons
+- fixed websockets not connecting after updating to API 11
+- fixed `fontHeight` calculations
+- fixed `Modal` being shifted up by soft keyboard instead of being covered
+- fixed `RefreshControl` not working correctly in nested `ScrollViews`
+- fixed `Touchables` not detecting all touches when nested in `ScrollView`
+- fixed `topLayout` event being unsupported
+
 ## v0.72.15
 
 - BREAKING: deprecated `RNComponentFactory` in favour of `wrappedCustomRNComponentBuilder` 
