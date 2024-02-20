@@ -25,13 +25,19 @@ export const FileTest = () => {
 
           const reader = new FileReader();
 
-          reader.onload = event => {
-            const result = event.target?.result;
-            expect(result).to.be.eq(fileTextString);
-          };
+          const onLoad = () =>
+            new Promise(resolve => {
+              reader.onload = event => {
+                const result = event.target?.result;
+                resolve(result);
+              };
+            });
 
           reader.readAsText(file);
 
+          const onLoadResult = await onLoad();
+
+          expect(onLoadResult).to.be.eq(fileTextString);
           expect(file.size).to.be.eq(fileTextString.length);
           expect(file.name).to.be.eq('test.txt');
         }}
@@ -48,13 +54,19 @@ export const FileTest = () => {
 
           const reader = new FileReader();
 
-          reader.onload = event => {
-            const result = event.target?.result;
-            expect(result).to.be.eq(CHINESE_SELECTED_CHARACTERS);
-          };
+          const onLoad = () =>
+            new Promise(resolve => {
+              reader.onload = event => {
+                const result = event.target?.result;
+                resolve(result);
+              };
+            });
 
           reader.readAsText(file);
 
+          const onLoadResult = await onLoad();
+
+          expect(onLoadResult).to.be.eq(CHINESE_SELECTED_CHARACTERS);
           expect(file.size).to.be.eq(expectedSize);
           expect(file.name).to.be.eq('chinese.txt');
         }}
@@ -77,13 +89,19 @@ export const FileTest = () => {
 
           const reader = new FileReader();
 
-          reader.onload = event => {
-            const result = event.target?.result;
-            expect(result).to.be.eq(blobString + fileTextString);
-          };
+          const onLoad = () =>
+            new Promise(resolve => {
+              reader.onload = event => {
+                const result = event.target?.result;
+                resolve(result);
+              };
+            });
 
           reader.readAsText(file);
 
+          const onLoadResult = await onLoad();
+
+          expect(onLoadResult).to.be.eq(blobString + fileTextString);
           expect(file.size).to.be.eq(blobString.length + fileTextString.length);
           expect(file.name).to.be.eq('test2.txt');
         }}
@@ -104,13 +122,19 @@ export const FileTest = () => {
 
           const reader = new FileReader();
 
-          reader.onload = event => {
-            const result = event.target?.result;
-            expect(result).to.be.eq(expectedDataURL);
-          };
+          const onLoad = () =>
+            new Promise(resolve => {
+              reader.onload = event => {
+                const result = event.target?.result;
+                resolve(result);
+              };
+            });
 
           reader.readAsDataURL(file);
 
+          const onLoadResult = await onLoad();
+
+          expect(onLoadResult).to.be.eq(expectedDataURL);
           expect(file.size).to.be.eq(fileTextString.length);
           expect(file.name).to.be.eq('test.txt');
         }}
