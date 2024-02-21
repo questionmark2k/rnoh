@@ -6,7 +6,7 @@ import {
   CustomComponentBuilder,
   ComponentBuilderContext
 } from "../../RNOH"
-import { RNView } from "./RNView"
+import { buildRNView, RNView } from "./RNView"
 import { RNImage } from "./RNImage"
 import { RNTextInput } from "./RNTextInput"
 import { RNText } from "./RNText"
@@ -44,10 +44,7 @@ class ComponentBuilderContextImpl implements ComponentBuilderContext {
 @Builder
 export function buildRNComponent(ctx: RNComponentContext, descriptorWrapper: DescriptorWrapper) {
   if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "View" || ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "RootView") {
-    RNView({
-      ctx: ctx,
-      tag: descriptorWrapper.tag,
-    })
+    buildRNView(ctx, descriptorWrapper.tag, {})
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "Image") {
     RNImage({
       ctx: ctx,

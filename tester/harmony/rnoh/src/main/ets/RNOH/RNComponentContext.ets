@@ -1,6 +1,7 @@
 import { RNOHContext } from "./RNOHContext"
-import { Tag } from "./DescriptorBase"
+import { DescriptorWrapper, Tag } from "./DescriptorBase"
 import { RNInstanceImpl } from "./RNInstance"
+import { RNComponentDataSource } from './RNComponentDataSource'
 
 export interface ComponentBuilderContext {
   /**
@@ -32,15 +33,29 @@ export type WrappedRNChildrenBuilder = WrappedBuilder<[RNComponentContext, Tag]>
 
 export type WrappedRNComponentBuilder = WrappedBuilder<[RNComponentContext, Tag]>
 
+export interface RNComponentDataSourceFactoryContext {
+  tag: Tag
+}
+
+export type RNComponentDataSourceFactory = (ctx: RNComponentDataSourceFactoryContext) => RNComponentDataSource
+
 export class RNComponentContext extends RNOHContext {
   public wrappedCustomRNComponentBuilder: WrappedCustomRNComponentBuilder
   public wrappedRNChildrenBuilder: WrappedRNChildrenBuilder
   public wrappedRNComponentBuilder: WrappedRNComponentBuilder
+  private dataSourceFactoriesByType: Map<string, RNComponentDataSourceFactory>
+
+  public createComponentDataSource(ctx: RNComponentDataSourceFactoryContext) {
+    const descriptorWrapper = this.descriptorRegistry.findDescriptorWrapperByTag(ctx.tag);
+    const createComponentDataSource = descriptorWrapper && this.dataSourceFactoriesByType.get(descriptorWrapper.type_);
+    return createComponentDataSource ? createComponentDataSource(ctx) : new RNComponentDataSource(this, ctx.tag);
+  }
 
   constructor(
     rnohContext: RNOHContext,
     wrappedCustomRNComponentBuilder: WrappedCustomRNComponentBuilder,
-    wrappedRNComponentBuilder: WrappedRNComponentBuilder
+    wrappedRNComponentBuilder: WrappedRNComponentBuilder,
+    rnComponentDataSourceFactoriesByDescriptorType: Map<string, RNComponentDataSourceFactory>
   ) {
     super(
       rnohContext.reactNativeVersion,
@@ -50,41 +65,18 @@ export class RNComponentContext extends RNOHContext {
     this.wrappedCustomRNComponentBuilder = wrappedCustomRNComponentBuilder
     this.wrappedRNChildrenBuilder = wrapBuilder(buildRNChildren)
     this.wrappedRNComponentBuilder = wrappedRNComponentBuilder
-  }
-}
-
-
-/**
- * This component will be replaced with a builder in the future once usage of DataSource is possible.
- */
-@Component
-struct RNChildren {
-  public ctx!: RNComponentContext
-  public parentTag: Tag = 0
-  @State childrenTags: Tag[] = []
-  private cleanUpCallbacks: (() => void)[] = []
-
-  aboutToAppear(): void {
-    this.childrenTags = this.ctx.descriptorRegistry.getDescriptor(this.parentTag).childrenTags
-    this.cleanUpCallbacks.push(this.ctx.descriptorRegistry.subscribeToDescriptorChanges(this.parentTag, (descriptor) => {
-      this.childrenTags = descriptor.childrenTags
-    }))
-  }
-
-  aboutToDisappear(): void {
-    this.cleanUpCallbacks.forEach(cb => cb())
-  }
-
-  build() {
-    Stack() {
-      ForEach(this.childrenTags, (childrenTag: Tag) => {
-        this.ctx.wrappedRNComponentBuilder.builder(this.ctx, childrenTag)
-      }, (childrenTag: Tag) => childrenTag.toString())
-    }
+    this.dataSourceFactoriesByType = rnComponentDataSourceFactoriesByDescriptorType
   }
 }
 
 @Builder
 function buildRNChildren(ctx: RNComponentContext, parentTag: Tag) {
-  RNChildren({ ctx, parentTag })
+  Stack() {
+    LazyForEach(ctx.createComponentDataSource({ tag: parentTag }),
+      (descriptorWrapper: DescriptorWrapper) => {
+        ctx.wrappedRNComponentBuilder.builder(ctx, descriptorWrapper.tag)
+      },
+      (descriptorWrapper: DescriptorWrapper) => descriptorWrapper.tag.toString() + "@" + descriptorWrapper.renderKey
+    )
+  }
 }

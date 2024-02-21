@@ -15,6 +15,11 @@ export function Benchmarker({
   const [_startDateTime, setStartDateTime] = useState<Date>();
   const [_endDateTime, setEndDateTime] = useState<Date>();
 
+  const durationInMs =
+    _startDateTime && _endDateTime
+      ? _endDateTime.getTime() - _startDateTime.getTime()
+      : 0;
+
   function start() {
     setStartDateTime(new Date());
     setStatus('RUNNING');
@@ -39,7 +44,7 @@ export function Benchmarker({
   }, [refreshKey, status, samplesCount]);
 
   return (
-    <View style={{height: '100%', padding: 16}}>
+    <View style={{height: '100%', padding: 16, backgroundColor: 'white'}}>
       <TouchableOpacity onPress={start}>
         <Text
           style={{
@@ -52,10 +57,9 @@ export function Benchmarker({
         </Text>
       </TouchableOpacity>
 
-      {/* <View
-        style={{opacity: status === 'FINISHED' && durationInMs > 0 ? 1 : 0}}>
+      <View>
         <Text style={{width: 128, height: 32}}>Duration {durationInMs} ms</Text>
-      </View> */}
+      </View>
 
       {status !== 'READY' && (
         <View style={{height: 600}}>{renderContent(refreshKey)}</View>

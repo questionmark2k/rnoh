@@ -7,6 +7,7 @@ import {
   Tag,
   CustomComponentBuilder,
   RNOHContext,
+  DescriptorWrapper,
 } from '../../../RNOH';
 import { _RNScrollViewManager } from './RNScrollViewManager';
 import { RNViewBase, ViewDescriptorWrapperBase } from '../RNViewBase';
@@ -551,9 +552,12 @@ export struct RNScrollView {
     Scroll(this.scroller) {
       Stack() {
         if (this.ctx instanceof RNComponentContext) {
-          ForEach(this.childrenTags, (childrenTag: Tag) => {
-            (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), childrenTag)
-          }, (childrenTag: Tag) => childrenTag.toString())
+          LazyForEach(this.ctx.createComponentDataSource({ tag: this.tag }),
+            (descriptorWrapper: DescriptorWrapper) => {
+              (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), descriptorWrapper.tag)
+            },
+            (descriptorWrapper: DescriptorWrapper) => descriptorWrapper.tag.toString() + "@" + descriptorWrapper.renderKey
+          )
         } else {
           ForEach(this.childrenTags, (childrenTag: Tag) => {
             RNComponentFactory({ ctx: this.ctx, tag: childrenTag, buildCustomComponent: this.buildCustomComponent })

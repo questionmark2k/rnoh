@@ -1,5 +1,9 @@
-import { RNComponentContext, RNOHContext, Tag, CustomComponentBuilder } from '../../RNOH'
-import { ViewBaseDescriptor, ViewDescriptorWrapperBase, RNViewBaseAttributeModifierBase } from './RNViewBase'
+import { RNComponentContext, RNOHContext, Tag, CustomComponentBuilder, DescriptorWrapper } from '../../RNOH'
+import {
+  ViewBaseDescriptor,
+  ViewDescriptorWrapperBase,
+  RNViewBaseAttributeModifierBase,
+} from './RNViewBase'
 import { RNComponentFactory } from "./RNComponentFactory"
 import { RNViewManager } from '../componentManagers';
 
@@ -8,7 +12,6 @@ export struct RNView {
   public ctx!: RNOHContext
   public tag: number = 0
   @BuilderParam public buildCustomComponent: CustomComponentBuilder
-
   private componentManager!: RNViewManager;
   @State private childrenTags: Tag[] = []
   @State private descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
@@ -67,9 +70,12 @@ export struct RNView {
         Button().width(0).height(0).padding(0).margin(0)
       }
       if (this.ctx instanceof RNComponentContext) {
-        ForEach(this.childrenTags, (childrenTag: Tag) => {
-          (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), childrenTag)
-        }, (childrenTag: Tag) => childrenTag.toString())
+        LazyForEach(this.ctx.createComponentDataSource({ tag: this.tag }),
+          (descriptorWrapper: DescriptorWrapper) => {
+            (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), descriptorWrapper.tag)
+          },
+          (descriptorWrapper: DescriptorWrapper) => descriptorWrapper.tag.toString() + "@" + descriptorWrapper.renderKey
+        )
       } else {
         ForEach(this.childrenTags, (childrenTag: Tag) => {
           RNComponentFactory({ ctx: this.ctx, tag: childrenTag, buildCustomComponent: this.buildCustomComponent })
@@ -81,5 +87,50 @@ export struct RNView {
     .attributeModifier(this.rnViewAttributeModifier)
     .align(Alignment.TopStart);
   }
+}
+
+function onClickEvent(event: ClickEvent, ctx: RNComponentContext, tag: Tag) {
+  if (event.source !== SourceType.TouchScreen) {
+    ctx.rnInstance.emitComponentEvent(tag, "onClick", {})
+  }
+}
+
+interface RNViewStateHolder {
+  componentManager?: RNViewManager
+  onDisappearCallbacks?: (() => void)[]
+}
+
+@Builder
+export function buildRNView(ctx: RNComponentContext, tag: Tag, stateHolder: RNViewStateHolder) {
+  Stack() {
+    /**
+     * Focus hack: container components cannot be focused if they don't contain focusable children.
+     * An invisible button is added to a focusable View to avoid this problem.
+     */
+    if ((ctx.descriptorRegistry.findDescriptorWrapperByTag(tag) as ViewDescriptorWrapperBase)?.focusable) {
+      Button().width(0).height(0).padding(0).margin(0)
+    }
+    LazyForEach(ctx.createComponentDataSource({ tag }),
+      (descriptorWrapper: DescriptorWrapper) => {
+        ctx.wrappedRNComponentBuilder.builder(ctx, descriptorWrapper.tag)
+      },
+      (descriptorWrapper: DescriptorWrapper) => descriptorWrapper.tag.toString() + "@" + descriptorWrapper.renderKey
+    )
+  }
+  .onAppear(() => {
+    if (stateHolder.componentManager === undefined) {
+      stateHolder.componentManager = new RNViewManager(tag, ctx);
+      const cleanup = ctx.componentManagerRegistry.registerComponentManager(tag, stateHolder.componentManager);
+      stateHolder.onDisappearCallbacks = [cleanup];
+    }
+  })
+  .onDisAppear(() => {
+    stateHolder.onDisappearCallbacks?.forEach(cb => cb());
+    stateHolder.onDisappearCallbacks = undefined
+  })
+  .id(tag.toString())
+  .onClick((event: ClickEvent) => onClickEvent(event, ctx, tag))
+  .attributeModifier(new RNViewBaseAttributeModifierBase(ctx, ctx.descriptorRegistry.findDescriptorWrapperByTag(tag) as ViewDescriptorWrapperBase))
+  .align(Alignment.TopStart)
 }
 

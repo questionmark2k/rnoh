@@ -3,7 +3,8 @@ import {
   RNOHContext,
   convertColorSegmentsToString,
   Tag,
-  CustomComponentBuilder
+  CustomComponentBuilder,
+  DescriptorWrapper
 } from '../../../RNOH'
 import { RNViewBase } from '../RNViewBase'
 import { PositionedFragment } from '../../../ParagraphMeasurer';
@@ -108,9 +109,12 @@ export struct RNParagraph {
         })
       })
       if (this.ctx instanceof RNComponentContext) {
-        ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
-          (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), childrenTag)
-        }, (childrenTag: Tag) => childrenTag.toString())
+        LazyForEach(this.ctx.createComponentDataSource({ tag: this.tag }),
+          (descriptorWrapper: DescriptorWrapper) => {
+            (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), descriptorWrapper.tag)
+          },
+          (descriptorWrapper: DescriptorWrapper) => descriptorWrapper.tag.toString() + "@" + descriptorWrapper.renderKey
+        )
       } else {
         ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
           RNComponentFactory({ ctx: this.ctx, tag: childrenTag, buildCustomComponent: this.buildCustomComponent })

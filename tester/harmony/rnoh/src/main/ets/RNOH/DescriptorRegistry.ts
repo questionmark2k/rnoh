@@ -12,6 +12,26 @@ export type DescriptorWrapperFactory = (ctx: { descriptor: Descriptor }) => Desc
 
 type DescriptorChangeListener = (descriptor: Descriptor, descriptorWrapper: DescriptorWrapper | null) => void
 
+type InsertMutation = {
+  descriptorMutationType: "INSERT_CHILD",
+  childIndex: number,
+  childTag: Tag
+}
+type UpdateMutation = {
+  descriptorMutationType: "UPDATE_CHILD",
+  childIndex: number,
+  childTag: Tag
+}
+type RemoveMutation = {
+  descriptorMutationType: "REMOVE_CHILD",
+  childIndex: number,
+  childTag: Tag
+}
+
+export type DescriptorMutation = InsertMutation | UpdateMutation | RemoveMutation
+
+export type DescriptorMutationListener = (args: DescriptorMutation) => void
+
 export class DescriptorRegistry {
   static readonly ANIMATED_NON_RAW_PROP_KEYS = ['transform'];
 
@@ -19,6 +39,7 @@ export class DescriptorRegistry {
   private descriptorWrapperByTag: Map<Tag, DescriptorWrapper> = new Map();
   private descriptorTagById: Map<NativeId, Tag> = new Map();
   private descriptorListenersSetByTag: Map<Tag, Set<DescriptorChangeListener>> = new Map();
+  private descriptorMutationListenersByTag: Map<Tag, Set<DescriptorMutationListener>> = new Map()
   private subtreeListenersSetByTag: Map<Tag, Set<SubtreeListener>> = new Map();
   private animatedRawPropsByTag: Map<Tag, Set<string>> = new Map();
   private updatedUnnotifiedTags = new Set<Tag>()
@@ -46,6 +67,8 @@ export class DescriptorRegistry {
   }
 
   private saveDescriptor(descriptor: Descriptor) {
+    const previousRenderKey = this.descriptorByTag.get(descriptor.tag)?.renderKey;
+    descriptor.renderKey = previousRenderKey !== undefined ? (previousRenderKey + 1) : 0;
     this.descriptorByTag.set(descriptor.tag, descriptor)
     const createDescriptorWrapper = this.descriptorWrapperFactoryByDescriptorType.get(descriptor.type)
     let descriptorWrapper = new DescriptorWrapper(descriptor)
@@ -147,6 +170,14 @@ export class DescriptorRegistry {
     this.saveDescriptor(updatedDescriptor)
 
     this.descriptorListenersSetByTag.get(tag)?.forEach(cb => cb(updatedDescriptor, this.findDescriptorWrapperByTag(tag)));
+    if (updatedDescriptor.parentTag) {
+      const listeners = this.descriptorMutationListenersByTag.get(updatedDescriptor.parentTag);
+      const parentDescriptor = this.getDescriptor(updatedDescriptor.parentTag);
+      const childIndex = parentDescriptor?.childrenTags.findIndex((childTag) => childTag === tag);
+      if (childIndex >= 0) {
+        listeners?.forEach(listener => listener({ descriptorMutationType: "UPDATE_CHILD", childIndex, childTag: tag }));
+      }
+    }
     this.callSubtreeListeners(new Set([tag]));
   }
 
@@ -208,6 +239,20 @@ export class DescriptorRegistry {
     });
   }
 
+  public subscribeToDescriptorMutations(tag: Tag, listener: DescriptorMutationListener) {
+    if (!this.descriptorMutationListenersByTag.has(tag)) {
+      this.descriptorMutationListenersByTag.set(tag, new Set());
+    }
+    this.descriptorMutationListenersByTag.get(tag)!.add(listener);
+    return () => {
+      const listeners = this.descriptorMutationListenersByTag.get(tag);
+      listeners?.delete(listener);
+      if (listeners?.size === 0) {
+        this.descriptorMutationListenersByTag.delete(tag);
+      }
+    };
+  }
+
   public subscribeToDescriptorChanges(
     tag: Tag,
     listener: DescriptorChangeListener,
@@ -262,6 +307,11 @@ export class DescriptorRegistry {
         0,
         mutation.childTag,
       );
+      this.descriptorMutationListenersByTag.get(mutation.parentTag)?.forEach((cb) => cb({
+        descriptorMutationType: "INSERT_CHILD",
+        childIndex: mutation.index,
+        childTag: mutation.childTag
+      }));
       return [mutation.childTag, mutation.parentTag];
     } else if (mutation.type === MutationType.UPDATE) {
       const currentDescriptor = this.descriptorByTag.get(mutation.descriptor.tag);
@@ -279,11 +329,29 @@ export class DescriptorRegistry {
         childrenTags: children,
       };
       this.saveDescriptor(newDescriptor)
+
+      if (currentDescriptor?.parentTag) {
+        const parentDescriptor = this.descriptorByTag.get(currentDescriptor.parentTag ?? 0)
+        const childIndex = parentDescriptor?.childrenTags.indexOf(currentDescriptor.tag)
+        if (parentDescriptor && childIndex >= 0) {
+          this.descriptorMutationListenersByTag.get(currentDescriptor.parentTag)?.forEach((cb) => cb({
+            descriptorMutationType: "UPDATE_CHILD",
+            childTag: currentDescriptor.tag,
+            childIndex
+          }))
+        }
+      }
+
       return [mutation.descriptor.tag];
     } else if (mutation.type === MutationType.REMOVE) {
       const parentDescriptor = this.descriptorByTag.get(mutation.parentTag)!;
       const childDescriptor = this.descriptorByTag.get(mutation.childTag)!;
       const idx = parentDescriptor.childrenTags.indexOf(mutation.childTag);
+      this.descriptorMutationListenersByTag.get(mutation.parentTag)?.forEach((cb) => cb({
+        descriptorMutationType: "REMOVE_CHILD",
+        childTag: mutation.childTag,
+        childIndex: idx
+      }));
       if (idx != -1) {
         parentDescriptor.childrenTags.splice(idx, 1);
       }

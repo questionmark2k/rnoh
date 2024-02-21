@@ -98,6 +98,7 @@ export struct RNApp {
           }),
           this.wrappedCustomRNComponentBuilder,
           wrapBuilder(buildRNComponentForTag),
+          new Map(),
         )
         this.logBoxDialogController = new CustomDialogController({
           cornerRadius: 0,

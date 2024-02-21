@@ -1,5 +1,5 @@
 import { CustomComponentBuilder, RNComponentContext, RNOHContext, Size } from '../../RNOH';
-import { Descriptor, Tag } from '../../RNOH/DescriptorBase';
+import { Descriptor, DescriptorWrapper, Tag } from '../../RNOH/DescriptorBase';
 import { ViewBaseProps } from './RNViewBase';
 import { TouchDispatcher } from '../../RNOH/TouchDispatcher';
 import { RNModalHostViewManager } from '../componentManagers/RNModalHostViewManager';
@@ -116,9 +116,12 @@ struct ModalHostViewDialog {
     if (this.showContent) {
       Stack() {
         if (this.ctx instanceof RNComponentContext) {
-          ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
-            (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), childrenTag)
-          }, (childrenTag: Tag) => childrenTag.toString())
+          LazyForEach(this.ctx.createComponentDataSource({ tag: this.tag }),
+            (descriptorWrapper: DescriptorWrapper) => {
+              (this.ctx as RNComponentContext).wrappedRNComponentBuilder.builder((this.ctx as RNComponentContext), descriptorWrapper.tag)
+            },
+            (descriptorWrapper: DescriptorWrapper) => descriptorWrapper.tag.toString() + "@" + descriptorWrapper.renderKey
+          )
         } else {
           ForEach(this.descriptor.childrenTags, (childrenTag: Tag) => {
             RNComponentFactory({ ctx: this.ctx, tag: childrenTag, buildCustomComponent: this.buildCustomComponent })

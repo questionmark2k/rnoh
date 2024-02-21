@@ -69,6 +69,7 @@ export class RNViewBaseAttributeModifierBase<TViewDescriptorWrapper extends View
     }, "solid")
     this.maybeAssignAttribute(dw => dw.opacity, val => instance.opacity(val), 1)
     this.maybeAssignAttribute(dw => dw.rawTransformationMatrix, val => {
+      if (!val) return;
       const rawTransformationMatrix = val.slice()
       rawTransformationMatrix[12] = vp2px(rawTransformationMatrix[12]);
       rawTransformationMatrix[13] = vp2px(rawTransformationMatrix[13]);

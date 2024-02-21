@@ -18,6 +18,12 @@
         "name": "ohos.permission.ACCELEROMETER"
       },
     ],
+    "metadata": [
+      {
+        "name": "OPTLazyForEach",
+        "value": "true",
+      }
+    ],
     "abilities": [
       {
         "name": "EntryAbility",

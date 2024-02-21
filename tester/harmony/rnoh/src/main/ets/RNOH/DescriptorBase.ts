@@ -111,6 +111,13 @@ TPropsSelector extends PropsSelectorBase = PropsSelectorBase,
     return []
   }
 
+  /**
+   * A number which changes each time the component corresponding to this descriptor is updated.
+   */
+  public get renderKey(): number {
+    return this.descriptor.renderKey ?? 0
+  }
+
   protected get rawProps(): TRawProps {
     return this.descriptor.rawProps
   }
@@ -199,6 +206,11 @@ TRawProps extends Object = Object> {
    * @deprecated: Use `rawProps`
    */
   isDynamicBinder: boolean;
+
+  /**
+   * A number which changes each time this component is updated
+   */
+  renderKey?: number;
 }
 ;
 
