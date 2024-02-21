@@ -17,7 +17,7 @@ export class ImageLoaderTurboModule extends TurboModule {
   constructor(protected ctx: TurboModuleContext) {
     super(ctx)
     this.imageLoader = new RemoteImageLoader(
-      new RemoteImageMemoryCache(128), new RemoteImageDiskCache(128), ctx.uiAbilityContext)
+      new RemoteImageMemoryCache(128), new RemoteImageDiskCache(128, ctx.uiAbilityContext.cacheDir), ctx.uiAbilityContext)
   }
 
   public getConstants() {
@@ -53,10 +53,6 @@ export class ImageLoaderTurboModule extends TurboModule {
     ).filter(([_uri, value]) => value !== undefined);
     const cachedUriMap = Object.fromEntries(cachedUriEntries)
     return Promise.resolve(cachedUriMap)
-  }
-
-  public getCachedImage(uri: string): string | undefined {
-    return this.imageLoader.getImageFromCache(uri)
   }
 
   public async getRemoteImageSource(uri:string): Promise<RemoteImageSource> {
