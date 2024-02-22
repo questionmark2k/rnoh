@@ -108,6 +108,10 @@ export struct RNTextInput {
     const event: TextInputEvent = {
       text: this.value,
       eventCount: ++this.nativeEventCount,
+      selectionRange: {
+        location: this.selection.start,
+        length: this.selection.end - this.selection.start,
+      }
     };
     return event;
   }
@@ -135,6 +139,9 @@ export struct RNTextInput {
       this.value = "";
       this.shouldIgnoreNextValueChange = true;
     }
+    if (this.descriptorWrapper?.selectTextOnFocus) {
+      this.getController().setTextSelection(0, this.value.length);
+    }
     this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onFocus", this.createTextInputEvent());
   }
 
@@ -151,6 +158,13 @@ export struct RNTextInput {
     if (this.canUpdateWithEventCount(mostRecentEventCount)) {
       this.value = newValue;
     }
+  }
+
+  getController(): TextInputController | TextAreaController {
+    if (this.descriptor.props?.multiline) {
+      return this.areaController;
+    }
+    return this.inputController;
   }
 
   onDescriptorChange(newDescriptor: TextInputDescriptor) {
@@ -180,16 +194,14 @@ export struct RNTextInput {
       this.tag,
       (command, args: Object[]) => {
         if (command === 'blur') {
-          if (this.descriptor.props?.multiline) {
-            this.areaController.stopEditing();
-          }
-          else {
-            this.inputController.stopEditing();
-          }
+          this.getController().stopEditing();
         } else if (command === 'setTextAndSelection') {
           const parsedArgs = parseSetTextAndSelectionCommandCallback(args);
           if (parsedArgs.value !== undefined) {
             this.maybeSetValue(parsedArgs.value, parsedArgs.mostRecentEventCount);
+          }
+          if (parsedArgs.start !== undefined && parsedArgs.end !== undefined) {
+            this.getController().setTextSelection(parsedArgs.start, parsedArgs.end);
           }
         } else if (command === 'focus') {
           focusControl.requestFocus(`TextInput@${this.tag}`)
@@ -261,6 +273,7 @@ export struct RNTextInput {
     this.dispatchKeyEvent({ start: currentSelectionStart, end: currentSelectionEnd });
     this.selection = { start: currentSelectionStart, end: currentSelectionEnd };
     this.dispatchChangeEvent();
+    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onSelectionChange", this.createTextInputEvent());
   }
 
   build() {

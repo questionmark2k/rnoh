@@ -385,9 +385,52 @@ export function TextInputTest() {
         <TextInputWithText style={styles.textInput} clearButtonMode="never" />
         <Text>clearButtonMode="never"</Text>
       </TestCase>
+      <TestCase modal itShould="show selection start and end values">
+        <TextSelectionChangeTest />
+      </TestCase>
+      <TestCase
+        modal
+        itShould="show textinput with 'Selection' substring selected">
+        <SelectionTest />
+      </TestCase>
+      <TestCase modal itShould="select text on focus">
+        <TextInput
+          value="selectTextOnFocus"
+          selectTextOnFocus
+          style={styles.textInput}
+        />
+      </TestCase>
     </TestSuite>
   );
 }
+
+const SelectionTest = () => {
+  return (
+    <View>
+      <TextInput
+        style={styles.textInput}
+        value="TextSelectionTest"
+        selection={{start: 4, end: 13}}
+      />
+    </View>
+  );
+};
+
+const TextSelectionChangeTest = () => {
+  const [eventData, setEventData] = useState('');
+  return (
+    <View>
+      <TextInput
+        style={styles.textInput}
+        onSelectionChange={event =>
+          setEventData(JSON.stringify(event.nativeEvent.selection))
+        }
+      />
+      <Text style={{marginVertical: 8}}>Selection {eventData}</Text>
+    </View>
+  );
+};
+
 const FocusTextInputTest = (props: {
   setState: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {

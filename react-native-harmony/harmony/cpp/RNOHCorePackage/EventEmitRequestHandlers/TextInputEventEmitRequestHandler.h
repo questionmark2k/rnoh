@@ -7,7 +7,10 @@ namespace rnoh {
 facebook::react::TextInputMetrics convertTextInputEvent(ArkJS &arkJs, napi_value eventObject) {
     auto text = arkJs.getString(arkJs.getObjectProperty(eventObject, "text"));
     auto eventCount = arkJs.getInteger(arkJs.getObjectProperty(eventObject, "eventCount"));
-    facebook::react::TextInputMetrics textInputMetrics{.text = text, .eventCount = eventCount};
+    auto selectionRangeNapi = arkJs.getObject(arkJs.getObjectProperty(eventObject, "selectionRange"));
+    auto selectionRangeLocation = arkJs.getInteger(selectionRangeNapi.getProperty("location"));
+    auto selectionRangeLength = arkJs.getInteger(selectionRangeNapi.getProperty("length"));
+    facebook::react::TextInputMetrics textInputMetrics{.text = text, .selectionRange = {.location = selectionRangeLocation, .length = selectionRangeLength}, .eventCount = eventCount};
     return textInputMetrics;
 }
 
@@ -26,6 +29,7 @@ enum TextInputEventType {
     TEXT_INPUT_ON_FOCUS,
     TEXT_INPUT_ON_BLUR,
     TEXT_INPUT_ON_KEY_PRESS,
+    TEXT_INPUT_ON_SELECTION_CHANGE,
 };
 
 TextInputEventType getTextInputEventType(std::string const &eventName) {
@@ -41,6 +45,8 @@ TextInputEventType getTextInputEventType(std::string const &eventName) {
         return TextInputEventType::TEXT_INPUT_ON_BLUR;
     } else if (eventName == "onKeyPress") {
         return TextInputEventType::TEXT_INPUT_ON_KEY_PRESS;
+    } else if (eventName == "onSelectionChange") {
+        return TextInputEventType::TEXT_INPUT_ON_SELECTION_CHANGE;
     } else {
         return TextInputEventType::TEXT_INPUT_UNSUPPORTED;
     }
@@ -77,6 +83,9 @@ class TextInputEventEmitRequestHandler : public EventEmitRequestHandler {
             break;
         case TextInputEventType::TEXT_INPUT_ON_KEY_PRESS:
             eventEmitter->onKeyPress(convertKeyPressEvent(arkJs, ctx.payload));
+            break;
+        case TextInputEventType::TEXT_INPUT_ON_SELECTION_CHANGE:
+            eventEmitter->onSelectionChange(convertTextInputEvent(arkJs, ctx.payload));
             break;
         default:
             break;

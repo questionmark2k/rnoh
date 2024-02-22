@@ -23,6 +23,7 @@ class TextInputComponentJSIBinder : public ViewComponentJSIBinder {
         nativeProps.setProperty(rt, "clearTextOnFocus", "boolean");
         nativeProps.setProperty(rt, "mostRecentEventCount", "number");
         nativeProps.setProperty(rt, "clearButtonMode", "string");
+        nativeProps.setProperty(rt, "selectTextOnFocus", "boolean");
 
         return nativeProps;
     };
@@ -33,6 +34,7 @@ class TextInputComponentJSIBinder : public ViewComponentJSIBinder {
         events.setProperty(rt, "topSubmitEditing", createDirectEvent(rt, "onSubmitEditing"));
         events.setProperty(rt, "topEndEditing", createDirectEvent(rt, "onEndEditing"));
         events.setProperty(rt, "topKeyPress", createDirectEvent(rt, "onKeyPress"));
+        events.setProperty(rt, "topSelectionChange", createDirectEvent(rt, "topSelectionChange"));
 
         return events;
     }

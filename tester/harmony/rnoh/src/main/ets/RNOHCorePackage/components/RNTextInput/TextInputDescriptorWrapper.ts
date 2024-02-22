@@ -1,6 +1,6 @@
 import { convertColorValueToRGBA, Descriptor, Point } from '../../../RNOH/ts';
 import { ViewDescriptorWrapperBase } from '../RNViewBase/ViewDescriptorWrapper';
-import { ClearButtonMode, TextInputProps, TextInputRawProps, TextInputState } from './types';
+import { ClearButtonMode, Selection, TextInputProps, TextInputRawProps, TextInputState } from './types';
 
 
 export class TextInputDescriptorWrapper extends ViewDescriptorWrapperBase<string, TextInputProps, TextInputState, TextInputRawProps> {
@@ -56,4 +56,9 @@ export class TextInputDescriptorWrapper extends ViewDescriptorWrapperBase<string
   public get clearButtonMode(): ClearButtonMode {
     return this.rawProps.clearButtonMode ?? 'never';
   }
+
+  public get selectTextOnFocus(): boolean {
+    return this.rawProps.selectTextOnFocus ?? false;
+  }
+
 }
