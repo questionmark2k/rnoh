@@ -1,12 +1,12 @@
-import { RNComponentFactory, buildRNComponent } from './RNOHCorePackage';
+import { RNComponentFactory, RNView } from './RNOHCorePackage';
 import {
+  ComponentBuilderContext,
   Descriptor,
   DisplayMode,
   RNComponentContext,
-  ComponentBuilderContext,
-  RNOHLogger,
   RNOHContext,
-  RNOHError
+  RNOHError,
+  RNOHLogger
 } from './RNOH';
 import {
   ViewBaseProps,
@@ -146,7 +146,7 @@ export struct RNSurface {
   build() {
     Stack() {
       if (this.ctx instanceof RNComponentContext) {
-        buildRNComponent(this.ctx, this.ctx.descriptorRegistry.findDescriptorWrapperByTag(this.surfaceHandle.getTag())!)
+        RNView({ ctx: this.ctx, tag: this.surfaceHandle.getTag() })
       } else {
         RNComponentFactory({
           ctx: this.ctx,
