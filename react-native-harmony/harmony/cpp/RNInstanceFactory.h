@@ -1,16 +1,11 @@
 #pragma once
-#include "napi/native_api.h"
 #include <memory>
 #include <string>
 #include <array>
 #include <vector>
-#include <react/renderer/components/view/ViewComponentDescriptor.h>
+#include <react/renderer/mounting/ShadowViewMutation.h>
 #include <react/renderer/components/image/ImageComponentDescriptor.h>
-#include <react/renderer/components/text/TextComponentDescriptor.h>
-#include <react/renderer/components/text/RawTextComponentDescriptor.h>
 #include <react/renderer/components/text/ParagraphComponentDescriptor.h>
-#include <react/renderer/components/textinput/TextInputComponentDescriptor.h>
-#include <react/renderer/components/scrollview/ScrollViewComponentDescriptor.h>
 #include "RNOH/ArkJS.h"
 #include "RNOH/RNInstance.h"
 #include "RNOH/MutationsToNapiConverter.h"
@@ -26,21 +21,17 @@
 
 using namespace rnoh;
 
-std::unique_ptr<RNInstance> createRNInstance(int id,
-                                             napi_env env,
-                                             napi_ref arkTsTurboModuleProviderRef,
+std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef,
                                              MutationsListener &&mutationsListener,
                                              MountingManager::CommandDispatcher &&commandDispatcher,
-                                             napi_ref measureTextFnRef,
-                                             napi_ref napiEventDispatcherRef,
-                                             FeatureFlagRegistry::Shared featureFlagRegistry,
-                                             UITicker::Shared uiTicker,
-                                             bool shouldEnableDebugger,
-                                             bool shouldEnableBackgroundExecutor) {
+                                             napi_ref measureTextFnRef, napi_ref napiEventDispatcherRef,
+                                             FeatureFlagRegistry::Shared featureFlagRegistry, UITicker::Shared uiTicker,
+                                             bool shouldEnableDebugger, bool shouldEnableBackgroundExecutor) {
     std::shared_ptr<TaskExecutor> taskExecutor = std::make_shared<TaskExecutor>(env, shouldEnableBackgroundExecutor);
-    auto mainThreadChannel = std::make_shared<ArkTSChannel>(taskExecutor, ArkJS(env), napiEventDispatcherRef);
+    auto arkTSChannel = std::make_shared<ArkTSChannel>(taskExecutor, ArkJS(env), napiEventDispatcherRef);
 
-    taskExecutor->setExceptionHandler([weakExecutor = std::weak_ptr(taskExecutor), weakChannel = std::weak_ptr(mainThreadChannel)](std::exception const &e) {
+    taskExecutor->setExceptionHandler([weakExecutor = std::weak_ptr(taskExecutor),
+                                       weakChannel = std::weak_ptr(arkTSChannel)](std::exception const &e) {
         auto executor = weakExecutor.lock();
         if (executor == nullptr) {
             return;
@@ -73,7 +64,8 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
     contextContainer->insert("textLayoutManagerDelegate", textMeasurer);
     PackageProvider packageProvider;
     auto packages = packageProvider.getPackages({});
-    packages.insert(packages.begin(), std::make_shared<RNOHCorePackage>(Package::Context{.shadowViewRegistry = shadowViewRegistry}));
+    packages.insert(packages.begin(),
+                    std::make_shared<RNOHCorePackage>(Package::Context{.shadowViewRegistry = shadowViewRegistry}));
 
     auto componentDescriptorProviderRegistry = std::make_shared<facebook::react::ComponentDescriptorProviderRegistry>();
     std::vector<std::shared_ptr<TurboModuleFactoryDelegate>> turboModuleFactoryDelegates;
@@ -97,32 +89,36 @@ std::unique_ptr<RNInstance> createRNInstance(int id,
             componentNapiBinderByName.insert({name, componentNapiBinder});
         };
         auto packageGlobalJSIBinders = package->createGlobalJSIBinders();
-        globalJSIBinders.insert(globalJSIBinders.end(),
-                                        std::make_move_iterator(packageGlobalJSIBinders.begin()),
-                                        std::make_move_iterator(packageGlobalJSIBinders.end()));
+        globalJSIBinders.insert(globalJSIBinders.end(), std::make_move_iterator(packageGlobalJSIBinders.begin()),
+                                std::make_move_iterator(packageGlobalJSIBinders.end()));
         auto packageEventEmitRequestHandlers = package->createEventEmitRequestHandlers();
         eventEmitRequestHandlers.insert(eventEmitRequestHandlers.end(),
                                         std::make_move_iterator(packageEventEmitRequestHandlers.begin()),
                                         std::make_move_iterator(packageEventEmitRequestHandlers.end()));
     }
 
-    auto turboModuleFactory = TurboModuleFactory(env, arkTsTurboModuleProviderRef,
-                                                 std::move(componentJSIBinderByName),
-                                                 taskExecutor,
-                                                 std::move(turboModuleFactoryDelegates));
-    return std::make_unique<RNInstance>(id,
-                                        contextContainer,
-                                        std::move(turboModuleFactory),
-                                        taskExecutor,
-                                        componentDescriptorProviderRegistry,
-                                        MutationsToNapiConverter(std::move(componentNapiBinderByName)),
-                                        eventEmitRequestHandlers,
-                                        globalJSIBinders,
-                                        std::move(mutationsListener),
-                                        std::move(commandDispatcher),
-                                        mainThreadChannel,
-                                        uiTicker,
-                                        shadowViewRegistry,
-                                        shouldEnableDebugger,
-                                        shouldEnableBackgroundExecutor);
+    auto turboModuleFactory = TurboModuleFactory(env, arkTsTurboModuleProviderRef, std::move(componentJSIBinderByName),
+                                                 taskExecutor, std::move(turboModuleFactoryDelegates));
+    MutationsToNapiConverter mutationsToNapiConverter(std::move(componentNapiBinderByName));
+    auto schedulerDelegate = std::make_unique<SchedulerDelegate>(
+        MountingManager(
+            taskExecutor, shadowViewRegistry,
+            [mutationsListener = mutationsListener,
+             mutationsToNapiConverter = mutationsToNapiConverter](facebook::react::ShadowViewMutationList mutations) {
+                mutationsListener(mutationsToNapiConverter, mutations);
+            },
+            [weakExecutor = std::weak_ptr(taskExecutor),
+             commandDispatcher = commandDispatcher](auto tag, auto commandName, auto args) {
+                if (auto taskExecutor = weakExecutor.lock()) {
+                    taskExecutor->runTask(TaskThread::MAIN,
+                                          [tag, commandDispatcher, commandName = std::move(commandName),
+                                           args = std::move(args)]() { commandDispatcher(tag, commandName, args); });
+                }
+            }),
+        arkTSChannel);
+    return std::make_unique<RNInstance>(
+        id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
+        MutationsToNapiConverter(std::move(componentNapiBinderByName)), eventEmitRequestHandlers, globalJSIBinders,
+        uiTicker, shadowViewRegistry, std::move(schedulerDelegate), shouldEnableDebugger,
+        shouldEnableBackgroundExecutor);
 }

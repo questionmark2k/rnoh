@@ -87,24 +87,11 @@ void RNInstance::initializeScheduler(std::shared_ptr<TurboModuleProvider> turboM
         };
     }
 
-    this->schedulerDelegate = std::make_unique<SchedulerDelegate>(MountingManager(
-                                                                      taskExecutor,
-                                                                      m_shadowViewRegistry,
-                                                                      [mutationsListener = this->m_mutationsListener, mutationsToNapiConverter = this->m_mutationsToNapiConverter](react::ShadowViewMutationList mutations) {
-                                                                          mutationsListener(mutationsToNapiConverter, mutations);
-                                                                      },
-                                                                      [weakExecutor = std::weak_ptr(this->taskExecutor), commandDispatcher = this->m_commandDispatcher](auto tag, auto commandName, auto args) {
-                                                                          if (auto taskExecutor = weakExecutor.lock()) {
-                                                                              taskExecutor->runTask(TaskThread::MAIN, [tag, commandDispatcher, commandName = std::move(commandName), args = std::move(args)]() {
-                                                                                  commandDispatcher(tag, commandName, args);
-                                                                              });
-                                                                          }
-                                                                      }),
-                                                                  m_arkTsChannel);
+
     m_animationDriver = std::make_shared<react::LayoutAnimationDriver>(
         this->instance->getRuntimeExecutor(), m_contextContainer, this);
     this->scheduler = std::make_shared<react::Scheduler>(
-        schedulerToolbox, m_animationDriver.get(), schedulerDelegate.get());
+        schedulerToolbox, m_animationDriver.get(), m_schedulerDelegate.get());
     turboModuleProvider->setScheduler(this->scheduler);
 }
 

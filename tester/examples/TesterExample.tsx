@@ -1,14 +1,13 @@
 import {Tester, Filter} from '@rnoh/testerino';
 import * as React from 'react';
-import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import * as tests from '../tests';
 
 export function TesterExample({filter}: {filter: Filter}) {
   const scrollRef = React.useRef<ScrollView>(null);
 
   return (
-    <SafeAreaView
-      style={{width: '100%', height: '100%', backgroundColor: '#222'}}>
+    <View style={{width: '100%', height: '100%', backgroundColor: '#222'}}>
       <Tester style={{flex: 1}} filter={filter}>
         <ScrollView style={styles.container} ref={scrollRef}>
           {Object.keys(tests).map(testSuiteName => {
@@ -24,7 +23,7 @@ export function TesterExample({filter}: {filter: Filter}) {
           })}
         </ScrollView>
       </Tester>
-    </SafeAreaView>
+    </View>
   );
 }
 

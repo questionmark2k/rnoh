@@ -74,7 +74,8 @@
     "yargs": "^17.7.2"
   },
   "overrides": {
-    "@react-native-community/cli": "11.3.6"
+    "@react-native-community/cli": "11.3.6",
+    "@react-native/codegen": "0.74.0"
   },
   "resolutions": {
     "@react-native-community/cli": "11.3.6"
