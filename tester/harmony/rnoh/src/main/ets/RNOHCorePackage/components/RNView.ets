@@ -95,13 +95,8 @@ function onClickEvent(event: ClickEvent, ctx: RNComponentContext, tag: Tag) {
   }
 }
 
-interface RNViewStateHolder {
-  componentManager?: RNViewManager
-  onDisappearCallbacks?: (() => void)[]
-}
-
 @Builder
-export function buildRNView(ctx: RNComponentContext, tag: Tag, stateHolder: RNViewStateHolder) {
+export function buildRNView(ctx: RNComponentContext, tag: Tag) {
   Stack() {
     /**
      * Focus hack: container components cannot be focused if they don't contain focusable children.
@@ -118,15 +113,14 @@ export function buildRNView(ctx: RNComponentContext, tag: Tag, stateHolder: RNVi
     )
   }
   .onAppear(() => {
-    if (stateHolder.componentManager === undefined) {
-      stateHolder.componentManager = new RNViewManager(tag, ctx);
-      const cleanup = ctx.componentManagerRegistry.registerComponentManager(tag, stateHolder.componentManager);
-      stateHolder.onDisappearCallbacks = [cleanup];
-    }
+    const descriptorWrapper = ctx.descriptorRegistry.findDescriptorWrapperByTag(tag) as ViewDescriptorWrapperBase
+    const componentManager = ctx.componentManagerRegistry.findOrCreateComponentManager(tag, () => {
+      return new RNViewManager(tag, ctx);
+    })
+    componentManager.setParentTag(descriptorWrapper.parentTag)
   })
   .onDisAppear(() => {
-    stateHolder.onDisappearCallbacks?.forEach(cb => cb());
-    stateHolder.onDisappearCallbacks = undefined
+    ctx.componentManagerRegistry.releaseComponentManager(tag)
   })
   .id(tag.toString())
   .onClick((event: ClickEvent) => onClickEvent(event, ctx, tag))

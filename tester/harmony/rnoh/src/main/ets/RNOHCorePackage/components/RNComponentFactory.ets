@@ -44,7 +44,7 @@ class ComponentBuilderContextImpl implements ComponentBuilderContext {
 @Builder
 export function buildRNComponent(ctx: RNComponentContext, descriptorWrapper: DescriptorWrapper) {
   if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "View" || ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "RootView") {
-    buildRNView(ctx, descriptorWrapper.tag, {})
+    buildRNView(ctx, descriptorWrapper.tag)
   } else if (ctx.rnInstance.getComponentNameFromDescriptorType(descriptorWrapper.type_) === "Image") {
     RNImage({
       ctx: ctx,

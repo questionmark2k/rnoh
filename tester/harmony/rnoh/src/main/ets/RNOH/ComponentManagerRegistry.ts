@@ -2,15 +2,26 @@ import type { ComponentManager } from './ComponentManager';
 import type { Tag } from './DescriptorBase';
 import type { RNOHLogger } from "./RNOHLogger"
 
+interface ComponentManagerRegistryEntry {
+  componentManager: ComponentManager,
+  refCounter: number,
+}
+
 export class ComponentManagerRegistry {
   private componentManagersByTag: Map<Tag, ComponentManager[]>;
+  private entryByTag: Map<Tag, ComponentManagerRegistryEntry> = new Map();
   private logger: RNOHLogger
+
   constructor(logger: RNOHLogger) {
     this.componentManagersByTag = new Map();
     this.logger = logger.clone("ComponentManagerRegistry")
   }
 
   public getComponentManager(tag: Tag): ComponentManager | undefined {
+    const entry = this.entryByTag.get(tag);
+    if (entry) {
+      return entry.componentManager;
+    }
     const componentManagers = this.componentManagersByTag.get(tag);
     if (!componentManagers || componentManagers.length === 0) {
       return undefined
@@ -21,6 +32,11 @@ export class ComponentManagerRegistry {
     return componentManagers[componentManagers.length - 1]
   }
 
+  /**
+   * @param tag
+   * @param manager
+   * @deprecated Use findOrCreateComponentManager instead
+   */
   public registerComponentManager(tag: Tag, manager: ComponentManager) {
     const componentManagers = this.componentManagersByTag.get(tag)
     if (!componentManagers) {
@@ -41,6 +57,52 @@ export class ComponentManagerRegistry {
     }
   }
 
+  /**
+   * Returns the `ComponentManager` for a view,
+   * creating it if there's none registered.
+   * Each call to `findOrCreateComponentManager` must be matched 1:1
+   * with a call to `releaseComponentManager` for the same `tag`
+   * @param tag
+   * tag of the view
+   * @param createComponentManager
+   * factory function to call when the manager has not yet been registered
+   */
+  public findOrCreateComponentManager<TComponentManager extends ComponentManager>(
+    tag: Tag,
+    createComponentManager: () => TComponentManager
+  ): TComponentManager {
+    const entry = this.entryByTag.get(tag);
+    if (entry !== undefined) {
+      entry.refCounter += 1
+      return entry.componentManager as TComponentManager
+    }
+
+    const componentManager = createComponentManager();
+    this.entryByTag.set(tag, { componentManager, refCounter: 1 });
+    return componentManager;
+  }
+
+  /**
+   * Called to allow releasing a `ComponentManager`
+   * previously obtained from `findOrCreateComponentManager`.
+   * Each call to `findOrCreateComponentManager` must be matched 1:1
+   * with a call to `releaseComponentManager` for the same `tag`
+   * @param tag
+   */
+  public releaseComponentManager(tag: Tag) {
+    const entry = this.entryByTag.get(tag);
+    if (entry === undefined) {
+      this.logger.warn(`Tried to release already disposed component manager for tag: ${tag}`)
+      return;
+    }
+
+    entry.refCounter -= 1;
+    if (entry.refCounter === 0) {
+      entry.componentManager.onDestroy();
+      this.entryByTag.delete(tag);
+    }
+  }
+
   public getComponentManagerLineage(tag: Tag): ComponentManager[] {
     const results: ComponentManager[] = []
     let currentTag: Tag | undefined = tag
@@ -55,5 +117,4 @@ export class ComponentManagerRegistry {
     } while (currentTag !== undefined);
     return results.reverse();
   }
-
 }
