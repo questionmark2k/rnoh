@@ -72,7 +72,7 @@ const rootDescriptor = {
   }
 }
 
-type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS"
+type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS" | "IMAGE_LOADER"
 
 export interface RNInstance {
   descriptorRegistry: DescriptorRegistry;
@@ -137,6 +137,7 @@ export type RNInstanceOptions = {
   enableDebugger?: boolean,
   enableBackgroundExecutor?: boolean,
   enableNDKTextMeasuring?: boolean,
+  enableImageLoader?: boolean,
 }
 
 
@@ -174,10 +175,14 @@ export class RNInstanceImpl implements RNInstance {
     private shouldEnableDebugger: boolean,
     private shouldEnableBackgroundExecutor: boolean,
     private shouldUseNDKToMeasureText: boolean,
+    private shouldUseImageLoader: boolean,
   ) {
     this.logger = injectedLogger.clone("RNInstance")
     if (this.shouldUseNDKToMeasureText) {
       this.enableFeatureFlag("NDK_TEXT_MEASUREMENTS")
+    }
+    if (this.shouldUseImageLoader) {
+      this.enableFeatureFlag("IMAGE_LOADER")
     }
     this.onCreate()
   }

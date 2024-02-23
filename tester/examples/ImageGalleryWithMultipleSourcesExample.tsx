@@ -1,15 +1,53 @@
-import React, {useState} from 'react';
-import {Image, ScrollView, StyleSheet, TextInput, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 const REMOTE_IMAGE_URL =
-  'https://images.pexels.com/photos/7125778/pexels-photo-7125778.jpeg?auto=compress&cs=tinysrgb&w=2000&h=2000&dpr=2';
+  'https://images.pexels.com/photos/7125778/pexels-photo-7125778.jpeg?auto=compress&cs=tinysrgb&w=1900&h=1900&dpr=2';
+const NUMBER_OF_IMAGES = 90;
+const MEMORY_CONSUMING_SCENARIO = false;
 
 // run example and it will break, sometimes after scrolling the page
 export function ImageGalleryWithMultipleSourcesExample() {
-  const [numberOfComponents, setNumberOfComponents] = useState(70);
+  const [numberOfComponents, setNumberOfComponents] =
+    useState(NUMBER_OF_IMAGES);
+  const [preloadingImagesOn, setPreloadingImagesOn] = useState(
+    MEMORY_CONSUMING_SCENARIO,
+  );
 
+  useEffect(() => {
+    if (!preloadingImagesOn) {
+      return;
+    }
+    const promisesArray: Promise<boolean>[] = [];
+    for (let i = 0; i < numberOfComponents; i++) {
+      const promise = Image.prefetch(REMOTE_IMAGE_URL + '&v=' + i);
+      promisesArray.push(promise);
+    }
+    Promise.all(promisesArray)
+      .then(res => console.log('Successfully loaded all images', res))
+      .catch(err => console.log('Failed to load all images', err))
+      .finally(() => {
+        setPreloadingImagesOn(false);
+      });
+  }, []);
+  if (preloadingImagesOn) {
+    return (
+      <View>
+        <Text style={styles.textInput}>
+          Preloading images on. Wait ~1 minute for finishing image preload
+        </Text>
+      </View>
+    );
+  }
   return (
     <ScrollView style={{flex: 1}}>
-      <View style={{flexDirection: 'column'}}>
+      <View>
         <TextInput
           style={styles.textInput}
           value={numberOfComponents.toString()}
@@ -39,8 +77,8 @@ export function ImageGalleryWithMultipleSourcesExample() {
 }
 const styles = StyleSheet.create({
   image: {
-    width: 30,
-    height: 30,
+    width: 60,
+    height: 60,
     aspectRatio: 1,
   },
   textInput: {

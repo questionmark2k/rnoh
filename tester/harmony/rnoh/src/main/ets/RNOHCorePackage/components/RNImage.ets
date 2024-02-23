@@ -86,7 +86,7 @@ export struct RNImage {
     this.unregisterDescriptorChangesListener?.()
   }
 
-  updateImageSource() {
+  async updateImageSource() {
     const uri = this.descriptor.props.uri;
     if (uri.startsWith("asset://")) {
       this.imageSource = new ImageSourceHolder($rawfile(uri.replace("asset://", "assets/")));
@@ -96,7 +96,15 @@ export struct RNImage {
       this.imageSource = new ImageSourceHolder(uri);
       return;
     }
+    const skipImageLoader = true && !this.ctx.rnInstance.isFeatureFlagEnabled("IMAGE_LOADER");
     const imageLoader = this.ctx.rnInstance.getTurboModule<ImageLoaderTurboModule>("ImageLoader");
+    const queryCacheResult = await imageLoader.queryCache([uri]) as Record<string, string>;
+    const isNotCached = !queryCacheResult[uri];
+    if (skipImageLoader && isNotCached) {
+      this.imageSource = new ImageSourceHolder(uri);
+      return;
+    }
+
     this.imageSource = undefined;
     imageLoader.getRemoteImageSource(uri).then(async (remoteImage) => {
       try {
