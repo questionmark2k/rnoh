@@ -29,16 +29,18 @@ using ComponentNapiBinderByString = std::unordered_map<std::string, std::shared_
 
 class MutationsToNapiConverter {
   public:
-    MutationsToNapiConverter(ComponentNapiBinderByString &&componentNapiBinderByName);
+    using Shared = std::shared_ptr<MutationsToNapiConverter>;
+
+    MutationsToNapiConverter(ComponentNapiBinderByString componentNapiBinderByName);
 
     napi_value convert(
         napi_env env,
-        facebook::react::ShadowViewMutationList const &mutations);
+        facebook::react::ShadowViewMutationList const &mutations) const;
 
     void updateState(napi_env env, std::string const &componentName, facebook::react::State::Shared const &state, napi_value newState);
 
   private:
-    napi_value convertShadowView(napi_env env, facebook::react::ShadowView const shadowView);
+    napi_value convertShadowView(napi_env env, facebook::react::ShadowView const shadowView) const;
 
     ComponentNapiBinderByString m_componentNapiBinderByName;
 };

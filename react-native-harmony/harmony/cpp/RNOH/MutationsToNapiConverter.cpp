@@ -6,10 +6,10 @@
 using namespace facebook;
 using namespace rnoh;
 
-MutationsToNapiConverter::MutationsToNapiConverter(ComponentNapiBinderByString &&componentNapiBinderByName)
+MutationsToNapiConverter::MutationsToNapiConverter(ComponentNapiBinderByString componentNapiBinderByName)
     : m_componentNapiBinderByName(std::move(componentNapiBinderByName)) {}
 
-napi_value MutationsToNapiConverter::convert(napi_env env, react::ShadowViewMutationList const &mutations) {
+napi_value MutationsToNapiConverter::convert(napi_env env, react::ShadowViewMutationList const &mutations) const {
     std::vector<napi_value> napiMutations;
     ArkJS arkJs(env);
     for (auto &mutation : mutations) {
@@ -55,7 +55,7 @@ void rnoh::MutationsToNapiConverter::updateState(napi_env env, std::string const
     return;
 }
 
-napi_value MutationsToNapiConverter::convertShadowView(napi_env env, react::ShadowView const shadowView) {
+napi_value MutationsToNapiConverter::convertShadowView(napi_env env, react::ShadowView const shadowView) const {
     ArkJS arkJs(env);
     auto descriptorBuilder = arkJs.createObjectBuilder();
     if (m_componentNapiBinderByName.count(shadowView.componentName) > 0) {

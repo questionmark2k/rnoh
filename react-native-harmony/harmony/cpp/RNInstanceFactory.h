@@ -99,13 +99,13 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
 
     auto turboModuleFactory = TurboModuleFactory(env, arkTsTurboModuleProviderRef, std::move(componentJSIBinderByName),
                                                  taskExecutor, std::move(turboModuleFactoryDelegates));
-    MutationsToNapiConverter mutationsToNapiConverter(std::move(componentNapiBinderByName));
+    auto mutationsToNapiConverter = std::make_shared<MutationsToNapiConverter>(std::move(componentNapiBinderByName));
     auto schedulerDelegate = std::make_unique<SchedulerDelegate>(
         MountingManager(
             taskExecutor, shadowViewRegistry,
-            [mutationsListener = mutationsListener,
-             mutationsToNapiConverter = mutationsToNapiConverter](facebook::react::ShadowViewMutationList mutations) {
-                mutationsListener(mutationsToNapiConverter, mutations);
+            [mutationsListener = std::move(mutationsListener),
+             mutationsToNapiConverter](facebook::react::ShadowViewMutationList mutations) {
+                mutationsListener(*mutationsToNapiConverter, mutations);
             },
             [weakExecutor = std::weak_ptr(taskExecutor),
              commandDispatcher = commandDispatcher](auto tag, auto commandName, auto args) {
@@ -118,7 +118,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
         arkTSChannel);
     return std::make_unique<RNInstance>(
         id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
-        MutationsToNapiConverter(std::move(componentNapiBinderByName)), eventEmitRequestHandlers, globalJSIBinders,
+        mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders,
         uiTicker, shadowViewRegistry, std::move(schedulerDelegate), shouldEnableDebugger,
         shouldEnableBackgroundExecutor);
 }

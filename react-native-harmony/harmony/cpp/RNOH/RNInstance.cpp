@@ -289,7 +289,7 @@ void rnoh::RNInstance::onMemoryLevel(size_t memoryLevel) {
 
 void rnoh::RNInstance::updateState(napi_env env, std::string const &componentName, facebook::react::Tag tag, napi_value newState) {
     if (auto state = m_shadowViewRegistry->getFabricState<facebook::react::State>(tag)) {
-        m_mutationsToNapiConverter.updateState(env, componentName, state, newState);
+        m_mutationsToNapiConverter->updateState(env, componentName, state, newState);
     }
 }
 

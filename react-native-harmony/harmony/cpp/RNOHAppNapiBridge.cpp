@@ -78,7 +78,7 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
         instanceId,
         env,
         arkTsTurboModuleProviderRef,
-        [env, instanceId, mutationsListenerRef](MutationsToNapiConverter mutationsToNapiConverter, auto const &mutations) {
+        [env, instanceId, mutationsListenerRef](auto const &mutationsToNapiConverter, auto const &mutations) {
             {
                 auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
                 if (rnInstanceById.find(instanceId) == rnInstanceById.end()) {

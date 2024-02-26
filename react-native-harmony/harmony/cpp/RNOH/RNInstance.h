@@ -30,7 +30,7 @@
 #include "RNOH/ArkTSChannel.h"
 namespace rnoh {
     using MutationsListener =
-        std::function<void(MutationsToNapiConverter, facebook::react::ShadowViewMutationList const &mutations)>;
+        std::function<void(MutationsToNapiConverter const&, facebook::react::ShadowViewMutationList const &mutations)>;
 
     class RNInstance : public facebook::react::LayoutAnimationStatusDelegate {
     public:
@@ -38,7 +38,7 @@ namespace rnoh {
             int id, std::shared_ptr<facebook::react::ContextContainer> contextContainer,
             TurboModuleFactory &&turboModuleFactory, std::shared_ptr<TaskExecutor> taskExecutor,
             std::shared_ptr<facebook::react::ComponentDescriptorProviderRegistry> componentDescriptorProviderRegistry,
-            MutationsToNapiConverter mutationsToNapiConverter, EventEmitRequestHandlers eventEmitRequestHandlers,
+            MutationsToNapiConverter::Shared mutationsToNapiConverter, EventEmitRequestHandlers eventEmitRequestHandlers,
             GlobalJSIBinders globalJSIBinders, UITicker::Shared uiTicker, ShadowViewRegistry::Shared shadowViewRegistry,
             std::unique_ptr<SchedulerDelegate> schedulerDelegate, bool shouldEnableDebugger,
             bool shouldEnableBackgroundExecutor)
@@ -110,7 +110,7 @@ namespace rnoh {
         ShadowViewRegistry::Shared m_shadowViewRegistry;
         TurboModuleFactory m_turboModuleFactory;
         std::shared_ptr<EventDispatcher> m_eventDispatcher;
-        MutationsToNapiConverter m_mutationsToNapiConverter;
+        MutationsToNapiConverter::Shared m_mutationsToNapiConverter;
         EventEmitRequestHandlers m_eventEmitRequestHandlers;
         GlobalJSIBinders m_globalJSIBinders;
         std::shared_ptr<facebook::react::LayoutAnimationDriver> m_animationDriver;
