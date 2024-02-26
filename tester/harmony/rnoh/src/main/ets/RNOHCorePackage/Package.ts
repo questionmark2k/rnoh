@@ -1,6 +1,7 @@
-import { DescriptorWrapperFactoryByDescriptorType, RNPackage, TurboModulesFactory } from '../RNOH/RNPackage';
+import { DescriptorWrapperFactoryByDescriptorType, RNPackage, TurboModulesFactory, } from '../RNOH/RNPackage';
 import type { TurboModule, TurboModuleContext } from '../RNOH/TurboModule';
 import {
+  AccessibilityInfoTurboModule,
   AlertManagerTurboModule,
   AppearanceTurboModule,
   AppStateTurboModule,
@@ -25,7 +26,7 @@ import {
   TimingTurboModule,
   ToastAndroidTurboModule,
   VibrationTurboModule,
-  WebSocketTurboModule
+  WebSocketTurboModule,
 } from './turboModules';
 import { LinkingManagerTurboModule } from './turboModules/LinkingManagerTurboModule';
 import { ViewDescriptorWrapper } from './components/ts';
@@ -36,15 +37,16 @@ export class RNOHCorePackage extends RNPackage {
   }
 
   createDescriptorWrapperFactoryByDescriptorType({}): DescriptorWrapperFactoryByDescriptorType {
-    return { "View": (ctx) => new ViewDescriptorWrapper(ctx.descriptor) }
+    return { View: ctx => new ViewDescriptorWrapper(ctx.descriptor) };
   }
 
   getDebugName() {
-    return "rnoh"
+    return 'rnoh';
   }
 }
 
 const TURBO_MODULE_CLASS_BY_NAME: Record<string, typeof TurboModule> = {
+  [AccessibilityInfoTurboModule.NAME]: AccessibilityInfoTurboModule,
   [AlertManagerTurboModule.NAME]: AlertManagerTurboModule,
   [AppearanceTurboModule.NAME]: AppearanceTurboModule,
   [AppStateTurboModule.NAME]: AppStateTurboModule,
@@ -74,23 +76,28 @@ const EAGER_TURBO_MODULE_CLASS_BY_NAME = {
   [DeviceInfoTurboModule.NAME]: DeviceInfoTurboModule,
   [StatusBarTurboModule.NAME]: StatusBarTurboModule,
   [SafeAreaTurboModule.NAME]: SafeAreaTurboModule,
-} as const
+} as const;
 
 class CoreTurboModulesFactory extends TurboModulesFactory {
-  private eagerTurboModuleByName: Partial<Record<keyof typeof EAGER_TURBO_MODULE_CLASS_BY_NAME, TurboModule>> = {}
+  private eagerTurboModuleByName: Partial<Record<keyof typeof EAGER_TURBO_MODULE_CLASS_BY_NAME, TurboModule>> = {};
 
   async prepareEagerTurboModules() {
-    const statusBarTurboModule = new StatusBarTurboModule(this.ctx)
+    const statusBarTurboModule = new StatusBarTurboModule(this.ctx);
     this.eagerTurboModuleByName = {
-      [SafeAreaTurboModule.NAME]: await SafeAreaTurboModule.create(this.ctx, statusBarTurboModule),
+      [SafeAreaTurboModule.NAME]: await SafeAreaTurboModule.create(
+        this.ctx,
+        statusBarTurboModule,
+      ),
       [StatusBarTurboModule.NAME]: statusBarTurboModule,
-      [DeviceInfoTurboModule.NAME]: await DeviceInfoTurboModule.create(this.ctx),
-    }
+      [DeviceInfoTurboModule.NAME]: await DeviceInfoTurboModule.create(
+        this.ctx,
+      ),
+    };
   }
 
   createTurboModule(name: string): TurboModule {
     if (this.eagerTurboModuleByName[name]) {
-      return this.eagerTurboModuleByName[name]
+      return this.eagerTurboModuleByName[name];
     }
     if (this.hasTurboModule(name)) {
       return new TURBO_MODULE_CLASS_BY_NAME[name](this.ctx);
@@ -99,6 +106,8 @@ class CoreTurboModulesFactory extends TurboModulesFactory {
   }
 
   hasTurboModule(name: string): boolean {
-    return (name in TURBO_MODULE_CLASS_BY_NAME) || (name in this.eagerTurboModuleByName);
+    return (
+      name in TURBO_MODULE_CLASS_BY_NAME || name in this.eagerTurboModuleByName
+    );
   }
 }

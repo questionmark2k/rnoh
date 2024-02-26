@@ -1,3 +1,4 @@
+export * from './AccessibilityInfoTest';
 export * from './ActivityIndicatorTest';
 export * from './AlertTest';
 export * from './AnimatedEasingTest';

@@ -1,3 +1,5 @@
+export * from "./AccessibilityInfoTurboModule";
+
 export * from "./AppearanceTurboModule";
 
 export * from "./AppStateTurboModule";

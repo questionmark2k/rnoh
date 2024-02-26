@@ -401,6 +401,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOH/TaskExecutor/NapiTaskRunner.cpp"
     "${RNOH_CPP_DIR}/RNOH/TaskExecutor/ThreadTaskRunner.cpp"
     "${RNOH_CPP_DIR}/RNOH/TaskExecutor/DefaultExceptionHandler.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/AccessibilityInfoTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/AlertManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/AppearanceTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/AppStateTurboModule.cpp"

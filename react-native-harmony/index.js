@@ -1,4 +1,8 @@
 module.exports = {
+  get AccessibilityInfo() {
+    return require('./Libraries/Components/AccessibilityInfo/AccessibilityInfo')
+      .default;
+  },
   get ActivityIndicator() {
     return require('react-native/Libraries/Components/ActivityIndicator/ActivityIndicator')
       .default;
