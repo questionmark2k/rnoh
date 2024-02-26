@@ -13,8 +13,46 @@ export class RNComponentDataSource implements IDataSource {
   public constructor(ctx: RNComponentContext, tag: Tag) {
     this.ctx = ctx
     this.tag = tag
-    this.descriptorWrapper = this.ctx.descriptorRegistry.findDescriptorWrapperByTag(tag) ?? undefined
     this.logger = ctx.logger.clone("RNComponentDataSource")
+  }
+
+  public registerDataChangeListener(listener: DataChangeListener): void {
+    if (this.listeners.size === 0) {
+      this.startListeningToDescriptorMutations();
+    }
+    this.listeners.add(listener);
+  }
+
+  public unregisterDataChangeListener(listener: DataChangeListener): void {
+    this.listeners.delete(listener);
+    if (this.listeners.size === 0) {
+      this.stopListeningToDescriptorMutations();
+    }
+  }
+
+  public totalCount(): number {
+    return this.descriptorWrapper?.childrenTags.length ?? 0;
+  }
+
+  public getData(index: number): DescriptorWrapper {
+    if (index < 0 || index >= this.descriptorWrapper!.childrenTags.length) {
+      this.logger.fatal("Invalid childIndex")
+    }
+    const childrenTag = this.descriptorWrapper?.childrenTags[index]
+    if (childrenTag === undefined) {
+      this.logger.error("Couldn't find childrenTag")
+      throw new Error("Couldn't find childrenTag")
+    }
+    const result = this.ctx.descriptorRegistry.findDescriptorWrapperByTag(childrenTag)
+    if (!result) {
+      this.logger.error("Couldn't find descriptorWrapper")
+      throw new Error("Couldn't find descriptorWrapper")
+    }
+    return result
+  }
+
+  private startListeningToDescriptorMutations() {
+    this.descriptorWrapper = this.ctx.descriptorRegistry.findDescriptorWrapperByTag(this.tag) ?? undefined
 
     this.cleanUpCallbacks.push(this.ctx.descriptorRegistry.subscribeToDescriptorChanges(this.tag, () => {
       this.descriptorWrapper = this.ctx.descriptorRegistry.findDescriptorWrapperByTag(this.tag) ?? undefined
@@ -38,34 +76,8 @@ export class RNComponentDataSource implements IDataSource {
     }))
   }
 
-
-
-  public registerDataChangeListener(listener: DataChangeListener): void {
-    this.listeners.add(listener);
-  }
-
-  public unregisterDataChangeListener(listener: DataChangeListener): void {
-    this.listeners.delete(listener)
-  }
-
-  public totalCount(): number {
-    return this.descriptorWrapper?.childrenTags.length ?? 0;
-  }
-
-  public getData(index: number): DescriptorWrapper {
-    if (index < 0 || index >= this.descriptorWrapper!.childrenTags.length) {
-      this.logger.fatal("Invalid childIndex")
-    }
-    const childrenTag = this.descriptorWrapper?.childrenTags[index]
-    if (childrenTag === undefined) {
-      this.logger.error("Couldn't find childrenTag")
-      throw new Error("Couldn't find childrenTag")
-    }
-    const result = this.ctx.descriptorRegistry.findDescriptorWrapperByTag(childrenTag)
-    if (!result) {
-      this.logger.error("Couldn't find descriptorWrapper")
-      throw new Error("Couldn't find descriptorWrapper")
-    }
-    return result
+  private stopListeningToDescriptorMutations() {
+    this.cleanUpCallbacks.forEach(cb => cb())
+    this.descriptorWrapper = undefined
   }
 }
