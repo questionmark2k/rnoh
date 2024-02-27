@@ -13,10 +13,15 @@ class ScrollViewComponentNapiBinder : public ViewComponentNapiBinder {
         if (auto props = std::dynamic_pointer_cast<const facebook::react::ScrollViewProps>(shadowView.props)) {
             auto rawProps = shadowView.props->rawProps;
 
+            // default values for properties from rawProps which can be missing
             auto persistentScrollbar = false;
+            auto flexDirection = 1;
 
             if (rawProps.count("persistentScrollbar") > 0) {
                 persistentScrollbar = rawProps["persistentScrollbar"].asBool();
+            }
+            if (rawProps.count("horizontal") > 0) {
+                flexDirection = rawProps["horizontal"].asBool() ? 2 : 1;
             }
 
             ArkJS(env)
@@ -29,7 +34,7 @@ class ScrollViewComponentNapiBinder : public ViewComponentNapiBinder {
                 .addProperty("bounces", props->bounces)
                 .addProperty("showsHorizontalScrollIndicator", props->showsHorizontalScrollIndicator)
                 .addProperty("showsVerticalScrollIndicator", props->showsVerticalScrollIndicator)
-                .addProperty("flexDirection", props->yogaStyle.flexDirection())
+                .addProperty("flexDirection", flexDirection)
                 .addProperty("persistentScrollbar", persistentScrollbar)
                 .addProperty("indicatorStyle", static_cast<int>(props->indicatorStyle))
                 .addProperty("decelerationRate", props->decelerationRate)
