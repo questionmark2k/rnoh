@@ -117,14 +117,16 @@ export struct RNScrollView {
     this.props = newDescriptor.props
     this.descriptor = newDescriptor
     this.descriptorWrapper = new ScrollViewDescriptorWrapper(newDescriptor)
+    const contentSizeWidth = this.descriptor.state.contentSizeWidth;
+    const contentSizeHeight = this.descriptor.state.contentSizeHeight;
     this.contentSize = {
-      width: newDescriptor.state.contentSizeWidth,
-      height: newDescriptor.state.contentSizeHeight
+      width: contentSizeWidth,
+      height: contentSizeHeight
     }
     this.childrenTags = newDescriptor.childrenTags
     this.parentTag = newDescriptor.parentTag
-    const contentSizeChanged = this.descriptor.state.contentSizeWidth !== prevState?.contentSizeWidth
-      || this.descriptor.state.contentSizeHeight !== prevState?.contentSizeHeight
+    const contentSizeChanged = contentSizeWidth !== prevState?.contentSizeWidth
+      || contentSizeHeight !== prevState?.contentSizeHeight
     if (newDescriptor.props.contentOffsetX !== prevProps.contentOffsetX || newDescriptor.props.contentOffsetY !== prevProps.contentOffsetY) {
       this.scrollToPropsContentOffset();
     }
@@ -137,8 +139,8 @@ export struct RNScrollView {
          */
         const width = this.descriptorWrapper?.width ?? 0;
         const height = this.descriptorWrapper?.height ?? 0;
-        const maxOffsetX = this.descriptor.state.contentSizeWidth < width ? 0 : (this.descriptor.state.contentSizeWidth - width);
-        const maxOffsetY = this.descriptor.state.contentSizeHeight < height ? 0 : (this.descriptor.state.contentSizeHeight - height);
+        const maxOffsetX = contentSizeWidth < width ? 0 : (contentSizeWidth - width);
+        const maxOffsetY = contentSizeHeight < height ? 0 : (contentSizeHeight - height);
         const xOffset = (width && this.contentOffset.x > maxOffsetX) ? maxOffsetX : this.contentOffset.x;
         const yOffset = (height && this.contentOffset.y > maxOffsetY) ? maxOffsetY : this.contentOffset.y;
         this.scroller.scrollTo({
@@ -323,6 +325,14 @@ export struct RNScrollView {
     return undefined
   }
 
+  getContentOffset(): Position {
+    const currentOffset = this.scroller.currentOffset();
+    return {
+      x: currentOffset.xOffset,
+      y: currentOffset.yOffset,
+    };
+  };
+
   createScrollEvent(): ScrollEvent | undefined {
     const descriptor = this.ctx.descriptorRegistry.getDescriptor<ScrollViewDescriptor>(this.tag);
 
@@ -336,10 +346,7 @@ export struct RNScrollView {
         width: this.contentSize.width,
         height: this.contentSize.height,
       },
-      contentOffset: {
-        x: descriptor.state.contentOffsetX,
-        y: descriptor.state.contentOffsetY,
-      },
+      contentOffset: this.getContentOffset(),
       containerSize: {
         width: this.descriptor.layoutMetrics.frame.size.width,
         height: this.descriptor.layoutMetrics.frame.size.height,
@@ -386,13 +393,7 @@ export struct RNScrollView {
         this.isScrolling = true;
       }
     }
-
-    descriptor.state.contentOffsetX = currentOffset.xOffset;
-    descriptor.state.contentOffsetY = currentOffset.yOffset;
-    this.contentOffset = {
-      x: currentOffset.xOffset,
-      y: currentOffset.yOffset,
-    }
+    this.contentOffset = this.getContentOffset();
 
     const now = Date.now();
     if (this.isScrolling && (this.allowNextScrollEvent || descriptor.props.scrollEventThrottle < now - this.lastScrollDispatchTime)) {
@@ -469,7 +470,7 @@ export struct RNScrollView {
 
   onScrollBegin() {
     // this.positionBeforeScrolling = { x : this.descriptor.state.contentOffsetX, y : this.descriptor.state.contentOffsetY };
-    this.positionBeforeScrolling = { x : this.scroller.currentOffset().xOffset, y : this.scroller.currentOffset().yOffset };
+    this.positionBeforeScrolling = this.getContentOffset();
     this.isScrolling = false;
     this.componentManager.setScrolling(true);
     this.allowNextScrollEvent = false;
@@ -495,11 +496,7 @@ export struct RNScrollView {
     }
     this.scrollState = ScrollState.Idle;
 
-    const currentOffset: CurrentOffset = this.scroller.currentOffset();
-    descriptor.state.contentOffsetX = currentOffset.xOffset;
-    descriptor.state.contentOffsetY = currentOffset.yOffset;
-    this.contentOffset = { x: currentOffset.xOffset, y: currentOffset.yOffset }
-    this.ctx.descriptorRegistry.setState<ScrollViewState>(this.tag, descriptor.state);
+    this.contentOffset = this.getContentOffset();
     this.isScrolling = false;
   }
 
