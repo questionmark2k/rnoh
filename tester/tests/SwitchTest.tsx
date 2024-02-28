@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
-import {View, Switch, StyleSheet, Text} from 'react-native';
+import {View, Switch, StyleSheet, Text, Platform} from 'react-native';
 import {TestCase, TestSuite} from '@rnoh/testerino';
 
 export function SwitchTest() {
   const [isEnabled, setIsEnabled] = useState(false);
   const [event, setEvent] = useState('');
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+
   return (
     <TestSuite name="Switch">
       <TestCase itShould="Render a working switch and display it's state and SwitchChangeEvent details">
@@ -28,6 +29,21 @@ export function SwitchTest() {
           <Switch
             trackColor={{false: 'green', true: 'firebrick'}}
             thumbColor={'beige'}
+            disabled
+          />
+        </View>
+      </TestCase>
+      <TestCase
+        itShould="Render a disabled switch with true value"
+        skip={
+          // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/864
+          Platform.select({harmony: 'Not working on Harmony '})
+        }>
+        <View style={styles.container}>
+          <Switch
+            trackColor={{false: 'green', true: 'firebrick'}}
+            thumbColor={'beige'}
+            value={true}
             disabled
           />
         </View>

@@ -5,6 +5,7 @@ import {
   TextInput,
   KeyboardEvent,
   Dimensions,
+  Platform,
 } from 'react-native';
 import {Button} from '../components';
 import {useEffect} from 'react';
@@ -19,9 +20,16 @@ export function KeyboardTest() {
           expect(Keyboard.isVisible()).to.be.false;
         }}
       />
-      <TestCase modal itShould="dismiss keyboard on button press">
-        <TextInput style={styles.textInput} />
+      <TestCase
+        modal
+        itShould="dismiss keyboard on button press"
+        skip={Platform.select({
+          // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/866
+          harmony: "Test doesn't work. Wrong test implementation",
+          android: "Test doesn't work. Wrong test implementation",
+        })}>
         <Button label="Dismiss keyboard" onPress={() => Keyboard.dismiss()} />
+        <TextInput style={styles.textInput} />
       </TestCase>
       <TestCase
         modal

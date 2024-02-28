@@ -52,7 +52,7 @@ export const ImageTest = () => {
         source={{uri: REMOTE_GIF_URL}}
       />
       <TestCase itShould="display alt when the image doesn't load">
-        <View>
+        <View style={{minHeight: 50}}>
           <Image
             source={require('../assets/fonts/Pacifico-Regular.ttf')}
             alt="This image could not be loaded!"

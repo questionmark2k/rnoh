@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 import {TestSuite, TestCase} from '@rnoh/testerino';
 import {SAMPLE_PARAGRAPH_TEXT} from './fixtures';
 
@@ -11,6 +11,54 @@ export function TextStyleTest() {
             style={{
               ...styles.blackText,
               fontFamily: 'Pacifico-Regular',
+              padding: 5,
+            }}>
+            Lorem ipsum dolor sit amet
+          </Text>
+        </View>
+      </TestCase>
+      <TestCase
+        itShould="show text with the 'sans-serif' font"
+        skip={Platform.select({harmony: 'Not supported'})}
+        // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/860
+      >
+        <View style={{height: 30, width: '100%'}}>
+          <Text
+            style={{
+              ...styles.blackText,
+              fontFamily: 'sans-serif',
+              padding: 5,
+            }}>
+            Lorem ipsum dolor sit amet
+          </Text>
+        </View>
+      </TestCase>
+      <TestCase
+        itShould="show text with the 'serif' font"
+        skip={Platform.select({harmony: 'Not supported'})}
+        // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/860
+      >
+        <View style={{height: 30, width: '100%'}}>
+          <Text
+            style={{
+              ...styles.blackText,
+              fontFamily: 'serif',
+              padding: 5,
+            }}>
+            Lorem ipsum dolor sit amet
+          </Text>
+        </View>
+      </TestCase>
+      <TestCase
+        itShould="show text with the 'monospace' font"
+        skip={Platform.select({harmony: 'Not supported'})}
+        // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/860
+      >
+        <View style={{height: 30, width: '100%'}}>
+          <Text
+            style={{
+              ...styles.blackText,
+              fontFamily: 'monospace',
               padding: 5,
             }}>
             Lorem ipsum dolor sit amet

@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Animated, View, Text} from 'react-native';
+import {Animated, View, Text, PanResponder} from 'react-native';
 import {TestCase, TestSuite} from '@rnoh/testerino';
 import {Button, Effect} from '../components';
 
@@ -40,7 +40,7 @@ export function AnimatedValueTest() {
           <SetOffsetView singular={false} />
         </TestCase>
         <TestCase<Object>
-          itShould="get layout of animated value on press"
+          itShould="get layout of animated value"
           initialState={{}}
           arrange={({setState}) => {
             const animValue = new Animated.ValueXY({x: 1, y: 1});
@@ -63,6 +63,12 @@ export function AnimatedValueTest() {
         </TestCase>
         <TestCase itShould="move square to the left after flatten offset">
           <FlattenOffsetView />
+        </TestCase>
+        <TestCase itShould="blue square should move the same as red square">
+          <AnimatedGetLayout />
+        </TestCase>
+        <TestCase itShould="move the blue square on drag">
+          <AnimatedDraggableView />
         </TestCase>
       </TestSuite>
     </>
@@ -387,6 +393,114 @@ const MovingSquareXY = (props: {
         <Button label="animate" onPress={animate} />
         {buttons}
       </View>
+    </View>
+  );
+};
+
+const AnimatedGetLayout = () => {
+  const [isRunning, setIsRunning] = useState(false);
+  const animValueXY = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
+
+  const animation = Animated.loop(
+    Animated.sequence([
+      Animated.timing(animValueXY, {
+        toValue: {x: 80, y: 80},
+        duration: 500,
+        useNativeDriver: false,
+      }),
+      Animated.timing(animValueXY, {
+        toValue: {x: 0, y: 0},
+        duration: 500,
+        useNativeDriver: false,
+      }),
+    ]),
+  );
+
+  const animate = () => {
+    if (isRunning) {
+      animation.stop();
+      animValueXY.setOffset({x: 0, y: 0});
+      setIsRunning(false);
+    } else {
+      setIsRunning(true);
+      animation.start();
+    }
+  };
+
+  return (
+    <View>
+      <View style={{width: '100%', height: 100, flexDirection: 'row'}}>
+        <View style={{flex: 1}}>
+          <Animated.View
+            style={{
+              height: 20,
+              width: 20,
+              backgroundColor: 'red',
+              transform: animValueXY.getTranslateTransform(),
+            }}
+          />
+        </View>
+        <View style={{flex: 1, position: 'relative'}}>
+          <Animated.View
+            style={[
+              animValueXY.getLayout(),
+              {
+                position: 'absolute',
+                height: 20,
+                width: 20,
+                backgroundColor: 'blue',
+              },
+            ]}
+          />
+        </View>
+      </View>
+      <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+        <Button label="animate" onPress={animate} />
+      </View>
+    </View>
+  );
+};
+
+const AnimatedDraggableView = () => {
+  const pan = useRef(new Animated.ValueXY()).current;
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: Animated.event(
+      [
+        null,
+        {
+          dx: pan.x,
+          dy: pan.y,
+        },
+      ],
+      {
+        useNativeDriver: false,
+      },
+    ),
+    onPanResponderRelease: () => {
+      Animated.spring(pan, {
+        toValue: {x: 0, y: 0},
+        useNativeDriver: false,
+      }).start();
+    },
+  });
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 400,
+      }}>
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={[
+          pan.getLayout(),
+          {backgroundColor: '#61dafb', width: 80, height: 80, borderRadius: 4},
+        ]}
+      />
     </View>
   );
 };

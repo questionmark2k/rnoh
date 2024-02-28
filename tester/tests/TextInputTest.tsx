@@ -1,4 +1,5 @@
 import {
+  KeyboardTypeOptions,
   Platform,
   ReturnKeyType,
   ReturnKeyTypeAndroid,
@@ -11,6 +12,16 @@ import {
 import {TestSuite, TestCase} from '@rnoh/testerino';
 import {useState, useRef} from 'react';
 import {Button, Effect, StateKeeper} from '../components';
+
+const KEYBOARD_TYPES: KeyboardTypeOptions[] = [
+  'default',
+  'number-pad',
+  'decimal-pad',
+  'numeric',
+  'email-address',
+  'phone-pad',
+  'url',
+];
 
 export function TextInputTest() {
   return (
@@ -279,13 +290,25 @@ export function TextInputTest() {
         modal
         itShould="render textinputs with different keyboard types">
         <View>
-          <TextInputKeyboardType keyboardType="default" />
-          <TextInputKeyboardType keyboardType="number-pad" />
-          <TextInputKeyboardType keyboardType="decimal-pad" />
-          <TextInputKeyboardType keyboardType="numeric" />
-          <TextInputKeyboardType keyboardType="email-address" />
-          <TextInputKeyboardType keyboardType="phone-pad" />
-          <TextInputKeyboardType keyboardType="url" />
+          {KEYBOARD_TYPES.map(type => (
+            <TextInputKeyboardType
+              key={`singleline_${type}`}
+              keyboardType={type}
+            />
+          ))}
+        </View>
+      </TestCase>
+      <TestCase
+        modal
+        itShould="render multiline textinputs with different keyboard types">
+        <View>
+          {KEYBOARD_TYPES.map(type => (
+            <TextInputKeyboardType
+              key={`multiline_${type}`}
+              keyboardType={type}
+              multiline
+            />
+          ))}
         </View>
       </TestCase>
       <TestCase modal itShould="render textinput with allowFontScaling">
@@ -450,6 +473,7 @@ const TextInputKeyboardType = (props: TextInputProps) => {
       <TextInput
         style={{...styles.textInputSmall, marginBottom: 10}}
         keyboardType={props.keyboardType}
+        multiline={props.multiline}
       />
     </>
   );

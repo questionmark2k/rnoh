@@ -6,6 +6,7 @@ export * from './CursorExample';
 export * from './FlatListVsScrollViewExample';
 export * from './ImageGalleryExample';
 export * from './ImageGalleryWithMultipleSourcesExample';
+export * from './KeyboardDismissExample';
 export * from './KeyboardShouldPersistTapsExample';
 export * from './LargeImageScrollExample';
 export * from './NestedScrollWithTouchableExample';

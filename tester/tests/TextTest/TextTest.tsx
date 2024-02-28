@@ -102,7 +102,6 @@ export function TextTest() {
           expect(state).to.have.all.keys('x', 'y', 'width', 'height');
         }}
       />
-      <TextStyleTest />
     </TestSuite>
   );
 }

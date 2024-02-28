@@ -70,15 +70,31 @@ function getInputType(keyboardType?: string, secureTextEntry?: boolean): InputTy
   }
   switch (keyboardType) {
     case "numberPad":
-    case "decimalPad":
     case "numeric":
       return InputType.Number;
+    case "decimalPad":
+      return InputType.NUMBER_DECIMAL;
     case "phonePad":
       return InputType.PhoneNumber;
     case "emailAddress":
       return InputType.Email;
     default:
       return InputType.Normal
+  }
+}
+
+function getTextAreaType(keyboardType?: string): TextAreaType {
+  switch (keyboardType) {
+    case "numberPad":
+    case "numeric":
+    case "decimalPad":
+      return TextAreaType.NUMBER
+    case "phonePad":
+      return TextAreaType.PHONE_NUMBER
+    case "emailAddress":
+      return TextAreaType.EMAIL
+    default:
+      return TextAreaType.NORMAL
   }
 }
 
@@ -322,6 +338,7 @@ export struct RNTextInput {
           .focusable(this.descriptorWrapper?.focusable ?? true)
           .onPaste(() => this.onPaste())
           .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
+          .type(getTextAreaType(this.descriptor.props.keyboardType))
       } else {
         TextInput({
           controller: this.inputController,
