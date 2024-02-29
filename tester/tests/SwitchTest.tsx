@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Switch, StyleSheet, Text, Platform} from 'react-native';
+import {View, Switch, StyleSheet, Text} from 'react-native';
 import {TestCase, TestSuite} from '@rnoh/testerino';
 
 export function SwitchTest() {
@@ -33,12 +33,7 @@ export function SwitchTest() {
           />
         </View>
       </TestCase>
-      <TestCase
-        itShould="Render a disabled switch with true value"
-        skip={
-          // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/864
-          Platform.select({harmony: 'Not working on Harmony '})
-        }>
+      <TestCase itShould="Render a disabled switch with true value">
         <View style={styles.container}>
           <Switch
             trackColor={{false: 'green', true: 'firebrick'}}
