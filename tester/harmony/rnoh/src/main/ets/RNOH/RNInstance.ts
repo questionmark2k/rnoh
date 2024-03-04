@@ -72,7 +72,7 @@ const rootDescriptor = {
   }
 }
 
-type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS" | "IMAGE_LOADER"
+type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS" | "IMAGE_LOADER" | "C_API_ARCH"
 
 export interface RNInstance {
   descriptorRegistry: DescriptorRegistry;
@@ -125,6 +125,8 @@ export interface RNInstance {
   blockComponentsGestures(targetComponentTag: Tag): (() => void)
 
   getInitialBundleUrl(): string | undefined
+
+  getArchitecture(): "ARK_TS" | "C_API"
 }
 
 /**
@@ -138,6 +140,7 @@ export type RNInstanceOptions = {
   enableBackgroundExecutor?: boolean,
   enableNDKTextMeasuring?: boolean,
   enableImageLoader?: boolean,
+  enableCAPIArchitecture?: boolean,
 }
 
 
@@ -176,6 +179,7 @@ export class RNInstanceImpl implements RNInstance {
     private shouldEnableBackgroundExecutor: boolean,
     private shouldUseNDKToMeasureText: boolean,
     private shouldUseImageLoader: boolean,
+    private shouldUseCApiArchitecture: boolean
   ) {
     this.logger = injectedLogger.clone("RNInstance")
     if (this.shouldUseNDKToMeasureText) {
@@ -184,7 +188,14 @@ export class RNInstanceImpl implements RNInstance {
     if (this.shouldUseImageLoader) {
       this.enableFeatureFlag("IMAGE_LOADER")
     }
+    if (this.shouldUseCApiArchitecture) {
+      this.enableFeatureFlag("C_API_ARCH")
+    }
     this.onCreate()
+  }
+
+  public getArchitecture() {
+    return this.shouldUseCApiArchitecture ? "C_API" : "ARK_TS"
   }
 
   public onCreate() {
@@ -236,6 +247,9 @@ export class RNInstanceImpl implements RNInstance {
       this.logger,
     );
     const cppFeatureFlags: CppFeatureFlag[] = []
+    if (this.shouldUseCApiArchitecture) {
+      cppFeatureFlags.push("C_API_ARCH")
+    }
     if (this.shouldUseNDKToMeasureText) {
       cppFeatureFlags.push("ENABLE_NDK_TEXT_MEASURING")
     }
@@ -266,7 +280,7 @@ export class RNInstanceImpl implements RNInstance {
       },
       this.shouldEnableDebugger,
       this.shouldEnableBackgroundExecutor,
-      this.shouldUseNDKToMeasureText ? ["ENABLE_NDK_TEXT_MEASURING"] : [],
+      cppFeatureFlags,
     )
     stopTracing()
   }

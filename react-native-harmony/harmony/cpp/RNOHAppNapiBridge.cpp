@@ -1,4 +1,5 @@
 #include "napi/native_api.h"
+#include <ace/xcomponent/native_interface_xcomponent.h>
 #include <js_native_api.h>
 #include <js_native_api_types.h>
 #include <memory>
@@ -14,6 +15,7 @@
 #include "RNInstanceFactory.h"
 #include "RNOH/TaskExecutor/ThreadTaskRunner.h"
 #include "RNOH/Inspector.h"
+#include "RNOH/RNInstanceCAPI.h"
 
 using namespace rnoh;
 
@@ -46,9 +48,7 @@ static napi_value onInit(napi_env env, napi_callback_info info) {
 #ifdef REACT_NATIVE_DEBUG
     isDebugModeEnabled = true;
 #endif
-    return arkJs.createObjectBuilder()
-        .addProperty("isDebugModeEnabled", isDebugModeEnabled)
-        .build();
+    return arkJs.createObjectBuilder().addProperty("isDebugModeEnabled", isDebugModeEnabled).build();
 }
 
 static napi_value getNextRNInstanceId(napi_env env, napi_callback_info info) {
@@ -72,17 +72,17 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
     auto shouldEnableBackgroundExecutor = arkJs.getBoolean(args[7]);
     auto featureFlagRegistry = std::make_shared<FeatureFlagRegistry>();
     for (auto featureFlagNameAndStatus : arkJs.getObjectProperties(args[8])) {
-        featureFlagRegistry->setFeatureFlagStatus(arkJs.getString(featureFlagNameAndStatus.first), arkJs.getBoolean(featureFlagNameAndStatus.second));
+        featureFlagRegistry->setFeatureFlagStatus(arkJs.getString(featureFlagNameAndStatus.first),
+                                                  arkJs.getBoolean(featureFlagNameAndStatus.second));
     }
     auto rnInstance = createRNInstance(
-        instanceId,
-        env,
-        arkTsTurboModuleProviderRef,
+        instanceId, env, arkTsTurboModuleProviderRef,
         [env, instanceId, mutationsListenerRef](auto const &mutationsToNapiConverter, auto const &mutations) {
             {
                 auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
                 if (rnInstanceById.find(instanceId) == rnInstanceById.end()) {
-                    LOG(WARNING) << "RNInstance with the following id " + std::to_string(instanceId) + " does not exist";
+                    LOG(WARNING) << "RNInstance with the following id " + std::to_string(instanceId) +
+                                        " does not exist";
                     return;
                 }
             }
@@ -96,21 +96,19 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
             {
                 auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
                 if (rnInstanceById.find(instanceId) == rnInstanceById.end()) {
-                    LOG(WARNING) << "RNInstance with the following id " + std::to_string(instanceId) + " does not exist";
+                    LOG(WARNING) << "RNInstance with the following id " + std::to_string(instanceId) +
+                                        " does not exist";
                     return;
                 }
             }
             ArkJS arkJs(env);
             auto napiArgs = arkJs.convertIntermediaryValueToNapiValue(args);
-            std::array<napi_value, 3> napiArgsArray = {arkJs.createDouble(tag), arkJs.createString(commandName), napiArgs};
+            std::array<napi_value, 3> napiArgsArray = {arkJs.createDouble(tag), arkJs.createString(commandName),
+                                                       napiArgs};
             auto commandDispatcher = arkJs.getReferenceValue(commandDispatcherRef);
             arkJs.call<3>(commandDispatcher, napiArgsArray);
         },
-        measureTextFnRef,
-        eventDispatcherRef,
-        featureFlagRegistry,
-        uiTicker,
-        shouldEnableDebugger,
+        measureTextFnRef, eventDispatcherRef, featureFlagRegistry, uiTicker, shouldEnableDebugger,
         shouldEnableBackgroundExecutor);
 
     auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
@@ -153,17 +151,16 @@ static napi_value loadScript(napi_env env, napi_callback_info info) {
     }
     auto &rnInstance = it->second;
     auto onFinishRef = arkJs.createReference(args[3]);
-    rnInstance->loadScript(
-        arkJs.getArrayBuffer(args[1]),
-        arkJs.getString(args[2]),
-        [taskExecutor = rnInstance->taskExecutor, env, onFinishRef](const std::string errorMsg) {
-            taskExecutor->runTask(TaskThread::MAIN, [env, onFinishRef, errorMsg = std::move(errorMsg)]() {
-                ArkJS arkJs(env);
-                auto listener = arkJs.getReferenceValue(onFinishRef);
-                arkJs.call<1>(listener, {arkJs.createString(errorMsg)});
-                arkJs.deleteReference(onFinishRef);
-            });
-        });
+    rnInstance->loadScript(arkJs.getArrayBuffer(args[1]), arkJs.getString(args[2]),
+                           [taskExecutor = rnInstance->taskExecutor, env, onFinishRef](const std::string errorMsg) {
+                               taskExecutor->runTask(TaskThread::MAIN,
+                                                     [env, onFinishRef, errorMsg = std::move(errorMsg)]() {
+                                                         ArkJS arkJs(env);
+                                                         auto listener = arkJs.getReferenceValue(onFinishRef);
+                                                         arkJs.call<1>(listener, {arkJs.createString(errorMsg)});
+                                                         arkJs.deleteReference(onFinishRef);
+                                                     });
+                           });
     return arkJs.getUndefined();
 }
 
@@ -178,12 +175,8 @@ static napi_value updateSurfaceConstraints(napi_env env, napi_callback_info info
         return arkJs.getUndefined();
     }
     auto &rnInstance = it->second;
-    rnInstance->updateSurfaceConstraints(arkJs.getDouble(args[1]),
-                                         arkJs.getDouble(args[2]),
-                                         arkJs.getDouble(args[3]),
-                                         arkJs.getDouble(args[4]),
-                                         arkJs.getDouble(args[5]),
-                                         arkJs.getDouble(args[6]));
+    rnInstance->updateSurfaceConstraints(arkJs.getDouble(args[1]), arkJs.getDouble(args[2]), arkJs.getDouble(args[3]),
+                                         arkJs.getDouble(args[4]), arkJs.getDouble(args[5]), arkJs.getDouble(args[6]));
     return arkJs.getUndefined();
 }
 
@@ -216,13 +209,8 @@ static napi_value startSurface(napi_env env, napi_callback_info info) {
     auto &rnInstance = it->second;
     facebook::react::Tag surfaceId = arkJs.getDouble(args[1]);
     LOG(INFO) << "startSurface: surfaceId=" << surfaceId << "\n";
-    rnInstance->startSurface(surfaceId,
-                             arkJs.getDouble(args[2]),
-                             arkJs.getDouble(args[3]),
-                             arkJs.getDouble(args[4]),
-                             arkJs.getDouble(args[5]),
-                             arkJs.getDouble(args[6]),
-                             arkJs.getDynamic(args[7]));
+    rnInstance->startSurface(surfaceId, arkJs.getDouble(args[2]), arkJs.getDouble(args[3]), arkJs.getDouble(args[4]),
+                             arkJs.getDouble(args[5]), arkJs.getDouble(args[6]), arkJs.getDynamic(args[7]));
     return arkJs.getUndefined();
 }
 
@@ -300,10 +288,7 @@ static napi_value emitComponentEvent(napi_env env, napi_callback_info info) {
         return arkJs.getUndefined();
     }
     auto &rnInstance = it->second;
-    rnInstance->emitComponentEvent(env,
-                                   arkJs.getDouble(args[1]),
-                                   arkJs.getString(args[2]),
-                                   args[3]);
+    rnInstance->emitComponentEvent(env, arkJs.getDouble(args[1]), arkJs.getString(args[2]), args[3]);
     return arkJs.getUndefined();
 }
 
@@ -356,19 +341,70 @@ static napi_value updateState(napi_env env, napi_callback_info info) {
     return arkJs.getUndefined();
 }
 
+static void registerNativeXComponent(napi_env env, napi_value exports) {
+    if ((env == nullptr) || (exports == nullptr)) {
+        LOG(ERROR) << "registerNativeXComponent: env or exports is null"
+                   << "\n";
+        return;
+    }
+
+    napi_value exportInstance = nullptr;
+    if (napi_get_named_property(env, exports, OH_NATIVE_XCOMPONENT_OBJ, &exportInstance) != napi_ok) {
+        LOG(ERROR) << "registerNativeXComponent: napi_get_named_property fail"
+                   << "\n";
+        return;
+    }
+
+    OH_NativeXComponent *nativeXComponent = nullptr;
+    if (napi_unwrap(env, exportInstance, reinterpret_cast<void **>(&nativeXComponent)) != napi_ok) {
+        LOG(ERROR) << "registerNativeXComponent: napi_get_named_property fail"
+                   << "\n";
+        return;
+    }
+
+    char idStr[OH_XCOMPONENT_ID_LEN_MAX + 1] = {'\0'};
+    uint64_t idSize = OH_XCOMPONENT_ID_LEN_MAX + 1;
+    if (OH_NativeXComponent_GetXComponentId(nativeXComponent, idStr, &idSize) != OH_NATIVEXCOMPONENT_RESULT_SUCCESS) {
+        LOG(ERROR) << "registerNativeXComponent: OH_NativeXComponent_GetXComponentId fail"
+                   << "\n";
+        return;
+    }
+    std::string xcomponentStr(idStr);
+    std::stringstream ss(xcomponentStr);
+    std::string instanceId;
+    std::getline(ss, instanceId, '_');
+    std::string surfaceId;
+    std::getline(ss, surfaceId, '_');
+    size_t instanceIdNum = std::stod(instanceId, nullptr);
+    if (rnInstanceById.find(instanceIdNum) == rnInstanceById.end()) {
+        LOG(ERROR) << "RNInstance with the following id " + std::to_string(instanceIdNum) + " does not exist";
+        return;
+    }
+    auto &rnInstance = rnInstanceById.at(instanceIdNum);
+
+    RNInstanceCAPI *rnInstanceCPIRawPtr = dynamic_cast<RNInstanceCAPI *>(rnInstance.get());
+    if (rnInstanceCPIRawPtr) {
+        rnInstanceCPIRawPtr->registerNativeXComponentHandle(nativeXComponent, std::stoi(surfaceId));
+    }
+    LOG(INFO) << "registerNativeXComponent: id = " << instanceId << "\n";
+}
+
 EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor desc[] = {
         {"onInit", nullptr, onInit, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getNextRNInstanceId", nullptr, getNextRNInstanceId, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"createReactNativeInstance", nullptr, createReactNativeInstance, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"destroyReactNativeInstance", nullptr, destroyReactNativeInstance, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"createReactNativeInstance", nullptr, createReactNativeInstance, nullptr, nullptr, nullptr, napi_default,
+         nullptr},
+        {"destroyReactNativeInstance", nullptr, destroyReactNativeInstance, nullptr, nullptr, nullptr, napi_default,
+         nullptr},
         {"loadScript", nullptr, loadScript, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"startSurface", nullptr, startSurface, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"stopSurface", nullptr, stopSurface, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"destroySurface", nullptr, destroySurface, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"createSurface", nullptr, createSurface, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"updateSurfaceConstraints", nullptr, updateSurfaceConstraints, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"updateSurfaceConstraints", nullptr, updateSurfaceConstraints, nullptr, nullptr, nullptr, napi_default,
+         nullptr},
         {"setSurfaceDisplayMode", nullptr, setSurfaceDisplayMode, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"emitComponentEvent", nullptr, emitComponentEvent, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"callRNFunction", nullptr, callRNFunction, nullptr, nullptr, nullptr, napi_default, nullptr},
@@ -377,6 +413,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"getInspectorWrapper", nullptr, rnoh::getInspectorWrapper, nullptr, nullptr, nullptr, napi_default, nullptr}};
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc);
+    registerNativeXComponent(env, exports); // NOTE: shouldn't this be called when creating surface?
     return exports;
 }
 EXTERN_C_END
@@ -391,6 +428,4 @@ static napi_module demoModule = {
     .reserved = {0},
 };
 
-extern "C" __attribute__((constructor)) void RegisterEntryModule(void) {
-    napi_module_register(&demoModule);
-}
+extern "C" __attribute__((constructor)) void RegisterEntryModule(void) { napi_module_register(&demoModule); }

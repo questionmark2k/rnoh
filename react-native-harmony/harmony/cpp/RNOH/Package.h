@@ -7,14 +7,13 @@
 #include "RNOH/UIManagerModule.h"
 #include "RNOH/MutationsToNapiConverter.h"
 #include "RNOH/EventEmitRequestHandler.h"
+#include "RNOH/ComponentInstanceFactory.h"
 
 namespace rnoh {
 
-
-
 class Package {
   public:
-    struct Context {
+    struct Context : ComponentInstance::Context {
       ShadowViewRegistry::Shared shadowViewRegistry;
     };
 
@@ -32,6 +31,11 @@ class Package {
     virtual ComponentNapiBinderByString createComponentNapiBinderByName();
 
     virtual EventEmitRequestHandlers createEventEmitRequestHandlers();
+
+    /**
+     * Used only in C-API based Architecture.
+     */
+    virtual ComponentInstanceFactoryDelegate::Shared createComponentInstanceFactoryDelegate();
 
   protected:
     Context m_ctx;

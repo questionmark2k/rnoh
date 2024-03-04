@@ -1,7 +1,6 @@
 import type common from '@ohos.app.ability.common';
 import type { DescriptorRegistry } from './DescriptorRegistry';
 import type { RNComponentCommandHub, RNComponentCommandReceiver } from './RNComponentCommandHub';
-import type { RNOHLogger } from './RNOHLogger';
 import type { RNInstance, RNInstanceImpl } from './RNInstance';
 import type { ComponentManagerRegistry } from './ComponentManagerRegistry';
 import { RNOHCoreContext } from './RNOHCoreContext';

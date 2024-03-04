@@ -8,7 +8,7 @@ import { RNOHLogger } from "./RNOHLogger"
 import type { InspectorInstance } from './types'
 import { FatalRNOHError } from "./RNOHError"
 
-export type CppFeatureFlag = "ENABLE_NDK_TEXT_MEASURING"
+export type CppFeatureFlag = "ENABLE_NDK_TEXT_MEASURING" | "C_API_ARCH"
 
 export class NapiBridge {
   private logger: RNOHLogger

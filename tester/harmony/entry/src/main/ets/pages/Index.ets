@@ -83,7 +83,12 @@ struct Index {
           RNOHErrorDialog({ ctx: this.rnAbility.rnohCoreContext })
         }
         RNApp({
-          rnInstanceConfig: { createRNPackages, enableNDKTextMeasuring: true, enableBackgroundExecutor: false },
+          rnInstanceConfig: {
+            createRNPackages,
+            enableNDKTextMeasuring: true,
+            enableBackgroundExecutor: false,
+            enableCAPIArchitecture: false,
+          },
           initialProps: { "foo": "bar" } as Record<string, string>,
           appKey: "app_name",
           wrappedCustomRNComponentBuilder: wrappedCustomRNComponentBuilder,

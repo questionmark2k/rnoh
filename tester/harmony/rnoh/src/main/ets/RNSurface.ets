@@ -145,14 +145,28 @@ export struct RNSurface {
 
   build() {
     Stack() {
-      if (this.ctx instanceof RNComponentContext) {
-        RNView({ ctx: this.ctx, tag: this.surfaceHandle.getTag() })
-      } else {
-        RNComponentFactory({
-          ctx: this.ctx,
-          tag: this.surfaceHandle.getTag(),
-          buildCustomComponent: this.buildCustomComponent
+      if (this.ctx.rnInstance.getArchitecture() === "C_API") {
+        XComponent({
+          id: this.ctx.rnInstance.getId() + "_" + this.surfaceHandle.getTag(),
+          type: "node",
+          libraryname: 'rnoh_app'
         })
+          .width("100%")
+          .height("100%")
+          .border({ width: 1, color: 'black' })
+      } else {
+        if (this.ctx instanceof RNComponentContext) {
+          RNView({
+            ctx: this.ctx,
+            tag: this.surfaceHandle.getTag()
+          }) // THIS LINE IS WRONG!!!! WE MUST ALLOW REPLACING ROOT VIEW
+        } else {
+          RNComponentFactory({
+            ctx: this.ctx,
+            tag: this.surfaceHandle.getTag(),
+            buildCustomComponent: this.buildCustomComponent
+          })
+        }
       }
     }
     .width("100%")

@@ -40,7 +40,7 @@ namespace rnoh {
             std::shared_ptr<facebook::react::ComponentDescriptorProviderRegistry> componentDescriptorProviderRegistry,
             MutationsToNapiConverter::Shared mutationsToNapiConverter, EventEmitRequestHandlers eventEmitRequestHandlers,
             GlobalJSIBinders globalJSIBinders, UITicker::Shared uiTicker, ShadowViewRegistry::Shared shadowViewRegistry,
-            std::unique_ptr<SchedulerDelegate> schedulerDelegate, bool shouldEnableDebugger,
+            std::unique_ptr<facebook::react::SchedulerDelegate> schedulerDelegate, bool shouldEnableDebugger,
             bool shouldEnableBackgroundExecutor)
             : m_id(id), instance(std::make_shared<facebook::react::Instance>()), m_contextContainer(contextContainer),
               scheduler(nullptr), taskExecutor(taskExecutor), m_shadowViewRegistry(shadowViewRegistry),
@@ -80,13 +80,13 @@ namespace rnoh {
             cv.wait(lock);
         }
 
-        void start();
+        virtual void start();
         void loadScript(std::vector<uint8_t> &&bundle, std::string const sourceURL,
                         std::function<void(const std::string)> &&onFinish);
-        void createSurface(facebook::react::Tag surfaceId, std::string const &moduleName);
+        virtual void createSurface(facebook::react::Tag surfaceId, std::string const &moduleName);
         void updateSurfaceConstraints(facebook::react::Tag surfaceId, float width, float height, float viewportOffsetX,
                                       float viewportOffsetY, float pixelRatio);
-        void startSurface(facebook::react::Tag surfaceId, float width, float height, float viewportOffsetX,
+        virtual void startSurface(facebook::react::Tag surfaceId, float width, float height, float viewportOffsetX,
                           float viewportOffsetY, float pixelRatio, folly::dynamic &&initialProps);
         void setSurfaceProps(facebook::react::Tag surfaceId, folly::dynamic &&props);
         void stopSurface(facebook::react::Tag surfaceId);
@@ -99,13 +99,13 @@ namespace rnoh {
 
         std::shared_ptr<TaskExecutor> taskExecutor;
 
-    private:
+    protected:
         int m_id;
         facebook::react::ContextContainer::Shared m_contextContainer;
         std::shared_ptr<facebook::react::Instance> instance;
         std::map<facebook::react::Tag, std::shared_ptr<facebook::react::SurfaceHandler>> surfaceHandlers;
         std::shared_ptr<facebook::react::Scheduler> scheduler;
-        std::unique_ptr<SchedulerDelegate> m_schedulerDelegate;
+        std::unique_ptr<facebook::react::SchedulerDelegate> m_schedulerDelegate;
         std::shared_ptr<facebook::react::ComponentDescriptorProviderRegistry> m_componentDescriptorProviderRegistry;
         ShadowViewRegistry::Shared m_shadowViewRegistry;
         TurboModuleFactory m_turboModuleFactory;

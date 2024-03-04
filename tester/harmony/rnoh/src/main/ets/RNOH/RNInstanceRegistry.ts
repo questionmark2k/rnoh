@@ -35,6 +35,7 @@ export class RNInstanceRegistry {
       options.enableBackgroundExecutor ?? false,
       options.enableNDKTextMeasuring ?? false,
       options.enableImageLoader ?? false,
+      options.enableCAPIArchitecture ?? false,
     )
     await instance.initialize(options.createRNPackages({}))
     this.instanceMap.set(id, instance)

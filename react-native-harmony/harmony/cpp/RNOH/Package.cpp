@@ -4,29 +4,18 @@
 using namespace rnoh;
 using namespace facebook;
 
-Package::Package(Context ctx) : m_ctx(ctx) {
-}
+Package::Package(Context ctx) : m_ctx(ctx) {}
 
-std::unique_ptr<TurboModuleFactoryDelegate> Package::createTurboModuleFactoryDelegate() {
-    return nullptr;
-}
+std::unique_ptr<TurboModuleFactoryDelegate> Package::createTurboModuleFactoryDelegate() { return nullptr; }
 
-std::vector<react::ComponentDescriptorProvider> Package::createComponentDescriptorProviders() {
-    return {};
-}
+std::vector<react::ComponentDescriptorProvider> Package::createComponentDescriptorProviders() { return {}; }
 
-GlobalJSIBinders rnoh::Package::createGlobalJSIBinders() {
-    return {};
-}
+GlobalJSIBinders rnoh::Package::createGlobalJSIBinders() { return {}; }
 
-ComponentJSIBinderByString rnoh::Package::createComponentJSIBinderByName() {
-    return {};
-}
+ComponentJSIBinderByString rnoh::Package::createComponentJSIBinderByName() { return {}; }
 
-ComponentNapiBinderByString rnoh::Package::createComponentNapiBinderByName() {
-    return {};
-}
+ComponentNapiBinderByString rnoh::Package::createComponentNapiBinderByName() { return {}; }
 
-EventEmitRequestHandlers rnoh::Package::createEventEmitRequestHandlers() {
-    return {};
-}
+EventEmitRequestHandlers rnoh::Package::createEventEmitRequestHandlers() { return {}; }
+
+ComponentInstanceFactoryDelegate::Shared rnoh::Package::createComponentInstanceFactoryDelegate() { return nullptr; }

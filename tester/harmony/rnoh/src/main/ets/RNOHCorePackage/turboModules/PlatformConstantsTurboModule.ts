@@ -20,7 +20,8 @@ export class PlatformConstantsTurboModule extends TurboModule {
         major: versionParts[0],
         minor: versionParts[1],
         patch: versionParts[2],
-      }
+      },
+      rnohArchitecture: this.ctx.rnInstance.getArchitecture()
     };
   }
 }

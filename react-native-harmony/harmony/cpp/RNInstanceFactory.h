@@ -8,6 +8,7 @@
 #include <react/renderer/components/text/ParagraphComponentDescriptor.h>
 #include "RNOH/ArkJS.h"
 #include "RNOH/RNInstance.h"
+#include "RNOH/RNInstanceCAPI.h"
 #include "RNOH/MutationsToNapiConverter.h"
 #include "RNOH/TurboModuleFactory.h"
 #include "RNOH/ArkTSTurboModule.h"
@@ -19,6 +20,12 @@
 #include "RNOH/ArkTSChannel.h"
 #include "RNOH/FeatureFlagRegistry.h"
 
+#ifdef C_API_ARCH
+#include "RNOH/SchedulerDelegateCAPI.h"
+#include "RNOH/ComponentInstanceRegistry.h"
+#include "RNOH/ComponentInstanceFactory.h"
+#endif
+
 using namespace rnoh;
 
 std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef,
@@ -27,6 +34,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
                                              napi_ref measureTextFnRef, napi_ref napiEventDispatcherRef,
                                              FeatureFlagRegistry::Shared featureFlagRegistry, UITicker::Shared uiTicker,
                                              bool shouldEnableDebugger, bool shouldEnableBackgroundExecutor) {
+    auto shouldUseCAPIArchitecture = featureFlagRegistry->getFeatureFlagStatus("C_API_ARCH");
     std::shared_ptr<TaskExecutor> taskExecutor = std::make_shared<TaskExecutor>(env, shouldEnableBackgroundExecutor);
     auto arkTSChannel = std::make_shared<ArkTSChannel>(taskExecutor, ArkJS(env), napiEventDispatcherRef);
 
@@ -73,6 +81,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
     GlobalJSIBinders globalJSIBinders = {};
     ComponentNapiBinderByString componentNapiBinderByName = {};
     EventEmitRequestHandlers eventEmitRequestHandlers = {};
+    std::vector<ComponentInstanceFactoryDelegate::Shared> componentInstanceFactoryDelegates = {};
 
     for (auto &package : packages) {
         auto turboModuleFactoryDelegate = package->createTurboModuleFactoryDelegate();
@@ -95,11 +104,34 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
         eventEmitRequestHandlers.insert(eventEmitRequestHandlers.end(),
                                         std::make_move_iterator(packageEventEmitRequestHandlers.begin()),
                                         std::make_move_iterator(packageEventEmitRequestHandlers.end()));
+        auto componentInstanceFactoryDelegate = package->createComponentInstanceFactoryDelegate();
+        if (componentInstanceFactoryDelegate != nullptr) {
+            componentInstanceFactoryDelegates.push_back(std::move(componentInstanceFactoryDelegate));
+        }
     }
 
     auto turboModuleFactory = TurboModuleFactory(env, arkTsTurboModuleProviderRef, std::move(componentJSIBinderByName),
                                                  taskExecutor, std::move(turboModuleFactoryDelegates));
     auto mutationsToNapiConverter = std::make_shared<MutationsToNapiConverter>(std::move(componentNapiBinderByName));
+
+    if (shouldUseCAPIArchitecture) {
+#ifdef C_API_ARCH
+        auto componentInstanceFactory = std::make_shared<ComponentInstanceFactory>(componentInstanceFactoryDelegates);
+        auto componentInstanceRegistry = std::make_shared<ComponentInstanceRegistry>();
+        auto schedulerDelegate = std::make_unique<SchedulerDelegateCAPI>(
+            taskExecutor, shadowViewRegistry, componentInstanceRegistry, componentInstanceFactory);
+        auto result = std::make_unique<RNInstanceCAPI>(
+            id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
+            mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
+            std::move(schedulerDelegate), shouldEnableDebugger, shouldEnableBackgroundExecutor);
+        result->setCAPIArchDependencies(componentInstanceRegistry, componentInstanceFactory);
+        return result;
+#else
+     LOG(FATAL) << "The C_API architecture also needs to be enabled on the CPP side. Have you set the RNOH_C_API_ARCH=1 environment variable, completely closed and reopened DevEco Studio and run Build > Clean Project?";   
+#endif
+    }
+
+
     auto schedulerDelegate = std::make_unique<SchedulerDelegate>(
         MountingManager(
             taskExecutor, shadowViewRegistry,
@@ -118,7 +150,6 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
         arkTSChannel);
     return std::make_unique<RNInstance>(
         id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
-        mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders,
-        uiTicker, shadowViewRegistry, std::move(schedulerDelegate), shouldEnableDebugger,
-        shouldEnableBackgroundExecutor);
+        mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
+        std::move(schedulerDelegate), shouldEnableDebugger, shouldEnableBackgroundExecutor);
 }

@@ -439,6 +439,12 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/Animated/Drivers/EventAnimationDriver.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/I18nManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/EventEmitRequestHandlers/TouchEventEmitRequestHandler.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/NativeNodeApi.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/ArkUINode.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/StackNode.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/TextNode.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ViewComponentInstance.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/TextComponentInstance.cpp"
 )
 target_include_directories(rnoh PUBLIC
     "${RNOH_CPP_DIR}"
@@ -450,6 +456,7 @@ target_include_directories(rnoh PUBLIC
 )
 target_link_libraries(rnoh PUBLIC
     libace_napi.z.so
+    libace_ndk.z.so
     libhilog_ndk.z.so
     libnative_vsync.so
     libnative_drawing.so
@@ -474,3 +481,8 @@ target_compile_options(rnoh PUBLIC
     -DRAW_PROPS_ENABLED
     -std=c++17
 )
+
+if("$ENV{RNOH_C_API_ARCH}" STREQUAL "1")
+    message("Experimental C-API architecture enabled")
+    target_compile_definitions(rnoh PUBLIC C_API_ARCH)
+endif()
