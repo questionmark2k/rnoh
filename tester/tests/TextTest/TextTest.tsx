@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 import {TestSuite, TestCase} from '@rnoh/testerino';
 import {Button} from '../../components';
 import {useState} from 'react';
@@ -102,6 +102,24 @@ export function TextTest() {
           expect(state).to.have.all.keys('x', 'y', 'width', 'height');
         }}
       />
+      <TestCase
+        itShould="display text with a selection color of Indian Red"
+        skip={Platform.select({harmony: 'Missing prop on ArkUI side'})}>
+        <Text selectionColor="#F15156" selectable>
+          Text with indian red selection color
+        </Text>
+      </TestCase>
+      <TestCase
+        itShould="display text with a selection color of Blue"
+        skip={Platform.select({harmony: 'Missing prop on ArkUI side'})}>
+        <Text selectionColor="blue" selectable>
+          Text with blue selection color but on longer text. In React Native,
+          the selectionColor prop in the Text component is used to customize the
+          color of the text highlight when the text field is selected. This is
+          useful when you want the text highlight color to match your app's
+          theme. 一 乙 二 十 丁 厂 七 卜 人 入 八 九 几 儿 了 力 乃 又
+        </Text>
+      </TestCase>
     </TestSuite>
   );
 }
