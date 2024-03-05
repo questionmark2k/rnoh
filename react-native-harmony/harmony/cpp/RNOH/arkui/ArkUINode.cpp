@@ -1,7 +1,14 @@
 #include "ArkUINode.h"
+
 #include "NativeNodeApi.h"
+#include "ArkUINodeRegistry.h"
 
 namespace rnoh {
+
+ArkUINode::ArkUINode(ArkUI_NodeHandle nodeHandle) : m_nodeHandle(nodeHandle) {
+    ArkUINodeRegistry::getInstance().registerNode(this);
+}
+
 ArkUINode::ArkUINode(ArkUINode &&other) noexcept : m_nodeHandle(std::move(other.m_nodeHandle)) {
     other.m_nodeHandle = nullptr;
 }
@@ -10,6 +17,8 @@ ArkUINode &ArkUINode::operator=(ArkUINode &&other) noexcept {
     std::swap(m_nodeHandle, other.m_nodeHandle);
     return *this;
 }
+
+void ArkUINode::onNodeEvent(ArkUI_NodeEvent *event) {}
 
 ArkUI_NodeHandle ArkUINode::getArkUINodeHandle() {
     return m_nodeHandle;
@@ -57,6 +66,10 @@ ArkUINode &ArkUINode::setBackgroundColor(facebook::react::SharedColor const &col
 }
 
 ArkUINode::~ArkUINode() {
+    if (m_nodeHandle) {
+        ArkUINodeRegistry::getInstance().unregisterNode(this);
+        NativeNodeApi::getInstance()->disposeNode(m_nodeHandle);
+    }
 }
 
 } // namespace rnoh

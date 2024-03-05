@@ -10,8 +10,7 @@
 namespace rnoh {
     class ArkUINode {
     protected:
-        ArkUINode(ArkUI_NodeHandle nodeHandle) : m_nodeHandle(nodeHandle) {}
-        ArkUINode(): ArkUINode(nullptr) {}
+        ArkUINode(ArkUI_NodeHandle nodeHandle);
 
         ArkUINode(const ArkUINode &other) = delete;
         ArkUINode &operator=(const ArkUINode &other) = delete;
@@ -27,6 +26,8 @@ namespace rnoh {
         virtual ArkUINode &setPosition(facebook::react::Point const &position);
         virtual ArkUINode &setSize(facebook::react::Size const &size);
         virtual ArkUINode &setBackgroundColor(facebook::react::SharedColor const &color);
+
+        virtual void onNodeEvent(ArkUI_NodeEvent *event);
 
         virtual ~ArkUINode();
 

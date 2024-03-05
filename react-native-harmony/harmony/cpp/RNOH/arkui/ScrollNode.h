@@ -4,15 +4,16 @@
 
 namespace rnoh {
 
-    class ScrollNode : public ArkUINode {
-    public:
-        ScrollNode() : ArkUINode(NativeNodeApi::getInstance()->createNode(ArkUI_NodeType::ARKUI_NODE_SCROLL)) {}
-    
-        void insertChild(ArkUINode &child) {
-            maybeThrow(NativeNodeApi::getInstance()->addChild(m_nodeHandle, child.getArkUINodeHandle()));
-        }
-    
-        
-    };
+class ScrollNode : public ArkUINode {
+  public:
+    ScrollNode();
+    ~ScrollNode() override;
+
+    void insertChild(ArkUINode &child) {
+        maybeThrow(NativeNodeApi::getInstance()->addChild(m_nodeHandle, child.getArkUINodeHandle()));
+    }
+
+    void onNodeEvent(ArkUI_NodeEvent *event) override;
+};
 
 } // namespace rnoh
