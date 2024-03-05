@@ -64,6 +64,7 @@
 #include "RNOHCorePackage/GlobalBinders/BlobCollectorJSIBinder.h"
 #include "RNOHCorePackage/ComponentInstances/ViewComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/TextComponentInstance.h"
+#include "RNOHCorePackage/ComponentInstances/ScrollViewComponentInstance.h"
 
 namespace rnoh {
 
@@ -140,6 +141,9 @@ namespace rnoh {
             if (ctx.componentName == "Paragraph") {
                 return std::make_shared<TextComponentInstance>(m_ctx, ctx.tag);
             }
+            if (ctx.componentName == "ScrollView") {
+                return std::make_shared<ScrollViewComponentInstance>(m_ctx, ctx.tag);
+            } 
             return nullptr;
         }
     };
