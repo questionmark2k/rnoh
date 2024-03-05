@@ -84,14 +84,14 @@ namespace rnoh {
         void loadScript(std::vector<uint8_t> &&bundle, std::string const sourceURL,
                         std::function<void(const std::string)> &&onFinish);
         virtual void createSurface(facebook::react::Tag surfaceId, std::string const &moduleName);
-        void updateSurfaceConstraints(facebook::react::Tag surfaceId, float width, float height, float viewportOffsetX,
+        virtual void updateSurfaceConstraints(facebook::react::Tag surfaceId, float width, float height, float viewportOffsetX,
                                       float viewportOffsetY, float pixelRatio);
         virtual void startSurface(facebook::react::Tag surfaceId, float width, float height, float viewportOffsetX,
                           float viewportOffsetY, float pixelRatio, folly::dynamic &&initialProps);
-        void setSurfaceProps(facebook::react::Tag surfaceId, folly::dynamic &&props);
-        void stopSurface(facebook::react::Tag surfaceId);
-        void destroySurface(facebook::react::Tag surfaceId);
-        void setSurfaceDisplayMode(facebook::react::Tag surfaceId, facebook::react::DisplayMode displayMode);
+        virtual void setSurfaceProps(facebook::react::Tag surfaceId, folly::dynamic &&props);
+        virtual void stopSurface(facebook::react::Tag surfaceId);
+        virtual void destroySurface(facebook::react::Tag surfaceId);
+        virtual void setSurfaceDisplayMode(facebook::react::Tag surfaceId, facebook::react::DisplayMode displayMode);
         void callFunction(std::string &&module, std::string &&method, folly::dynamic &&params);
         void emitComponentEvent(napi_env env, facebook::react::Tag tag, std::string eventName, napi_value payload);
         void onMemoryLevel(size_t memoryLevel);

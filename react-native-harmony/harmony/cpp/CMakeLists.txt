@@ -381,6 +381,7 @@ target_compile_options(hermes_inspector PRIVATE ${folly_compile_options})
 
 add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOH/RNInstance.cpp"
+    "${RNOH_CPP_DIR}/RNOH/RNInstanceCAPI.cpp"
     "${RNOH_CPP_DIR}/RNOH/BlobCollector.cpp"
     "${RNOH_CPP_DIR}/RNOH/MessageQueueThread.cpp"
     "${RNOH_CPP_DIR}/RNOH/MutationsToNapiConverter.cpp"
@@ -440,6 +441,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/I18nManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/EventEmitRequestHandlers/TouchEventEmitRequestHandler.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/NativeNodeApi.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/XComponentSurface.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/ArkUINode.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/StackNode.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/TextNode.cpp"
