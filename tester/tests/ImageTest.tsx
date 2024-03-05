@@ -9,6 +9,7 @@ import {
 import {TestCase, TestSuite} from '@rnoh/testerino';
 import React from 'react';
 import {Button} from '../components';
+import {getScrollViewContentHorizontal} from './ScrollViewTest/fixtures';
 
 const WRONG_IMAGE_SRC = 'not_image';
 const LOCAL_IMAGE_ASSET_ID = require('../assets/pravatar-131.jpg');
@@ -389,7 +390,39 @@ export const ImageTest = () => {
           ))}
         </ScrollView>
       </TestCase>
+      <TestCase itShould="allow scrolling by touching the image">
+        <ImagePointerEventsTest />
+      </TestCase>
     </TestSuite>
+  );
+};
+
+const ImagePointerEventsTest = () => {
+  return (
+    <View style={{height: 200, justifyContent: 'center', alignItems: 'center'}}>
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          zIndex: 1,
+          height: 150,
+          width: 150,
+          backgroundColor: 'green',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Image
+          source={LOCAL_IMAGE_ASSET_ID}
+          style={{width: 100, height: 100}}
+          resizeMode="cover"
+          //@ts-ignore
+          pointerEvents="none"
+        />
+      </View>
+      <ScrollView style={{height: 200}} horizontal>
+        {getScrollViewContentHorizontal({})}
+      </ScrollView>
+    </View>
   );
 };
 

@@ -214,6 +214,7 @@ export struct RNImage {
             this.imageSource = undefined;
           })
           .focusable(this.descriptorWrapper?.focusable ?? false)
+          .hitTestBehavior(HitTestMode.None)
       }
     }
   }
