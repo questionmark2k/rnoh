@@ -1,9 +1,5 @@
 import { RNComponentContext, RNOHContext, Tag, CustomComponentBuilder, DescriptorWrapper } from '../../RNOH'
-import {
-  ViewBaseDescriptor,
-  ViewDescriptorWrapperBase,
-  RNViewBaseAttributeModifierBase,
-} from './RNViewBase'
+import { ViewBaseDescriptor, ViewDescriptorWrapperBase, RNViewBaseAttributeModifier, } from './RNViewBase'
 import { RNComponentFactory } from "./RNComponentFactory"
 import { RNViewManager } from '../componentManagers';
 
@@ -15,7 +11,7 @@ export struct RNView {
   private componentManager!: RNViewManager;
   @State private childrenTags: Tag[] = []
   @State private descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
-  @State private rnViewAttributeModifier: RNViewBaseAttributeModifierBase | undefined = undefined
+  @State private rnViewAttributeModifier: RNViewBaseAttributeModifier | undefined = undefined
   private cleanUpCallbacks: (() => void)[] = []
 
   aboutToAppear() {
@@ -38,7 +34,7 @@ export struct RNView {
       descriptorWrapper = new ViewDescriptorWrapperBase(descriptor)
     }
     if (this.ctx instanceof RNComponentContext) {
-      this.rnViewAttributeModifier = new RNViewBaseAttributeModifierBase(this.ctx, descriptorWrapper)
+      this.rnViewAttributeModifier = new RNViewBaseAttributeModifier(descriptorWrapper)
     }
     this.descriptorWrapper = descriptorWrapper
     this.childrenTags = descriptorWrapper.childrenTags
@@ -124,7 +120,7 @@ export function buildRNView(ctx: RNComponentContext, tag: Tag) {
   })
   .id(tag.toString())
   .onClick((event: ClickEvent) => onClickEvent(event, ctx, tag))
-  .attributeModifier(new RNViewBaseAttributeModifierBase(ctx, ctx.descriptorRegistry.findDescriptorWrapperByTag(tag) as ViewDescriptorWrapperBase))
+  .attributeModifier(new RNViewBaseAttributeModifier(ctx.descriptorRegistry.findDescriptorWrapperByTag(tag) as ViewDescriptorWrapperBase))
   .align(Alignment.TopStart)
 }
 

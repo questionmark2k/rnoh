@@ -45,6 +45,8 @@ export type TextRawProps = ViewRawProps & {
   adjustsFontSizeToFit?: boolean
   allowFontScaling?: boolean
   minimumFontScale?: number
+  selectable?: boolean
+  disabled?: boolean
 }
 
 export type TextDescriptor = Descriptor<"Paragraph", TextProps, {}, TextRawProps>
@@ -69,7 +71,10 @@ export type TextProps = ViewBaseProps & ViewAccessibility & {
   ellipsizeMode?: EllipsizeMode
 }
 
-type PaddingProps = {
+export type ParagraphState = {}
+
+
+export type PaddingProps = {
   top: number,
   right: number,
   bottom: number,

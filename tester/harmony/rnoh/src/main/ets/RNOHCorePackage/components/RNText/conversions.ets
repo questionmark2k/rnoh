@@ -14,7 +14,7 @@ export function stringToAlignment(alignment?: string) {
   }
 }
 
-export function stringToVerticalAlign(textAlignVertical: string) {
+export function stringToVerticalAlign(textAlignVertical?: string) {
   switch (textAlignVertical) {
     case "top":
       return Alignment.TopStart
@@ -78,7 +78,7 @@ export function stringToTextTransform(textTransform?: string) {
   }
 }
 
-export function ellipsizeModeToTextOverflow(ellipsizeMode: EllipsizeMode): TextOverflow {
+export function ellipsizeModeToTextOverflow(ellipsizeMode?: EllipsizeMode): TextOverflow {
   if (ellipsizeMode === EllipsizeMode.Clip) {
     return TextOverflow.Clip
   }
@@ -92,7 +92,7 @@ export function getLetterSpacing(letterSpacing?: number) {
   return letterSpacing
 }
 
-export function getMaxLines(maximumNumberOfLines?: number) {
+export function getMaxLines(maximumNumberOfLines?: number): number | undefined {
   return (maximumNumberOfLines ?? 0) > 0 ? maximumNumberOfLines : undefined
 }
 
@@ -144,11 +144,11 @@ export function getTextDecorationLine(textDecorationLine: number | undefined) {
   }
 }
 
-export function getFontSize(fontSize: number | undefined, rawProps: TextRawProps) {
+export function getFontSize(fontSize: number | undefined, allowFontScaling?: boolean) {
   if (!fontSize) {
     return undefined;
   }
-  const pixelUnit = rawProps.allowFontScaling ? 'fp' : 'vp';
+  const pixelUnit = allowFontScaling ? 'fp' : 'vp';
   return `${fontSize}${pixelUnit}`;
 }
 

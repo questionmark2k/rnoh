@@ -101,6 +101,8 @@ export struct RNParagraph {
               .width(positionedFragment.size.width)
               .height(line.size.height)
               .maxLines(1)
+              .copyOption(this.descriptor.rawProps.selectable ? CopyOptions.LocalDevice : CopyOptions.None)
+              .enabled(!this.descriptor.rawProps.disabled)
               .accessibilityGroup(this.descriptorWrapper?.accessibilityGroup)
               .accessibilityText(this.descriptorWrapper?.accessibilityText)
               .accessibilityLevel(this.descriptorWrapper?.accessibilityLevel)

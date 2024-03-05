@@ -1,6 +1,6 @@
 import { Descriptor, RNOHContext, TransformMatrix, Edges, Corners, RNComponentContext } from '../../../RNOH';
 import { ViewBaseProps, ViewRawProps } from './types';
-import { ViewDescriptorWrapperBase } from './ViewDescriptorWrapper';
+import { ViewDescriptorWrapper, ViewDescriptorWrapperBase } from './ViewDescriptorWrapper';
 import { RNViewManager } from '../../componentManagers';
 import { areFirstLevelPropsEqual, areFirstLevelElementsEqual } from "./etsHacks"
 import matrix4 from '@ohos.matrix4';
@@ -18,14 +18,35 @@ TRawProps extends ViewRawProps = ViewRawProps> = Descriptor<TType, TProps, TStat
  */
 export type ViewDynamicDescriptor = Descriptor<string, ViewRawProps>
 
+export abstract class BaseAttributeModifier<TPropertyHolder, TAttribute> implements AttributeModifier<TAttribute> {
+  public propertyHolder: TPropertyHolder;
 
-export class RNViewBaseAttributeModifierBase<TViewDescriptorWrapper extends ViewDescriptorWrapperBase = ViewDescriptorWrapperBase> implements AttributeModifier<CommonAttribute> {
-  protected descriptorWrapper: TViewDescriptorWrapper
-
-  constructor(ctx: RNComponentContext, descriptorWrapper: TViewDescriptorWrapper) {
-    this.descriptorWrapper = descriptorWrapper
+  constructor(propertyHolder: TPropertyHolder) {
+    this.propertyHolder = propertyHolder;
   }
 
+  abstract applyNormalAttribute(instance: TAttribute): void;
+
+  protected maybeAssignAttribute<TPropertyValue>(
+    extractPropertyValue: (propertyHolder: TPropertyHolder) => TPropertyValue,
+    assign: (propertyValue: TPropertyValue) => void,
+    defaultValue: TPropertyValue,
+  ): void {
+    const newPropertyValue = extractPropertyValue(this.propertyHolder)
+    let isNewPropertyValueEqualToDefault = newPropertyValue === defaultValue
+    if (Array.isArray(defaultValue) && Array.isArray(newPropertyValue)) {
+      isNewPropertyValueEqualToDefault = areFirstLevelElementsEqual(newPropertyValue, defaultValue)
+    } else if (typeof defaultValue === "object" && typeof newPropertyValue === "object") {
+      isNewPropertyValueEqualToDefault = areFirstLevelPropsEqual(newPropertyValue, defaultValue)
+    }
+    if (!isNewPropertyValueEqualToDefault) {
+      assign(newPropertyValue)
+    }
+  }
+}
+
+
+export class RNViewBaseAttributeModifier extends BaseAttributeModifier<ViewDescriptorWrapper, CommonAttribute> {
   applyNormalAttribute(instance: CommonAttribute): void {
     this.maybeAssignAttribute((dw => dw.width), (val) => instance.width(val), 0)
     this.maybeAssignAttribute((dw => dw.height), (val) => instance.height(val), 0)
@@ -87,24 +108,6 @@ export class RNViewBaseAttributeModifierBase<TViewDescriptorWrapper extends View
     this.maybeAssignAttribute(dw => dw.accessibilityDescription, val => instance.accessibilityDescription(val), undefined)
 
   }
-
-
-  protected maybeAssignAttribute<TPropertyValue>(
-    extractPropertyValue: (descriptorWrapper: ViewDescriptorWrapperBase) => TPropertyValue,
-    assign: (propertyValue: TPropertyValue) => void,
-    defaultValue: TPropertyValue,
-  ): void {
-    const newPropertyValue = extractPropertyValue(this.descriptorWrapper)
-    let isNewPropertyValueEqualToDefault = newPropertyValue === defaultValue
-    if (Array.isArray(defaultValue) && Array.isArray(newPropertyValue)) {
-      isNewPropertyValueEqualToDefault = areFirstLevelElementsEqual(newPropertyValue, defaultValue)
-    } else if (typeof defaultValue === "object" && typeof newPropertyValue === "object") {
-      isNewPropertyValueEqualToDefault = areFirstLevelPropsEqual(newPropertyValue, defaultValue)
-    }
-    if (!isNewPropertyValueEqualToDefault) {
-      assign(newPropertyValue)
-    }
-  }
 }
 
 @Component
@@ -116,7 +119,7 @@ export struct RNViewBase {
   @Prop public controlsFocus: boolean = true;
   @BuilderParam public renderChildren: () => void
   @State private descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
-  @State private rnViewAttributeModifier: RNViewBaseAttributeModifierBase | undefined = undefined
+  @State private rnViewAttributeModifier: RNViewBaseAttributeModifier | undefined = undefined
   private unregisterDescriptorChangesListener?: () => void = undefined
   private unregisterComponentManager?: () => void = undefined
   private unregisterCommandCallback?: () => void = undefined
@@ -144,7 +147,7 @@ export struct RNViewBase {
       descriptorWrapper = new ViewDescriptorWrapperBase(descriptor)
     }
     if (this.ctx instanceof RNComponentContext) {
-      this.rnViewAttributeModifier = new RNViewBaseAttributeModifierBase(this.ctx, descriptorWrapper)
+      this.rnViewAttributeModifier = new RNViewBaseAttributeModifier(descriptorWrapper)
     }
     this.descriptorWrapper = descriptorWrapper
   }
