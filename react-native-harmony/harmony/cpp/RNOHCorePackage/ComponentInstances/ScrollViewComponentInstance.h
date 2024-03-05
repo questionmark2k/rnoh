@@ -15,5 +15,7 @@ namespace rnoh {
         ScrollNode &getLocalRootArkUINode() override;
 
         void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
+
+        void removeChild(ComponentInstance::Shared childComponentInstance) override;
     };
 } // namespace rnoh

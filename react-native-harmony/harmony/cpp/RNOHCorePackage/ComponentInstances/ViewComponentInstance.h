@@ -12,6 +12,8 @@ namespace rnoh {
 
         void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
 
+        void removeChild(ComponentInstance::Shared childComponentInstance) override;
+
         StackNode &getLocalRootArkUINode() override;
     };
 } // namespace rnoh

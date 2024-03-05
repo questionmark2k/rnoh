@@ -14,3 +14,7 @@ ScrollNode& ScrollViewComponentInstance::getLocalRootArkUINode() {
 void ScrollViewComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
     m_stackNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
 };
+
+void ScrollViewComponentInstance::removeChild(ComponentInstance::Shared childComponentInstance) {
+    m_stackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
+};

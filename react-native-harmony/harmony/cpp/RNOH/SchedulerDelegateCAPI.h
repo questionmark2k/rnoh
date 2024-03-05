@@ -104,7 +104,7 @@ namespace rnoh {
             case facebook::react::ShadowViewMutation::Remove: {
                 auto parentComponentInstance = m_componentInstanceRegistry->findByTag(mutation.parentShadowView.tag);
                 if (parentComponentInstance) {
-                    parentComponentInstance->removeChild(mutation.oldChildShadowView.tag);
+                    parentComponentInstance->removeChild(m_componentInstanceRegistry->findByTag(mutation.oldChildShadowView.tag));
                     parentComponentInstance->finalizeUpdates();
                 }
                 break;

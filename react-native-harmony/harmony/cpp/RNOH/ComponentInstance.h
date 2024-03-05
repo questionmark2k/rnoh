@@ -34,7 +34,7 @@ namespace rnoh {
 
         virtual void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {}
 
-        virtual void removeChild(facebook::react::Tag tag) {}
+        virtual void removeChild(ComponentInstance::Shared childComponentInstance) {}
 
         virtual void setProps(facebook::react::Props::Shared props) {
             if (auto p = std::dynamic_pointer_cast<const facebook::react::ViewProps>(props)) {
