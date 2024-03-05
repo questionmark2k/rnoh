@@ -10,15 +10,19 @@ using facebook::react::SurfaceId;
 void maybeAttachRootNode(OH_NativeXComponent *nativeXComponent, ComponentInstance &rootView) {
     if (nativeXComponent != nullptr) {
         LOG(INFO) << "Attaching native root node to nativeXComponent for surface with id: " << rootView.getTag();
+#ifdef C_API_ARCH
         OH_NativeXComponent_AttachNativeRootNode(nativeXComponent,
                                                  rootView.getLocalRootArkUINode().getArkUINodeHandle());
+#endif
     }
 }
 
 void maybeDetachRootNode(OH_NativeXComponent *nativeXComponent, ComponentInstance &rootView) {
     if (nativeXComponent != nullptr) {
+#ifdef C_API_ARCH
         OH_NativeXComponent_DetachNativeRootNode(nativeXComponent,
                                                  rootView.getLocalRootArkUINode().getArkUINodeHandle());
+#endif
     }
 }
 
@@ -43,11 +47,11 @@ XComponentSurface::XComponentSurface(
 }
 
 XComponentSurface::XComponentSurface(XComponentSurface &&other) noexcept : m_surfaceId(other.m_surfaceId),
-                                            m_scheduler(std::move(other.m_scheduler)),
-                                            m_nativeXComponent(other.m_nativeXComponent),
-                                            m_rootView(std::move(other.m_rootView)),
-                                            m_componentInstanceRegistry(std::move(other.m_componentInstanceRegistry)),
-                                            m_surfaceHandler(std::move(other.m_surfaceHandler)) {
+                                                                           m_scheduler(std::move(other.m_scheduler)),
+                                                                           m_nativeXComponent(other.m_nativeXComponent),
+                                                                           m_rootView(std::move(other.m_rootView)),
+                                                                           m_componentInstanceRegistry(std::move(other.m_componentInstanceRegistry)),
+                                                                           m_surfaceHandler(std::move(other.m_surfaceHandler)) {
     other.m_nativeXComponent = nullptr;
 }
 
