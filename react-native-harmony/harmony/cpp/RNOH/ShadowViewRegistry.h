@@ -13,6 +13,10 @@ class ShadowViewRegistry {
     void setShadowView(facebook::react::Tag, facebook::react::ShadowView const &);
     void clearShadowView(facebook::react::Tag);
 
+    ~ShadowViewRegistry() {
+        DLOG(INFO) << "~ShadowViewRegistry"; 
+    }
+    
     template <typename TEventEmitter>
     std::shared_ptr<const TEventEmitter> getEventEmitter(facebook::react::Tag tag) {
         auto it = m_shadowViewEntryByTag.find(tag);

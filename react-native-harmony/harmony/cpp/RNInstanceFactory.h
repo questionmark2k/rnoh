@@ -8,6 +8,7 @@
 #include <react/renderer/components/text/ParagraphComponentDescriptor.h>
 #include "RNOH/ArkJS.h"
 #include "RNOH/RNInstance.h"
+#include "RNOH/RNInstanceArkTS.h"
 #include "RNOH/RNInstanceCAPI.h"
 #include "RNOH/MutationsToNapiConverter.h"
 #include "RNOH/TurboModuleFactory.h"
@@ -120,17 +121,14 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
         auto componentInstanceRegistry = std::make_shared<ComponentInstanceRegistry>();
         auto schedulerDelegate = std::make_unique<SchedulerDelegateCAPI>(
             taskExecutor, shadowViewRegistry, componentInstanceRegistry, componentInstanceFactory);
-        auto result = std::make_unique<RNInstanceCAPI>(
+        return std::make_unique<RNInstanceCAPI>(
             id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
             mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
-            std::move(schedulerDelegate), shouldEnableDebugger, shouldEnableBackgroundExecutor);
-        result->setCAPIArchDependencies(componentInstanceRegistry, componentInstanceFactory);
-        return result;
+            std::move(schedulerDelegate), componentInstanceRegistry, componentInstanceFactory, shouldEnableDebugger, shouldEnableBackgroundExecutor);
 #else
-     LOG(FATAL) << "The C_API architecture also needs to be enabled on the CPP side. Have you set the RNOH_C_API_ARCH=1 environment variable, completely closed and reopened DevEco Studio and run Build > Clean Project?";   
+        LOG(FATAL) << "The C_API architecture also needs to be enabled on the CPP side. Have you set the RNOH_C_API_ARCH=1 environment variable, completely closed and reopened DevEco Studio and run Build > Clean Project?";   
 #endif
     }
-
 
     auto schedulerDelegate = std::make_unique<SchedulerDelegate>(
         MountingManager(
@@ -148,7 +146,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
                 }
             }),
         arkTSChannel);
-    return std::make_unique<RNInstance>(
+    return std::make_unique<RNInstanceArkTS>(
         id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
         mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
         std::move(schedulerDelegate), shouldEnableDebugger, shouldEnableBackgroundExecutor);

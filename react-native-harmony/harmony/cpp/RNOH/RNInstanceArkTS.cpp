@@ -3,7 +3,6 @@
 #include <react/renderer/animations/LayoutAnimationDriver.h>
 #include <cxxreact/JSBundleType.h>
 #include "RNOH/MessageQueueThread.h"
-#include "RNOH/RNInstance.h"
 #include "RNOH/EventBeat.h"
 #include "hermes/executor/HermesExecutorFactory.h"
 #include <react/renderer/componentregistry/ComponentDescriptorProvider.h>
@@ -11,26 +10,29 @@
 #include "RNOH/ShadowViewRegistry.h"
 #include "RNOH/TurboModuleProvider.h"
 #include "RNOH/TurboModuleFactory.h"
-#include "RNInstance.h"
+#include "RNInstanceArkTS.h"
 #include "NativeLogger.h"
 
 using namespace facebook;
 using namespace rnoh;
 
-void RNInstance::start() {
+TaskExecutor::Shared RNInstanceArkTS::getTaskExecutor() {
+    return taskExecutor;
+};
+
+void RNInstanceArkTS::start() {
     this->initialize();
     auto turboModuleProvider = this->createTurboModuleProvider();
     this->initializeScheduler(turboModuleProvider);
     this->instance->getRuntimeExecutor()(
-        [binders = this->m_globalJSIBinders,turboModuleProvider](facebook::jsi::Runtime &rt) { 
+        [binders = this->m_globalJSIBinders, turboModuleProvider](facebook::jsi::Runtime &rt) {
             for (auto &binder : binders) {
                 binder->createBindings(rt, turboModuleProvider);
             }
-        }
-    );
+        });
 }
 
-void RNInstance::initialize() {
+void RNInstanceArkTS::initialize() {
     // create a new event dispatcher every time RN is initialized
     m_eventDispatcher = std::make_shared<EventDispatcher>();
     std::vector<std::unique_ptr<react::NativeModule>> modules;
@@ -46,26 +48,21 @@ void RNInstance::initialize() {
     jsExecutorFactory->setEnableDebugger(m_shouldEnableDebugger);
     m_jsQueue = std::make_shared<MessageQueueThread>(this->taskExecutor);
     auto moduleRegistry = std::make_shared<react::ModuleRegistry>(std::move(modules));
-    this->instance->initializeBridge(
-        std::move(instanceCallback),
-        std::move(jsExecutorFactory),
-        m_jsQueue,
-        std::move(moduleRegistry));
+    this->instance->initializeBridge(std::move(instanceCallback), std::move(jsExecutorFactory), m_jsQueue,
+                                     std::move(moduleRegistry));
 }
 
-void RNInstance::initializeScheduler(std::shared_ptr<TurboModuleProvider> turboModuleProvider) {
+void RNInstanceArkTS::initializeScheduler(std::shared_ptr<TurboModuleProvider> turboModuleProvider) {
     auto reactConfig = std::make_shared<react::EmptyReactNativeConfig>();
     m_contextContainer->insert("ReactNativeConfig", std::move(reactConfig));
 
-    react::EventBeat::Factory eventBeatFactory = [taskExecutor = std::weak_ptr(taskExecutor), runtimeExecutor = this->instance->getRuntimeExecutor()](auto ownerBox) {
-        return std::make_unique<EventBeat>(taskExecutor, runtimeExecutor, ownerBox);
-    };
+    react::EventBeat::Factory eventBeatFactory =
+        [taskExecutor = std::weak_ptr(taskExecutor), runtimeExecutor = this->instance->getRuntimeExecutor()](
+            auto ownerBox) { return std::make_unique<EventBeat>(taskExecutor, runtimeExecutor, ownerBox); };
 
     react::ComponentRegistryFactory componentRegistryFactory =
-        [registry = m_componentDescriptorProviderRegistry](
-            auto eventDispatcher, auto contextContainer) {
-            return registry->createComponentDescriptorRegistry(
-                {eventDispatcher, contextContainer});
+        [registry = m_componentDescriptorProviderRegistry](auto eventDispatcher, auto contextContainer) {
+            return registry->createComponentDescriptorRegistry({eventDispatcher, contextContainer});
         };
 
     react::SchedulerToolbox schedulerToolbox{
@@ -75,7 +72,7 @@ void RNInstance::initializeScheduler(std::shared_ptr<TurboModuleProvider> turboM
         .asynchronousEventBeatFactory = eventBeatFactory,
         .synchronousEventBeatFactory = eventBeatFactory,
     };
-    
+
     if (m_shouldEnableBackgroundExecutor) {
         schedulerToolbox.backgroundExecutor = [executor = this->taskExecutor](std::function<void()> &&callback) {
             if (executor->isOnTaskThread(TaskThread::MAIN)) {
@@ -88,51 +85,51 @@ void RNInstance::initializeScheduler(std::shared_ptr<TurboModuleProvider> turboM
     }
 
 
-    m_animationDriver = std::make_shared<react::LayoutAnimationDriver>(
-        this->instance->getRuntimeExecutor(), m_contextContainer, this);
-    this->scheduler = std::make_shared<react::Scheduler>(
-        schedulerToolbox, m_animationDriver.get(), m_schedulerDelegate.get());
+    m_animationDriver =
+        std::make_shared<react::LayoutAnimationDriver>(this->instance->getRuntimeExecutor(), m_contextContainer, this);
+    this->scheduler =
+        std::make_shared<react::Scheduler>(schedulerToolbox, m_animationDriver.get(), m_schedulerDelegate.get());
     turboModuleProvider->setScheduler(this->scheduler);
 }
 
-std::shared_ptr<TurboModuleProvider> RNInstance::createTurboModuleProvider() {
+std::shared_ptr<TurboModuleProvider> RNInstanceArkTS::createTurboModuleProvider() {
     auto turboModuleProvider = std::make_shared<TurboModuleProvider>(
-        this->instance->getJSCallInvoker(), std::move(m_turboModuleFactory),
-        m_eventDispatcher, std::move(m_jsQueue));
-    turboModuleProvider->installJSBindings(
-        this->instance->getRuntimeExecutor());
+        this->instance->getJSCallInvoker(), std::move(m_turboModuleFactory), m_eventDispatcher, std::move(m_jsQueue));
+    turboModuleProvider->installJSBindings(this->instance->getRuntimeExecutor());
     return turboModuleProvider;
 }
 
-void RNInstance::loadScript(std::vector<uint8_t> &&bundle, std::string const sourceURL, std::function<void(const std::string)> &&onFinish) {
-    this->taskExecutor->runTask(TaskThread::JS, [this, bundle = std::move(bundle), sourceURL, onFinish = std::move(onFinish)]() mutable {
-        std::unique_ptr<react::JSBigBufferString> jsBundle;
-        jsBundle = std::make_unique<react::JSBigBufferString>(bundle.size());
-        memcpy(jsBundle->data(), bundle.data(), bundle.size());
+void RNInstanceArkTS::loadScript(std::vector<uint8_t> &&bundle, std::string const sourceURL,
+                            std::function<void(const std::string)> &&onFinish) {
+    this->taskExecutor->runTask(
+        TaskThread::JS, [this, bundle = std::move(bundle), sourceURL, onFinish = std::move(onFinish)]() mutable {
+            std::unique_ptr<react::JSBigBufferString> jsBundle;
+            jsBundle = std::make_unique<react::JSBigBufferString>(bundle.size());
+            memcpy(jsBundle->data(), bundle.data(), bundle.size());
 
-        react::BundleHeader header;
-        memcpy(&header, bundle.data(), sizeof(react::BundleHeader));
-        react::ScriptTag scriptTag = react::parseTypeFromHeader(header);
-        // NOTE: Hermes bytecode bundles are treated as String bundles,
-        // and don't throw an error here.
-        if (scriptTag != react::ScriptTag::String) {
-            throw new std::runtime_error("RAM bundles are not yet supported");
-        }
-        try {
-            this->instance->loadScriptFromString(std::move(jsBundle), sourceURL, true);
-            onFinish("");
-        } catch (std::exception const &e) {
-            try {
-                std::rethrow_if_nested(e);
-                onFinish(e.what());
-            } catch (const std::exception &nested) {
-                onFinish(e.what() + std::string("\n") + nested.what());
+            react::BundleHeader header;
+            memcpy(&header, bundle.data(), sizeof(react::BundleHeader));
+            react::ScriptTag scriptTag = react::parseTypeFromHeader(header);
+            // NOTE: Hermes bytecode bundles are treated as String bundles,
+            // and don't throw an error here.
+            if (scriptTag != react::ScriptTag::String) {
+                throw new std::runtime_error("RAM bundles are not yet supported");
             }
-        }
-    });
+            try {
+                this->instance->loadScriptFromString(std::move(jsBundle), sourceURL, true);
+                onFinish("");
+            } catch (std::exception const &e) {
+                try {
+                    std::rethrow_if_nested(e);
+                    onFinish(e.what());
+                } catch (const std::exception &nested) {
+                    onFinish(e.what() + std::string("\n") + nested.what());
+                }
+            }
+        });
 }
 
-void rnoh::RNInstance::createSurface(react::Tag surfaceId, std::string const &appKey) {
+void rnoh::RNInstanceArkTS::createSurface(react::Tag surfaceId, std::string const &appKey) {
     taskExecutor->runTask(TaskThread::JS, [this, surfaceId, appKey] {
         if (surfaceHandlers.count(surfaceId)) {
             LOG(ERROR) << "createSurface: Surface with surface id " << surfaceId << " already exists.";
@@ -144,13 +141,8 @@ void rnoh::RNInstance::createSurface(react::Tag surfaceId, std::string const &ap
     });
 }
 
-void RNInstance::startSurface(react::Tag surfaceId,
-                              float width,
-                              float height,
-                              float viewportOffsetX,
-                              float viewportOffsetY,
-                              float pixelRatio,
-                              folly::dynamic &&initialProps) {
+void RNInstanceArkTS::startSurface(react::Tag surfaceId, float width, float height, float viewportOffsetX,
+                              float viewportOffsetY, float pixelRatio, folly::dynamic &&initialProps) {
     taskExecutor->runTask(TaskThread::JS, [=] {
         try {
             auto it = surfaceHandlers.find(surfaceId);
@@ -163,9 +155,7 @@ void RNInstance::startSurface(react::Tag surfaceId,
             surfaceHandler->setProps(std::move(initialProps));
             auto layoutConstraints = surfaceHandler->getLayoutConstraints();
             layoutConstraints.layoutDirection = react::LayoutDirection::LeftToRight;
-            layoutConstraints.minimumSize = layoutConstraints.maximumSize = {
-                .width = width,
-                .height = height};
+            layoutConstraints.minimumSize = layoutConstraints.maximumSize = {.width = width, .height = height};
             auto layoutContext = surfaceHandler->getLayoutContext();
             layoutContext.viewportOffset = {viewportOffsetX, viewportOffsetY};
             layoutContext.pointScaleFactor = pixelRatio;
@@ -182,7 +172,7 @@ void RNInstance::startSurface(react::Tag surfaceId,
     });
 }
 
-void rnoh::RNInstance::setSurfaceProps(facebook::react::Tag surfaceId, folly::dynamic &&props) {
+void rnoh::RNInstanceArkTS::setSurfaceProps(facebook::react::Tag surfaceId, folly::dynamic &&props) {
     taskExecutor->runTask(TaskThread::JS, [=] {
         auto it = surfaceHandlers.find(surfaceId);
         if (it == surfaceHandlers.end()) {
@@ -193,7 +183,7 @@ void rnoh::RNInstance::setSurfaceProps(facebook::react::Tag surfaceId, folly::dy
     });
 }
 
-void rnoh::RNInstance::stopSurface(react::Tag surfaceId) {
+void rnoh::RNInstanceArkTS::stopSurface(react::Tag surfaceId) {
     taskExecutor->runTask(TaskThread::JS, [=] {
         auto it = surfaceHandlers.find(surfaceId);
         if (it == surfaceHandlers.end()) {
@@ -212,7 +202,7 @@ void rnoh::RNInstance::stopSurface(react::Tag surfaceId) {
     });
 }
 
-void rnoh::RNInstance::destroySurface(react::Tag surfaceId) {
+void rnoh::RNInstanceArkTS::destroySurface(react::Tag surfaceId) {
     taskExecutor->runTask(TaskThread::JS, [=] {
         auto it = surfaceHandlers.find(surfaceId);
         if (it == surfaceHandlers.end()) {
@@ -224,7 +214,7 @@ void rnoh::RNInstance::destroySurface(react::Tag surfaceId) {
     });
 }
 
-void rnoh::RNInstance::setSurfaceDisplayMode(facebook::react::Tag surfaceId, facebook::react::DisplayMode displayMode) {
+void rnoh::RNInstanceArkTS::setSurfaceDisplayMode(facebook::react::Tag surfaceId, facebook::react::DisplayMode displayMode) {
     taskExecutor->runTask(TaskThread::JS, [this, surfaceId, displayMode]() {
         try {
             auto surfaceIt = surfaceHandlers.find(surfaceId);
@@ -241,27 +231,29 @@ void rnoh::RNInstance::setSurfaceDisplayMode(facebook::react::Tag surfaceId, fac
     });
 }
 
-void RNInstance::updateSurfaceConstraints(react::Tag surfaceId, float width, float height, float viewportOffsetX, float viewportOffsetY, float pixelRatio) {
-    taskExecutor->runTask(TaskThread::JS, [this, surfaceId, width, height, viewportOffsetX, viewportOffsetY, pixelRatio]() {
-        try {
-            if (surfaceHandlers.count(surfaceId) == 0) {
-                LOG(ERROR) << "updateSurfaceConstraints: No surface with id " << surfaceId;
-                return;
+void RNInstanceArkTS::updateSurfaceConstraints(react::Tag surfaceId, float width, float height, float viewportOffsetX,
+                                          float viewportOffsetY, float pixelRatio) {
+    taskExecutor->runTask(
+        TaskThread::JS, [this, surfaceId, width, height, viewportOffsetX, viewportOffsetY, pixelRatio]() {
+            try {
+                if (surfaceHandlers.count(surfaceId) == 0) {
+                    LOG(ERROR) << "updateSurfaceConstraints: No surface with id " << surfaceId;
+                    return;
+                }
+                auto layoutConstraints = surfaceHandlers[surfaceId]->getLayoutConstraints();
+                layoutConstraints.minimumSize = layoutConstraints.maximumSize = {.width = width, .height = height};
+                auto layoutContext = surfaceHandlers[surfaceId]->getLayoutContext();
+                layoutContext.viewportOffset = {viewportOffsetX, viewportOffsetY};
+                layoutContext.pointScaleFactor = pixelRatio;
+                surfaceHandlers[surfaceId]->constraintLayout(layoutConstraints, layoutContext);
+            } catch (const std::exception &e) {
+                LOG(ERROR) << "updateSurfaceConstraints: " << e.what() << "\n";
+                throw e;
             }
-            auto layoutConstraints = surfaceHandlers[surfaceId]->getLayoutConstraints();
-            layoutConstraints.minimumSize = layoutConstraints.maximumSize = {.width = width, .height = height};
-            auto layoutContext = surfaceHandlers[surfaceId]->getLayoutContext();
-            layoutContext.viewportOffset = {viewportOffsetX, viewportOffsetY};
-            layoutContext.pointScaleFactor = pixelRatio;
-            surfaceHandlers[surfaceId]->constraintLayout(layoutConstraints, layoutContext);
-        } catch (const std::exception &e) {
-            LOG(ERROR) << "updateSurfaceConstraints: " << e.what() << "\n";
-            throw e;
-        }
-    });
+        });
 }
 
-void rnoh::RNInstance::emitComponentEvent(napi_env env, react::Tag tag, std::string eventName, napi_value payload) {
+void rnoh::RNInstanceArkTS::emitComponentEvent(napi_env env, react::Tag tag, std::string eventName, napi_value payload) {
     EventEmitRequestHandler::Context ctx{
         .env = env,
         .tag = tag,
@@ -279,7 +271,7 @@ void rnoh::RNInstance::emitComponentEvent(napi_env env, react::Tag tag, std::str
     }
 }
 
-void rnoh::RNInstance::onMemoryLevel(size_t memoryLevel) {
+void rnoh::RNInstanceArkTS::onMemoryLevel(size_t memoryLevel) {
     // Android memory levels are 5, 10, 15, while Ark's are 0, 1, 2
     static const int memoryLevels[] = {5, 10, 15};
     if (this->instance) {
@@ -287,29 +279,28 @@ void rnoh::RNInstance::onMemoryLevel(size_t memoryLevel) {
     }
 }
 
-void rnoh::RNInstance::updateState(napi_env env, std::string const &componentName, facebook::react::Tag tag, napi_value newState) {
+void rnoh::RNInstanceArkTS::updateState(napi_env env, std::string const &componentName, facebook::react::Tag tag,
+                                   napi_value newState) {
     if (auto state = m_shadowViewRegistry->getFabricState<facebook::react::State>(tag)) {
         m_mutationsToNapiConverter->updateState(env, componentName, state, newState);
     }
 }
 
-void RNInstance::callFunction(std::string &&module, std::string &&method, folly::dynamic &&params) {
-    this->taskExecutor->runTask(TaskThread::JS, [weakInstance = std::weak_ptr(this->instance), module = std::move(module), method = std::move(method), params = std::move(params)]() mutable {
+void RNInstanceArkTS::callFunction(std::string &&module, std::string &&method, folly::dynamic &&params) {
+    this->taskExecutor->runTask(TaskThread::JS, [weakInstance = std::weak_ptr(this->instance),
+                                                 module = std::move(module), method = std::move(method),
+                                                 params = std::move(params)]() mutable {
         if (auto instance = weakInstance.lock()) {
             instance->callJSFunction(std::move(module), std::move(method), std::move(params));
         }
     });
 }
 
-void RNInstance::onAnimationStarted() {
-    m_shouldRelayUITick.store(true);
-}
+void RNInstanceArkTS::onAnimationStarted() { m_shouldRelayUITick.store(true); }
 
-void RNInstance::onAllAnimationsComplete() {
-    m_shouldRelayUITick.store(false);
-}
+void RNInstanceArkTS::onAllAnimationsComplete() { m_shouldRelayUITick.store(false); }
 
-void RNInstance::onUITick() {
+void RNInstanceArkTS::onUITick() {
     if (this->m_shouldRelayUITick.load()) {
         this->scheduler->animationTick();
     }

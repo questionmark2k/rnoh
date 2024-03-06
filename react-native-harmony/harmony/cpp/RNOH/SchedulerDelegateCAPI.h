@@ -17,12 +17,14 @@ namespace rnoh {
                               ComponentInstanceRegistry::Shared componentInstanceRegistry,
                               ComponentInstanceFactory::Shared componentInstanceFactory)
             : m_taskExecutor(taskExecutor), m_shadowViewRegistry(shadowViewRegistry),
-              m_componentInstanceRegistry(componentInstanceRegistry),
+              m_componentInstanceRegistry(std::move(componentInstanceRegistry)),
               m_componentInstanceFactory(std::move(componentInstanceFactory)){};
+    
 
-
-        ~SchedulerDelegateCAPI() = default;
-
+        ~SchedulerDelegateCAPI() {
+            DLOG(INFO) << "~SchedulerDelegateCAPI";
+        }
+    
         void schedulerDidFinishTransaction(facebook::react::MountingCoordinator::Shared mountingCoordinator) override {
             mountingCoordinator->getTelemetryController().pullTransaction(
                 [this](facebook::react::MountingTransaction const &transaction,

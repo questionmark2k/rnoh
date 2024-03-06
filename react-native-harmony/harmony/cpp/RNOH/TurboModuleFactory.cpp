@@ -55,8 +55,12 @@ TurboModuleFactory::SharedTurboModule TurboModuleFactory::delegateCreatingTurboM
 }
 
 napi_ref TurboModuleFactory::maybeGetArkTsTurboModuleInstanceRef(const std::string &name) const {
+    DLOG(INFO) << "TurboModuleFactory::maybeGetArkTsTurboModuleInstanceRef: start";
     napi_ref result = nullptr;
-    m_taskExecutor->runSyncTask(TaskThread::MAIN, [env = m_env, arkTsTurboModuleProviderRef = m_arkTsTurboModuleProviderRef, name, &result]() {
+    m_taskExecutor->runSyncTask(TaskThread::MAIN, [env = m_env,
+                                                   arkTsTurboModuleProviderRef = m_arkTsTurboModuleProviderRef, name,
+                                                   &result]() {
+        DLOG(INFO) << "TurboModuleFactory::maybeGetArkTsTurboModuleInstanceRef: started calling hasModule";
         ArkJS arkJs(env);
         {
             auto result = arkJs.getObject(arkTsTurboModuleProviderRef).call("hasModule", {arkJs.createString(name)});
@@ -67,6 +71,7 @@ napi_ref TurboModuleFactory::maybeGetArkTsTurboModuleInstanceRef(const std::stri
         auto n_turboModuleInstance = arkJs.getObject(arkTsTurboModuleProviderRef).call("getModule", {arkJs.createString(name)});
         result = arkJs.createReference(n_turboModuleInstance);
     });
+    DLOG(INFO) << "TurboModuleFactory::maybeGetArkTsTurboModuleInstanceRef: stop";
     return result;
 }
 

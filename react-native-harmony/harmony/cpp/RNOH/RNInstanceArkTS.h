@@ -7,7 +7,6 @@
 #include <js_native_api_types.h>
 #include <atomic>
 
-#include <ace/xcomponent/native_interface_xcomponent.h>
 #include <cxxreact/Instance.h>
 #include <cxxreact/ModuleRegistry.h>
 #include <cxxreact/NativeModule.h>
@@ -30,44 +29,35 @@
 #include "RNOH/ArkTSChannel.h"
 #include "RNOH/RNInstance.h"
 
-#include "RNOH/ComponentInstanceRegistry.h"
-#include "RNOH/ComponentInstanceFactory.h"
-#include "RNOH/arkui/XComponentSurface.h"
-
 namespace rnoh {
     using MutationsListener =
         std::function<void(MutationsToNapiConverter const &, facebook::react::ShadowViewMutationList const &mutations)>;
 
-    class RNInstanceCAPI : public RNInstance, public facebook::react::LayoutAnimationStatusDelegate {
+    class RNInstanceArkTS : public RNInstance, public facebook::react::LayoutAnimationStatusDelegate {
     public:
-        RNInstanceCAPI(
+        RNInstanceArkTS(
             int id, std::shared_ptr<facebook::react::ContextContainer> contextContainer,
             TurboModuleFactory &&turboModuleFactory, std::shared_ptr<TaskExecutor> taskExecutor,
             std::shared_ptr<facebook::react::ComponentDescriptorProviderRegistry> componentDescriptorProviderRegistry,
             MutationsToNapiConverter::Shared mutationsToNapiConverter,
             EventEmitRequestHandlers eventEmitRequestHandlers, GlobalJSIBinders globalJSIBinders,
             UITicker::Shared uiTicker, ShadowViewRegistry::Shared shadowViewRegistry,
-            std::unique_ptr<facebook::react::SchedulerDelegate> schedulerDelegate,
-            ComponentInstanceRegistry::Shared componentInstanceRegistry,
-            ComponentInstanceFactory::Shared componentInstanceFactory, bool shouldEnableDebugger,
+            std::unique_ptr<facebook::react::SchedulerDelegate> schedulerDelegate, bool shouldEnableDebugger,
             bool shouldEnableBackgroundExecutor)
-            : RNInstance(), m_id(id), instance(std::make_shared<facebook::react::Instance>()),
-              m_contextContainer(contextContainer), scheduler(nullptr), taskExecutor(taskExecutor),
-              m_shadowViewRegistry(shadowViewRegistry), m_turboModuleFactory(std::move(turboModuleFactory)),
+            : RNInstance(), m_id(id), instance(std::make_shared<facebook::react::Instance>()), m_contextContainer(contextContainer),
+              scheduler(nullptr), taskExecutor(taskExecutor), m_shadowViewRegistry(shadowViewRegistry),
+              m_turboModuleFactory(std::move(turboModuleFactory)),
               m_componentDescriptorProviderRegistry(componentDescriptorProviderRegistry),
               m_mutationsToNapiConverter(mutationsToNapiConverter),
               m_eventEmitRequestHandlers(eventEmitRequestHandlers), m_globalJSIBinders(globalJSIBinders),
               m_shouldRelayUITick(false), m_uiTicker(uiTicker), m_schedulerDelegate(std::move(schedulerDelegate)),
               m_shouldEnableDebugger(shouldEnableDebugger),
-              m_shouldEnableBackgroundExecutor(shouldEnableBackgroundExecutor),
-              m_componentInstanceRegistry(componentInstanceRegistry),
-              m_componentInstanceFactory(componentInstanceFactory) {
+              m_shouldEnableBackgroundExecutor(shouldEnableBackgroundExecutor) {
             this->unsubscribeUITickListener = this->m_uiTicker->subscribe(
                 m_id, [this]() { this->taskExecutor->runTask(TaskThread::MAIN, [this]() { this->onUITick(); }); });
         }
 
-        ~RNInstanceCAPI() {
-            DLOG(INFO) << "~RNInstanceCAPI::start";
+        ~RNInstanceArkTS() {
             if (this->unsubscribeUITickListener != nullptr) {
                 unsubscribeUITickListener();
             }
@@ -90,31 +80,26 @@ namespace rnoh {
             // block until the task has finished running,
             // to ensure that the instance is not destroyed before all surface are unregistered
             cv.wait(lock);
-            DLOG(INFO) << "~RNInstanceCAPI::stop";
         }
-
+    
         TaskExecutor::Shared getTaskExecutor() override;
 
         void start() override;
         void loadScript(std::vector<uint8_t> &&bundle, std::string const sourceURL,
                         std::function<void(const std::string)> &&onFinish) override;
         void createSurface(facebook::react::Tag surfaceId, std::string const &moduleName) override;
-        void updateSurfaceConstraints(facebook::react::Tag surfaceId, float width, float height, float viewportOffsetX,
-                                      float viewportOffsetY, float pixelRatio) override;
+        void updateSurfaceConstraints(facebook::react::Tag surfaceId, float width, float height,
+                                              float viewportOffsetX, float viewportOffsetY, float pixelRatio) override;
         void startSurface(facebook::react::Tag surfaceId, float width, float height, float viewportOffsetX,
-                          float viewportOffsetY, float pixelRatio, folly::dynamic &&initialProps) override;
+                                  float viewportOffsetY, float pixelRatio, folly::dynamic &&initialProps) override;
         void setSurfaceProps(facebook::react::Tag surfaceId, folly::dynamic &&props) override;
         void stopSurface(facebook::react::Tag surfaceId) override;
         void destroySurface(facebook::react::Tag surfaceId) override;
         void setSurfaceDisplayMode(facebook::react::Tag surfaceId, facebook::react::DisplayMode displayMode) override;
         void callFunction(std::string &&module, std::string &&method, folly::dynamic &&params) override;
-        void emitComponentEvent(napi_env env, facebook::react::Tag tag, std::string eventName,
-                                napi_value payload) override;
+        void emitComponentEvent(napi_env env, facebook::react::Tag tag, std::string eventName, napi_value payload) override;
         void onMemoryLevel(size_t memoryLevel) override;
-        void updateState(napi_env env, std::string const &componentName, facebook::react::Tag tag,
-                         napi_value newState) override;
-
-        void registerNativeXComponentHandle(OH_NativeXComponent *nativeXComponent, facebook::react::Tag surfaceId);
+        void updateState(napi_env env, std::string const &componentName, facebook::react::Tag tag, napi_value newState) override;
 
         std::shared_ptr<TaskExecutor> taskExecutor;
 
@@ -122,6 +107,9 @@ namespace rnoh {
         int m_id;
         facebook::react::ContextContainer::Shared m_contextContainer;
         std::map<facebook::react::Tag, std::shared_ptr<facebook::react::SurfaceHandler>> surfaceHandlers;
+        std::shared_ptr<facebook::react::Scheduler> scheduler;
+        std::unique_ptr<facebook::react::SchedulerDelegate> m_schedulerDelegate;
+        std::shared_ptr<facebook::react::Instance> instance;
         std::shared_ptr<facebook::react::ComponentDescriptorProviderRegistry> m_componentDescriptorProviderRegistry;
         ShadowViewRegistry::Shared m_shadowViewRegistry;
         TurboModuleFactory m_turboModuleFactory;
@@ -136,12 +124,6 @@ namespace rnoh {
         std::shared_ptr<MessageQueueThread> m_jsQueue;
         bool m_shouldEnableDebugger;
         bool m_shouldEnableBackgroundExecutor;
-        std::unordered_map<facebook::react::SurfaceId, XComponentSurface> m_surfaceById;
-        ComponentInstanceRegistry::Shared m_componentInstanceRegistry;
-        ComponentInstanceFactory::Shared m_componentInstanceFactory;
-        std::unique_ptr<facebook::react::SchedulerDelegate> m_schedulerDelegate;
-        std::shared_ptr<facebook::react::Scheduler> scheduler;
-        std::shared_ptr<facebook::react::Instance> instance;
 
         void initialize();
         void initializeScheduler(std::shared_ptr<TurboModuleProvider> turboModuleProvider);

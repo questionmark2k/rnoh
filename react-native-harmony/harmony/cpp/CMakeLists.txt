@@ -380,7 +380,7 @@ target_compile_options(hermes_inspector PRIVATE ${folly_compile_options})
 # ----------------------------------------------------------------------------------------------------------------------
 
 add_library(rnoh SHARED
-    "${RNOH_CPP_DIR}/RNOH/RNInstance.cpp"
+    "${RNOH_CPP_DIR}/RNOH/RNInstanceArkTS.cpp"
     "${RNOH_CPP_DIR}/RNOH/RNInstanceCAPI.cpp"
     "${RNOH_CPP_DIR}/RNOH/BlobCollector.cpp"
     "${RNOH_CPP_DIR}/RNOH/MessageQueueThread.cpp"

@@ -35,6 +35,7 @@ namespace facebook {
 namespace react {
 
 Instance::~Instance() {
+  DLOG(INFO) << "~Instance"; // RNOH: patch
   if (nativeToJsBridge_) {
     nativeToJsBridge_->destroy();
   }

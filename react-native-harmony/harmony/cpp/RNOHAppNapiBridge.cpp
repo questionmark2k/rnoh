@@ -134,7 +134,6 @@ static napi_value destroyReactNativeInstance(napi_env env, napi_callback_info in
                 rnInstanceById.erase(rnInstanceId);
             }
         }
-        instance.reset();
     });
     return arkJs.getUndefined();
 }
@@ -152,7 +151,7 @@ static napi_value loadScript(napi_env env, napi_callback_info info) {
     auto &rnInstance = it->second;
     auto onFinishRef = arkJs.createReference(args[3]);
     rnInstance->loadScript(arkJs.getArrayBuffer(args[1]), arkJs.getString(args[2]),
-                           [taskExecutor = rnInstance->taskExecutor, env, onFinishRef](const std::string errorMsg) {
+                           [taskExecutor = rnInstance->getTaskExecutor(), env, onFinishRef](const std::string errorMsg) {
                                taskExecutor->runTask(TaskThread::MAIN,
                                                      [env, onFinishRef, errorMsg = std::move(errorMsg)]() {
                                                          ArkJS arkJs(env);

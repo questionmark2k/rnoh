@@ -15,6 +15,8 @@ std::string getThreadSymbol() {
         return "__█";
     } else if (threadName == "RNOH_BACKGROUND") {
         return "_█_";
+    } else if (threadName == "RNOH_CLEANUP") {
+        return "___█";
     } else {
         return "█__";
     }
