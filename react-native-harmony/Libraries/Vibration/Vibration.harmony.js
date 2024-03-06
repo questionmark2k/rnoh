@@ -9,6 +9,7 @@ import NativeVibration from 'react-native/Libraries/Vibration/NativeVibration'; 
 
 let _vibrating: boolean = false;
 let _id: number = 0; // _id is necessary to prevent race condition.
+const _default_vibration_length = 400;
 
 
 function vibrateByPattern(pattern: Array<number>, repeat: boolean = false) {
