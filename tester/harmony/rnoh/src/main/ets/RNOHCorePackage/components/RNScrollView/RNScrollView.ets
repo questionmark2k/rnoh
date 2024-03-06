@@ -1,13 +1,13 @@
 import {
+  CustomComponentBuilder,
   Descriptor,
+  DescriptorWrapper,
   Position,
-  RNOHComponentCommand,
   RNComponentContext,
+  RNOHComponentCommand,
+  RNOHContext,
   Size,
   Tag,
-  CustomComponentBuilder,
-  RNOHContext,
-  DescriptorWrapper,
 } from '../../../RNOH';
 import { _RNScrollViewManager } from './RNScrollViewManager';
 import { RNViewBase, ViewDescriptorWrapperBase } from '../RNViewBase';
@@ -221,13 +221,17 @@ export struct RNScrollView {
     // When animation === undefined,onScrollStart and
     // onScrollStop will not be triggered,so we need to
     // initialize and destruct the parameters here.
-    if(!animation){
-      this.positionBeforeScrolling = { x : this.scroller.currentOffset().xOffset, y : this.scroller.currentOffset().yOffset };
+    const currentOffset = this.scroller.currentOffset();
+    if (!animation && currentOffset) {
+      this.positionBeforeScrolling = {
+        x: currentOffset.xOffset,
+        y: currentOffset.yOffset,
+      };
       this.isScrolling = false
     }
     this.scroller.scrollTo({ xOffset, yOffset, animation })
     this.contentOffset = { x: xOffset, y: yOffset };
-    if(!animation){
+    if (!animation) {
       this.isScrolling = false;
     }
   }
@@ -591,7 +595,16 @@ export struct RNScrollView {
       this.onScrollEnd()
     })
     .onAppear(() => {
-      if (this.props.contentOffsetX !== 0 || this.props.contentOffsetY !== 0) {
+      if (this.descriptor.state.contentOffsetX !== 0 || this.descriptor.state.contentOffsetY !== 0) {
+        this.scroller.scrollTo({
+          xOffset: this.descriptor.state.contentOffsetX,
+          yOffset: this.descriptor.state.contentOffsetY
+        });
+        this.contentOffset = {
+          x: this.descriptor.state.contentOffsetX,
+          y: this.descriptor.state.contentOffsetY,
+        }
+      } else if (this.props.contentOffsetX !== 0 || this.props.contentOffsetY !== 0) {
         this.scrollToPropsContentOffset()
       } else if (this.contentOffset.x !== 0 || this.contentOffset.y !== 0) {
         // this handles the case where `scrollTo` has been called

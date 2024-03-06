@@ -7,7 +7,6 @@ import {
   Text,
   ImageBackground,
   TouchableWithoutFeedback,
-  SafeAreaView,
 } from 'react-native';
 const sortFiledList = [
   {
@@ -305,14 +304,12 @@ export class TabsAndScrollViewExample extends Component<any, any> {
   };
   render() {
     return (
-      <SafeAreaView>
-        <View style={{width: '100%', height: 40, backgroundColor: 'grey'}}>
-          <View>
-            {this.renderFlatList()}
-            {this.renderHeader()}
-          </View>
+      <View style={{width: '100%', height: 40, backgroundColor: 'grey'}}>
+        <View>
+          {this.renderFlatList()}
+          {this.renderHeader()}
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 }
