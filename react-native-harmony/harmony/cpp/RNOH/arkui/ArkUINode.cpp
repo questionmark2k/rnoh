@@ -1,5 +1,6 @@
-#include "ArkUINode.h"
+#include <algorithm>
 
+#include "ArkUINode.h"
 #include "NativeNodeApi.h"
 #include "ArkUINodeRegistry.h"
 
@@ -33,9 +34,11 @@ void ArkUINode::markDirty() {
 }
 
 ArkUINode &ArkUINode::setPosition(facebook::react::Point const &position) {
-    ArkUI_NumberValue value[] = {(float)position.x, (float)position.y};
+    if (position.x < 0 || position.y < 0) {
+        LOG(ERROR) << "ArkUI doesn't support negative coordinates when setting a position (x: " << position.x << ", y: " << position.y << ").";
+    }
+    ArkUI_NumberValue value[] = {std::max((float)position.x, 0.0f), std::max((float)position.y, 0.0f)};
     ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
-
     maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_POSITION, &item));
     return *this;
 }

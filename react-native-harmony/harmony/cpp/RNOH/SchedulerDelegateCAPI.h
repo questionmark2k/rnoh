@@ -33,22 +33,25 @@ namespace rnoh {
                 },
                 [this](facebook::react::MountingTransaction const &transaction,
                        facebook::react::SurfaceTelemetry const &surfaceTelemetry) {
-                    // Mounting
+
                 },
                 [this](facebook::react::MountingTransaction const &transaction,
                        facebook::react::SurfaceTelemetry const &surfaceTelemetry) {
                     // Did mount
                     m_taskExecutor->runTask(TaskThread::MAIN, [this, mutations = transaction.getMutations()] {
                         for (auto mutation : mutations) {
-                            this->handleMutation(mutation);
+                            try {
+                                this->handleMutation(mutation);
+                            } catch( std::runtime_error &e) {
+                                LOG(ERROR) << "Mutation " << this->getMutationNameFromType(mutation.type) << " failed: " << e.what();
+                            }
                         }
                     });
                 });
         }
 
         void schedulerDidRequestPreliminaryViewAllocation(facebook::react::SurfaceId surfaceId,
-                                                          const facebook::react::ShadowNode &shadowNode) override {
-        }
+                                                          const facebook::react::ShadowNode &shadowNode) override {}
 
         void schedulerDidDispatchCommand(const facebook::react::ShadowView &shadowView, std::string const &commandName,
                                          folly::dynamic const &args) override {
@@ -71,6 +74,9 @@ namespace rnoh {
         ComponentInstanceFactory::Shared m_componentInstanceFactory;
 
         void handleMutation(facebook::react::ShadowViewMutation mutation) {
+            DLOG(INFO) << "mutation (type:" << this->getMutationNameFromType(mutation.type) << "; new: " << mutation.newChildShadowView.tag
+                       << "; old: " << mutation.oldChildShadowView.tag << "; parent: " << mutation.parentShadowView.tag
+                       << ")";
             switch (mutation.type) {
             case facebook::react::ShadowViewMutation::Create: {
                 auto newChild = mutation.newChildShadowView;
@@ -106,7 +112,8 @@ namespace rnoh {
             case facebook::react::ShadowViewMutation::Remove: {
                 auto parentComponentInstance = m_componentInstanceRegistry->findByTag(mutation.parentShadowView.tag);
                 if (parentComponentInstance) {
-                    parentComponentInstance->removeChild(m_componentInstanceRegistry->findByTag(mutation.oldChildShadowView.tag));
+                    parentComponentInstance->removeChild(
+                        m_componentInstanceRegistry->findByTag(mutation.oldChildShadowView.tag));
                     parentComponentInstance->finalizeUpdates();
                 }
                 break;
@@ -122,6 +129,25 @@ namespace rnoh {
                 m_shadowViewRegistry->setShadowView(mutation.newChildShadowView.tag, mutation.newChildShadowView);
                 break;
             }
+            }
+        }
+
+        std::string getMutationNameFromType(facebook::react::ShadowViewMutation::Type mutationType) {
+            switch (mutationType) {
+            case facebook::react::ShadowViewMutation::Create:
+                return "CREATE";
+            case facebook::react::ShadowViewMutation::Delete:
+                return "DELETE";
+            case facebook::react::ShadowViewMutation::Update:
+                return "UPDATE";
+            case facebook::react::ShadowViewMutation::Insert:
+                return "INSERT";
+            case facebook::react::ShadowViewMutation::Remove:
+                return "REMOVE";
+            case facebook::react::ShadowViewMutation::RemoveDeleteTree:
+                return "REMOVE_DELETE_TREE";
+            default:
+                return "UNKNOWN";
             }
         }
     };

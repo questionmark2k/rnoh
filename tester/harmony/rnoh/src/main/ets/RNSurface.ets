@@ -138,9 +138,10 @@ export struct RNSurface {
   }
 
   handleTouch(event: TouchEvent) {
-    this.logger.clone("handleTouch").debug()
-    this.touchDispatcher.handleTouchEvent(event)
-
+    if (this.ctx.rnInstance.getArchitecture() === "ARK_TS") {
+      this.logger.clone("handleTouch").debug()
+      this.touchDispatcher.handleTouchEvent(event)
+    }
   }
 
   build() {

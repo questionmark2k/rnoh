@@ -1,26 +1,29 @@
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
+import {TestSuite} from '@rnoh/testerino';
 import React, {useState} from 'react';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 
 export function ViewTest() {
   return (
     <TestSuite name="View">
-      <TestCase
+      <TestCase.Example
         modal
         itShould="log the descriptor on the native side when 'debug' hint is provided">
         <View
           id="__harmony::debug:sampleNativeId"
           style={{width: 64, height: 64, backgroundColor: 'red'}}
         />
-      </TestCase>
-      <TestCase itShould="render square with transparent background on gray background">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        skip={{
+          android: false,
+          harmony: {
+            arkTS: false,
+            cAPI: 'borderWidth needs to be implemented to be able to see the square with transparent background',
+          },
+        }}
+        itShould="render square with transparent background on gray background">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -31,8 +34,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render square with rounded corners with different radii (left/right)">
+      </TestCase.Example>
+      <TestCase.Example itShould="render square with rounded corners with different radii (left/right)">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -47,8 +50,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render square with rounded corners with different radii (start/end)">
+      </TestCase.Example>
+      <TestCase.Example itShould="render square with rounded corners with different radii (start/end)">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -63,8 +66,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render squares with borderTopStartRadius and borderTopEndRadius">
+      </TestCase.Example>
+      <TestCase.Example itShould="render squares with borderTopStartRadius and borderTopEndRadius">
         <View style={styles.squaresContainer}>
           <View style={[styles.square, {borderTopStartRadius: 24}]}>
             <Text style={styles.squareContent}>borderTopStartRadius</Text>
@@ -82,8 +85,8 @@ export function ViewTest() {
             </Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase itShould="render squares with borderBottomStartRadius + borderBottomEndRadius">
+      </TestCase.Example>
+      <TestCase.Example itShould="render squares with borderBottomStartRadius + borderBottomEndRadius">
         <View style={styles.squaresContainer}>
           <View style={[styles.square, {borderBottomStartRadius: 24}]}>
             <Text style={styles.squareContent}>borderBottomStartRadius</Text>
@@ -101,8 +104,8 @@ export function ViewTest() {
             </Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase itShould="render circles">
+      </TestCase.Example>
+      <TestCase.Example itShould="render circles">
         <View style={styles.squaresContainer}>
           <View style={[styles.square, {borderRadius: 50}]} />
           <View
@@ -128,8 +131,8 @@ export function ViewTest() {
             ]}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render square with borders with different widths">
+      </TestCase.Example>
+      <TestCase.Example itShould="render square with borders with different widths">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -143,8 +146,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render rectangle with borders with different widths and colors">
+      </TestCase.Example>
+      <TestCase.Example itShould="render rectangle with borders with different widths and colors">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -161,8 +164,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render square with borders with different colors">
+      </TestCase.Example>
+      <TestCase.Example itShould="render square with borders with different colors">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -176,8 +179,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render square with borders with different start/end colors">
+      </TestCase.Example>
+      <TestCase.Example itShould="render square with borders with different start/end colors">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -189,8 +192,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render squares with borders with different style">
+      </TestCase.Example>
+      <TestCase.Example itShould="render squares with borders with different style">
         <View
           style={{
             width: '100%',
@@ -228,8 +231,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="hide the overflow">
+      </TestCase.Example>
+      <TestCase.Example itShould="hide the overflow">
         <View
           style={{
             width: 64,
@@ -247,8 +250,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="not hide the overflow">
+      </TestCase.Example>
+      <TestCase.Example itShould="not hide the overflow">
         <View
           style={{
             width: 64,
@@ -265,8 +268,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render blue rectangle (zIndex test)">
+      </TestCase.Example>
+      <TestCase.Example itShould="render blue rectangle (zIndex test)">
         <View>
           <View
             style={{
@@ -287,10 +290,10 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         itShould="render square with elevation"
-        skip
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/238
       >
         <View style={{width: '100%', height: 100}}>
@@ -304,9 +307,15 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase
-        skip
+      </TestCase.Example>
+      <TestCase.Example
+        skip={{
+          android: false,
+          harmony: {
+            arkTS: true,
+            cAPI: true,
+          },
+        }}
         itShould="show inner rectangle with the same color as the reference (needsOffscreenAlphaCompositing)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/322
       >
@@ -338,9 +347,9 @@ export function ViewTest() {
             opacity: 0.5,
           }}
         />
-      </TestCase>
+      </TestCase.Example>
       <TestSuite name="pointerEvents">
-        <TestCase
+        <TestCase.Manual
           itShould="call inner and outer view when pressing inner"
           initialState={{inner: false, outer: false, outerContainer: false}}
           arrange={({setState, reset}) => {
@@ -360,7 +369,7 @@ export function ViewTest() {
             });
           }}
         />
-        <TestCase
+        <TestCase.Manual
           itShould="call only outer when pressing inner view"
           initialState={{inner: false, outer: false, outerContainer: true}}
           arrange={({setState, reset}) => {
@@ -380,7 +389,7 @@ export function ViewTest() {
             });
           }}
         />
-        <TestCase
+        <TestCase.Manual
           itShould="call inner and outer only when pressing inner view"
           initialState={{inner: false, outer: false, outerContainer: false}}
           arrange={({setState, reset}) => {
@@ -398,7 +407,7 @@ export function ViewTest() {
             expect(state.outer).to.be.true;
           }}
         />
-        <TestCase
+        <TestCase.Manual
           itShould="not call inner or outer when pressing inner or outer views"
           initialState={{inner: false, outer: false, outerContainer: false}}
           arrange={({setState, reset}) => {
@@ -419,7 +428,7 @@ export function ViewTest() {
           }}
         />
       </TestSuite>
-      <TestCase
+      <TestCase.Manual
         itShould="pass on touching blue background"
         initialState={false}
         arrange={({setState}) => (
@@ -448,7 +457,7 @@ export function ViewTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="blue view should not allow clicks with non-touch input device"
         modal
         initialState={{first: false, second: false, third: false}}
@@ -499,7 +508,7 @@ export function ViewTest() {
           });
         }}
       />
-      <TestCase itShould="render view with fixed width and aspectRatio 1">
+      <TestCase.Example itShould="render view with fixed width and aspectRatio 1">
         <View style={{width: '100%', height: 100}}>
           <View
             style={{
@@ -509,8 +518,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="render views with set flex and aspectRatio 1">
+      </TestCase.Example>
+      <TestCase.Example itShould="render views with set flex and aspectRatio 1">
         <View style={{width: '100%', height: 100}}>
           <View
             style={{
@@ -529,8 +538,8 @@ export function ViewTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="show view rotated by 180deg(backfaceVisibility: visible)">
+      </TestCase.Example>
+      <TestCase.Example itShould="show view rotated by 180deg(backfaceVisibility: visible)">
         <View style={{width: '100%', height: 20}}>
           <View
             style={{
@@ -542,8 +551,8 @@ export function ViewTest() {
             <Text style={{height: 20}}>Backface</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase itShould="not show view rotated by 180deg(backfaceVisibility: hidden)">
+      </TestCase.Example>
+      <TestCase.Example itShould="not show view rotated by 180deg(backfaceVisibility: hidden)">
         <View style={{width: '100%', height: 20}}>
           <View
             style={{
@@ -555,8 +564,8 @@ export function ViewTest() {
             <Text style={{height: 20}}>Backface</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase itShould="render light blue shadow shifted towards bottom and right">
+      </TestCase.Example>
+      <TestCase.Example itShould="render light blue shadow shifted towards bottom and right">
         <View
           style={{
             width: 64,
@@ -569,20 +578,17 @@ export function ViewTest() {
             shadowRadius: 16,
           }}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         itShould="render a view with role"
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/603
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/603
       >
         <View role="alert">
           <Text>Alert</Text>
         </View>
-      </TestCase>
-      <TestCase
-        skip={Platform.select({
-          android: 'bug in RN',
-          harmony: 'bug in RN, fails on Android',
-        })}
+      </TestCase.Example>
+      <TestCase.Manual
+        skip={'bug in RN'}
         itShould="pass on blue rect touch (onResponderReject)"
         initialState={{
           responderRejectedCount: 0,
@@ -628,11 +634,11 @@ export function ViewTest() {
           expect(state.responderRejectedCount).to.be.greaterThan(0);
         }}
       />
-      <TestCase
+      <TestCase.Manual
         modal
         itShould='call the "escape" gesture handler'
         initialState={false}
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/602
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/602
         arrange={({setState}) => (
           <View
             accessible={true}
@@ -654,7 +660,7 @@ export function ViewTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Example
         modal
         itShould='render "First Layout" view and ignore "Ignored Layout" when accessibility is true'>
         <View accessible={true} style={styles.accessibilityContainer}>
@@ -669,10 +675,10 @@ export function ViewTest() {
             <Text>Ignored Layout</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/600
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/600
         itShould="render a view with aria-valuemax accessibility prop">
         <View
           accessible={true}
@@ -680,10 +686,10 @@ export function ViewTest() {
           style={[styles.accessibilityLayout, {backgroundColor: 'green'}]}>
           <Text>aria-valuemax: 100</Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/600
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/600
         itShould="render a view with aria-valuemin accessibility prop">
         <View
           accessible={true}
@@ -691,10 +697,10 @@ export function ViewTest() {
           style={[styles.accessibilityLayout, {backgroundColor: 'green'}]}>
           <Text>aria-valuemin: 10</Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/600
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/600
         itShould="render a view with aria-valuenow accessibility prop">
         <View
           accessible={true}
@@ -702,10 +708,10 @@ export function ViewTest() {
           style={[styles.accessibilityLayout, {backgroundColor: 'green'}]}>
           <Text>aria-valuemin: 55</Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/600
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/600
         itShould="render a view with aria-valuetext accessibility prop">
         <View
           accessible={true}
@@ -713,14 +719,14 @@ export function ViewTest() {
           style={[styles.accessibilityLayout, {backgroundColor: 'green'}]}>
           <Text>aria-valuemin: Test Text</Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/599
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/599
         itShould="render a view with aria-selected accessibility prop">
         <ViewAccessibilityAriaSelected />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="make the screen reader say 'This view has a red background and no text' when clicking on the View component with accessibilityLabel prop">
         <View
@@ -728,8 +734,8 @@ export function ViewTest() {
           accessibilityLabel="This view has a red background and no text"
           style={[styles.accessibilityLayout, {backgroundColor: 'red'}]}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="make the screen reader say/display 'This view has a red background and no text' when clicking on the View component with aria-label prop">
         <View
@@ -737,8 +743,8 @@ export function ViewTest() {
           aria-label="This view has a red background and no text"
           style={[styles.accessibilityLayout, {backgroundColor: 'red'}]}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="make the screen reader say/display 'busy' after clicking on the backgroud">
         <View
@@ -746,20 +752,24 @@ export function ViewTest() {
           aria-busy={true}
           style={styles.accessibilityLayout}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="make the screen reader say/display: 'checked, mixed' when both button are 'checked', 'mixed' when one of the button is 'checked' and 'unchecked' when none of the button is 'checked'">
         <ViewAccessibilityAriaChecked />
-      </TestCase>
-      <TestCase modal itShould="make the screen reader say/display: 'disabled'">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="make the screen reader say/display: 'disabled'">
         <View
           accessible={true}
           aria-disabled={true}
           style={styles.accessibilityLayout}
         />
-      </TestCase>
-      <TestCase modal itShould="make the screen reader hide 'Hidden layout'">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="make the screen reader hide 'Hidden layout'">
         <View accessible={true} style={styles.accessibilityContainer}>
           <View
             style={[styles.accessibilityLayout, {backgroundColor: 'green'}]}
@@ -772,10 +782,10 @@ export function ViewTest() {
             <Text>Hidden Layout</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip // works only on iOS
+        skip="only works on iOS"
         itShould="make the screen reader hide 'Hidden layout' accessibilityHidden">
         <View accessible={true} style={styles.accessibilityContainer}>
           <View
@@ -788,8 +798,8 @@ export function ViewTest() {
             <Text>Hidden Layout</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="make the screen reader say/display 'This view has a red background' and 'Hint: and no text'">
         <View
@@ -798,7 +808,7 @@ export function ViewTest() {
           accessibilityHint="Hint: and no text"
           style={[styles.accessibilityLayout, {backgroundColor: 'red'}]}
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

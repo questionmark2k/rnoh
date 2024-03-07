@@ -6,6 +6,7 @@
 #include <react/renderer/graphics/Rect.h>
 #include <react/renderer/graphics/Color.h>
 #include <stdexcept>
+#include "glog/logging.h"
 
 namespace rnoh {
     class ArkUINode {
@@ -35,7 +36,7 @@ namespace rnoh {
         void maybeThrow(int32_t status) {
             // TODO: map status to error message, maybe add a new error type
             if (status != 0) {
-                throw std::runtime_error("ArkUINode operation failed");
+                throw std::runtime_error(std::string("ArkUINode operation failed with status: ") + std::to_string(status));
             }
         }
 

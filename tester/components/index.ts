@@ -7,3 +7,4 @@ export * from './StateKeeper';
 export * from './ObjectDisplayer';
 export * from './Ref';
 export * from './PressCounter';
+export * from './TestCase';

@@ -1,4 +1,7 @@
 #include "ScrollViewComponentInstance.h"
+#include <react/renderer/core/ConcreteState.h>
+#include <react/renderer/components/scrollview/ScrollViewState.h>
+
 
 using namespace rnoh;
 
@@ -17,4 +20,15 @@ void ScrollViewComponentInstance::insertChild(ComponentInstance::Shared childCom
 
 void ScrollViewComponentInstance::removeChild(ComponentInstance::Shared childComponentInstance) {
     m_stackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
+};
+
+void ScrollViewComponentInstance::setState(facebook::react::State::Shared state) {
+    ComponentInstance::setState(state);
+    auto scrollViewState =
+        std::dynamic_pointer_cast<const facebook::react::ConcreteState<facebook::react::ScrollViewState>>(state);
+    if (scrollViewState == nullptr) {
+        return;
+    }
+//     m_stackNode.setSize(scrollViewState->getData().getContentSize()); 
+    
 };

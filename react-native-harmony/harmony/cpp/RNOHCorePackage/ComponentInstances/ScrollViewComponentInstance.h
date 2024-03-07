@@ -17,5 +17,7 @@ namespace rnoh {
         void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
 
         void removeChild(ComponentInstance::Shared childComponentInstance) override;
+
+        void setState(facebook::react::State::Shared state) override;
     };
 } // namespace rnoh

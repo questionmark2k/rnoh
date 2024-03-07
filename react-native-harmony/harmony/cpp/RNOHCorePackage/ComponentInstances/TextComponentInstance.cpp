@@ -6,7 +6,7 @@
 #include <react/renderer/components/text/ParagraphState.h>
 #include <glog/logging.h>
 
-namespace rnoh {
+using namespace rnoh;
 
 TextComponentInstance::TextComponentInstance(Context context, facebook::react::Tag tag)
     : ComponentInstance(std::move(context), tag) {}
@@ -22,7 +22,8 @@ void TextComponentInstance::setProps(facebook::react::Props::Shared props) {
 
 void TextComponentInstance::setState(facebook::react::State::Shared state) {
     ComponentInstance::setState(state);
-    auto textState = std::dynamic_pointer_cast<const facebook::react::ConcreteState<facebook::react::ParagraphState>>(state);
+    auto textState =
+        std::dynamic_pointer_cast<const facebook::react::ConcreteState<facebook::react::ParagraphState>>(state);
     if (textState == nullptr) {
         return;
     }
@@ -30,13 +31,10 @@ void TextComponentInstance::setState(facebook::react::State::Shared state) {
     std::ostringstream contentStream;
     for (auto const &fragment : textState->getData().attributedString.getFragments()) {
         contentStream << fragment.string;
+        m_textNode.setFontColor(fragment.textAttributes.foregroundColor).setFontSize(fragment.textAttributes.fontSize);
     }
     auto content = contentStream.str();
     m_textNode.setTextContent(content);
 }
 
-TextNode &TextComponentInstance::getLocalRootArkUINode() {
-    return m_textNode;
-}
-
-} // namespace rnoh
+TextNode &TextComponentInstance::getLocalRootArkUINode() { return m_textNode; }

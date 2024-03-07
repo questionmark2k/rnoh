@@ -13,7 +13,6 @@ import {Benchmarker, DeepTree, SierpinskiTriangle} from './benchmarks';
 import {PortalHost, PortalProvider} from '@gorhom/portal';
 import * as testSuiteByName from './tests';
 import {Tester} from '@rnoh/testerino';
-import {AppCAPI} from './AppCAPI';
 
 const {TesterExample, ...remainingExampleByName} = exampleByName;
 
@@ -22,7 +21,11 @@ function App() {
     'rnohArchitecture' in Platform.constants &&
     Platform.constants.rnohArchitecture === 'C_API'
   ) {
-    return <AppCAPI />;
+    return (
+      <View style={{paddingTop: 38, backgroundColor: 'black'}}>
+        <TesterExample filter={{tags: ['C_API']}} />
+      </View>
+    );
   }
 
   return (
