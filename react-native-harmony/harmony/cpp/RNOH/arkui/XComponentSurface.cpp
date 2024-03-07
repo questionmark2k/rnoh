@@ -1,5 +1,8 @@
 #include "XComponentSurface.h"
+#include "NativeNodeApi.h"
 #include <glog/logging.h>
+#include "ArkUINodeRegistry.h"
+#include "TouchEventDispatcher.h"
 
 namespace rnoh {
 
@@ -26,6 +29,29 @@ void maybeDetachRootNode(OH_NativeXComponent *nativeXComponent, ComponentInstanc
     }
 }
 
+class SurfaceTouchEventHandler : public TouchEventHandler {
+    private:
+        ComponentInstance::Shared m_rootView;
+        TouchEventDispatcher m_touchEventDispatcher;
+    public:
+        SurfaceTouchEventHandler(ComponentInstance::Shared rootView) : m_rootView(std::move(rootView)) {
+            ArkUINodeRegistry::getInstance().registerTouchHandler(&m_rootView->getLocalRootArkUINode(), this);
+            NativeNodeApi::getInstance()->registerNodeEvent(m_rootView->getLocalRootArkUINode().getArkUINodeHandle(), NODE_TOUCH_EVENT, 0);
+        }
+
+        SurfaceTouchEventHandler(SurfaceTouchEventHandler const &other) = delete;
+        SurfaceTouchEventHandler &operator=(SurfaceTouchEventHandler const &other) = delete;
+
+        ~SurfaceTouchEventHandler() override {
+            NativeNodeApi::getInstance()->unregisterNodeEvent(m_rootView->getLocalRootArkUINode().getArkUINodeHandle(), NODE_TOUCH_EVENT);
+            ArkUINodeRegistry::getInstance().unregisterTouchHandler(&m_rootView->getLocalRootArkUINode());
+        }
+
+        void onTouchEvent(ArkUI_NodeTouchEvent event) override {
+            m_touchEventDispatcher.dispatchTouchEvent(event, m_rootView);
+        }
+};
+
 XComponentSurface::XComponentSurface(
     std::shared_ptr<Scheduler> scheduler,
     ComponentInstanceRegistry::Shared componentInstanceRegistry,
@@ -44,6 +70,7 @@ XComponentSurface::XComponentSurface(
         return;
     }
     m_componentInstanceRegistry->insert(m_rootView);
+    m_touchEventHandler = std::make_unique<SurfaceTouchEventHandler>(m_rootView);
 }
 
 XComponentSurface::XComponentSurface(XComponentSurface &&other) noexcept : m_surfaceId(other.m_surfaceId),
@@ -51,7 +78,8 @@ XComponentSurface::XComponentSurface(XComponentSurface &&other) noexcept : m_sur
                                                                            m_nativeXComponent(other.m_nativeXComponent),
                                                                            m_rootView(std::move(other.m_rootView)),
                                                                            m_componentInstanceRegistry(std::move(other.m_componentInstanceRegistry)),
-                                                                           m_surfaceHandler(std::move(other.m_surfaceHandler)) {
+                                                                           m_surfaceHandler(std::move(other.m_surfaceHandler)),
+                                                                           m_touchEventHandler(std::move(other.m_touchEventHandler)) {
     other.m_nativeXComponent = nullptr;
 }
 
@@ -62,6 +90,7 @@ XComponentSurface &XComponentSurface::operator=(XComponentSurface &&other) noexc
     std::swap(m_rootView, other.m_rootView);
     std::swap(m_componentInstanceRegistry, other.m_componentInstanceRegistry);
     std::swap(m_surfaceHandler, other.m_surfaceHandler);
+    std::swap(m_touchEventHandler, other.m_touchEventHandler);
     return *this;
 }
 

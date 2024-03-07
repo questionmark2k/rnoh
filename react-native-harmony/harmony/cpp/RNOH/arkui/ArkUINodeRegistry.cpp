@@ -28,6 +28,24 @@ void ArkUINodeRegistry::unregisterNode(ArkUINode *node) {
     m_nodeByHandle.erase(it);
 }
 
+void ArkUINodeRegistry::registerTouchHandler(ArkUINode *node, TouchEventHandler *touchEventHandler) {
+    DLOG(INFO) << "Registering touch handler for node handle " << node->getArkUINodeHandle();
+    auto [_it, inserted] = m_touchHandlerByNodeHandle.emplace(node->getArkUINodeHandle(), touchEventHandler);
+    if (!inserted) {
+        LOG(WARNING) << "Touch handler for node handle: " << node->getArkUINodeHandle() << " was already registered";
+    }
+}
+
+void ArkUINodeRegistry::unregisterTouchHandler(ArkUINode *node) {
+    DLOG(INFO) << "Unregistering touch handler for node handle " << node->getArkUINodeHandle();
+    auto it = m_touchHandlerByNodeHandle.find(node->getArkUINodeHandle());
+    if (it == m_touchHandlerByNodeHandle.end()) {
+        LOG(WARNING) << "Touch handler for node handle: " << node->getArkUINodeHandle() << " not found";
+        return;
+    }
+    m_touchHandlerByNodeHandle.erase(it);
+}
+
 ArkUINodeRegistry::ArkUINodeRegistry() {
     NativeNodeApi::getInstance()->registerNodeEventReceiver([](ArkUI_NodeEvent *event) {
         ArkUINodeRegistry::getInstance().receiveEvent(event);
@@ -35,6 +53,17 @@ ArkUINodeRegistry::ArkUINodeRegistry() {
 }
 
 void ArkUINodeRegistry::receiveEvent(ArkUI_NodeEvent *event) {
+    if (event->kind == ArkUI_NodeEventType::NODE_TOUCH_EVENT) {
+        auto it = m_touchHandlerByNodeHandle.find(event->node);
+        if (it == m_touchHandlerByNodeHandle.end()) {
+            LOG(WARNING) << "Touch event for node with handle: " << event->node << " not found";
+            return;
+        }
+
+        it->second->onTouchEvent(event->touchEvent);
+        return;
+    }
+
     auto it = m_nodeByHandle.find(event->node);
     if (it == m_nodeByHandle.end()) {
         LOG(WARNING) << "Node with handle: " << event->node << " not found";

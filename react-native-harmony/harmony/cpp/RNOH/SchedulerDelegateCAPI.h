@@ -11,6 +11,15 @@
 
 namespace rnoh {
 
+    void updateComponentWithShadowView(ComponentInstance::Shared const &componentInstance,
+                                       facebook::react::ShadowView const &shadowView) {
+        componentInstance->setProps(shadowView.props);
+        componentInstance->setState(shadowView.state);
+        componentInstance->setLayout(shadowView.layoutMetrics);
+        componentInstance->setEventEmitter(shadowView.eventEmitter);
+        componentInstance->finalizeUpdates();
+    }
+
     class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
     public:
         SchedulerDelegateCAPI(TaskExecutor::Shared taskExecutor, ShadowViewRegistry::Shared shadowViewRegistry,
@@ -74,7 +83,8 @@ namespace rnoh {
         ComponentInstanceFactory::Shared m_componentInstanceFactory;
 
         void handleMutation(facebook::react::ShadowViewMutation mutation) {
-            DLOG(INFO) << "mutation (type:" << this->getMutationNameFromType(mutation.type) << "; new: " << mutation.newChildShadowView.tag
+            DLOG(INFO) << "mutation (type:" << this->getMutationNameFromType(mutation.type) 
+                       << "; new: " << mutation.newChildShadowView.tag << " component type: " << mutation.newChildShadowView.componentName
                        << "; old: " << mutation.oldChildShadowView.tag << "; parent: " << mutation.parentShadowView.tag
                        << ")";
             switch (mutation.type) {
@@ -84,11 +94,8 @@ namespace rnoh {
                 auto componentInstance = m_componentInstanceFactory->create(
                     {.tag = newChild.tag, .componentName = mutation.newChildShadowView.componentName});
                 if (componentInstance != nullptr) {
-                    componentInstance->setProps(mutation.newChildShadowView.props);
-                    componentInstance->setState(mutation.newChildShadowView.state);
-                    componentInstance->setLayout(mutation.newChildShadowView.layoutMetrics);
+                    updateComponentWithShadowView(componentInstance, mutation.newChildShadowView);
                     m_componentInstanceRegistry->insert(componentInstance);
-                    componentInstance->finalizeUpdates();
                 }
                 break;
             }
@@ -121,10 +128,7 @@ namespace rnoh {
             case facebook::react::ShadowViewMutation::Update: {
                 auto componentInstance = m_componentInstanceRegistry->findByTag(mutation.newChildShadowView.tag);
                 if (componentInstance != nullptr) {
-                    componentInstance->setProps(mutation.newChildShadowView.props);
-                    componentInstance->setState(mutation.newChildShadowView.state);
-                    componentInstance->setLayout(mutation.newChildShadowView.layoutMetrics);
-                    componentInstance->finalizeUpdates();
+                    updateComponentWithShadowView(componentInstance, mutation.newChildShadowView);
                 }
                 m_shadowViewRegistry->setShadowView(mutation.newChildShadowView.tag, mutation.newChildShadowView);
                 break;

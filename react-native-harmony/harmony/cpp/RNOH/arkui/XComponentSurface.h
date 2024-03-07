@@ -6,6 +6,7 @@
 #include "RNOH/ComponentInstance.h"
 #include "RNOH/ComponentInstanceFactory.h"
 #include "RNOH/ComponentInstanceRegistry.h"
+#include "ArkUINodeRegistry.h"
 
 namespace rnoh {
 
@@ -43,6 +44,7 @@ class XComponentSurface {
     ComponentInstance::Shared m_rootView;
     ComponentInstanceRegistry::Shared m_componentInstanceRegistry;
     facebook::react::SurfaceHandler m_surfaceHandler;
+    std::unique_ptr<TouchEventHandler> m_touchEventHandler;
 };
 
 } // namespace rnoh

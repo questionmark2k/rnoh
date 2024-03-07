@@ -14,8 +14,17 @@ namespace rnoh {
 
     void ScrollNode::onNodeEvent(ArkUI_NodeEvent *event) {
         if (event->kind == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL) {
-            DLOG(INFO) << "ScrollNode " << m_nodeHandle << " received scroll event";
+            // TODO: implement scroll events
         }
+    }
+
+    facebook::react::Point ScrollNode::getScrollOffset() const {
+        // an attempt was made: this returns garbage
+        auto item = NativeNodeApi::getInstance()->getAttribute(m_nodeHandle, NODE_SCROLL_OFFSET);
+        auto x = item->value[0].f32;
+        auto y = item->value[1].f32;
+        DLOG(INFO) << "Scroll offset: " << x << ", " << y;
+        return Point{x, y};
     }
 
     void ScrollNode::insertChild(ArkUINode &child) {

@@ -19,5 +19,8 @@ namespace rnoh {
         void removeChild(ComponentInstance::Shared childComponentInstance) override;
 
         void setState(facebook::react::State::Shared state) override;
+
+    // TouchTarget implementation
+        facebook::react::Point computeChildPoint(facebook::react::Point const &point, TouchTarget::Shared const &child) const override;
     };
 } // namespace rnoh

@@ -15,10 +15,12 @@ ScrollNode& ScrollViewComponentInstance::getLocalRootArkUINode() {
 }
 
 void ScrollViewComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
+    ComponentInstance::insertChild(childComponentInstance, index);
     m_stackNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
 };
 
 void ScrollViewComponentInstance::removeChild(ComponentInstance::Shared childComponentInstance) {
+    ComponentInstance::removeChild(childComponentInstance);
     m_stackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
 };
 
@@ -29,6 +31,10 @@ void ScrollViewComponentInstance::setState(facebook::react::State::Shared state)
     if (scrollViewState == nullptr) {
         return;
     }
-//     m_stackNode.setSize(scrollViewState->getData().getContentSize()); 
-    
+    m_stackNode.setSize(scrollViewState->getData().getContentSize()); 
+}
+
+facebook::react::Point rnoh::ScrollViewComponentInstance::computeChildPoint(facebook::react::Point const &point, TouchTarget::Shared const &child) const {
+    auto offset = m_scrollNode.getScrollOffset();
+    return ComponentInstance::computeChildPoint(point + offset, child);
 };

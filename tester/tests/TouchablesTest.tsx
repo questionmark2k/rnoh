@@ -44,6 +44,7 @@ export const TouchablesTest = () => {
         <TouchableWithoutFeedbackDemo />
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="handle presses on empty views"
         initialState={false}
         arrange={({setState}) => {
