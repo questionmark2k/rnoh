@@ -19,10 +19,9 @@ namespace rnoh {
     }
 
     facebook::react::Point ScrollNode::getScrollOffset() const {
-        // an attempt was made: this returns garbage
         auto item = NativeNodeApi::getInstance()->getAttribute(m_nodeHandle, NODE_SCROLL_OFFSET);
-        auto x = item->value[0].f32;
-        auto y = item->value[1].f32;
+        facebook::react::Float x = item->value[0].i32;
+        facebook::react::Float y = item->value[1].i32;
         DLOG(INFO) << "Scroll offset: " << x << ", " << y;
         return Point{x, y};
     }
