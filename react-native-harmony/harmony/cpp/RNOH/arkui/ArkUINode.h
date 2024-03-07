@@ -7,6 +7,7 @@
 #include <react/renderer/graphics/Color.h>
 #include <stdexcept>
 #include "glog/logging.h"
+#include "react/renderer/components/view/primitives.h"
 
 namespace rnoh {
     class ArkUINode {
@@ -26,6 +27,8 @@ namespace rnoh {
 
         virtual ArkUINode &setPosition(facebook::react::Point const &position);
         virtual ArkUINode &setSize(facebook::react::Size const &size);
+        virtual ArkUINode &setBorderWidth(facebook::react::BorderWidths const &borderWidths);
+        virtual ArkUINode &setBorderColor(facebook::react::BorderColors const &borderColors);
         virtual ArkUINode &setBackgroundColor(facebook::react::SharedColor const &color);
 
         virtual void onNodeEvent(ArkUI_NodeEvent *event);
@@ -36,7 +39,8 @@ namespace rnoh {
         void maybeThrow(int32_t status) {
             // TODO: map status to error message, maybe add a new error type
             if (status != 0) {
-                throw std::runtime_error(std::string("ArkUINode operation failed with status: ") + std::to_string(status));
+                throw std::runtime_error(std::string("ArkUINode operation failed with status: ") +
+                                         std::to_string(status));
             }
         }
 

@@ -27,10 +27,10 @@ export function ViewTest() {
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
-              width: 100,
+              width: 200,
               height: 100,
-              borderWidth: 3,
-              borderColor: 'white',
+              borderWidth: 1,
+              borderColor: '#FF00FF',
             }}
           />
         </View>
