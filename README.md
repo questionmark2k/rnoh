@@ -25,35 +25,31 @@
 
 Note: native code lives in the `/tester/harmony/rnoh` directory (native code must be in the project directory).
 
-
 ## Prerequisites
 
 ### DevEco Studio setup
 
-This project uses unreleased DevEco Studio 4.0.3.700 and Open Harmony SDK shipped with DevEco. Follow steps below to install the IDE and required SDKs.
+1. Download DevEco Studio from [File Storage repo](https://gl.swmansion.com/rnoh/file-storage).
+1. Unpack all .partX.rar archives (you can use `The Unarchiver` app).
+1. Install DevEco Studio and run it.
+1. Close DevEco.
+1. In `~/Library/Application\ Support/Huawei/DevEcoStudio4.1/options/country.region.xml`, change `name="PL"` to `name="CN"`.
 
 #### SDK setup
 
 Before starting the development you have to install required SDKs.
 
-##### Installing unreleased SDK
+##### Installing SDK
 
-1. Download SDK from internal channel or download unreleased DevEcoStudio (unreleased SDK should be included)
-1. Change path to SDK in Dev Eco Studio: `Tools` -> `SDK Manager`
-1. Update your `buildProfile.json5` based on `buildProfile.template.json5`
-1. Update `hvigor`
-   1. Copy contents of `plugins` from internal DevEcoStudio release directory to `tester/harmony/hvigor`
-   1. Open `tester/harmony/hvigor/hvigor-config.json5` in DevEcoStudio
-   1. DevEcoStudio should show yellow pop ups which should allow you to install dependencies and sync the project
+1. In DevEco Studio go to `Preferences->SDK`.
+1. Choose a location and install SDK.
+1. Go to `{DEVECO SDK LOCATION}/HarmonyOS-NEXT-DP1/base` and remove all folders.
+1. Download latest [daily SDK build](https://ci.openharmony.cn/workbench/cicd/dailybuild/dailylist) and unpack it.
+1. Move all `.zip` files to `{DEVECO SDK LOCATION}/HarmonyOS-NEXT-DP1/base` and unzip them.
+1. Remove `.zip` files.
+1. Restart DevEco Studio
 1. DevEcoStudio: `Build` -> `Clean Project`
-1. Remove `.cxx` directory from `entry` module
-1. Build and run the tester app
-1. On Mac, gatekeeper may complain about running unsigned apps. In such case disable gatekeeper completely or
-   1. Press the Cancel button
-   1. Open Mac Settings and search for Gatekeeper
-   1. Click the button that allows running the cancelled application
-   1. Try building the app again, this time you should be able to click `Open` button instead of `Move to bin`
-   1. Repeat this process until Gatekeeper stops complaining (~20 apps/libs)
+1. DevEcoStudio: `File` -> `Sync and Refresh Project`
 
 ### Git setup
 
@@ -70,6 +66,14 @@ In order to download project dependencies from the git repository, you will have
 1. Copy the token
 
 #### Saving the access token in environment variables
+
+##### macOS
+
+1. Edit `.zshrc`.
+1. Add `export RNOH_NPM_TOKEN={YOUR TOKEN}`.
+1. Save it and reload terminals.
+
+##### Windows
 
 1. Press `Win + R` to open the Windows Run prompt
 1. Type in `sysdm.cpl` and click `Ok`
@@ -91,11 +95,13 @@ More details about GitLab access tokens can be found [in the docs](https://docs.
 ### Installing Dependencies
 
 1. Go to the `react-native-harmony` directory
-1. Create the package by running the `npm pack` command
+1. Create the package by running the `npm install` and `npm pack` command
+1. Go to the `react-native-harmony-cli` directory
+1. Run the `npm install` and `npm pack` command
+1. Go to the `react-native-harmony-sample-package` directory
+1. Run the `npm install` and `npm pack` command
 1. Go to the `../tester` directory
 1. Run the `npm run i` command to install dependencies and setup build-profile
-1. Open the `/tester/harmony/entry/oh_package.json5` in the DevEco Studio
-1. Click "Sync" on the pop-up at the top
 
 ### Creating the Local Emulator (up to 3.1.0 DevEco Studio version only)
 
@@ -123,17 +129,19 @@ Before you start the project, you have to setup the device on which you will be 
 1. Open `/tester/harmony` in DevEco Studio
 1. Start the HarmonyOS emulator
 1. Run `hdc rport tcp:8081 tcp:8081`
-   If `hdc` is not in your `PATH`, it can be found under `<OPEN_HARMONY_SDK>/X86SDK/openharmony/10/toolchains`
+   If `hdc` is not in your `PATH`, it can be found under `{SDK LOCATION}/HarmonyOS-NEXT-DP1/base/toolchains`
 1. Start metro by running `npm run start`
 1. Build and run entry module
-
-### Benchmarking FPS
-
-Frame times can be measured using `node ./scripts/get-frame-times`. It runs hdc hitrace and returns an array (frame times) which contains the time gap between repaints. You can also use it to get the frame times from manually captured traces.
-
-You can use `node ./scripts/create-fps-stats` to get a performance report based on the measured frame times. `node ./scripts/create-fps-stats-flipper file1.csv file2.csv` generates the performance report based on one or more .csv files exported from flippers [rnperfmonitor](https://github.com/bamlab/react-native-flipper-performance-monitor) plugin, allowing to compare performance to react-native-android.
 
 ## Creating NPM Package
 
 1. Go to the `/react-native-harmony`
 1. Run `npm run pack:prod`
+
+## Enable C-API
+
+1. Add `RNOH_C_API_ARCH="1"` to environment variables.
+1. In `tester/harmony/entry/src/main/ets/pages/Index.ets` change `enableCAPIArchitecture` to `true`
+1. Restart DevEco Studio
+1. DevEcoStudio: `Build` -> `Clean Project`
+1. DevEcoStudio: `File` -> `Sync and Refresh Project`

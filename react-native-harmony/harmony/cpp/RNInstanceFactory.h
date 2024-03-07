@@ -126,7 +126,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
             mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
             std::move(schedulerDelegate), componentInstanceRegistry, componentInstanceFactory, shouldEnableDebugger, shouldEnableBackgroundExecutor);
 #else
-        LOG(FATAL) << "The C_API architecture also needs to be enabled on the CPP side. Have you set the RNOH_C_API_ARCH=1 environment variable, completely closed and reopened DevEco Studio and run Build > Clean Project?";   
+        LOG(FATAL) << "The C_API architecture also needs to be enabled on the CPP side. Have you set the RNOH_C_API_ARCH=\"1\" environment variable, completely closed and reopened DevEco Studio and run Build > Clean Project?";
 #endif
     }
 
