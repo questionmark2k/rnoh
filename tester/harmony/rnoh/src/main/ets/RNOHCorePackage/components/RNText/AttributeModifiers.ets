@@ -45,7 +45,7 @@ export class RNParagraphExperimentalSpanAttributeModifier extends BaseAttributeM
   protected allowFontScaling?: boolean;
 
   applyNormalAttribute(instance: SpanAttribute): void {
-    this.maybeAssignAttribute((fr => fr.fontColor), (val) => instance.fontColor(convertColorSegmentsToString(val)), [1, 1, 1, 1] as ColorSegments)
+    this.maybeAssignAttribute((fr => fr.fontColor), (val) => instance.fontColor(convertColorSegmentsToString(val)), [0, 0, 0, 1] as ColorSegments)
     this.maybeAssignAttribute((fr => fr.fontSize), (val) => instance.fontSize(getFontSize(val, this.allowFontScaling)), 16)
     this.maybeAssignAttribute((fr => fr.fontFamily), (val) => instance.fontFamily(val), "HarmonyOS Sans")
     this.maybeAssignAttribute((fr => fr.fontWeight), (val) => instance.fontWeight(val), FontWeight.Normal)

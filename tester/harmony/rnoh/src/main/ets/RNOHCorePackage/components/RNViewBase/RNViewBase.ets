@@ -33,7 +33,7 @@ export abstract class BaseAttributeModifier<TPropertyHolder, TAttribute> impleme
     defaultValue: TPropertyValue,
   ): void {
     const newPropertyValue = extractPropertyValue(this.propertyHolder)
-    let isNewPropertyValueEqualToDefault = newPropertyValue === defaultValue
+    let isNewPropertyValueEqualToDefault = newPropertyValue === defaultValue || Number.isNaN(newPropertyValue)
     if (Array.isArray(defaultValue) && Array.isArray(newPropertyValue)) {
       isNewPropertyValueEqualToDefault = areFirstLevelElementsEqual(newPropertyValue, defaultValue)
     } else if (typeof defaultValue === "object" && typeof newPropertyValue === "object") {

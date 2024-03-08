@@ -37,16 +37,17 @@ export struct RNText {
   }
 
   build() {
-    if (this.descriptor.props.fragments.length <= 1 && !this.descriptor.props.fragments.some(fragment => fragment.text === PLACEHOLDER_SYMBOL)) {
-      RNSimpleText({ ctx: this.ctx, tag: this.tag, componentManager: this.componentManager })
+
+    if (this.ctx.rnInstance.isFeatureFlagEnabled("NDK_TEXT_MEASUREMENTS")) {
+      RNParagraphExperimental({
+        ctx: this.ctx,
+        tag: this.tag,
+        componentManager: this.componentManager,
+        buildCustomComponent: this.buildCustomComponent
+      })
     } else {
-      if (this.ctx.rnInstance.isFeatureFlagEnabled("NDK_TEXT_MEASUREMENTS")) {
-        RNParagraphExperimental({
-          ctx: this.ctx,
-          tag: this.tag,
-          componentManager: this.componentManager,
-          buildCustomComponent: this.buildCustomComponent
-        })
+      if (this.descriptor.props.fragments.length <= 1 && !this.descriptor.props.fragments.some(fragment => fragment.text === PLACEHOLDER_SYMBOL)) {
+        RNSimpleText({ ctx: this.ctx, tag: this.tag, componentManager: this.componentManager })
       } else {
         RNParagraph({
           ctx: this.ctx,
