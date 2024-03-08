@@ -15,45 +15,4 @@ namespace rnoh {
             m_children.erase(it);
         }
     }
-
-    void ComponentInstance::setProps(facebook::react::Props::Shared props) {
-        if (auto p = std::dynamic_pointer_cast<const facebook::react::ViewProps>(props)) {
-            this->getLocalRootArkUINode().setBackgroundColor(p->backgroundColor);
-
-            facebook::react::BorderMetrics borderMetrics = p->resolveBorderMetrics(this->m_layoutMetrics);
-            this->getLocalRootArkUINode().setBorderWidth(borderMetrics.borderWidths);
-            this->getLocalRootArkUINode().setBorderColor(borderMetrics.borderColors);
-        }
-    }
-
-    void ComponentInstance::setLayout(facebook::react::LayoutMetrics layoutMetrics) {
-        this->getLocalRootArkUINode().setPosition(layoutMetrics.frame.origin);
-        this->getLocalRootArkUINode().setSize(layoutMetrics.frame.size);
-        m_layoutMetrics = layoutMetrics;
-    }
-
-    facebook::react::Point ComponentInstance::computeChildPoint(facebook::react::Point const &point,
-                                                                TouchTarget::Shared const &child) const {
-        auto childComponent = std::dynamic_pointer_cast<ComponentInstance const>(child);
-        if (!childComponent) {
-            LOG(FATAL) << "Child is not a ComponentInstance";
-        }
-
-        auto childLayout = childComponent->m_layoutMetrics;
-
-        // TODO: apply inverse transform
-
-        return point - childLayout.frame.origin;
-    }
-
-    bool ComponentInstance::containsPoint(facebook::react::Point const &point) const {
-        // TODO: hitslops
-        return point.x >= 0 && point.y >= 0 && point.x < m_layoutMetrics.frame.size.width &&
-               point.y < m_layoutMetrics.frame.size.height;
-    }
-
-    bool ComponentInstance::containsPointInBoundingBox(facebook::react::Point const &point) const {
-        return containsPoint(point);
-    }
-
 } // namespace rnoh

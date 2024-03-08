@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RNOH/ComponentInstance.h"
+#include "RNOH/CppComponentInstance.h"
 #include "RNOH/arkui/TextNode.h"
 
 namespace rnoh {
-    class TextComponentInstance : public ComponentInstance {
+    class TextComponentInstance : public CppComponentInstance {
     private:
         TextNode m_textNode;
 

@@ -17,5 +17,6 @@ class TouchTarget {
     virtual facebook::react::Tag getTouchTargetTag() const = 0;
     virtual facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const = 0;
     virtual std::vector<Shared> getTouchTargetChildren() const = 0;
+    virtual facebook::react::LayoutMetrics getLayoutMetrics() const = 0;
 };
 } // namespace rnoh

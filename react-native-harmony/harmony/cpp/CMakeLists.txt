@@ -449,6 +449,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOH/arkui/TextNode.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/TouchEventDispatcher.cpp"
     "${RNOH_CPP_DIR}/RNOH/ComponentInstance.cpp"
+    "${RNOH_CPP_DIR}/RNOH/CppComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ViewComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/TextComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ScrollViewComponentInstance.cpp"

@@ -1,10 +1,10 @@
 #pragma once
 #include <react/renderer/components/view/ViewEventEmitter.h>
-#include "RNOH/ComponentInstance.h"
+#include "RNOH/CppComponentInstance.h"
 #include "RNOH/arkui/StackNode.h"
 
 namespace rnoh {
-    class ViewComponentInstance : public ComponentInstance {
+    class ViewComponentInstance : public CppComponentInstance {
     private:
         StackNode m_stackNode;
         facebook::react::SharedViewEventEmitter m_eventEmitter;

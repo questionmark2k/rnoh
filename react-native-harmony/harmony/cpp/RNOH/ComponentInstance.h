@@ -33,13 +33,13 @@ namespace rnoh {
 
         virtual void removeChild(ComponentInstance::Shared childComponentInstance);
 
-        virtual void setProps(facebook::react::Props::Shared props);
+        virtual void setProps(facebook::react::Props::Shared props) {};
 
-        virtual void setState(facebook::react::State::Shared state) {}
+        virtual void setState(facebook::react::State::Shared state) {};
 
-        virtual void setLayout(facebook::react::LayoutMetrics layoutMetrics);
+        virtual void setLayout(facebook::react::LayoutMetrics layoutMetrics) {};
 
-        virtual void setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) {}
+        virtual void setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) {};
 
         virtual void finalizeUpdates() { this->getLocalRootArkUINode().markDirty(); }
 
@@ -48,18 +48,11 @@ namespace rnoh {
         virtual std::vector<ComponentInstance::Shared> const &getChildren() const { return m_children; }
 
         // TouchTarget implementation
-        facebook::react::Point computeChildPoint(facebook::react::Point const &point,
-                                                 TouchTarget::Shared const &child) const override;
-
-        bool containsPoint(facebook::react::Point const &point) const override;
-
-        bool containsPointInBoundingBox(facebook::react::Point const &point) const override;
-
         facebook::react::Tag getTouchTargetTag() const override { return getTag(); }
 
         facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { return nullptr; }
 
-        std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
+        virtual std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
             auto children = getChildren();
             return std::vector<TouchTarget::Shared>(children.begin(), children.end());
         }

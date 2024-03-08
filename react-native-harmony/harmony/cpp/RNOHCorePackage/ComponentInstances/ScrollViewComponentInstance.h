@@ -1,11 +1,11 @@
 #pragma once
 #include <react/renderer/components/scrollview/ScrollViewEventEmitter.h>
-#include "RNOH/ComponentInstance.h"
+#include "RNOH/CppComponentInstance.h"
 #include "RNOH/arkui/ScrollNode.h"
 #include "RNOH/arkui/StackNode.h"
 
 namespace rnoh {
-    class ScrollViewComponentInstance : public ComponentInstance, public ScrollNodeDelegate {
+    class ScrollViewComponentInstance : public CppComponentInstance, public ScrollNodeDelegate {
     private:
         ScrollNode m_scrollNode;
         StackNode m_stackNode;

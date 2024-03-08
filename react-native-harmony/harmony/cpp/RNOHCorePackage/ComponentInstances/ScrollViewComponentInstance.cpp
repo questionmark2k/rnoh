@@ -6,7 +6,7 @@
 using namespace rnoh;
 
 ScrollViewComponentInstance::ScrollViewComponentInstance(Context context, facebook::react::Tag tag)
-    : ComponentInstance(context, tag) {
+    : CppComponentInstance(context, tag) {
     m_scrollNode.insertChild(m_stackNode);
     m_scrollNode.setScrollNodeDelegate(this);
 }
@@ -14,12 +14,12 @@ ScrollViewComponentInstance::ScrollViewComponentInstance(Context context, facebo
 ScrollNode &ScrollViewComponentInstance::getLocalRootArkUINode() { return m_scrollNode; }
 
 void ScrollViewComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
-    ComponentInstance::insertChild(childComponentInstance, index);
+    CppComponentInstance::insertChild(childComponentInstance, index);
     m_stackNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
 };
 
 void ScrollViewComponentInstance::removeChild(ComponentInstance::Shared childComponentInstance) {
-    ComponentInstance::removeChild(childComponentInstance);
+    CppComponentInstance::removeChild(childComponentInstance);
     m_stackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
 };
 
@@ -28,7 +28,7 @@ void ScrollViewComponentInstance::setLayout(facebook::react::LayoutMetrics layou
 }
 
 void ScrollViewComponentInstance::setState(facebook::react::State::Shared state) {
-    ComponentInstance::setState(state);
+    CppComponentInstance::setState(state);
     auto scrollViewState =
         std::dynamic_pointer_cast<const facebook::react::ConcreteState<facebook::react::ScrollViewState>>(state);
     if (scrollViewState == nullptr) {
@@ -42,11 +42,11 @@ void ScrollViewComponentInstance::setState(facebook::react::State::Shared state)
 facebook::react::Point rnoh::ScrollViewComponentInstance::computeChildPoint(facebook::react::Point const &point,
                                                                             TouchTarget::Shared const &child) const {
     auto offset = m_scrollNode.getScrollOffset();
-    return ComponentInstance::computeChildPoint(point + offset, child);
+    return CppComponentInstance::computeChildPoint(point + offset, child);
 };
 
 void ScrollViewComponentInstance::setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) {
-    ComponentInstance::setEventEmitter(eventEmitter);
+    CppComponentInstance::setEventEmitter(eventEmitter);
     auto scrollViewEventEmitter =
         std::dynamic_pointer_cast<const facebook::react::ScrollViewEventEmitter>(eventEmitter);
     if (scrollViewEventEmitter == nullptr) {

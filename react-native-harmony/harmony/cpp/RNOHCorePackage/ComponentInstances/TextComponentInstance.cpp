@@ -9,10 +9,10 @@
 using namespace rnoh;
 
 TextComponentInstance::TextComponentInstance(Context context, facebook::react::Tag tag)
-    : ComponentInstance(std::move(context), tag) {}
+    : CppComponentInstance(std::move(context), tag) {}
 
 void TextComponentInstance::setProps(facebook::react::Props::Shared props) {
-    ComponentInstance::setProps(props);
+    CppComponentInstance::setProps(props);
     auto textProps = std::dynamic_pointer_cast<const facebook::react::ParagraphProps>(props);
     if (textProps == nullptr) {
         return;
@@ -21,7 +21,7 @@ void TextComponentInstance::setProps(facebook::react::Props::Shared props) {
 }
 
 void TextComponentInstance::setState(facebook::react::State::Shared state) {
-    ComponentInstance::setState(state);
+    CppComponentInstance::setState(state);
     auto textState =
         std::dynamic_pointer_cast<const facebook::react::ConcreteState<facebook::react::ParagraphState>>(state);
     if (textState == nullptr) {
