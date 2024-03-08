@@ -28,6 +28,10 @@ export class InspectorPackagerConnection {
   private logger: RNOHLogger;
 
   constructor(private url: string, logger: RNOHLogger, private inspectorInstance: InspectorInstance) {
+    if (url.startsWith("http")) {
+      url = url.replace("http", "ws");
+    }
+    this.url = url;
     this.logger = logger.clone("InspectorPackagerConnection");
   }
 

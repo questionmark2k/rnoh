@@ -13,7 +13,7 @@ function getServerHost(bundleUrlString: string): string {
 
 // returns the inspector url for current device and application
 function getInspectorDeviceUrl(bundleUrl: string) {
-  // TODO:
+  // TODO: get real deviceName and appName instead of hardcoded values
   const deviceName = "HarmonyDevice";
   const appName = "com.rnoh.tester";
   return `http://${getServerHost(bundleUrl)}/inspector/device?name=${deviceName}&app=${appName}`;
