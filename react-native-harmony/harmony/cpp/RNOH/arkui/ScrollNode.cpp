@@ -4,7 +4,7 @@
 namespace rnoh {
     ScrollNode::ScrollNode()
         : ArkUINode(NativeNodeApi::getInstance()->createNode(ArkUI_NodeType::ARKUI_NODE_SCROLL)),
-          m_childArkUINodeHandle(nullptr) {
+          m_childArkUINodeHandle(nullptr), m_scrollNodeDelegate(nullptr) {
         maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL, 0));
     }
 
@@ -14,7 +14,9 @@ namespace rnoh {
 
     void ScrollNode::onNodeEvent(ArkUI_NodeEvent *event) {
         if (event->kind == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL) {
-            // TODO: implement scroll events
+            if (m_scrollNodeDelegate != nullptr) {
+                m_scrollNodeDelegate->onScroll();
+            }
         }
     }
 
@@ -22,7 +24,6 @@ namespace rnoh {
         auto item = NativeNodeApi::getInstance()->getAttribute(m_nodeHandle, NODE_SCROLL_OFFSET);
         facebook::react::Float x = item->value[0].i32;
         facebook::react::Float y = item->value[1].i32;
-        DLOG(INFO) << "Scroll offset: " << x << ", " << y;
         return Point{x, y};
     }
 
@@ -40,5 +41,9 @@ namespace rnoh {
         }
         NativeNodeApi::getInstance()->removeChild(m_nodeHandle, m_childArkUINodeHandle);
         m_childArkUINodeHandle = nullptr;
+    }
+
+    void ScrollNode::setScrollNodeDelegate(ScrollNodeDelegate *scrollNodeDelegate) {
+        m_scrollNodeDelegate = scrollNodeDelegate;
     }
 } // namespace rnoh

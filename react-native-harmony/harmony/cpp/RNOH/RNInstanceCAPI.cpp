@@ -173,7 +173,7 @@ void rnoh::RNInstanceCAPI::updateState(napi_env env, std::string const &componen
 }
 
 void RNInstanceCAPI::callFunction(std::string &&module, std::string &&method, folly::dynamic &&params) {
-    DLOG(INFO) << "RNInstanceCAPI::callFunction";
+//     DLOG(INFO) << "RNInstanceCAPI::callFunction"; // commented out, it's too verbose
     this->taskExecutor->runTask(TaskThread::JS, [weakInstance = std::weak_ptr(this->instance),
                                                  module = std::move(module), method = std::move(method),
                                                  params = std::move(params)]() mutable {

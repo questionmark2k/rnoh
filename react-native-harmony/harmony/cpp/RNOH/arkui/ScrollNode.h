@@ -4,12 +4,19 @@
 #include <react/renderer/graphics/Point.h>
 
 namespace rnoh {
+    class ScrollNodeDelegate {
+    public:
+        virtual ~ScrollNodeDelegate() = default;
+        virtual void onScroll() {};
+    };
+
 
     class ScrollNode : public ArkUINode {
     protected:
         using Point = facebook::react::Point;
 
         ArkUI_NodeHandle m_childArkUINodeHandle;
+        ScrollNodeDelegate *m_scrollNodeDelegate;
 
     public:
         ScrollNode();
@@ -20,6 +27,7 @@ namespace rnoh {
         void onNodeEvent(ArkUI_NodeEvent *event) override;
 
         Point getScrollOffset() const;
+        void setScrollNodeDelegate(ScrollNodeDelegate *scrollNodeDelegate);
     };
 
 } // namespace rnoh
