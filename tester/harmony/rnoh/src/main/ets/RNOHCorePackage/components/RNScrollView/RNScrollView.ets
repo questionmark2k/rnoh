@@ -501,6 +501,9 @@ export struct RNScrollView {
     this.scrollState = ScrollState.Idle;
 
     this.contentOffset = this.getContentOffset();
+    descriptor.state.contentOffsetX = this.contentOffset.x;
+    descriptor.state.contentOffsetY = this.contentOffset.y;
+    this.ctx.descriptorRegistry.setState<ScrollViewState>(this.tag, descriptor.state);
     this.isScrolling = false;
   }
 

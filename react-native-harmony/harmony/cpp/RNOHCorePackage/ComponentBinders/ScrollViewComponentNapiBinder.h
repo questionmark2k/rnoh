@@ -58,6 +58,30 @@ class ScrollViewComponentNapiBinder : public ViewComponentNapiBinder {
         }
         return napiViewState;
     };
+
+
+    void updateState(StateUpdateContext const &ctx) override {
+        ArkJS arkJs(ctx.env);
+        auto scrollState = std::dynamic_pointer_cast<facebook::react::ConcreteState<facebook::react::ScrollViewState> const>(ctx.state);
+        if (scrollState == nullptr) {
+            return;
+        }
+
+        auto contentOffsetX = arkJs.getObjectProperty(ctx.newState, "contentOffsetX");
+        auto contentOffsetY = arkJs.getObjectProperty(ctx.newState, "contentOffsetY");
+        auto contentOffset = facebook::react::Point{
+            (facebook::react::Float)arkJs.getDouble(contentOffsetX),
+            (facebook::react::Float)arkJs.getDouble(contentOffsetY)};
+
+        // we want to keep content size so we use update function, similar to iOS implementation
+        auto updateCallback = [contentOffset](facebook::react::ConcreteState<facebook::react::ScrollViewState>::Data const &data) {
+            auto newData = data;
+            newData.contentOffset = contentOffset;
+            return std::make_shared<facebook::react::ConcreteState<facebook::react::ScrollViewState>::Data const>(newData);
+        };
+        scrollState->updateState(updateCallback);
+        return;
+    };
 };
 
 } // namespace rnoh
