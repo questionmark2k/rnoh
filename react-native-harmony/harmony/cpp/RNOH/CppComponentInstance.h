@@ -28,7 +28,9 @@ namespace rnoh {
 
         void setLayout(facebook::react::LayoutMetrics layoutMetrics) override;
 
-        void setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) override {};
+        void setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) override {
+            m_cppComponentEventEmitter = eventEmitter;
+        };
 
         // TouchTarget implementation
         facebook::react::LayoutMetrics getLayoutMetrics() const override;
@@ -42,13 +44,18 @@ namespace rnoh {
 
         facebook::react::Tag getTouchTargetTag() const override { return getTag(); }
 
-        facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { return nullptr; }
+        facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { 
+            auto ret = std::dynamic_pointer_cast<const facebook::react::TouchEventEmitter>(m_cppComponentEventEmitter);
+            return ret; 
+        }
 
         std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
             auto children = getChildren();
             return std::vector<TouchTarget::Shared>(children.begin(), children.end());
         }
-    
+
+    private:
+        facebook::react::SharedEventEmitter m_cppComponentEventEmitter;
 
     };
 

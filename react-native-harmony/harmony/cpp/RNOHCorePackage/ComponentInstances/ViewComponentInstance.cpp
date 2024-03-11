@@ -6,6 +6,7 @@ namespace rnoh {
         : CppComponentInstance(std::move(context), tag) {}
 
     void ViewComponentInstance::setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) {
+        CppComponentInstance::setEventEmitter(eventEmitter);
         m_eventEmitter = std::dynamic_pointer_cast<facebook::react::ViewEventEmitter const>(eventEmitter);
     }
 
