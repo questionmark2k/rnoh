@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.72.17
+- added foundations for an experimental C-API based architecture
+- added optional approach of building components based on LazyForEach and DataSources that provides better performance
+- added `TextInput::onSelectionChange` support
+- added `TextInput::selection` support
+- added `TextInput::selectTextOnFocus` support
+- optimized disk caching of Images
+- fixed react-native codegen crash when generating code
+- fixed `Switch::value`
+- fixed `Image` intercepting touches when it shouldn't
+
 ## v0.72.16
 - BREAKING: removed dependencies on RNAbility in RNOHContext
 - added internal import resolving for harmony packages with `redirectInternalImports: true`
