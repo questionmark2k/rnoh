@@ -588,7 +588,6 @@ export function ViewTest() {
         </View>
       </TestCase.Example>
       <TestCase.Manual
-        skip={'bug in RN'}
         itShould="pass on blue rect touch (onResponderReject)"
         initialState={{
           responderRejectedCount: 0,
@@ -598,7 +597,7 @@ export function ViewTest() {
         arrange={({setState}) => {
           return (
             <View
-              onStartShouldSetResponder={() => true}
+              onMoveShouldSetResponder={() => true}
               onResponderReject={() => {
                 setState(prev => ({
                   ...prev,
