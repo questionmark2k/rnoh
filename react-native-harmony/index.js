@@ -89,6 +89,10 @@ module.exports = {
   get Platform() {
     return require('./Libraries/Utilities/Platform');
   },
+  get PlatformColor() {
+    return require('./Libraries/StyleSheet/PlatformColorValueTypes')
+      .PlatformColor;
+  },
   get Pressable() {
     return require('react-native/Libraries/Components/Pressable/Pressable')
       .default;

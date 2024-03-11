@@ -31,6 +31,7 @@ export * from './NativeEventEmitterTest';
 export * from './NetworkingTest';
 export * from './PanResponderTest';
 export * from './PixelRatioTest';
+export * from './PlatformColorTest';
 export * from './PlatformConstantsTest';
 export * from './PressableTest';
 export * from './RefreshControlTest';

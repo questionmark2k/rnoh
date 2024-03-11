@@ -22,6 +22,7 @@
 #include "RNOHCorePackage/TurboModules/ImageLoaderTurboModule.h"
 #include "RNOHCorePackage/TurboModules/LinkingManagerTurboModule.h"
 #include "RNOHCorePackage/TurboModules/NetworkingTurboModule.h"
+#include "RNOHCorePackage/TurboModules/PlatformColorTurboModule.h"
 #include "RNOHCorePackage/TurboModules/PlatformConstantsTurboModule.h"
 #include "RNOHCorePackage/TurboModules/SourceCodeTurboModule.h"
 #include "RNOHCorePackage/TurboModules/StatusBarTurboModule.h"
@@ -99,6 +100,8 @@ namespace rnoh {
                 return std::make_shared<NativeAnimatedTurboModule>(ctx, name);
             } else if (name == "Networking") {
                 return std::make_shared<NetworkingTurboModule>(ctx, name);
+            } else if (name == "PlatformColor") {
+                return std::make_shared<PlatformColorTurboModule>(ctx, name);
             } else if (name == "PlatformConstants") {
                 return std::make_shared<PlatformConstantsTurboModule>(ctx, name);
             } else if (name == "SourceCode") {

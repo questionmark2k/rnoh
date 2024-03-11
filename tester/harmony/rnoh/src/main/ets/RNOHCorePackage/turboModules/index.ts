@@ -20,6 +20,8 @@ export * from "./NativeAnimatedTurboModule"
 
 export * from "./Networking";
 
+export * from "./PlatformColorTurboModule";
+
 export * from "./PlatformConstantsTurboModule";
 
 export * from "./LogBoxTurboModule";
