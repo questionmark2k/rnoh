@@ -74,6 +74,7 @@ export struct RNImage {
         const newImageDescriptor = (newDescriptor as ImageDescriptor);
         const uriChanged = newImageDescriptor.props.uri !== this.descriptor.props.uri;
         this.descriptor = newImageDescriptor;
+        this.descriptorWrapper = new ImageDescriptorWrapper(this.descriptor)
         if (uriChanged) {
           this.onLoadStart();
           this.updateImageSource();
