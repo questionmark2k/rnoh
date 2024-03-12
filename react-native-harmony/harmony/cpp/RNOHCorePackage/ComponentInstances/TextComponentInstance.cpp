@@ -12,7 +12,7 @@ TextComponentInstance::TextComponentInstance(Context context, facebook::react::T
     : CppComponentInstance(std::move(context), tag) {}
 
 void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react::ParagraphProps> const &props) {
-    // TODO: text and paragraph attributes
+    CppComponentInstance::onPropsChanged(props);
 }
 
 void TextComponentInstance::onStateChanged(std::shared_ptr<const facebook::react::ConcreteState<facebook::react::ParagraphState>> const &textState) {

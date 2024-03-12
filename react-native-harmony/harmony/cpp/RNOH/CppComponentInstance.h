@@ -14,7 +14,6 @@
 
 
 namespace rnoh {
-
     template <typename ShadowNodeT>
     class CppComponentInstance : public ComponentInstance {
         static_assert(std::is_base_of_v<facebook::react::ShadowNode, ShadowNodeT>, "ShadowNodeT must be a subclass of facebook::react::ShadowNode");
@@ -41,12 +40,6 @@ namespace rnoh {
             if (!newProps) { 
                 return;
             }
-
-            this->getLocalRootArkUINode().setBackgroundColor(newProps->backgroundColor);
-
-            facebook::react::BorderMetrics borderMetrics = newProps->resolveBorderMetrics(this->m_layoutMetrics);
-            this->getLocalRootArkUINode().setBorderWidth(borderMetrics.borderWidths);
-            this->getLocalRootArkUINode().setBorderColor(borderMetrics.borderColors);
 
             this->onPropsChanged(newProps);
             m_props = newProps;
@@ -117,7 +110,13 @@ namespace rnoh {
         }
 
     protected:
-        virtual void onPropsChanged(SharedConcreteProps const &props) {};
+        virtual void onPropsChanged(SharedConcreteProps const &props) {
+            this->getLocalRootArkUINode().setBackgroundColor(props->backgroundColor);
+
+            facebook::react::BorderMetrics borderMetrics = props->resolveBorderMetrics(this->m_layoutMetrics);
+            this->getLocalRootArkUINode().setBorderWidth(borderMetrics.borderWidths);
+            this->getLocalRootArkUINode().setBorderColor(borderMetrics.borderColors);
+        };
 
         virtual void onStateChanged(SharedConcreteState const &state) {};
 
