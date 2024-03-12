@@ -1,8 +1,8 @@
-import { Descriptor, RNOHContext, TransformMatrix, Edges, Corners, RNComponentContext } from '../../../RNOH';
+import { Corners, Descriptor, Edges, RNComponentContext, RNOHContext, TransformMatrix } from '../../../RNOH';
 import { ViewBaseProps, ViewRawProps } from './types';
 import { ViewDescriptorWrapper, ViewDescriptorWrapperBase } from './ViewDescriptorWrapper';
 import { RNViewManager } from '../../componentManagers';
-import { areFirstLevelPropsEqual, areFirstLevelElementsEqual } from "./etsHacks"
+import { areFirstLevelElementsEqual, areFirstLevelPropsEqual } from './etsHacks';
 import matrix4 from '@ohos.matrix4';
 
 export interface ViewBaseState {}
@@ -48,8 +48,8 @@ export abstract class BaseAttributeModifier<TPropertyHolder, TAttribute> impleme
 
 export class RNViewBaseAttributeModifier extends BaseAttributeModifier<ViewDescriptorWrapper, CommonAttribute> {
   applyNormalAttribute(instance: CommonAttribute): void {
-    this.maybeAssignAttribute((dw => dw.width), (val) => instance.width(val), 0)
-    this.maybeAssignAttribute((dw => dw.height), (val) => instance.height(val), 0)
+    this.maybeAssignAttribute((dw => dw.width), (val) => instance.width(val), undefined)
+    this.maybeAssignAttribute((dw => dw.height), (val) => instance.height(val), undefined)
     this.maybeAssignAttribute((dw => dw.backgroundColor), (val) => instance.backgroundColor(val), "#00000000")
     this.maybeAssignAttribute<Position>((dw => dw.positionRelativeToParent), (val) => instance.position(val), {
       x: 0,

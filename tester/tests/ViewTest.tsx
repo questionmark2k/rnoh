@@ -269,6 +269,25 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
+      <TestCase.Example itShould="not show view with height 0 and overflow hidden">
+        <View
+          style={{
+            width: 64,
+            height: 0,
+            backgroundColor: 'red',
+            overflow: 'hidden',
+            margin: 10,
+          }}>
+          <View
+            style={{
+              width: 64,
+              height: 64,
+              backgroundColor: 'green',
+              marginLeft: 32,
+            }}
+          />
+        </View>
+      </TestCase.Example>
       <TestCase.Example itShould="render blue rectangle (zIndex test)">
         <View>
           <View
