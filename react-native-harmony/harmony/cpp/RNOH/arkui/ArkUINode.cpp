@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <bits/alltypes.h>
-
 #include "ArkUINode.h"
 #include "NativeNodeApi.h"
 #include "ArkUINodeRegistry.h"
+#include "conversions.h"
 
 namespace rnoh {
 
@@ -37,19 +37,20 @@ namespace rnoh {
             LOG(ERROR) << "ArkUI doesn't support negative coordinates when setting a position (x: " << position.x
                        << ", y: " << position.y << ").";
         }
-        ArkUI_NumberValue value[] = {std::max((float)position.x, 0.0f), std::max((float)position.y, 0.0f)};
+        ArkUI_NumberValue value[] = {std::max(static_cast<float>(position.x), 0.0f),
+                                     std::max(static_cast<float>(position.y), 0.0f)};
         ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_POSITION, &item));
         return *this;
     }
 
     ArkUINode &ArkUINode::setSize(facebook::react::Size const &size) {
-        ArkUI_NumberValue widthValue[] = {(float)size.width};
+        ArkUI_NumberValue widthValue[] = {static_cast<float>(size.width)};
         ArkUI_AttributeItem widthItem = {widthValue, sizeof(widthValue) / sizeof(ArkUI_NumberValue)};
 
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_WIDTH, &widthItem));
 
-        ArkUI_NumberValue heightValue[] = {(float)size.height};
+        ArkUI_NumberValue heightValue[] = {static_cast<float>(size.height)};
         ArkUI_AttributeItem heightItem = {heightValue, sizeof(heightValue) / sizeof(ArkUI_NumberValue)};
 
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_HEIGHT, &heightItem));
@@ -57,9 +58,9 @@ namespace rnoh {
     }
 
     ArkUINode &ArkUINode::setBorderWidth(facebook::react::BorderWidths const &borderWidths) {
-
-        ArkUI_NumberValue borderWidthValue[] = {(float)borderWidths.top, (float)borderWidths.right,
-                                                (float)borderWidths.bottom, (float)borderWidths.left};
+        ArkUI_NumberValue borderWidthValue[] = {
+            static_cast<float>(borderWidths.top), static_cast<float>(borderWidths.right),
+            static_cast<float>(borderWidths.bottom), static_cast<float>(borderWidths.left)};
 
         ArkUI_AttributeItem borderWidthItem = {borderWidthValue, sizeof(borderWidthValue) / sizeof(ArkUI_NumberValue)};
 
@@ -68,15 +69,39 @@ namespace rnoh {
     }
 
     ArkUINode &ArkUINode::setBorderColor(facebook::react::BorderColors const &borderColors) {
-
-        ArkUI_NumberValue borderColorValue[] = {{.u32 = (uint32_t)*borderColors.top},
-                                                {.u32 = (uint32_t)*borderColors.right},
-                                                {.u32 = (uint32_t)*borderColors.bottom},
-                                                {.u32 = (uint32_t)*borderColors.left}};
+        ArkUI_NumberValue borderColorValue[] = {{.u32 = static_cast<uint32_t>(*borderColors.top)},
+                                                {.u32 = static_cast<uint32_t>(*borderColors.right)},
+                                                {.u32 = static_cast<uint32_t>(*borderColors.bottom)},
+                                                {.u32 = static_cast<uint32_t>(*borderColors.left)}};
 
         ArkUI_AttributeItem borderColorItem = {borderColorValue, sizeof(borderColorValue) / sizeof(ArkUI_NumberValue)};
 
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_BORDER_COLOR, &borderColorItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setBorderRadius(facebook::react::BorderRadii const &borderRadius) {
+        ArkUI_NumberValue borderRadiusValue[] = {
+            static_cast<float>(borderRadius.topLeft), static_cast<float>(borderRadius.topRight),
+            static_cast<float>(borderRadius.bottomLeft), static_cast<float>(borderRadius.bottomRight)};
+
+        ArkUI_AttributeItem borderRadiusItem = {borderRadiusValue,
+                                                sizeof(borderRadiusValue) / sizeof(ArkUI_NumberValue)};
+
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_BORDER_RADIUS, &borderRadiusItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setBorderStyle(facebook::react::BorderStyles const &borderStyles) {
+        ArkUI_NumberValue borderStyleValue[] = {
+            {.i32 = static_cast<int32_t>(rnoh::convertReactBorderStyleToArk(borderStyles.top))},
+            {.i32 = static_cast<int32_t>(rnoh::convertReactBorderStyleToArk(borderStyles.right))},
+            {.i32 = static_cast<int32_t>(rnoh::convertReactBorderStyleToArk(borderStyles.bottom))},
+            {.i32 = static_cast<int32_t>(rnoh::convertReactBorderStyleToArk(borderStyles.left))}};
+
+        ArkUI_AttributeItem borderStyleItem = {borderStyleValue, sizeof(borderStyleValue) / sizeof(ArkUI_NumberValue)};
+
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_BORDER_STYLE, &borderStyleItem));
         return *this;
     }
 
@@ -90,6 +115,14 @@ namespace rnoh {
         ArkUI_NumberValue preparedColorValue[] = {{.u32 = colorValue}};
         ArkUI_AttributeItem colorItem = {preparedColorValue, sizeof(preparedColorValue) / sizeof(ArkUI_NumberValue)};
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_BACKGROUND_COLOR, &colorItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setOpacity(facebook::react::Float const &opacity) {
+        ArkUI_NumberValue opacityValue[] = {static_cast<float>(opacity)};
+        ArkUI_AttributeItem opacityItem = {opacityValue, sizeof(opacityValue) / sizeof(ArkUI_NumberValue)};
+
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_OPACITY, &opacityItem));
         return *this;
     }
 

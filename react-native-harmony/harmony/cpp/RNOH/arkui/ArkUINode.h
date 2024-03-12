@@ -29,7 +29,10 @@ namespace rnoh {
         virtual ArkUINode &setSize(facebook::react::Size const &size);
         virtual ArkUINode &setBorderWidth(facebook::react::BorderWidths const &borderWidths);
         virtual ArkUINode &setBorderColor(facebook::react::BorderColors const &borderColors);
+        virtual ArkUINode &setBorderRadius(facebook::react::BorderRadii const &borderRadius);
+        virtual ArkUINode &setBorderStyle(facebook::react::BorderStyles const &borderStyles);
         virtual ArkUINode &setBackgroundColor(facebook::react::SharedColor const &color);
+        virtual ArkUINode &setOpacity(facebook::react::Float const &opacity);
 
         virtual void onNodeEvent(ArkUI_NodeEvent *event);
 

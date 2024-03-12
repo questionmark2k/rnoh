@@ -14,13 +14,13 @@
 
 
 namespace rnoh {
-    template <typename ShadowNodeT>
-    class CppComponentInstance : public ComponentInstance {
-        static_assert(std::is_base_of_v<facebook::react::ShadowNode, ShadowNodeT>, "ShadowNodeT must be a subclass of facebook::react::ShadowNode");
+    template <typename ShadowNodeT> class CppComponentInstance : public ComponentInstance {
+        static_assert(std::is_base_of_v<facebook::react::ShadowNode, ShadowNodeT>,
+                      "ShadowNodeT must be a subclass of facebook::react::ShadowNode");
 
     protected:
         using ConcreteProps = typename ShadowNodeT::ConcreteProps;
-        using ConcreteState = typename ShadowNodeT::ConcreteState; 
+        using ConcreteState = typename ShadowNodeT::ConcreteState;
         using ConcreteEventEmitter = typename ShadowNodeT::ConcreteEventEmitter;
         using SharedConcreteProps = std::shared_ptr<const ConcreteProps>;
         using SharedConcreteState = std::shared_ptr<const ConcreteState>;
@@ -37,7 +37,7 @@ namespace rnoh {
 
         void setProps(facebook::react::Props::Shared props) final {
             auto newProps = std::dynamic_pointer_cast<const ConcreteProps>(props);
-            if (!newProps) { 
+            if (!newProps) {
                 return;
             }
 
@@ -75,9 +75,7 @@ namespace rnoh {
         }
 
         // TouchTarget implementation
-        facebook::react::LayoutMetrics getLayoutMetrics() const override {
-            return m_layoutMetrics;
-        }
+        facebook::react::LayoutMetrics getLayoutMetrics() const override { return m_layoutMetrics; }
 
         facebook::react::Point computeChildPoint(facebook::react::Point const &point,
                                                  TouchTarget::Shared const &child) const override {
@@ -91,7 +89,7 @@ namespace rnoh {
         bool containsPoint(facebook::react::Point const &point) const override {
             // TODO: hitslops
             return point.x >= 0 && point.y >= 0 && point.x < m_layoutMetrics.frame.size.width &&
-                point.y < m_layoutMetrics.frame.size.height;
+                   point.y < m_layoutMetrics.frame.size.height;
         }
 
         bool containsPointInBoundingBox(facebook::react::Point const &point) const override {
@@ -100,9 +98,7 @@ namespace rnoh {
 
         facebook::react::Tag getTouchTargetTag() const override { return getTag(); }
 
-        facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { 
-            return m_eventEmitter;
-        }
+        facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { return m_eventEmitter; }
 
         std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
             auto children = getChildren();
@@ -116,15 +112,18 @@ namespace rnoh {
             facebook::react::BorderMetrics borderMetrics = props->resolveBorderMetrics(this->m_layoutMetrics);
             this->getLocalRootArkUINode().setBorderWidth(borderMetrics.borderWidths);
             this->getLocalRootArkUINode().setBorderColor(borderMetrics.borderColors);
+            this->getLocalRootArkUINode().setBorderRadius(borderMetrics.borderRadii);
+            this->getLocalRootArkUINode().setBorderStyle(borderMetrics.borderStyles);
+
+            this->getLocalRootArkUINode().setOpacity(props->opacity);
         };
 
-        virtual void onStateChanged(SharedConcreteState const &state) {};
+        virtual void onStateChanged(SharedConcreteState const &state){};
 
-        virtual void onEventEmitterChanged(SharedConcreteEventEmitter const &eventEmitter) {};
+        virtual void onEventEmitterChanged(SharedConcreteEventEmitter const &eventEmitter){};
 
         SharedConcreteProps m_props;
         SharedConcreteState m_state;
         SharedConcreteEventEmitter m_eventEmitter;
     };
-
 } // namespace rnoh

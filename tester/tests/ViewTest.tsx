@@ -16,13 +16,6 @@ export function ViewTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
-        skip={{
-          android: false,
-          harmony: {
-            arkTS: false,
-            cAPI: 'borderWidth needs to be implemented to be able to see the square with transparent background',
-          },
-        }}
         itShould="render square with transparent background on gray background">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
@@ -35,7 +28,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render square with rounded corners with different radii (left/right)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render square with rounded corners with different radii (left/right)">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -51,7 +46,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render square with rounded corners with different radii (start/end)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render square with rounded corners with different radii (start/end)">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -67,7 +64,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render squares with borderTopStartRadius and borderTopEndRadius">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render squares with borderTopStartRadius and borderTopEndRadius">
         <View style={styles.squaresContainer}>
           <View style={[styles.square, {borderTopStartRadius: 24}]}>
             <Text style={styles.squareContent}>borderTopStartRadius</Text>
@@ -86,7 +85,9 @@ export function ViewTest() {
           </View>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render squares with borderBottomStartRadius + borderBottomEndRadius">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render squares with borderBottomStartRadius + borderBottomEndRadius">
         <View style={styles.squaresContainer}>
           <View style={[styles.square, {borderBottomStartRadius: 24}]}>
             <Text style={styles.squareContent}>borderBottomStartRadius</Text>
@@ -105,7 +106,7 @@ export function ViewTest() {
           </View>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render circles">
+      <TestCase.Example tags={['C_API']} itShould="render circles">
         <View style={styles.squaresContainer}>
           <View style={[styles.square, {borderRadius: 50}]} />
           <View
@@ -132,7 +133,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render square with borders with different widths">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render square with borders with different widths">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -147,7 +150,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render rectangle with borders with different widths and colors">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render rectangle with borders with different widths and colors">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -165,7 +170,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render square with borders with different colors">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render square with borders with different colors">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -180,7 +187,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render square with borders with different start/end colors">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render square with borders with different start/end colors">
         <View style={{width: '100%', height: 100, backgroundColor: 'gray'}}>
           <View
             style={{
@@ -193,7 +202,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render squares with borders with different style">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render squares with borders with different style">
         <View
           style={{
             width: '100%',
@@ -335,6 +346,7 @@ export function ViewTest() {
             cAPI: true,
           },
         }}
+        tags={['C_API']}
         itShould="show inner rectangle with the same color as the reference (needsOffscreenAlphaCompositing)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/322
       >

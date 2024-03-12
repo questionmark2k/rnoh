@@ -87,7 +87,7 @@ struct Index {
             createRNPackages,
             enableNDKTextMeasuring: true,
             enableBackgroundExecutor: false,
-            enableCAPIArchitecture: false,
+            enableCAPIArchitecture: true,
           },
           initialProps: { "foo": "bar" } as Record<string, string>,
           appKey: "app_name",
