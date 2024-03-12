@@ -8,6 +8,8 @@ namespace rnoh {
     public:
         virtual ~ScrollNodeDelegate() = default;
         virtual void onScroll() {};
+        virtual void onScrollStart(){};
+        virtual void onScrollStop(){};
     };
 
 
@@ -17,8 +19,9 @@ namespace rnoh {
 
         ArkUI_NodeHandle m_childArkUINodeHandle;
         ScrollNodeDelegate *m_scrollNodeDelegate;
+        void setNestedScroll();
 
-    public:
+      public:
         ScrollNode();
         ~ScrollNode() override;
 

@@ -14,8 +14,9 @@ namespace rnoh {
         StackNode m_stackNode;
         facebook::react::Size m_contentSize;
         facebook::react::Size m_containerSize;
+        facebook::react::ScrollViewMetrics getScrollViewMetrics();
 
-    public:
+      public:
         ScrollViewComponentInstance(Context context, facebook::react::Tag tag);
 
         ScrollNode &getLocalRootArkUINode() override;
@@ -29,6 +30,10 @@ namespace rnoh {
         void onStateChanged(SharedConcreteState const &state) override;
 
         void onScroll() override;
+
+        void onScrollStart() override;
+
+        void onScrollStop() override;
 
         // TouchTarget implementation
         facebook::react::Point computeChildPoint(facebook::react::Point const &point,

@@ -53,13 +53,18 @@ void rnoh::ScrollViewComponentInstance::updateStateWithContentOffset(facebook::r
 }
 
 
-void ScrollViewComponentInstance::onScroll() {
+facebook::react::ScrollViewMetrics ScrollViewComponentInstance::getScrollViewMetrics() {
     auto scrollViewMetrics = facebook::react::ScrollViewMetrics();
     scrollViewMetrics.responderIgnoreScroll = true;
     scrollViewMetrics.zoomScale = 1;
     scrollViewMetrics.contentSize = m_contentSize;
     scrollViewMetrics.contentOffset = m_scrollNode.getScrollOffset();
     scrollViewMetrics.containerSize = m_containerSize;
+    return scrollViewMetrics;
+}
+
+void ScrollViewComponentInstance::onScroll() {
+    auto scrollViewMetrics = getScrollViewMetrics();
     DLOG(INFO) << "onScroll (contentOffset: " << scrollViewMetrics.contentOffset.x << ", "
                << scrollViewMetrics.contentOffset.y << "; contentSize: " << scrollViewMetrics.contentSize.width
                << ", " << scrollViewMetrics.contentSize.height
@@ -67,4 +72,14 @@ void ScrollViewComponentInstance::onScroll() {
                << scrollViewMetrics.containerSize.height << ")";
     m_eventEmitter->onScroll(scrollViewMetrics);
     updateStateWithContentOffset(scrollViewMetrics.contentOffset);
+}
+
+void ScrollViewComponentInstance::onScrollStart() {
+    auto scrollViewMetrics = getScrollViewMetrics();
+    m_eventEmitter->onMomentumScrollBegin(scrollViewMetrics);
+}
+
+void ScrollViewComponentInstance::onScrollStop() {
+    auto scrollViewMetrics = getScrollViewMetrics();
+    m_eventEmitter->onMomentumScrollEnd(scrollViewMetrics);
 }
