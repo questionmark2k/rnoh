@@ -9,44 +9,106 @@
 #include <react/renderer/core/EventEmitter.h>
 #include <react/renderer/core/ReactPrimitives.h>
 #include <react/renderer/components/view/ViewProps.h>
+#include <react/renderer/components/view/TouchEventEmitter.h>
 #include "RNOH/ComponentInstance.h"
 
 
 namespace rnoh {
 
+    template <typename ShadowNodeT>
     class CppComponentInstance : public ComponentInstance {
+        static_assert(std::is_base_of_v<facebook::react::ShadowNode, ShadowNodeT>, "ShadowNodeT must be a subclass of facebook::react::ShadowNode");
+
+    protected:
+        using ConcreteProps = typename ShadowNodeT::ConcreteProps;
+        using ConcreteState = typename ShadowNodeT::ConcreteState; 
+        using ConcreteEventEmitter = typename ShadowNodeT::ConcreteEventEmitter;
+        using SharedConcreteProps = std::shared_ptr<const ConcreteProps>;
+        using SharedConcreteState = std::shared_ptr<const ConcreteState>;
+        using SharedConcreteEventEmitter = std::shared_ptr<const ConcreteEventEmitter>;
+
     public:
         using Shared = std::shared_ptr<CppComponentInstance>;
 
-        CppComponentInstance(Context context, facebook::react::Tag tag);
+        CppComponentInstance(Context context, facebook::react::Tag tag) : ComponentInstance(context, tag) {}
 
         facebook::react::Tag getTag() const { return m_tag; }
 
-        void setProps(facebook::react::Props::Shared props) override;
+        SharedConcreteProps const &getProps() const { return m_props; }
 
-        void setState(facebook::react::State::Shared state) override {};
+        void setProps(facebook::react::Props::Shared props) final {
+            auto newProps = std::dynamic_pointer_cast<const ConcreteProps>(props);
+            if (!newProps) { 
+                return;
+            }
 
-        void setLayout(facebook::react::LayoutMetrics layoutMetrics) override;
+            this->getLocalRootArkUINode().setBackgroundColor(newProps->backgroundColor);
 
-        void setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) override {
-            m_cppComponentEventEmitter = eventEmitter;
-        };
+            facebook::react::BorderMetrics borderMetrics = newProps->resolveBorderMetrics(this->m_layoutMetrics);
+            this->getLocalRootArkUINode().setBorderWidth(borderMetrics.borderWidths);
+            this->getLocalRootArkUINode().setBorderColor(borderMetrics.borderColors);
+
+            this->onPropsChanged(newProps);
+            m_props = newProps;
+        }
+
+        SharedConcreteState const &getState() const { return m_state; }
+
+        void setState(facebook::react::State::Shared state) final {
+            auto newState = std::dynamic_pointer_cast<const ConcreteState>(state);
+            if (!newState) {
+                return;
+            }
+
+            this->onStateChanged(newState);
+            m_state = newState;
+        }
+
+        SharedConcreteEventEmitter const &getEventEmitter() const { return m_eventEmitter; }
+
+        void setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) final {
+            auto newEventEmitter = std::dynamic_pointer_cast<const ConcreteEventEmitter>(eventEmitter);
+            if (!newEventEmitter) {
+                return;
+            }
+            this->onEventEmitterChanged(newEventEmitter);
+            m_eventEmitter = newEventEmitter;
+        }
+
+        void setLayout(facebook::react::LayoutMetrics layoutMetrics) override {
+            this->getLocalRootArkUINode().setPosition(layoutMetrics.frame.origin);
+            this->getLocalRootArkUINode().setSize(layoutMetrics.frame.size);
+            m_layoutMetrics = layoutMetrics;
+        }
 
         // TouchTarget implementation
-        facebook::react::LayoutMetrics getLayoutMetrics() const override;
+        facebook::react::LayoutMetrics getLayoutMetrics() const override {
+            return m_layoutMetrics;
+        }
 
         facebook::react::Point computeChildPoint(facebook::react::Point const &point,
-                                                 TouchTarget::Shared const &child) const override;
+                                                 TouchTarget::Shared const &child) const override {
+            auto childLayout = child->getLayoutMetrics();
 
-        bool containsPoint(facebook::react::Point const &point) const override;
+            // TODO: apply inverse transform
 
-        bool containsPointInBoundingBox(facebook::react::Point const &point) const override;
+            return point - childLayout.frame.origin;
+        }
+
+        bool containsPoint(facebook::react::Point const &point) const override {
+            // TODO: hitslops
+            return point.x >= 0 && point.y >= 0 && point.x < m_layoutMetrics.frame.size.width &&
+                point.y < m_layoutMetrics.frame.size.height;
+        }
+
+        bool containsPointInBoundingBox(facebook::react::Point const &point) const override {
+            return containsPoint(point);
+        }
 
         facebook::react::Tag getTouchTargetTag() const override { return getTag(); }
 
         facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { 
-            auto ret = std::dynamic_pointer_cast<const facebook::react::TouchEventEmitter>(m_cppComponentEventEmitter);
-            return ret; 
+            return m_eventEmitter;
         }
 
         std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
@@ -54,9 +116,16 @@ namespace rnoh {
             return std::vector<TouchTarget::Shared>(children.begin(), children.end());
         }
 
-    private:
-        facebook::react::SharedEventEmitter m_cppComponentEventEmitter;
+    protected:
+        virtual void onPropsChanged(SharedConcreteProps const &props) {};
 
+        virtual void onStateChanged(SharedConcreteState const &state) {};
+
+        virtual void onEventEmitterChanged(SharedConcreteEventEmitter const &eventEmitter) {};
+
+        SharedConcreteProps m_props;
+        SharedConcreteState m_state;
+        SharedConcreteEventEmitter m_eventEmitter;
     };
 
 } // namespace rnoh

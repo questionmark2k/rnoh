@@ -11,23 +11,11 @@ using namespace rnoh;
 TextComponentInstance::TextComponentInstance(Context context, facebook::react::Tag tag)
     : CppComponentInstance(std::move(context), tag) {}
 
-void TextComponentInstance::setProps(facebook::react::Props::Shared props) {
-    CppComponentInstance::setProps(props);
-    auto textProps = std::dynamic_pointer_cast<const facebook::react::ParagraphProps>(props);
-    if (textProps == nullptr) {
-        return;
-    }
+void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react::ParagraphProps> const &props) {
     // TODO: text and paragraph attributes
 }
 
-void TextComponentInstance::setState(facebook::react::State::Shared state) {
-    CppComponentInstance::setState(state);
-    auto textState =
-        std::dynamic_pointer_cast<const facebook::react::ConcreteState<facebook::react::ParagraphState>>(state);
-    if (textState == nullptr) {
-        return;
-    }
-
+void TextComponentInstance::onStateChanged(std::shared_ptr<const facebook::react::ConcreteState<facebook::react::ParagraphState>> const &textState) {
     std::ostringstream contentStream;
     for (auto const &fragment : textState->getData().attributedString.getFragments()) {
         contentStream << fragment.string;

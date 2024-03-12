@@ -29,27 +29,16 @@ void ScrollViewComponentInstance::setLayout(facebook::react::LayoutMetrics layou
     m_containerSize = layoutMetrics.frame.size;
 }
 
-void ScrollViewComponentInstance::setState(facebook::react::State::Shared state) {
-    CppComponentInstance::setState(state);
-    auto scrollViewState =
-        std::dynamic_pointer_cast<const facebook::react::ConcreteState<facebook::react::ScrollViewState>>(state);
-    if (scrollViewState == nullptr) {
-        return;
-    }
-    auto stateData = scrollViewState->getData();
+void rnoh::ScrollViewComponentInstance::onStateChanged(SharedConcreteState const &state) {
+    auto stateData = state->getData();
     m_stackNode.setSize(stateData.getContentSize());
     m_contentSize = stateData.getContentSize();
-    m_state = scrollViewState;
 }
 
 facebook::react::Point rnoh::ScrollViewComponentInstance::computeChildPoint(facebook::react::Point const &point,
                                                                             TouchTarget::Shared const &child) const {
     auto offset = m_scrollNode.getScrollOffset();
     return CppComponentInstance::computeChildPoint(point + offset, child);
-}
-
-facebook::react::SharedTouchEventEmitter rnoh::ScrollViewComponentInstance::getTouchEventEmitter() const {
-    return m_scrollViewEventEmitter;
 }
 
 void rnoh::ScrollViewComponentInstance::updateStateWithContentOffset(facebook::react::Point contentOffset) {
@@ -61,16 +50,6 @@ void rnoh::ScrollViewComponentInstance::updateStateWithContentOffset(facebook::r
         newData.contentOffset = contentOffset;
         return std::make_shared<facebook::react::ScrollViewShadowNode::ConcreteState::Data const>(newData);
     });
-}
-
-void ScrollViewComponentInstance::setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) {
-    CppComponentInstance::setEventEmitter(eventEmitter);
-    auto scrollViewEventEmitter =
-        std::dynamic_pointer_cast<const facebook::react::ScrollViewEventEmitter>(eventEmitter);
-    if (scrollViewEventEmitter == nullptr) {
-        return;
-    }
-    m_scrollViewEventEmitter = scrollViewEventEmitter;
 }
 
 
@@ -86,6 +65,6 @@ void ScrollViewComponentInstance::onScroll() {
                << ", " << scrollViewMetrics.contentSize.height
                << "; containerSize: " << scrollViewMetrics.containerSize.width << ", "
                << scrollViewMetrics.containerSize.height << ")";
-    m_scrollViewEventEmitter->onScroll(scrollViewMetrics);
+    m_eventEmitter->onScroll(scrollViewMetrics);
     updateStateWithContentOffset(scrollViewMetrics.contentOffset);
 }

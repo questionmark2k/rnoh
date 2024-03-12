@@ -1,10 +1,10 @@
 #pragma once
-#include <react/renderer/components/view/ViewEventEmitter.h>
+#include <react/renderer/components/view/ViewShadowNode.h>
 #include "RNOH/CppComponentInstance.h"
 #include "RNOH/arkui/StackNode.h"
 
 namespace rnoh {
-    class ViewComponentInstance : public CppComponentInstance {
+    class ViewComponentInstance : public CppComponentInstance<facebook::react::ViewShadowNode> {
     private:
         StackNode m_stackNode;
         facebook::react::SharedViewEventEmitter m_eventEmitter;
@@ -12,17 +12,10 @@ namespace rnoh {
     public:
         ViewComponentInstance(Context context, facebook::react::Tag tag);
 
-        void setEventEmitter(facebook::react::SharedEventEmitter eventEmitter) override;
-
-        facebook::react::SharedViewEventEmitter const &getEventEmitter() const;
-
         void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
 
         void removeChild(ComponentInstance::Shared childComponentInstance) override;
 
         StackNode &getLocalRootArkUINode() override;
-
-    // TouchTarget implementation
-        facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override;
     };
 } // namespace rnoh
