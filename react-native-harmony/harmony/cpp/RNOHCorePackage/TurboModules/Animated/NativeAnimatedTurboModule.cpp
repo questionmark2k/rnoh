@@ -428,9 +428,18 @@ void NativeAnimatedTurboModule::setNativeProps(
         return;
     }
 #endif
+    // NOTE: in ArkTS architecture, we used to construct the `transform` property
+    // in a way incompatible with RN's RawProps. With C-API we fix it in the TransformAnimatedNode,
+    // but we pass it the old way to ArkTS to preserve compatibility.
+    auto clonedProps = props;
+    if (auto it = props.find("transform"); it != props.items().end()) {
+        auto &transform = it->second;
+        clonedProps["transform"] = transform[0]["matrix"];
+    }
+
     ArkJS arkJs(m_ctx.env);
     auto napiTag = arkJs.createInt(tag);
-    auto napiProps = arkJs.createFromDynamic(props);
+    auto napiProps = arkJs.createFromDynamic(clonedProps);
 
     auto napiTurboModuleObject = arkJs.getObject(m_ctx.arkTsTurboModuleInstanceRef);
     napiTurboModuleObject.call("setViewProps", {napiTag, napiProps});

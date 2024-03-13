@@ -118,7 +118,7 @@ namespace rnoh {
         return *this;
     }
 
-    ArkUINode &ArkUINode::transform(facebook::react::Transform const &transform) {
+    ArkUINode &ArkUINode::setTransform(facebook::react::Transform const &transform, facebook::react::Float pointScaleFactor) {
         ArkUI_NumberValue transformCenterValue[] = {0, 0, 0, 0.5f, 0.5f};
 
         ArkUI_AttributeItem transformCenterItem = {transformCenterValue,
@@ -126,9 +126,16 @@ namespace rnoh {
         maybeThrow(
             NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_TRANSFORM_CENTER, &transformCenterItem));
 
+        // NOTE: ArkUI translation is in `px` units, while React Native uses `vp` units,
+        // so we need to correct for the scale factor here
+        auto matrix = transform.matrix;
+        matrix[12] *= pointScaleFactor;
+        matrix[13] *= pointScaleFactor;
+        matrix[14] *= pointScaleFactor;
+
         std::array<ArkUI_NumberValue, 16> transformValue;
         for (int i = 0; i < 16; i++) {
-            transformValue[i] = {.f32 = static_cast<float>(transform.matrix[i])};
+            transformValue[i] = {.f32 = static_cast<float>(matrix[i])};
         }
 
         ArkUI_AttributeItem transformItem = {transformValue.data(), transformValue.size()};

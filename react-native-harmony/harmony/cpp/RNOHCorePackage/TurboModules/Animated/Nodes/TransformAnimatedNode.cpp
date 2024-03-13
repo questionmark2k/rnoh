@@ -93,7 +93,7 @@ folly::dynamic TransformAnimatedNode::getTransform() const {
 
         transform = applyTransformOperation(transform, property, value);
     }
-    return transformToDynamic(transform);
+    return folly::dynamic::array(folly::dynamic::object("matrix", transformToDynamic(transform)));
 }
 
 } // namespace rnoh
