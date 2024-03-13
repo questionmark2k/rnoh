@@ -66,6 +66,9 @@ module.exports = {
   get Linking() {
     return require('react-native/Libraries/Linking/Linking');
   },
+  get LogBox() {
+    return require('react-native/Libraries/LogBox/LogBox').default;
+  },
   get Modal() {
     return require('react-native/Libraries/Modal/Modal');
   },
