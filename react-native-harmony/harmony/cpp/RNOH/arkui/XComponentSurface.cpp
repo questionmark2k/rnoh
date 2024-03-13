@@ -1,6 +1,7 @@
 #include "XComponentSurface.h"
-#include "NativeNodeApi.h"
 #include <glog/logging.h>
+#include <react/renderer/components/root/RootComponentDescriptor.h>
+#include "NativeNodeApi.h"
 #include "ArkUINodeRegistry.h"
 #include "TouchEventDispatcher.h"
 
@@ -30,26 +31,27 @@ void maybeDetachRootNode(OH_NativeXComponent *nativeXComponent, ComponentInstanc
 }
 
 class SurfaceTouchEventHandler : public TouchEventHandler {
-    private:
-        ComponentInstance::Shared m_rootView;
-        TouchEventDispatcher m_touchEventDispatcher;
-    public:
-        SurfaceTouchEventHandler(ComponentInstance::Shared rootView) : m_rootView(std::move(rootView)) {
-            ArkUINodeRegistry::getInstance().registerTouchHandler(&m_rootView->getLocalRootArkUINode(), this);
-            NativeNodeApi::getInstance()->registerNodeEvent(m_rootView->getLocalRootArkUINode().getArkUINodeHandle(), NODE_TOUCH_EVENT, 0);
-        }
+  private:
+    ComponentInstance::Shared m_rootView;
+    TouchEventDispatcher m_touchEventDispatcher;
 
-        SurfaceTouchEventHandler(SurfaceTouchEventHandler const &other) = delete;
-        SurfaceTouchEventHandler &operator=(SurfaceTouchEventHandler const &other) = delete;
+  public:
+    SurfaceTouchEventHandler(ComponentInstance::Shared rootView) : m_rootView(std::move(rootView)) {
+        ArkUINodeRegistry::getInstance().registerTouchHandler(&m_rootView->getLocalRootArkUINode(), this);
+        NativeNodeApi::getInstance()->registerNodeEvent(m_rootView->getLocalRootArkUINode().getArkUINodeHandle(), NODE_TOUCH_EVENT, 0);
+    }
 
-        ~SurfaceTouchEventHandler() override {
-            NativeNodeApi::getInstance()->unregisterNodeEvent(m_rootView->getLocalRootArkUINode().getArkUINodeHandle(), NODE_TOUCH_EVENT);
-            ArkUINodeRegistry::getInstance().unregisterTouchHandler(&m_rootView->getLocalRootArkUINode());
-        }
+    SurfaceTouchEventHandler(SurfaceTouchEventHandler const &other) = delete;
+    SurfaceTouchEventHandler &operator=(SurfaceTouchEventHandler const &other) = delete;
 
-        void onTouchEvent(ArkUI_NodeTouchEvent event) override {
-            m_touchEventDispatcher.dispatchTouchEvent(event, m_rootView);
-        }
+    ~SurfaceTouchEventHandler() override {
+        NativeNodeApi::getInstance()->unregisterNodeEvent(m_rootView->getLocalRootArkUINode().getArkUINodeHandle(), NODE_TOUCH_EVENT);
+        ArkUINodeRegistry::getInstance().unregisterTouchHandler(&m_rootView->getLocalRootArkUINode());
+    }
+
+    void onTouchEvent(ArkUI_NodeTouchEvent event) override {
+        m_touchEventDispatcher.dispatchTouchEvent(event, m_rootView);
+    }
 };
 
 XComponentSurface::XComponentSurface(
@@ -64,7 +66,9 @@ XComponentSurface::XComponentSurface(
                                  m_componentInstanceRegistry(std::move(componentInstanceRegistry)),
                                  m_surfaceHandler(SurfaceHandler(appKey, surfaceId)) {
     m_scheduler->registerSurface(m_surfaceHandler);
-    m_rootView = componentInstanceFactory->create({"RootView", surfaceId});
+    m_rootView = componentInstanceFactory->create({.tag = surfaceId,
+                                                   .componentHandle = facebook::react::RootShadowNode::Handle(),
+                                                   .componentName = "RootView"});
     if (m_rootView == nullptr) {
         LOG(ERROR) << "Couldn't create rootInstanceComponent for surface with id: " << surfaceId;
         return;

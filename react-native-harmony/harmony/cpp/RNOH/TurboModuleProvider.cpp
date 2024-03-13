@@ -10,14 +10,16 @@ using namespace facebook;
 TurboModuleProvider::TurboModuleProvider(std::shared_ptr<react::CallInvoker> jsInvoker,
                                          TurboModuleFactory &&turboModuleFactory,
                                          std::shared_ptr<EventDispatcher> eventDispatcher,
-                                         std::shared_ptr<MessageQueueThread> jsQueue)
+                                         std::shared_ptr<MessageQueueThread> jsQueue,
+                                         std::shared_ptr<RNInstance> const &instance)
     : m_jsInvoker(jsInvoker),
-      m_createTurboModule([eventDispatcher, jsQueue, factory = std::move(turboModuleFactory)](
+      m_instance(instance),
+      m_createTurboModule([eventDispatcher, jsQueue, instance = m_instance, factory = std::move(turboModuleFactory)](
                               std::string const &moduleName,
                               std::shared_ptr<react::CallInvoker> jsInvoker,
                               std::shared_ptr<react::Scheduler> scheduler)
                               -> std::shared_ptr<react::TurboModule> {
-          return factory.create(jsInvoker, moduleName, eventDispatcher, jsQueue, scheduler);
+          return factory.create(jsInvoker, moduleName, eventDispatcher, jsQueue, scheduler, instance);
       }) {}
 
 void TurboModuleProvider::installJSBindings(react::RuntimeExecutor runtimeExecutor) {

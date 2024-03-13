@@ -137,15 +137,15 @@ namespace rnoh {
     public:
         using ComponentInstanceFactoryDelegate::ComponentInstanceFactoryDelegate;
     
-        ComponentInstance::Shared create(ComponentInstanceFactoryContext ctx) override {
+        ComponentInstance::Shared create(ComponentInstance::Context ctx) override {
             if (ctx.componentName == "RootView" || ctx.componentName == "View") {
-                return std::make_shared<ViewComponentInstance>(m_ctx, ctx.tag);
+                return std::make_shared<ViewComponentInstance>(std::move(ctx));
             }
             if (ctx.componentName == "Paragraph") {
-                return std::make_shared<TextComponentInstance>(m_ctx, ctx.tag);
+                return std::make_shared<TextComponentInstance>(std::move(ctx));
             }
             if (ctx.componentName == "ScrollView") {
-                return std::make_shared<ScrollViewComponentInstance>(m_ctx, ctx.tag);
+                return std::make_shared<ScrollViewComponentInstance>(std::move(ctx));
             } 
             return nullptr;
         }
@@ -160,7 +160,7 @@ namespace rnoh {
         }
 
         ComponentInstanceFactoryDelegate::Shared createComponentInstanceFactoryDelegate() override {
-            return std::make_shared<RNOHCorePackageComponentInstanceFactoryDelegate>(m_ctx);
+            return std::make_shared<RNOHCorePackageComponentInstanceFactoryDelegate>();
         }
 
         std::vector<facebook::react::ComponentDescriptorProvider> createComponentDescriptorProviders() override {

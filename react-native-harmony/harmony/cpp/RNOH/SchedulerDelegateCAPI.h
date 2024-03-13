@@ -3,22 +3,20 @@
  */
 #pragma once
 #include <react/renderer/scheduler/SchedulerDelegate.h>
+#include <react/renderer/core/ComponentDescriptor.h>
 #include <folly/dynamic.h>
 #include "RNOH/TaskExecutor/TaskExecutor.h"
 #include "RNOH/ShadowViewRegistry.h"
 #include "RNOH/ComponentInstanceRegistry.h"
 #include "RNOH/ComponentInstanceFactory.h"
 
-namespace rnoh {
-
-    void updateComponentWithShadowView(ComponentInstance::Shared const &componentInstance,
-                                       facebook::react::ShadowView const &shadowView) {
-        componentInstance->setLayout(shadowView.layoutMetrics);
-        componentInstance->setProps(shadowView.props);
-        componentInstance->setState(shadowView.state);
-        componentInstance->setEventEmitter(shadowView.eventEmitter);
-        componentInstance->finalizeUpdates();
+namespace facebook{
+    namespace react{
+        class Scheduler;
     }
+}
+
+namespace rnoh {
 
     class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
     public:
@@ -76,11 +74,26 @@ namespace rnoh {
         void schedulerDidSetIsJSResponder(facebook::react::ShadowView const &shadowView, bool isJSResponder,
                                           bool blockNativeResponder) override {}
 
+        void synchronouslyUpdateViewOnUIThread(
+            facebook::react::Tag tag,
+            folly::dynamic props, 
+            facebook::react::ComponentDescriptor const &componentDescriptor);
+
     private:
         TaskExecutor::Shared m_taskExecutor;
         ShadowViewRegistry::Shared m_shadowViewRegistry;
         ComponentInstanceRegistry::Shared m_componentInstanceRegistry;
         ComponentInstanceFactory::Shared m_componentInstanceFactory;
+        facebook::react::ContextContainer::Shared m_contextContainer;
+
+        void updateComponentWithShadowView(ComponentInstance::Shared const &componentInstance,
+                                        facebook::react::ShadowView const &shadowView) {
+            componentInstance->setLayout(shadowView.layoutMetrics);
+            componentInstance->setProps(shadowView.props);
+            componentInstance->setState(shadowView.state);
+            componentInstance->setEventEmitter(shadowView.eventEmitter);
+            componentInstance->finalizeUpdates();
+        }
 
         void handleMutation(facebook::react::ShadowViewMutation mutation) {
             DLOG(INFO) << "mutation (type:" << this->getMutationNameFromType(mutation.type) 
@@ -92,9 +105,13 @@ namespace rnoh {
                 auto newChild = mutation.newChildShadowView;
                 m_shadowViewRegistry->setShadowView(newChild.tag, newChild);
                 auto componentInstance = m_componentInstanceFactory->create(
-                    {.tag = newChild.tag, .componentName = mutation.newChildShadowView.componentName});
+                    {
+                        .tag = newChild.tag, 
+                        .componentHandle = newChild.componentHandle,
+                        .componentName = newChild.componentName
+                    });
                 if (componentInstance != nullptr) {
-                    updateComponentWithShadowView(componentInstance, mutation.newChildShadowView);
+                    updateComponentWithShadowView(componentInstance, newChild);
                     m_componentInstanceRegistry->insert(componentInstance);
                 }
                 break;

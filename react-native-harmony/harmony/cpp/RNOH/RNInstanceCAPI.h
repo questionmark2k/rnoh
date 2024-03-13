@@ -38,7 +38,10 @@ namespace rnoh {
     using MutationsListener =
         std::function<void(MutationsToNapiConverter const &, facebook::react::ShadowViewMutationList const &mutations)>;
 
-    class RNInstanceCAPI : public RNInstance, public facebook::react::LayoutAnimationStatusDelegate {
+    class RNInstanceCAPI 
+    : public RNInstance, public RNInstanceInternal, 
+      public facebook::react::LayoutAnimationStatusDelegate,
+      public std::enable_shared_from_this<RNInstanceCAPI> {
     public:
         RNInstanceCAPI(
             int id, std::shared_ptr<facebook::react::ContextContainer> contextContainer,
@@ -51,7 +54,7 @@ namespace rnoh {
             ComponentInstanceRegistry::Shared componentInstanceRegistry,
             ComponentInstanceFactory::Shared componentInstanceFactory, bool shouldEnableDebugger,
             bool shouldEnableBackgroundExecutor)
-            : RNInstance(), m_id(id), instance(std::make_shared<facebook::react::Instance>()),
+            : RNInstanceInternal(), m_id(id), instance(std::make_shared<facebook::react::Instance>()),
               m_contextContainer(contextContainer), scheduler(nullptr), taskExecutor(taskExecutor),
               m_shadowViewRegistry(shadowViewRegistry), m_turboModuleFactory(std::move(turboModuleFactory)),
               m_componentDescriptorProviderRegistry(componentDescriptorProviderRegistry),
@@ -113,6 +116,12 @@ namespace rnoh {
         void onMemoryLevel(size_t memoryLevel) override;
         void updateState(napi_env env, std::string const &componentName, facebook::react::Tag tag,
                          napi_value newState) override;
+
+        void synchronouslyUpdateViewOnUIThread(
+            facebook::react::Tag tag,
+            folly::dynamic props) override;
+
+        facebook::react::ContextContainer const &getContextContainer() const override;
 
         void registerNativeXComponentHandle(OH_NativeXComponent *nativeXComponent, facebook::react::Tag surfaceId);
 

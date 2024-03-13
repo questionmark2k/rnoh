@@ -31,7 +31,8 @@ namespace rnoh {
 
         void insert(ComponentInstance::Shared componentInstance) {
             std::lock_guard<std::mutex> lock(m_mtx);
-            m_componentInstanceByTag[componentInstance->getTag()] = componentInstance;
+            auto tag = componentInstance->getTag();
+            m_componentInstanceByTag.emplace(tag, std::move(componentInstance));
         }
 
         void deleteByTag(facebook::react::Tag tag) {

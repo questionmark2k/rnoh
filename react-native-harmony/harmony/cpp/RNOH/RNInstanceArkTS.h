@@ -33,7 +33,7 @@ namespace rnoh {
     using MutationsListener =
         std::function<void(MutationsToNapiConverter const &, facebook::react::ShadowViewMutationList const &mutations)>;
 
-    class RNInstanceArkTS : public RNInstance, public facebook::react::LayoutAnimationStatusDelegate {
+    class RNInstanceArkTS : public RNInstanceInternal, public facebook::react::LayoutAnimationStatusDelegate {
     public:
         RNInstanceArkTS(
             int id, std::shared_ptr<facebook::react::ContextContainer> contextContainer,
@@ -44,7 +44,7 @@ namespace rnoh {
             UITicker::Shared uiTicker, ShadowViewRegistry::Shared shadowViewRegistry,
             std::unique_ptr<facebook::react::SchedulerDelegate> schedulerDelegate, bool shouldEnableDebugger,
             bool shouldEnableBackgroundExecutor)
-            : RNInstance(), m_id(id), instance(std::make_shared<facebook::react::Instance>()), m_contextContainer(contextContainer),
+            : RNInstanceInternal(), m_id(id), instance(std::make_shared<facebook::react::Instance>()), m_contextContainer(contextContainer),
               scheduler(nullptr), taskExecutor(taskExecutor), m_shadowViewRegistry(shadowViewRegistry),
               m_turboModuleFactory(std::move(turboModuleFactory)),
               m_componentDescriptorProviderRegistry(componentDescriptorProviderRegistry),

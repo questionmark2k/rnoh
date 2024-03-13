@@ -8,8 +8,8 @@
 
 using namespace rnoh;
 
-TextComponentInstance::TextComponentInstance(Context context, facebook::react::Tag tag)
-    : CppComponentInstance(std::move(context), tag) {}
+TextComponentInstance::TextComponentInstance(Context context)
+    : CppComponentInstance(std::move(context)) {}
 
 void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react::ParagraphProps> const &props) {
     CppComponentInstance::onPropsChanged(props);

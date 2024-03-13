@@ -7,10 +7,13 @@
 
 namespace rnoh {
 
+class RNInstance;
+
 class TurboModule : public facebook::react::TurboModule {
   public:
     struct Context {
         std::shared_ptr<facebook::react::CallInvoker> jsInvoker;
+        std::weak_ptr<RNInstance> instance;
     };
 
     TurboModule(Context ctx, std::string name)

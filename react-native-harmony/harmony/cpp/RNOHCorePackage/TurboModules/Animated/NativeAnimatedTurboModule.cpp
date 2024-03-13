@@ -2,6 +2,7 @@
 
 #include <jsi/jsi/JSIDynamic.h>
 #include <chrono>
+#include "RNOH/RNInstance.h"
 
 using namespace facebook;
 
@@ -418,7 +419,15 @@ void NativeAnimatedTurboModule::runUpdates() {
     }
 }
 
-void NativeAnimatedTurboModule::setNativeProps(facebook::react::Tag tag, folly::dynamic const &props) {
+void NativeAnimatedTurboModule::setNativeProps(
+    facebook::react::Tag tag,
+    folly::dynamic const &props) {
+#ifdef C_API_ARCH
+    if (auto instance = m_ctx.instance.lock(); instance != nullptr) {
+        instance->synchronouslyUpdateViewOnUIThread(tag, props);
+        return;
+    }
+#endif
     ArkJS arkJs(m_ctx.env);
     auto napiTag = arkJs.createInt(tag);
     auto napiProps = arkJs.createFromDynamic(props);

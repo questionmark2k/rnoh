@@ -20,7 +20,7 @@
 using namespace rnoh;
 
 std::mutex rnInstanceByIdMutex;
-std::unordered_map<size_t, std::unique_ptr<RNInstance>> rnInstanceById;
+std::unordered_map<size_t, std::shared_ptr<RNInstanceInternal>> rnInstanceById;
 auto uiTicker = std::make_shared<UITicker>();
 static auto cleanupRunner = std::make_unique<ThreadTaskRunner>("RNOH_CLEANUP");
 
@@ -36,7 +36,7 @@ static napi_value onInit(napi_env env, napi_callback_info info) {
          * As a workaround, all rnInstances are removed on the start.
          */
         cleanupRunner->runAsyncTask([] {
-            std::unordered_map<size_t, std::unique_ptr<RNInstance>> instances;
+            decltype(rnInstanceById) instances;
             {
                 std::lock_guard<std::mutex> lock(rnInstanceByIdMutex);
                 std::swap(rnInstanceById, instances);
@@ -126,7 +126,7 @@ static napi_value destroyReactNativeInstance(napi_env env, napi_callback_info in
     auto args = arkJs.getCallbackArgs(info, 1);
     size_t rnInstanceId = arkJs.getDouble(args[0]);
     cleanupRunner->runAsyncTask([rnInstanceId] {
-        std::unique_ptr<RNInstance> instance;
+        std::shared_ptr<RNInstanceInternal> instance;
         {
             auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
             if (auto it = rnInstanceById.find(rnInstanceId); it != rnInstanceById.end()) {

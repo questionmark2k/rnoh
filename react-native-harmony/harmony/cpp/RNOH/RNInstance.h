@@ -28,8 +28,17 @@ namespace rnoh {
         std::function<void(MutationsToNapiConverter const &, facebook::react::ShadowViewMutationList const &mutations)>;
 
     class RNInstance {
-    public:
+        using ContextContainer = facebook::react::ContextContainer;
+      public:
         virtual ~RNInstance() = default;
+
+        virtual ContextContainer const &getContextContainer() const = 0;
+        virtual void synchronouslyUpdateViewOnUIThread(facebook::react::Tag tag, folly::dynamic props) = 0;
+    };
+
+    class RNInstanceInternal {
+    public:
+        virtual ~RNInstanceInternal() = default;
     
         virtual TaskExecutor::Shared getTaskExecutor() = 0;
         virtual void start() = 0;

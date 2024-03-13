@@ -2,63 +2,73 @@ import React, {useRef, useState} from 'react';
 
 import {Animated, Pressable, Text, View} from 'react-native';
 
-import {TestCase, TestSuite} from '@rnoh/testerino';
-import {Button} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, TestCase} from '../components';
 
 export function AnimatedTest() {
   return (
     <TestSuite name="Animated">
-      <TestCase itShould="update the button label after a delay">
+      <TestCase.Example itShould="update the button label after a delay">
         <AnimatedEndCallbackTest />
-      </TestCase>
-      <TestCase itShould="animate width">
+      </TestCase.Example>
+      <TestCase.Example itShould="animate width">
         <AnimatedRectangle />
-      </TestCase>
-      <TestCase itShould="move red square horizontally relatively to the scroll offset">
+      </TestCase.Example>
+      <TestCase.Example itShould="move red square horizontally relatively to the scroll offset">
         <AnimatedScrollViewTestCase />
-      </TestCase>
-      <TestCase itShould="fade in and out when clicked">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="fade in and out when clicked">
         <FadeInOut />
         <FadeInOut nativeDriver />
-      </TestCase>
-      <TestCase itShould="rotate grey square after red square with 0.5 second delay">
+      </TestCase.Example>
+      <TestCase.Example itShould="rotate grey square after red square with 0.5 second delay">
         <Delay />
-      </TestCase>
-      <TestCase itShould="rotate red square in a loop">
+      </TestCase.Example>
+      <TestCase.Example itShould="rotate red square in a loop">
         <Loop />
-      </TestCase>
-      <TestCase itShould="rotate both squares in paralell">
+      </TestCase.Example>
+      <TestCase.Example itShould="rotate both squares in paralell">
         <Parallel />
-      </TestCase>
-      <TestCase itShould="rotate button on press">
+      </TestCase.Example>
+      <TestCase.Example itShould="rotate button on press">
         <AnimatedPressableView />
-      </TestCase>
-      <TestCase itShould="rotate squares with different stiffness/mass">
+      </TestCase.Example>
+      <TestCase.Example itShould="rotate squares with different stiffness/mass">
         <Spring />
-      </TestCase>
-      <TestCase itShould="move squares with different initial velocity and deceleration values">
+      </TestCase.Example>
+      <TestCase.Example itShould="move squares with different initial velocity and deceleration values">
         <Decay />
-      </TestCase>
-      <TestCase itShould="move square immediately after pressing button">
+      </TestCase.Example>
+      <TestCase.Example itShould="move square immediately after pressing button">
         <DiffClamp />
-      </TestCase>
-      <TestCase itShould="move grey square 2x further horizontally than red">
+      </TestCase.Example>
+      <TestCase.Example itShould="move grey square 2x further horizontally than red">
         <Multiply />
-      </TestCase>
-      <TestCase itShould="move grey twice but half the total distance of red">
+      </TestCase.Example>
+      <TestCase.Example itShould="move grey twice but half the total distance of red">
         <Modulo />
-      </TestCase>
-      <TestCase skip itShould="move red square closer">
+      </TestCase.Example>
+      <TestCase.Example
+        skip={{
+          harmony: {
+            cAPI: 'perspective is not implemented on Harmony',
+            arkTS: 'perspective is not implemented on Harmony',
+          },
+          android: false,
+        }}
+        itShould="move red square closer">
         <Perspective />
-      </TestCase>
-      <TestCase itShould="move square both vertically and horizontally">
+      </TestCase.Example>
+      <TestCase.Example itShould="move square both vertically and horizontally">
         <ValueXY />
-      </TestCase>
-      <TestCase
-        skip
+      </TestCase.Example>
+      <TestCase.Example
+        skip="tracking value doesn't seem to work anywhere"
         itShould="(broken everywhere) move both squares, with blue square following the red with a spring">
         <TrackingValue />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

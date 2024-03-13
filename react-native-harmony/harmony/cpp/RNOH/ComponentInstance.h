@@ -15,23 +15,33 @@
 namespace rnoh {
 
     class ComponentInstance : public TouchTarget {
-    private:
+    protected:
+        using Tag = facebook::react::Tag;
+        using ComponentHandle = facebook::react::ComponentHandle;
     public:
-        struct Context {};
+        struct Context {
+            Tag tag;
+            ComponentHandle componentHandle;
+            std::string componentName;
+        };
 
         virtual ArkUINode &getLocalRootArkUINode() = 0;
 
         using Shared = std::shared_ptr<ComponentInstance>;
 
-        ComponentInstance(Context context, facebook::react::Tag tag);
+        ComponentInstance(Context context);
 
         virtual ~ComponentInstance() = default;
 
-        facebook::react::Tag getTag() const { return m_tag; }
+        Tag getTag() const { return m_tag; }
+
+        ComponentHandle getComponentHandle() const { return m_componentHandle; }
 
         virtual void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index);
 
         virtual void removeChild(ComponentInstance::Shared childComponentInstance);
+
+        virtual facebook::react::Props::Shared getProps() const = 0;
 
         virtual void setProps(facebook::react::Props::Shared props) {};
 
@@ -48,7 +58,7 @@ namespace rnoh {
         virtual std::vector<ComponentInstance::Shared> const &getChildren() const { return m_children; }
 
         // TouchTarget implementation
-        facebook::react::Tag getTouchTargetTag() const override { return getTag(); }
+        Tag getTouchTargetTag() const override { return getTag(); }
 
         facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { return nullptr; }
 
@@ -58,7 +68,8 @@ namespace rnoh {
         }
 
     protected:
-        facebook::react::Tag m_tag;
+        Tag m_tag;
+        ComponentHandle m_componentHandle;
         std::vector<ComponentInstance::Shared> m_children;
         facebook::react::LayoutMetrics m_layoutMetrics;
     };

@@ -29,7 +29,7 @@
 
 using namespace rnoh;
 
-std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef,
+std::shared_ptr<RNInstanceInternal> createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef,
                                              MutationsListener &&mutationsListener,
                                              MountingManager::CommandDispatcher &&commandDispatcher,
                                              napi_ref measureTextFnRef, napi_ref napiEventDispatcherRef,
@@ -121,7 +121,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
         auto componentInstanceRegistry = std::make_shared<ComponentInstanceRegistry>();
         auto schedulerDelegate = std::make_unique<SchedulerDelegateCAPI>(
             taskExecutor, shadowViewRegistry, componentInstanceRegistry, componentInstanceFactory);
-        return std::make_unique<RNInstanceCAPI>(
+        return std::make_shared<RNInstanceCAPI>(
             id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
             mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
             std::move(schedulerDelegate), componentInstanceRegistry, componentInstanceFactory, shouldEnableDebugger, shouldEnableBackgroundExecutor);
@@ -146,7 +146,7 @@ std::unique_ptr<RNInstance> createRNInstance(int id, napi_env env, napi_ref arkT
                 }
             }),
         arkTSChannel);
-    return std::make_unique<RNInstanceArkTS>(
+    return std::make_shared<RNInstanceArkTS>(
         id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
         mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
         std::move(schedulerDelegate), shouldEnableDebugger, shouldEnableBackgroundExecutor);

@@ -2,8 +2,8 @@
 
 namespace rnoh {
 
-    ViewComponentInstance::ViewComponentInstance(Context context, facebook::react::Tag tag)
-        : CppComponentInstance(std::move(context), tag) {}
+    ViewComponentInstance::ViewComponentInstance(Context context)
+        : CppComponentInstance(std::move(context)) {}
 
     void ViewComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
         CppComponentInstance::insertChild(childComponentInstance, index);

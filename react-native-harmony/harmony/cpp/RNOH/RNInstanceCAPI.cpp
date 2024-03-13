@@ -13,6 +13,7 @@
 #include "RNOH/TurboModuleFactory.h"
 #include "RNInstanceArkTS.h"
 #include "NativeLogger.h"
+#include "SchedulerDelegateCAPI.h"
 
 using namespace facebook;
 using namespace rnoh;
@@ -98,8 +99,9 @@ void RNInstanceCAPI::initializeScheduler(std::shared_ptr<TurboModuleProvider> tu
 
 std::shared_ptr<TurboModuleProvider> RNInstanceCAPI::createTurboModuleProvider() {
     DLOG(INFO) << "RNInstanceCAPI::createTurboModuleProvider";
+    auto sharedInstance = shared_from_this();
     auto turboModuleProvider = std::make_shared<TurboModuleProvider>(
-        this->instance->getJSCallInvoker(), std::move(m_turboModuleFactory), m_eventDispatcher, std::move(m_jsQueue));
+        this->instance->getJSCallInvoker(), std::move(m_turboModuleFactory), m_eventDispatcher, std::move(m_jsQueue), sharedInstance);
     turboModuleProvider->installJSBindings(this->instance->getRuntimeExecutor());
     return turboModuleProvider;
 }
@@ -170,6 +172,36 @@ void rnoh::RNInstanceCAPI::updateState(napi_env env, std::string const &componen
     if (auto state = m_shadowViewRegistry->getFabricState<facebook::react::State>(tag)) {
         m_mutationsToNapiConverter->updateState(env, componentName, state, newState);
     }
+}
+
+void rnoh::RNInstanceCAPI::synchronouslyUpdateViewOnUIThread(facebook::react::Tag tag, folly::dynamic props) {
+    DLOG(INFO) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread";
+    
+    auto schedulerDelegateCapi = dynamic_cast<SchedulerDelegateCAPI *>(m_schedulerDelegate.get());
+    if (schedulerDelegateCapi == nullptr) {
+        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: scheduler delegate for this instance is not set up correctly";
+        return;
+    }
+
+    auto componentInstance = m_componentInstanceRegistry->findByTag(tag);
+    if (componentInstance == nullptr) {
+        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: could not find componentInstance for tag: " << tag;
+        return;
+    }
+
+    auto componentHandle = componentInstance->getComponentHandle();
+    auto componentDescriptor = scheduler->findComponentDescriptorByHandle_DO_NOT_USE_THIS_IS_BROKEN(componentHandle);
+    if (componentDescriptor == nullptr) {
+        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: could not find componentDescriptor for tag: " << tag;
+        return;
+    }
+
+    schedulerDelegateCapi->synchronouslyUpdateViewOnUIThread(tag, std::move(props), *componentDescriptor);
+}
+
+facebook::react::ContextContainer const &rnoh::RNInstanceCAPI::getContextContainer() const {
+    DLOG(INFO) << "RNInstanceCAPI::getContextContainer";
+    return *m_contextContainer;
 }
 
 void RNInstanceCAPI::callFunction(std::string &&module, std::string &&method, folly::dynamic &&params) {

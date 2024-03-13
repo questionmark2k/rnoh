@@ -6,8 +6,8 @@
 
 using namespace rnoh;
 
-ScrollViewComponentInstance::ScrollViewComponentInstance(Context context, facebook::react::Tag tag)
-    : CppComponentInstance(context, tag) {
+ScrollViewComponentInstance::ScrollViewComponentInstance(Context context)
+    : CppComponentInstance(std::move(context)) {
     m_scrollNode.insertChild(m_stackNode);
     m_scrollNode.setScrollNodeDelegate(this);
 }

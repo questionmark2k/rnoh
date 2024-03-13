@@ -8,21 +8,13 @@
 #include "RNOH/ComponentInstance.h"
 
 namespace rnoh {
-    struct ComponentInstanceFactoryContext {
-        std::string componentName;
-        facebook::react::Tag tag;
-    };
-
     class ComponentInstanceFactoryDelegate {
-    protected:
-        ComponentInstance::Context m_ctx;
-
     public:
-        ComponentInstanceFactoryDelegate(ComponentInstance::Context ctx) : m_ctx(ctx) {}
+        ComponentInstanceFactoryDelegate() = default;
 
         using Shared = std::shared_ptr<ComponentInstanceFactoryDelegate>;
 
-        virtual ComponentInstance::Shared create(ComponentInstanceFactoryContext ctx) = 0;
+        virtual ComponentInstance::Shared create(ComponentInstance::Context ctx) = 0;
     };
 
 
@@ -36,7 +28,7 @@ namespace rnoh {
         ComponentInstanceFactory(std::vector<ComponentInstanceFactoryDelegate::Shared> delegates)
             : m_delegates(std::move(delegates)) {}
 
-        ComponentInstance::Shared create(ComponentInstanceFactoryContext ctx) {
+        ComponentInstance::Shared create(ComponentInstance::Context ctx) {
             for (auto &delegate : m_delegates) {
                 auto componentInstance = delegate->create(ctx);
                 if (componentInstance != nullptr) {

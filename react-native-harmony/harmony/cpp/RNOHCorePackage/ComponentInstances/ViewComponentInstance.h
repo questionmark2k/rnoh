@@ -10,7 +10,7 @@ namespace rnoh {
         facebook::react::SharedViewEventEmitter m_eventEmitter;
 
     public:
-        ViewComponentInstance(Context context, facebook::react::Tag tag);
+        ViewComponentInstance(Context context);
 
         void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
 

@@ -10,7 +10,7 @@ namespace rnoh {
         TextNode m_textNode;
 
     public:
-        TextComponentInstance(Context context, facebook::react::Tag tag);
+        TextComponentInstance(Context context);
 
         void onPropsChanged(std::shared_ptr<const facebook::react::ParagraphProps> const &props) override;
 

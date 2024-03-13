@@ -16,8 +16,8 @@ namespace rnoh {
         facebook::react::Size m_containerSize;
         facebook::react::ScrollViewMetrics getScrollViewMetrics();
 
-      public:
-        ScrollViewComponentInstance(Context context, facebook::react::Tag tag);
+    public:
+        ScrollViewComponentInstance(Context context);
 
         ScrollNode &getLocalRootArkUINode() override;
 

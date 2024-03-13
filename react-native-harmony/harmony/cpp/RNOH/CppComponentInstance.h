@@ -29,11 +29,11 @@ namespace rnoh {
     public:
         using Shared = std::shared_ptr<CppComponentInstance>;
 
-        CppComponentInstance(Context context, facebook::react::Tag tag) : ComponentInstance(context, tag) {}
+        CppComponentInstance(Context context) : ComponentInstance(std::move(context)) {}
 
         facebook::react::Tag getTag() const { return m_tag; }
 
-        SharedConcreteProps const &getProps() const { return m_props; }
+        facebook::react::Props::Shared getProps() const override { return m_props; }
 
         void setProps(facebook::react::Props::Shared props) final {
             auto newProps = std::dynamic_pointer_cast<const ConcreteProps>(props);

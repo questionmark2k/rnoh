@@ -1,5 +1,6 @@
 #include "RNOH/TurboModuleFactory.h"
 #include "RNOH/UIManagerModule.h"
+#include "RNOH/RNInstance.h"
 #include "RNOH/StubModule.h"
 #include "TurboModuleFactory.h"
 
@@ -22,10 +23,14 @@ TurboModuleFactory::SharedTurboModule TurboModuleFactory::create(
     const std::string &name,
     std::shared_ptr<EventDispatcher> eventDispatcher,
     std::shared_ptr<MessageQueueThread> jsQueue,
-    std::shared_ptr<facebook::react::Scheduler> scheduler) const {
+    std::shared_ptr<facebook::react::Scheduler> scheduler,
+    std::weak_ptr<RNInstance> instance) const {
     LOG(INFO) << "Providing Turbo Module: " << name;
     Context ctx{
-        {.jsInvoker = jsInvoker},
+        {
+            .jsInvoker = jsInvoker,
+            .instance = instance
+        },
         .env = m_env,
         .arkTsTurboModuleInstanceRef = this->maybeGetArkTsTurboModuleInstanceRef(name),
         .taskExecutor = m_taskExecutor,
