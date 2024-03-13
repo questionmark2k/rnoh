@@ -118,6 +118,24 @@ namespace rnoh {
         return *this;
     }
 
+    ArkUINode &ArkUINode::transform(facebook::react::Transform const &transform) {
+        ArkUI_NumberValue transformCenterValue[] = {0, 0, 0, 0.5f, 0.5f};
+
+        ArkUI_AttributeItem transformCenterItem = {transformCenterValue,
+                                                   sizeof(transformCenterValue) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(
+            NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_TRANSFORM_CENTER, &transformCenterItem));
+
+        std::array<ArkUI_NumberValue, 16> transformValue;
+        for (int i = 0; i < 16; i++) {
+            transformValue[i] = {.f32 = static_cast<float>(transform.matrix[i])};
+        }
+
+        ArkUI_AttributeItem transformItem = {transformValue.data(), transformValue.size()};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_TRANSFORM, &transformItem));
+        return *this;
+    }
+
     ArkUINode &ArkUINode::setOpacity(facebook::react::Float const &opacity) {
         ArkUI_NumberValue opacityValue[] = {static_cast<float>(opacity)};
         ArkUI_AttributeItem opacityItem = {opacityValue, sizeof(opacityValue) / sizeof(ArkUI_NumberValue)};

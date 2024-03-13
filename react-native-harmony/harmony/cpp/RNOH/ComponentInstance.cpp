@@ -2,7 +2,8 @@
 #include <glog/logging.h>
 
 namespace rnoh {
-    ComponentInstance::ComponentInstance(Context context) : m_tag(context.tag), m_componentHandle(context.componentHandle) {}
+    ComponentInstance::ComponentInstance(Context context)
+        : m_tag(context.tag), m_componentHandle(context.componentHandle) {}
 
     void ComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
         auto it = m_children.begin() + index;

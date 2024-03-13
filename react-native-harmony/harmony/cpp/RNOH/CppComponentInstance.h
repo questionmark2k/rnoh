@@ -116,6 +116,7 @@ namespace rnoh {
             this->getLocalRootArkUINode().setBorderStyle(borderMetrics.borderStyles);
 
             this->getLocalRootArkUINode().setOpacity(props->opacity);
+            this->getLocalRootArkUINode().transform(props->transform);
         };
 
         virtual void onStateChanged(SharedConcreteState const &state){};

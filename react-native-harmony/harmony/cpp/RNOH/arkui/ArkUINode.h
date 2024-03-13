@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include "glog/logging.h"
 #include "react/renderer/components/view/primitives.h"
+#include "react/renderer/graphics/Transform.h"
 
 namespace rnoh {
     class ArkUINode {
@@ -32,6 +33,7 @@ namespace rnoh {
         virtual ArkUINode &setBorderRadius(facebook::react::BorderRadii const &borderRadius);
         virtual ArkUINode &setBorderStyle(facebook::react::BorderStyles const &borderStyles);
         virtual ArkUINode &setBackgroundColor(facebook::react::SharedColor const &color);
+        virtual ArkUINode &transform(facebook::react::Transform const &transform);
         virtual ArkUINode &setOpacity(facebook::react::Float const &opacity);
 
         virtual void onNodeEvent(ArkUI_NodeEvent *event);

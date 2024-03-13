@@ -379,6 +379,20 @@ export function ViewTest() {
           }}
         />
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show view with X moved by 500px right, Y scaled 2 times, rotated by 5deg">
+        <View style={{width: '100%', height: 20}}>
+          <View
+            style={{
+              width: 100,
+              backgroundColor: 'blue',
+              transform: [{translateX: 500}, {rotate: '5deg'}, {scaleY: 2}],
+            }}>
+            <Text style={{height: 20}}>Text</Text>
+          </View>
+        </View>
+      </TestCase.Example>
       <TestSuite name="pointerEvents">
         <TestCase.Manual
           itShould="call inner and outer view when pressing inner"
