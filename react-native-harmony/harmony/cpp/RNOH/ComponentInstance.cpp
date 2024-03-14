@@ -7,6 +7,7 @@ namespace rnoh {
 
     void ComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
         auto it = m_children.begin() + index;
+        childComponentInstance->setParent(shared_from_this());
         m_children.insert(it, std::move(childComponentInstance));
     }
 

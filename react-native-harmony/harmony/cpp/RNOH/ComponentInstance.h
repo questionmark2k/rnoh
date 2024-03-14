@@ -16,7 +16,7 @@
 
 namespace rnoh {
 
-    class ComponentInstance : public TouchTarget {
+    class ComponentInstance : public TouchTarget, public std::enable_shared_from_this<ComponentInstance> {
     protected:
         using Tag = facebook::react::Tag;
         using ComponentHandle = facebook::react::ComponentHandle;
@@ -39,6 +39,7 @@ namespace rnoh {
         virtual ArkUINode &getLocalRootArkUINode() = 0;
 
         using Shared = std::shared_ptr<ComponentInstance>;
+        using Weak = std::weak_ptr<ComponentInstance>;
 
         ComponentInstance(Context context);
 
@@ -68,6 +69,10 @@ namespace rnoh {
 
         virtual std::vector<ComponentInstance::Shared> const &getChildren() const { return m_children; }
 
+        virtual ComponentInstance::Weak const getParent() const {return m_parent; }
+
+        virtual void setParent(ComponentInstance::Shared parent) { m_parent = parent; }
+
         // TouchTarget implementation
         Tag getTouchTargetTag() const override { return getTag(); }
 
@@ -82,6 +87,7 @@ namespace rnoh {
         Tag m_tag;
         ComponentHandle m_componentHandle;
         std::vector<ComponentInstance::Shared> m_children;
+        ComponentInstance::Weak m_parent;
         facebook::react::LayoutMetrics m_layoutMetrics;
         Dependencies::Shared m_deps;
     };
