@@ -29,12 +29,11 @@
 
 using namespace rnoh;
 
-std::shared_ptr<RNInstanceInternal> createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef,
-                                             MutationsListener &&mutationsListener,
-                                             MountingManager::CommandDispatcher &&commandDispatcher,
-                                             napi_ref measureTextFnRef, napi_ref napiEventDispatcherRef,
-                                             FeatureFlagRegistry::Shared featureFlagRegistry, UITicker::Shared uiTicker,
-                                             bool shouldEnableDebugger, bool shouldEnableBackgroundExecutor) {
+std::shared_ptr<RNInstanceInternal>
+createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef, MutationsListener &&mutationsListener,
+                 MountingManager::CommandDispatcher &&commandDispatcher, napi_ref measureTextFnRef,
+                 napi_ref napiEventDispatcherRef, FeatureFlagRegistry::Shared featureFlagRegistry,
+                 UITicker::Shared uiTicker, bool shouldEnableDebugger, bool shouldEnableBackgroundExecutor) {
     auto shouldUseCAPIArchitecture = featureFlagRegistry->getFeatureFlagStatus("C_API_ARCH");
     std::shared_ptr<TaskExecutor> taskExecutor = std::make_shared<TaskExecutor>(env, shouldEnableBackgroundExecutor);
     auto arkTSChannel = std::make_shared<ArkTSChannel>(taskExecutor, ArkJS(env), napiEventDispatcherRef);
@@ -117,16 +116,24 @@ std::shared_ptr<RNInstanceInternal> createRNInstance(int id, napi_env env, napi_
 
     if (shouldUseCAPIArchitecture) {
 #ifdef C_API_ARCH
-        auto componentInstanceFactory = std::make_shared<ComponentInstanceFactory>(componentInstanceFactoryDelegates);
+        auto componentInstanceDependencies = std::make_shared<ComponentInstance::Dependencies>();
+        componentInstanceDependencies->arkTSChannel = arkTSChannel;
+        auto componentInstanceFactory = std::make_shared<ComponentInstanceFactory>(
+            componentInstanceFactoryDelegates, componentInstanceDependencies);
         auto componentInstanceRegistry = std::make_shared<ComponentInstanceRegistry>();
         auto schedulerDelegate = std::make_unique<SchedulerDelegateCAPI>(
             taskExecutor, shadowViewRegistry, componentInstanceRegistry, componentInstanceFactory);
-        return std::make_shared<RNInstanceCAPI>(
+        auto rnInstance = std::make_shared<RNInstanceCAPI>(
             id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
             mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
-            std::move(schedulerDelegate), componentInstanceRegistry, componentInstanceFactory, shouldEnableDebugger, shouldEnableBackgroundExecutor);
+            std::move(schedulerDelegate), componentInstanceRegistry, componentInstanceFactory, shouldEnableDebugger,
+            shouldEnableBackgroundExecutor);
+        componentInstanceDependencies->rnInstance = rnInstance;
+        return rnInstance;
 #else
-        LOG(FATAL) << "The C_API architecture also needs to be enabled on the CPP side. Have you set the RNOH_C_API_ARCH=\"1\" environment variable, completely closed and reopened DevEco Studio and run Build > Clean Project?";
+        LOG(FATAL) << "The C_API architecture also needs to be enabled on the CPP side. Have you set the "
+                      "RNOH_C_API_ARCH=\"1\" environment variable, completely closed and reopened DevEco Studio and "
+                      "run Build > Clean Project?";
 #endif
     }
 

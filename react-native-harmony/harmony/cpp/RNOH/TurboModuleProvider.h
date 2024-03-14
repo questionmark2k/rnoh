@@ -13,6 +13,8 @@ namespace rnoh {
 
 class TurboModuleProvider : public std::enable_shared_from_this<TurboModuleProvider> {
   public:
+    using Shared = std::shared_ptr<TurboModuleProvider>;
+    
     TurboModuleProvider(std::shared_ptr<facebook::react::CallInvoker> jsInvoker,
                         TurboModuleFactory &&turboModuleFactory,
                         std::shared_ptr<EventDispatcher> eventDispatcher,

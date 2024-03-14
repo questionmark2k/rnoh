@@ -76,6 +76,7 @@ type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS" |
 
 export interface RNInstance {
   descriptorRegistry: DescriptorRegistry;
+  cppEventEmitter: EventEmitter<Record<string, unknown[]>>
 
   /**
    * @deprecated Use RNOHContext::componentCommandReceiver
@@ -153,6 +154,7 @@ export class RNInstanceImpl implements RNInstance {
   public componentCommandHub: RNComponentCommandHub;
   public componentManagerRegistry: ComponentManagerRegistry;
   public lifecycleEventEmitter = new EventEmitter<LifecycleEventArgsByEventName>()
+  public cppEventEmitter = new EventEmitter<Record<string, unknown[]>>()
   private componentNameByDescriptorType = new Map<string, string>()
   private logger: RNOHLogger
   private surfaceHandles: Set<SurfaceHandle> = new Set()
@@ -287,6 +289,7 @@ export class RNInstanceImpl implements RNInstance {
 
   private onCppMessage(type: string, payload: any) {
     try {
+      this.cppEventEmitter.emit(type, payload);
       switch (type) {
         case "SCHEDULER_DID_SET_IS_JS_RESPONDER": {
           if (payload.blockNativeResponder) {
@@ -305,8 +308,6 @@ export class RNInstanceImpl implements RNInstance {
           }));
           break;
         }
-        default:
-          this.logger.error(`Unknown action: ${type}`)
       }
     } catch (err) {
       this.logger.error(new RNOHError({

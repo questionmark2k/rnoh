@@ -10,11 +10,11 @@
 #include "RNOH/ComponentInstanceRegistry.h"
 #include "RNOH/ComponentInstanceFactory.h"
 
-namespace facebook{
-    namespace react{
+namespace facebook {
+    namespace react {
         class Scheduler;
     }
-}
+} // namespace facebook
 
 namespace rnoh {
 
@@ -25,13 +25,12 @@ namespace rnoh {
                               ComponentInstanceFactory::Shared componentInstanceFactory)
             : m_taskExecutor(taskExecutor), m_shadowViewRegistry(shadowViewRegistry),
               m_componentInstanceRegistry(std::move(componentInstanceRegistry)),
-              m_componentInstanceFactory(std::move(componentInstanceFactory)){};
-    
+              m_componentInstanceFactory(std::move(componentInstanceFactory))
+              {};
 
-        ~SchedulerDelegateCAPI() {
-            DLOG(INFO) << "~SchedulerDelegateCAPI";
-        }
-    
+
+        ~SchedulerDelegateCAPI() { DLOG(INFO) << "~SchedulerDelegateCAPI"; }
+
         void schedulerDidFinishTransaction(facebook::react::MountingCoordinator::Shared mountingCoordinator) override {
             mountingCoordinator->getTelemetryController().pullTransaction(
                 [this](facebook::react::MountingTransaction const &transaction,
@@ -49,8 +48,9 @@ namespace rnoh {
                         for (auto mutation : mutations) {
                             try {
                                 this->handleMutation(mutation);
-                            } catch( std::runtime_error &e) {
-                                LOG(ERROR) << "Mutation " << this->getMutationNameFromType(mutation.type) << " failed: " << e.what();
+                            } catch (std::runtime_error &e) {
+                                LOG(ERROR) << "Mutation " << this->getMutationNameFromType(mutation.type)
+                                           << " failed: " << e.what();
                             }
                         }
                     });
@@ -74,10 +74,8 @@ namespace rnoh {
         void schedulerDidSetIsJSResponder(facebook::react::ShadowView const &shadowView, bool isJSResponder,
                                           bool blockNativeResponder) override {}
 
-        void synchronouslyUpdateViewOnUIThread(
-            facebook::react::Tag tag,
-            folly::dynamic props, 
-            facebook::react::ComponentDescriptor const &componentDescriptor);
+        void synchronouslyUpdateViewOnUIThread(facebook::react::Tag tag, folly::dynamic props,
+                                               facebook::react::ComponentDescriptor const &componentDescriptor);
 
     private:
         TaskExecutor::Shared m_taskExecutor;
@@ -87,7 +85,7 @@ namespace rnoh {
         facebook::react::ContextContainer::Shared m_contextContainer;
 
         void updateComponentWithShadowView(ComponentInstance::Shared const &componentInstance,
-                                        facebook::react::ShadowView const &shadowView) {
+                                           facebook::react::ShadowView const &shadowView) {
             componentInstance->setLayout(shadowView.layoutMetrics);
             componentInstance->setProps(shadowView.props);
             componentInstance->setState(shadowView.state);
@@ -96,20 +94,16 @@ namespace rnoh {
         }
 
         void handleMutation(facebook::react::ShadowViewMutation mutation) {
-            DLOG(INFO) << "mutation (type:" << this->getMutationNameFromType(mutation.type) 
-                       << "; new: " << mutation.newChildShadowView.tag << " component type: " << mutation.newChildShadowView.componentName
+            DLOG(INFO) << "mutation (type:" << this->getMutationNameFromType(mutation.type)
+                       << "; new: " << mutation.newChildShadowView.tag
+                       << " component type: " << mutation.newChildShadowView.componentName
                        << "; old: " << mutation.oldChildShadowView.tag << "; parent: " << mutation.parentShadowView.tag
                        << ")";
             switch (mutation.type) {
             case facebook::react::ShadowViewMutation::Create: {
                 auto newChild = mutation.newChildShadowView;
                 m_shadowViewRegistry->setShadowView(newChild.tag, newChild);
-                auto componentInstance = m_componentInstanceFactory->create(
-                    {
-                        .tag = newChild.tag, 
-                        .componentHandle = newChild.componentHandle,
-                        .componentName = newChild.componentName
-                    });
+                auto componentInstance = m_componentInstanceFactory->create(newChild.tag, newChild.componentHandle, newChild.componentName);
                 if (componentInstance != nullptr) {
                     updateComponentWithShadowView(componentInstance, newChild);
                     m_componentInstanceRegistry->insert(componentInstance);

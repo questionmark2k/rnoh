@@ -22,6 +22,7 @@
 #include "RNOH/TaskExecutor/TaskExecutor.h"
 #include "RNOH/UITicker.h"
 #include "RNOH/ArkTSChannel.h"
+#include "RNOH/TurboModule.h"
 
 namespace rnoh {
     using MutationsListener =
@@ -30,9 +31,12 @@ namespace rnoh {
     class RNInstance {
         using ContextContainer = facebook::react::ContextContainer;
       public:
+        using Weak = std::weak_ptr<RNInstance>;
+    
         virtual ~RNInstance() = default;
 
         virtual ContextContainer const &getContextContainer() const = 0;
+        virtual TurboModule::Shared getTurboModule(const std::string &name) = 0;
         virtual void synchronouslyUpdateViewOnUIThread(facebook::react::Tag tag, folly::dynamic props) = 0;
     };
 

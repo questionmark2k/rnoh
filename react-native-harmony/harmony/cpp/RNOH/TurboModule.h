@@ -15,6 +15,8 @@ class TurboModule : public facebook::react::TurboModule {
         std::shared_ptr<facebook::react::CallInvoker> jsInvoker;
         std::weak_ptr<RNInstance> instance;
     };
+    
+    using Shared = std::shared_ptr<TurboModule>;
 
     TurboModule(Context ctx, std::string name)
         : facebook::react::TurboModule(name, ctx.jsInvoker) {

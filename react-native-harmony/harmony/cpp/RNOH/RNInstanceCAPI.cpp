@@ -24,10 +24,10 @@ TaskExecutor::Shared RNInstanceCAPI::getTaskExecutor() { return taskExecutor; };
 void RNInstanceCAPI::start() {
     DLOG(INFO) << "RNInstanceCAPI::start";
     this->initialize();
-    auto turboModuleProvider = this->createTurboModuleProvider();
-    this->initializeScheduler(turboModuleProvider);
+    m_turboModuleProvider = this->createTurboModuleProvider();
+    this->initializeScheduler(m_turboModuleProvider);
     this->instance->getRuntimeExecutor()(
-        [binders = this->m_globalJSIBinders, turboModuleProvider](facebook::jsi::Runtime &rt) {
+        [binders = this->m_globalJSIBinders, turboModuleProvider = m_turboModuleProvider](facebook::jsi::Runtime &rt) {
             for (auto &binder : binders) {
                 binder->createBindings(rt, turboModuleProvider);
             }
@@ -100,8 +100,9 @@ void RNInstanceCAPI::initializeScheduler(std::shared_ptr<TurboModuleProvider> tu
 std::shared_ptr<TurboModuleProvider> RNInstanceCAPI::createTurboModuleProvider() {
     DLOG(INFO) << "RNInstanceCAPI::createTurboModuleProvider";
     auto sharedInstance = shared_from_this();
-    auto turboModuleProvider = std::make_shared<TurboModuleProvider>(
-        this->instance->getJSCallInvoker(), std::move(m_turboModuleFactory), m_eventDispatcher, std::move(m_jsQueue), sharedInstance);
+    auto turboModuleProvider =
+        std::make_shared<TurboModuleProvider>(this->instance->getJSCallInvoker(), std::move(m_turboModuleFactory),
+                                              m_eventDispatcher, std::move(m_jsQueue), sharedInstance);
     turboModuleProvider->installJSBindings(this->instance->getRuntimeExecutor());
     return turboModuleProvider;
 }
@@ -176,23 +177,26 @@ void rnoh::RNInstanceCAPI::updateState(napi_env env, std::string const &componen
 
 void rnoh::RNInstanceCAPI::synchronouslyUpdateViewOnUIThread(facebook::react::Tag tag, folly::dynamic props) {
     DLOG(INFO) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread";
-    
+
     auto schedulerDelegateCapi = dynamic_cast<SchedulerDelegateCAPI *>(m_schedulerDelegate.get());
     if (schedulerDelegateCapi == nullptr) {
-        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: scheduler delegate for this instance is not set up correctly";
+        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: scheduler delegate for this instance is not "
+                      "set up correctly";
         return;
     }
 
     auto componentInstance = m_componentInstanceRegistry->findByTag(tag);
     if (componentInstance == nullptr) {
-        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: could not find componentInstance for tag: " << tag;
+        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: could not find componentInstance for tag: "
+                   << tag;
         return;
     }
 
     auto componentHandle = componentInstance->getComponentHandle();
     auto componentDescriptor = scheduler->findComponentDescriptorByHandle_DO_NOT_USE_THIS_IS_BROKEN(componentHandle);
     if (componentDescriptor == nullptr) {
-        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: could not find componentDescriptor for tag: " << tag;
+        LOG(ERROR) << "RNInstanceCAPI::synchronouslyUpdateViewOnUIThread: could not find componentDescriptor for tag: "
+                   << tag;
         return;
     }
 
@@ -205,7 +209,7 @@ facebook::react::ContextContainer const &rnoh::RNInstanceCAPI::getContextContain
 }
 
 void RNInstanceCAPI::callFunction(std::string &&module, std::string &&method, folly::dynamic &&params) {
-//     DLOG(INFO) << "RNInstanceCAPI::callFunction"; // commented out, it's too verbose
+    //     DLOG(INFO) << "RNInstanceCAPI::callFunction"; // commented out, it's too verbose
     this->taskExecutor->runTask(TaskThread::JS, [weakInstance = std::weak_ptr(this->instance),
                                                  module = std::move(module), method = std::move(method),
                                                  params = std::move(params)]() mutable {
@@ -238,6 +242,20 @@ void RNInstanceCAPI::registerNativeXComponentHandle(OH_NativeXComponent *nativeX
         return;
     }
     it->second.attachNativeXComponent(nativeXComponent);
+}
+
+TurboModule::Shared RNInstanceCAPI::getTurboModule(const std::string &name) {
+    auto turboModule = m_turboModuleProvider->getTurboModule(name);
+    if (turboModule) {
+        auto rnohTurboModule = std::dynamic_pointer_cast<TurboModule>(turboModule);
+        if (rnohTurboModule) {
+            return rnohTurboModule;
+        } else {
+            DLOG(ERROR) << "TurboModule '" << name << "' should extend rnoh::TurboModule";
+            return nullptr;
+        }
+    }
+    return nullptr;
 }
 
 void RNInstanceCAPI::createSurface(facebook::react::Tag surfaceId, std::string const &moduleName) {

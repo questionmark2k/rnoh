@@ -11,6 +11,8 @@
 #include <react/renderer/components/view/ViewProps.h>
 #include "RNOH/arkui/ArkUINode.h"
 #include "RNOH/TouchTarget.h"
+#include "RNOH/ArkTSChannel.h"
+#include "RNOH/RNInstance.h"
 
 namespace rnoh {
 
@@ -20,10 +22,18 @@ namespace rnoh {
         using ComponentHandle = facebook::react::ComponentHandle;
 
     public:
+        struct Dependencies {
+            using Shared = std::shared_ptr<const Dependencies>;    
+            
+            ArkTSChannel::Shared arkTSChannel;
+            RNInstance::Weak rnInstance;
+        };
+    
         struct Context {
             Tag tag;
             ComponentHandle componentHandle;
             std::string componentName;
+            Dependencies::Shared dependencies;
         };
 
         virtual ArkUINode &getLocalRootArkUINode() = 0;
@@ -73,6 +83,7 @@ namespace rnoh {
         ComponentHandle m_componentHandle;
         std::vector<ComponentInstance::Shared> m_children;
         facebook::react::LayoutMetrics m_layoutMetrics;
+        Dependencies::Shared m_deps;
     };
 
 } // namespace rnoh

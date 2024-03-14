@@ -12,30 +12,28 @@ namespace rnoh {
 
 class XComponentSurface {
   public:
-    XComponentSurface(
-        std::shared_ptr<facebook::react::Scheduler> scheduler,
-        ComponentInstanceRegistry::Shared componentInstanceRegistry,
-        ComponentInstanceFactory::Shared componentInstanceFactory,
-        facebook::react::SurfaceId surfaceId,
-        std::string const &appKey);
+      XComponentSurface(std::shared_ptr<facebook::react::Scheduler> scheduler,
+                        ComponentInstanceRegistry::Shared componentInstanceRegistry,
+                        ComponentInstanceFactory::Shared componentInstanceFactory,
+                        facebook::react::SurfaceId surfaceId,
+                        std::string const &appKey);
 
-    XComponentSurface(XComponentSurface const &other) = delete;
-    XComponentSurface &operator=(XComponentSurface const &other) = delete;
+      XComponentSurface(XComponentSurface const &other) = delete;
+      XComponentSurface &operator=(XComponentSurface const &other) = delete;
 
-    XComponentSurface(XComponentSurface &&other) noexcept;
-    XComponentSurface &operator=(XComponentSurface &&other) noexcept;
+      XComponentSurface(XComponentSurface &&other) noexcept;
+      XComponentSurface &operator=(XComponentSurface &&other) noexcept;
 
-    ~XComponentSurface() noexcept;
+      ~XComponentSurface() noexcept;
 
-    void attachNativeXComponent(OH_NativeXComponent *nativeXComponent);
+      void attachNativeXComponent(OH_NativeXComponent *nativeXComponent);
 
-    void updateConstraints(float width, float height, float viewportOffsetX,
-                           float viewportOffsetY, float pixelRatio);
-    void start(float width, float height, float viewportOffsetX,
-               float viewportOffsetY, float pixelRatio, folly::dynamic &&initialProps);
-    void setProps(folly::dynamic &&props);
-    void stop();
-    void setDisplayMode(facebook::react::DisplayMode displayMode);
+      void updateConstraints(float width, float height, float viewportOffsetX, float viewportOffsetY, float pixelRatio);
+      void start(float width, float height, float viewportOffsetX, float viewportOffsetY, float pixelRatio,
+                 folly::dynamic &&initialProps);
+      void setProps(folly::dynamic &&props);
+      void stop();
+      void setDisplayMode(facebook::react::DisplayMode displayMode);
 
   private:
     facebook::react::SurfaceId m_surfaceId;

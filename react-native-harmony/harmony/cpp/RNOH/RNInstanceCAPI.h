@@ -125,6 +125,8 @@ namespace rnoh {
 
         void registerNativeXComponentHandle(OH_NativeXComponent *nativeXComponent, facebook::react::Tag surfaceId);
 
+        TurboModule::Shared getTurboModule(const std::string &name) override;
+
         std::shared_ptr<TaskExecutor> taskExecutor;
 
     protected:
@@ -134,6 +136,7 @@ namespace rnoh {
         std::shared_ptr<facebook::react::ComponentDescriptorProviderRegistry> m_componentDescriptorProviderRegistry;
         ShadowViewRegistry::Shared m_shadowViewRegistry;
         TurboModuleFactory m_turboModuleFactory;
+        TurboModuleProvider::Shared m_turboModuleProvider;
         std::shared_ptr<EventDispatcher> m_eventDispatcher;
         MutationsToNapiConverter::Shared m_mutationsToNapiConverter;
         EventEmitRequestHandlers m_eventEmitRequestHandlers;
