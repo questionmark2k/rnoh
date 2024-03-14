@@ -4,7 +4,7 @@ set(NATIVERENDER_ROOT_PATH "${RNOH_CPP_DIR}")
 set(third_party_dir "${RNOH_CPP_DIR}/third-party")
 set(patches_dir "${RNOH_CPP_DIR}/patches")
 
-add_compile_options("-Wno-unused-command-line-argument")
+add_compile_options("-Wno-error=unused-command-line-argument")
 
 include_directories(${NATIVERENDER_ROOT_PATH}
                     ${NATIVERENDER_ROOT_PATH}/include)
