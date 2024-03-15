@@ -15,9 +15,11 @@ export function ModalTest() {
   return (
     <TestSuite name="Modal">
       <TestCase itShould="show modal">
+        tags={['C_API']}
         <ModalExample />
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="trigger onShow event after modal is shown"
         initialState={false}
         arrange={({setState}) => (
@@ -32,6 +34,7 @@ export function ModalTest() {
         }}
       />
       <TestCase
+        tags={['C_API']}
         itShould="show modal with slide animation"
         initialState={false}
         arrange={({setState}) => (
@@ -47,6 +50,7 @@ export function ModalTest() {
         }}
       />
       <TestCase
+        tags={['C_API']}
         itShould="show modal with fade animation"
         initialState={false}
         arrange={({setState}) => (
@@ -62,12 +66,15 @@ export function ModalTest() {
         }}
       />
       <TestCase itShould="soft keyboard should cover modal">
+        tags={['C_API']}
         <ModalExample withTextInput />
       </TestCase>
       <TestCase itShould="allow to display one modal on top of another">
+        tags={['C_API']}
         <NestedModalinModal />
       </TestCase>
       <TestCase itShould="display modal from flatlist item">
+        tags={['C_API']}
         <NestedModalInFlatlist />
       </TestCase>
     </TestSuite>

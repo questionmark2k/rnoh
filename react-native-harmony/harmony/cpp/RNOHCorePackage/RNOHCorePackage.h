@@ -67,6 +67,7 @@
 #include "RNOHCorePackage/ComponentInstances/TextComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ScrollViewComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ActivityIndicatorComponentInstance.h"
+#include "RNOHCorePackage/ComponentInstances/ModalHostViewComponentInstance.h"
 
 namespace rnoh {
 
@@ -135,7 +136,7 @@ namespace rnoh {
     };
 
     class RNOHCorePackageComponentInstanceFactoryDelegate : public ComponentInstanceFactoryDelegate {
-    public:
+      public:
         using ComponentInstanceFactoryDelegate::ComponentInstanceFactoryDelegate;
     
         ComponentInstance::Shared create(ComponentInstance::Context ctx) override {
@@ -150,6 +151,9 @@ namespace rnoh {
             } 
             if (ctx.componentName == "ActivityIndicatorView") {
                 return std::make_shared<ActivityIndicatorComponentInstance>(std::move(ctx));
+            }
+            if (ctx.componentName == "ModalHostView") {
+                return std::make_shared<ModalHostViewComponentInstance>(std::move(ctx));
             }
             return nullptr;
         }

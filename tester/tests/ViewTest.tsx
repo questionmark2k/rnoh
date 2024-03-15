@@ -610,7 +610,7 @@ export function ViewTest() {
           </View>
         </View>
       </TestCase.Example>
-      <TestCase.Example 
+      <TestCase.Example
         tags={['C_API']}
         itShould="render light blue shadow shifted towards bottom and right">
         <View
@@ -626,22 +626,42 @@ export function ViewTest() {
           }}
         />
       </TestCase.Example>
-      <TestCase.Example 
+      <TestCase.Example
         tags={['C_API']}
         itShould="View Overflow type hidden test by exceeded text">
         <View
-          style={{ backgroundColor: 'rgba(0,255,0,1)', width: 150, height: 100, overflow: 'hidden' }}
+          style={{
+            backgroundColor: 'rgba(0,255,0,1)',
+            width: 150,
+            height: 100,
+            overflow: 'hidden',
+          }}
           collapsable={false}>
-          <Text>Michaelmas term lately over, and the Lord Chancellor sitting in Lincoln's Inn Hall. Implacable November weather. As much mud in the streets as if the waters had but newly retired from the face of the earth.</Text>
+          <Text>
+            Michaelmas term lately over, and the Lord Chancellor sitting in
+            Lincoln's Inn Hall. Implacable November weather. As much mud in the
+            streets as if the waters had but newly retired from the face of the
+            earth.
+          </Text>
         </View>
       </TestCase.Example>
-      <TestCase.Example 
+      <TestCase.Example
         tags={['C_API']}
         itShould="View Overflow type visible test by exceeded text">
         <View
-          style={{ backgroundColor: 'rgba(0,255,0,1)', width: 150, height: 100, overflow: 'visible' }}
+          style={{
+            backgroundColor: 'rgba(0,255,0,1)',
+            width: 150,
+            height: 100,
+            overflow: 'visible',
+          }}
           collapsable={false}>
-          <Text>Michaelmas term lately over, and the Lord Chancellor sitting in Lincoln's Inn Hall. Implacable November weather. As much mud in the streets as if the waters had but newly retired from the face of the earth.</Text>
+          <Text>
+            Michaelmas term lately over, and the Lord Chancellor sitting in
+            Lincoln's Inn Hall. Implacable November weather. As much mud in the
+            streets as if the waters had but newly retired from the face of the
+            earth.
+          </Text>
         </View>
       </TestCase.Example>
       <TestCase.Example

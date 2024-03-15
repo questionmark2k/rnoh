@@ -443,12 +443,14 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/TurboModules/I18nManagerTurboModule.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/EventEmitRequestHandlers/TouchEventEmitRequestHandler.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/NativeNodeApi.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/NativeDialogApi.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/ArkUINodeRegistry.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/XComponentSurface.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/ArkUINode.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/ScrollNode.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/StackNode.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/TextNode.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/ArkUIDialogHandler.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/TouchEventDispatcher.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/LoadingProgressNode.cpp"
     "${RNOH_CPP_DIR}/RNOH/ComponentInstance.cpp"
@@ -456,6 +458,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/TextComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ScrollViewComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ActivityIndicatorComponentInstance.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ModalHostViewComponentInstance.cpp"
 )
 target_include_directories(rnoh PUBLIC
     "${RNOH_CPP_DIR}"

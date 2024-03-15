@@ -163,7 +163,7 @@ export const ImageTest = () => {
       <TestCase
         itShould="call onLoadEnd"
         initialState={'not called'}
-        arrange={({setState,state}) => {
+        arrange={({setState, state}) => {
           return (
             <View>
               <Text>{JSON.stringify(state)}</Text>

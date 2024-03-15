@@ -7,6 +7,7 @@
 #include <react/renderer/graphics/Color.h>
 #include <stdexcept>
 #include "glog/logging.h"
+#include <react/renderer/components/rncore/Props.h>
 #include "react/renderer/components/view/primitives.h"
 #include <react/renderer/graphics/Transform.h>
 #include <react/renderer/components/view/AccessibilityPrimitives.h>
@@ -58,6 +59,7 @@ namespace {
         virtual ArkUINode &setId(facebook::react::Tag const &tag);
         virtual ArkUINode &setOpacity(facebook::react::Float const &opacity);
         virtual ArkUINode &setClip(bool clip);
+        virtual ArkUINode &setTransition(facebook::react::ModalHostViewAnimationType animationType);
 
         virtual void onNodeEvent(ArkUI_NodeEvent *event);
 
