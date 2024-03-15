@@ -15,7 +15,7 @@ void LoadingProgressNode::setLoadingProgressNodeColor(facebook::react::SharedCol
 
 }
 
-void LoadingProgressNode::setLoadingProgressNodeanimating(const bool &enable) {
+void LoadingProgressNode::setLoadingProgressNodeAnimating(const bool &enable) {
     uint32_t typeValue = 1;
     if (!enable) {
         typeValue = 0;

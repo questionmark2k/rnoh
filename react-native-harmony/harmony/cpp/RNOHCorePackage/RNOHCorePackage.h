@@ -149,7 +149,7 @@ namespace rnoh {
                 return std::make_shared<ScrollViewComponentInstance>(std::move(ctx));
             } 
             if (ctx.componentName == "ActivityIndicatorView") {
-                return std::make_shared<ActivityIndicatorComponentInstance>(m_ctx, ctx.tag);
+                return std::make_shared<ActivityIndicatorComponentInstance>(std::move(ctx));
             }
             return nullptr;
         }

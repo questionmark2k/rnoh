@@ -10,7 +10,7 @@ namespace rnoh {
         LoadingProgressNode m_loadingProgressNode;
 
     public:
-        ActivityIndicatorComponentInstance(Context context, facebook::react::Tag tag);
+        ActivityIndicatorComponentInstance(Context context);
 
         void onPropsChanged(SharedConcreteProps const &props) override;
 

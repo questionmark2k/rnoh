@@ -7,22 +7,18 @@
 
 namespace rnoh {
 
-ActivityIndicatorComponentInstance::ActivityIndicatorComponentInstance(Context context, facebook::react::Tag tag)
-    : CppComponentInstance(std::move(context), tag) {}
+ActivityIndicatorComponentInstance::ActivityIndicatorComponentInstance(Context context)
+    : CppComponentInstance(std::move(context)) {}
 
 void ActivityIndicatorComponentInstance::onPropsChanged(SharedConcreteProps const &props) {
-    auto old = std::dynamic_pointer_cast<const facebook::react::ActivityIndicatorViewProps>(m_props);
+    auto old = m_props;
     CppComponentInstance::onPropsChanged(props);
-    auto p = std::dynamic_pointer_cast<const facebook::react::ActivityIndicatorViewProps>(props);
-    if (auto p = std::dynamic_pointer_cast<const facebook::react::ActivityIndicatorViewProps>(props)) {
-        if (!old || p->animating != old->animating) {
-            m_loadingProgressNode.setLoadingProgressNodeanimating(p->animating);
-        }
-        if (p->color && (!old || *(p->color) != *(old->color))) {
-            m_loadingProgressNode.setLoadingProgressNodeColor(p->color);
-        }
+    if (!old || props->animating != old->animating) {
+        m_loadingProgressNode.setLoadingProgressNodeAnimating(props->animating);
     }
-    m_props = props;
+    if (props->color && (!old || *(props->color) != *(old->color))) {
+        m_loadingProgressNode.setLoadingProgressNodeColor(props->color);
+    }
 }
 
 LoadingProgressNode &ActivityIndicatorComponentInstance::getLocalRootArkUINode() {

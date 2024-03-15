@@ -11,7 +11,7 @@ public:
 
     void setLoadingProgressNodeColor(facebook::react::SharedColor const &color);
 
-    void setLoadingProgressNodeanimating(const bool &enable);
+    void setLoadingProgressNodeAnimating(const bool &enable);
 };
 
 } // namespace rnoh
