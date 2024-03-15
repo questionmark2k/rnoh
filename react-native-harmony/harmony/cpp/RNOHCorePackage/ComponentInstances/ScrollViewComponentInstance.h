@@ -24,9 +24,8 @@ namespace rnoh {
 
         ScrollNode &getLocalRootArkUINode() override;
 
-        void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
-
-        void removeChild(ComponentInstance::Shared childComponentInstance) override;
+        void onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) override;
+        void onChildRemoved(ComponentInstance::Shared const &childComponentInstance) override;
 
         void setLayout(facebook::react::LayoutMetrics layoutMetrics) override;
 
@@ -34,10 +33,9 @@ namespace rnoh {
 
         void onPropsChanged(SharedConcreteProps const &props) override;
 
+        // ScrollNodeDelegate implementation
         void onScroll() override;
-
         void onScrollStart() override;
-
         void onScrollStop() override;
 
         // TouchTarget implementation

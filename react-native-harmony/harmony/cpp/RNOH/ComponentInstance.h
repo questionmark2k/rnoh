@@ -49,9 +49,9 @@ namespace rnoh {
 
         ComponentHandle getComponentHandle() const { return m_componentHandle; }
 
-        virtual void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index);
+        void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index);
 
-        virtual void removeChild(ComponentInstance::Shared childComponentInstance);
+        void removeChild(ComponentInstance::Shared childComponentInstance);
 
         virtual facebook::react::Props::Shared getProps() const = 0;
 
@@ -69,7 +69,7 @@ namespace rnoh {
 
         virtual std::vector<ComponentInstance::Shared> const &getChildren() const { return m_children; }
 
-        virtual ComponentInstance::Weak const getParent() const {return m_parent; }
+        virtual ComponentInstance::Weak const getParent() const { return m_parent; }
 
         virtual void setParent(ComponentInstance::Shared parent) { m_parent = parent; }
 
@@ -84,6 +84,9 @@ namespace rnoh {
         }
 
     protected:
+        virtual void onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) {}
+        virtual void onChildRemoved(ComponentInstance::Shared const &childComponentInstance) {}
+
         Tag m_tag;
         ComponentHandle m_componentHandle;
         std::vector<ComponentInstance::Shared> m_children;

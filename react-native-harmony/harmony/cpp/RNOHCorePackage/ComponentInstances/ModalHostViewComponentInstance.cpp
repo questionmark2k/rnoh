@@ -22,13 +22,13 @@ void ModalHostViewComponentInstance::onPropsChanged(SharedConcreteProps const &p
     }
 }
 
-void ModalHostViewComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
-    CppComponentInstance::insertChild(childComponentInstance, index);
+void ModalHostViewComponentInstance::onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) {
+    CppComponentInstance::onChildInserted(childComponentInstance, index);
     m_rootStackNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
 }
 
-void ModalHostViewComponentInstance::removeChild(ComponentInstance::Shared childComponentInstance) {
-    CppComponentInstance::removeChild(childComponentInstance);
+void ModalHostViewComponentInstance::onChildRemoved(ComponentInstance::Shared const &childComponentInstance) {
+    CppComponentInstance::onChildRemoved(childComponentInstance);
     m_rootStackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
 };
 

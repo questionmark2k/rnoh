@@ -14,15 +14,15 @@ ScrollViewComponentInstance::ScrollViewComponentInstance(Context context)
 
 ScrollNode &ScrollViewComponentInstance::getLocalRootArkUINode() { return m_scrollNode; }
 
-void ScrollViewComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
-    CppComponentInstance::insertChild(childComponentInstance, index);
+void ScrollViewComponentInstance::onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) {
+    CppComponentInstance::onChildInserted(childComponentInstance, index);
     m_stackNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
-};
+}
 
-void ScrollViewComponentInstance::removeChild(ComponentInstance::Shared childComponentInstance) {
-    CppComponentInstance::removeChild(childComponentInstance);
+void ScrollViewComponentInstance::onChildRemoved(ComponentInstance::Shared const &childComponentInstance) {
+    CppComponentInstance::onChildRemoved(childComponentInstance);
     m_stackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
-};
+}
 
 void ScrollViewComponentInstance::setLayout(facebook::react::LayoutMetrics layoutMetrics) {
     CppComponentInstance::setLayout(layoutMetrics);

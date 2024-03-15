@@ -13,9 +13,9 @@ namespace rnoh {
     public:
         ViewComponentInstance(Context context);
 
-        void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
+        void onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) override;
+        void onChildRemoved(ComponentInstance::Shared const &childComponentInstance) override;
 
-        void removeChild(ComponentInstance::Shared childComponentInstance) override;
         void onClick() override;
         StackNode &getLocalRootArkUINode() override;
     };

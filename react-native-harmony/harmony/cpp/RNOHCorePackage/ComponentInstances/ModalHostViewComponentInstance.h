@@ -18,9 +18,8 @@ class ModalHostViewComponentInstance : public CppComponentInstance<facebook::rea
 
     void onPropsChanged(SharedConcreteProps const &props) override;
 
-    void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
-
-    void removeChild(ComponentInstance::Shared childComponentInstance) override;
+    void onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) override;
+    void onChildRemoved(ComponentInstance::Shared const &childComponentInstance) override;
 
     StackNode &getLocalRootArkUINode() override;
 };

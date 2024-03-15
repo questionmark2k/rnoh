@@ -6,13 +6,13 @@ namespace rnoh {
         m_stackNode.setStackNodeDelegate(this);
     }
 
-    void ViewComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
-        CppComponentInstance::insertChild(childComponentInstance, index);
+    void ViewComponentInstance::onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) {
+        CppComponentInstance::onChildInserted(childComponentInstance, index);
         m_stackNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
     }
 
-    void ViewComponentInstance::removeChild(ComponentInstance::Shared childComponentInstance) {
-        CppComponentInstance::removeChild(childComponentInstance);
+    void ViewComponentInstance::onChildRemoved(ComponentInstance::Shared const &childComponentInstance) {
+        CppComponentInstance::onChildRemoved(childComponentInstance);
         m_stackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
     };
 
