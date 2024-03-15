@@ -413,6 +413,15 @@ export const ImageTest = () => {
       <TestCase itShould="allow scrolling by touching the image">
         <ImagePointerEventsTest />
       </TestCase>
+      <TestCase itShould="Display placeholder image before loading image" modal>
+        <Image
+          style={{width: 200, height: 200}}
+          source={{
+          uri: 'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' + Date.now()
+          }}
+          defaultSource={require('../assets/expo.png')}
+        />
+      </TestCase>
     </TestSuite>
   );
 };

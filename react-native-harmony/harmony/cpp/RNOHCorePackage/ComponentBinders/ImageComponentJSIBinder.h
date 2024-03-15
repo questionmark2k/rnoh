@@ -10,6 +10,7 @@ class ImageComponentJSIBinder : public ViewComponentJSIBinder {
         object.setProperty(rt, "resizeMode", "string");
         object.setProperty(rt, "resizeMethod", "string");
         object.setProperty(rt, "blurRadius", "number");
+        object.setProperty(rt, "defaultSource", "RCTImageSource");
         return object;
     }
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {

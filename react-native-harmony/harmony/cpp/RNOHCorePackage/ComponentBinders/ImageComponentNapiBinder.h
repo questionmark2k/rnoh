@@ -12,8 +12,13 @@ class ImageComponentNapiBinder : public ViewComponentNapiBinder {
             facebook::react::ImageSource imageSource;
             if (props->sources.size() > 0) {
                 imageSource = props->sources[0];
-                return ArkJS(env)
-                    .getObjectBuilder(napiViewProps)
+                ArkJS arkJs(env);
+                auto propsObjBuilder = arkJs.getObjectBuilder(napiViewProps);
+                if (props->defaultSources.size() > 0) {
+                    facebook::react::ImageSource defaultSource = props->defaultSources[0];
+                    propsObjBuilder.addProperty("defaultSource", defaultSource.uri);
+                }
+                return propsObjBuilder
                     .addProperty("uri", imageSource.uri)
                     .addProperty("resizeMode", static_cast<int>(props->resizeMode))
                     .addProperty("tintColor", props->tintColor)

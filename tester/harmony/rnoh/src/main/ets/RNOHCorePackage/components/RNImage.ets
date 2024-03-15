@@ -6,7 +6,8 @@ export interface ImageProps extends ViewBaseProps {
   uri: string,
   resizeMode: number,
   tintColor?: ColorSegments,
-  blurRadius: number
+  blurRadius: number,
+  defaultSource: string
 }
 
 interface ImageRawProps extends ViewRawProps {
@@ -128,6 +129,17 @@ export struct RNImage {
     })
   }
 
+  getDefaultSource(): string | Resource | undefined {
+    const defaultSource = this.descriptor.props.defaultSource;
+    if (defaultSource === undefined) {
+      return undefined;
+    }
+    if (defaultSource.startsWith("asset://")) {
+      return $rawfile(defaultSource.replace("asset://", "assets/"));
+    }
+    return defaultSource;
+  }
+
   /*
   * enum class ImageResizeMode {
   *   Cover,
@@ -203,6 +215,7 @@ export struct RNImage {
       if (this.imageSource?.source) {
         Image(this.imageSource.source)
           .accessibilityText(this.descriptor.rawProps.alt)
+          .alt(this.getDefaultSource())
           .interpolation(ImageInterpolation.High)
           .draggable(false)
           .width(this.descriptorWrapper?.width)
