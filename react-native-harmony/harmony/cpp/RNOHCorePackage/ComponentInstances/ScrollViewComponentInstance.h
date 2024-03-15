@@ -4,6 +4,8 @@
 #include "RNOH/arkui/StackNode.h"
 #include <react/renderer/components/scrollview/ScrollViewEventEmitter.h>
 #include <react/renderer/components/scrollview/ScrollViewShadowNode.h>
+#include <react/renderer/components/scrollview/ScrollViewProps.h>
+
 
 namespace rnoh {
     class ScrollViewComponentInstance 
@@ -15,6 +17,7 @@ namespace rnoh {
         facebook::react::Size m_contentSize;
         facebook::react::Size m_containerSize;
         facebook::react::ScrollViewMetrics getScrollViewMetrics();
+        facebook::react::Float getFrictionFromDecelerationRate(facebook::react::Float decelerationRate);
 
     public:
         ScrollViewComponentInstance(Context context);
@@ -28,6 +31,8 @@ namespace rnoh {
         void setLayout(facebook::react::LayoutMetrics layoutMetrics) override;
 
         void onStateChanged(SharedConcreteState const &state) override;
+
+        void onPropsChanged(SharedConcreteProps const &props) override;
 
         void onScroll() override;
 

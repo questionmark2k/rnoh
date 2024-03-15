@@ -66,4 +66,34 @@ namespace rnoh {
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_SCROLL_NESTED_SCROLL, &item));
     }
 
+    ScrollNode& ScrollNode::setHorizontal(bool horizontal) {
+        auto scrollDirection = horizontal ? ArkUI_ScrollDirection::ARKUI_SCROLL_DIRECTION_HORIZONTAL : ArkUI_ScrollDirection::ARKUI_SCROLL_DIRECTION_VERTICAL;
+        ArkUI_NumberValue value[] = {{.i32 =  scrollDirection}};
+        ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_SCROLL_SCROLL_DIRECTION, &item));
+        return *this;
+    }
+
+    ScrollNode& ScrollNode::setEnableScrollInteraction(bool enableScrollInteraction) {
+        ArkUI_NumberValue value[] = {{.i32 = enableScrollInteraction}};
+        ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_SCROLL_ENABLE_SCROLL_INTERACTION, &item));
+        return *this;
+    }
+
+    ScrollNode& ScrollNode::setFriction(float friction) {
+        ArkUI_NumberValue value[] = {{.f32 = friction}};
+        ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(
+            NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_SCROLL_FRICTION, &item));
+        return *this;
+    }
+
+    ScrollNode& ScrollNode::setEdgeEffect(bool bounces, bool alwaysBounce) {
+        ArkUI_EdgeEffect edgeEffect = bounces ? ArkUI_EdgeEffect::ARKUI_EDGE_EFFECT_SPRING : ArkUI_EdgeEffect::ARKUI_EDGE_EFFECT_NONE;
+        ArkUI_NumberValue value[] = {{.i32 = edgeEffect}, {.i32 = alwaysBounce}};
+        ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_SCROLL_EDGE_EFFECT, &item));
+        return *this;
+    }
 } // namespace rnoh

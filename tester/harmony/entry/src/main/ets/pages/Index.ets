@@ -1,16 +1,18 @@
-import { ComponentBuilderContext, FileJSBundleProvider, RNOHLogger } from 'rnoh';
 import {
-  RNApp,
-  RNAbility,
-  RNOHErrorDialog,
   AnyJSBundleProvider,
+  ComponentBuilderContext,
+  FileJSBundleProvider,
   MetroJSBundleProvider,
   ResourceJSBundleProvider,
+  RNAbility,
+  RNApp,
+  RNOHErrorDialog,
+  RNOHLogger,
   TraceJSBundleProviderDecorator
-} from 'rnoh'
-import { SampleView, PropsDisplayer, GeneratedSampleView } from "rnoh-sample-package"
+} from 'rnoh';
+import { GeneratedSampleView, PropsDisplayer, SampleView } from 'rnoh-sample-package';
 import font from '@ohos.font';
-import { createRNPackages } from '../RNPackagesFactory'
+import { createRNPackages } from '../RNPackagesFactory';
 
 @Builder
 export function buildCustomRNComponent(ctx: ComponentBuilderContext) {

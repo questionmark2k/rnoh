@@ -35,6 +35,15 @@ void rnoh::ScrollViewComponentInstance::onStateChanged(SharedConcreteState const
     m_contentSize = stateData.getContentSize();
 }
 
+void rnoh::ScrollViewComponentInstance::onPropsChanged(SharedConcreteProps const &props) {
+    auto horizontal = props->alwaysBounceHorizontal || m_contentSize.width > m_containerSize.width;
+    m_scrollNode
+        .setHorizontal(horizontal)
+        .setEnableScrollInteraction(props->scrollEnabled)
+        .setFriction(getFrictionFromDecelerationRate(props->decelerationRate))
+        .setEdgeEffect(props->bounces, horizontal ? props->alwaysBounceHorizontal : props->alwaysBounceVertical);
+}
+
 facebook::react::Point rnoh::ScrollViewComponentInstance::computeChildPoint(facebook::react::Point const &point,
                                                                             TouchTarget::Shared const &child) const {
     auto offset = m_scrollNode.getScrollOffset();
@@ -82,4 +91,20 @@ void ScrollViewComponentInstance::onScrollStart() {
 void ScrollViewComponentInstance::onScrollStop() {
     auto scrollViewMetrics = getScrollViewMetrics();
     m_eventEmitter->onMomentumScrollEnd(scrollViewMetrics);
+}
+
+facebook::react::Float ScrollViewComponentInstance::getFrictionFromDecelerationRate(facebook::react::Float decelerationRate) {
+    // default deceleration rate and friction values differ between ArkUI and RN
+    // so we adapt the decelerationRate accordingly to resemble iOS behaviour
+    // iOS's UIScrollView supports only two values of decelerationRate
+    // called 'normal' and 'fast' and maps all other to the nearest of those two
+    facebook::react::Float IOS_NORMAL = 0.998;
+    facebook::react::Float IOS_FAST = 0.99;
+    facebook::react::Float ARKUI_FAST = 2;
+    facebook::react::Float ARKUI_NORMAL = 0.6;
+    if (decelerationRate < (IOS_NORMAL + IOS_FAST) / 2) {
+        return ARKUI_FAST;
+    } else {
+        return ARKUI_NORMAL;
+    }
 }

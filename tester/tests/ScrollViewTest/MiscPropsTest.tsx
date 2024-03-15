@@ -1,49 +1,55 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import React from 'react';
-import {COMMON_PROPS, getScrollViewContent} from './fixtures';
+import {
+  COMMON_PROPS,
+  getScrollViewContent,
+  getScrollViewContentHorizontal,
+} from './fixtures';
 import {useEffect, useRef, useState} from 'react';
-import {Button, ObjectDisplayer} from '../../components';
+import {Button, ObjectDisplayer, TestCase} from '../../components';
 
 export function MiscPropsTest() {
   return (
     <TestSuite name="misc props">
-      <TestCase
-        modal
-        itShould="scroll should be disabled (it renders with the 5th element at the top)">
+      <TestCase.Example itShould="scroll should be disabled" tags={['C_API']}>
         <View style={styles.wrapperView}>
           <ScrollView {...COMMON_PROPS} scrollEnabled={false} />
         </View>
-      </TestCase>
-      <TestCase modal itShould="display horizontal scroll view">
+      </TestCase.Example>
+      <TestCase.Example
+        itShould="display horizontal scroll view"
+        tags={['C_API']}>
         <View
           style={{
             width: '100%',
             height: 150,
           }}>
-          <ScrollView {...COMMON_PROPS} horizontal={true} />
+          <ScrollView horizontal={true}>
+            {getScrollViewContentHorizontal({})}
+          </ScrollView>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="display ScrollView with the third view at the top (contentOffset)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/305
       >
         <ContentOffsetTestCase />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="scroll when contentOffset property is changed (contentOffset)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/305
       >
         <ToggleContentOffsetTestCase />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="toggle backface visibility on button press (the component should become invisible)">
         <BackfaceVisibilityTestCase />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         skip={Platform.select({android: 'fails', harmony: 'fails on Android'})}
         itShould="display ScrollView with different contentInsets (contentInset)"
@@ -55,13 +61,13 @@ export function MiscPropsTest() {
             contentInset={{top: 10, right: 20, bottom: 30, left: 40}}
           />
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="display current contentHeight (onContentSizeChange)">
         <OnContentSizeChangeTestCase />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="display onScroll native event throttled every second">
         <ObjectDisplayer
@@ -77,38 +83,36 @@ export function MiscPropsTest() {
             );
           }}
         />
-      </TestCase>
-      <TestCase
-        modal
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
         itShould="the left scrollview should decelerate faster (stops earlier) than the right one (decelarationRate)">
         <View style={[styles.wrapperView, {flexDirection: 'row'}]}>
           <ScrollView {...COMMON_PROPS} decelerationRate={0.8} />
           <ScrollView {...COMMON_PROPS} decelerationRate={0.999} />
         </View>
-      </TestCase>
+      </TestCase.Example>
 
-      <TestCase
+      <TestCase.Example
         modal
         itShould="the left scrollview should bounce (briefly scroll beyond the content to show the view below and then come back to top/bottom accordingly)">
         <View style={[styles.wrapperView, {flexDirection: 'row'}]}>
           <ScrollView {...COMMON_PROPS} />
           <ScrollView {...COMMON_PROPS} bounces={false} />
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         skip={Platform.select({android: 'fails', harmony: 'fails on Android'})}
         itShould="scroll outside of the content when pressing the button (scrollToOverflowEnabled)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/315
       >
         <ScrollToOverflowEnabledTestCase />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip
-        itShould="the left scrollview should allow for nested scroll while the right one shouldn't (nestedScrollEnabled)"
-        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/312
-      >
+        skip={'https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/312'}
+        itShould="the left scrollview should allow for nested scroll while the right one shouldn't (nestedScrollEnabled)">
         <View
           style={[
             styles.wrapperView,
@@ -147,18 +151,18 @@ export function MiscPropsTest() {
             {getScrollViewContent({})}
           </ScrollView>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="scroll down on the btn press, but prevent scrolling by dragging (scrollEnabled)">
         <ScrollEnabledTestCase />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/499
+        skip={'https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/499'}
         itShould="render scroll view with different fading edge length (fadingEdgeLength)">
         <ScrollViewFadingEdgeLengthTest />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }
