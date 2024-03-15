@@ -66,6 +66,7 @@
 #include "RNOHCorePackage/ComponentInstances/ViewComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/TextComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ScrollViewComponentInstance.h"
+#include "RNOHCorePackage/ComponentInstances/ActivityIndicatorComponentInstance.h"
 
 namespace rnoh {
 
@@ -147,6 +148,9 @@ namespace rnoh {
             if (ctx.componentName == "ScrollView") {
                 return std::make_shared<ScrollViewComponentInstance>(std::move(ctx));
             } 
+            if (ctx.componentName == "ActivityIndicatorView") {
+                return std::make_shared<ActivityIndicatorComponentInstance>(m_ctx, ctx.tag);
+            }
             return nullptr;
         }
     };

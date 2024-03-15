@@ -17,7 +17,7 @@ export function ActivityIndicatorTest() {
           }}
         />
       </TestCase>
-      <TestCase itShould="display red loading indicator">
+      <TestCase tags={['C_API']} itShould="display red loading indicator">
         <ActivityIndicator color={'red'} />
       </TestCase>
       <TestCase itShould="display large loading indicator">
