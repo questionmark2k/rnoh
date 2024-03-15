@@ -102,6 +102,7 @@ export abstract class RNAbility extends UIAbility {
   }
 
   public reportError(err: RNOHError) {
+    this.rnohCoreContext.devToolsController.setLastError(err)
     this.rnohCoreContext.devToolsController.eventEmitter.emit("NEW_ERROR", err)
   }
 

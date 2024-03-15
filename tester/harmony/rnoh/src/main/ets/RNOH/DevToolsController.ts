@@ -74,4 +74,8 @@ export class DevToolsController {
   getLastError(): RNOHError | null {
     return this.lastError
   }
+
+  setLastError(error: RNOHError): void {
+    this.lastError = error;
+  }
 }
