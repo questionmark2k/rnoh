@@ -23,6 +23,13 @@ class BaseComponentJSIBinder : public ComponentJSIBinder {
         nativeProps.setProperty(rt, "pointerEvents", "string");
         nativeProps.setProperty(rt, "collapsable", "boolean");
         nativeProps.setProperty(rt, "focusable", "boolean");
+        nativeProps.setProperty(rt, "accessible", "boolean");
+        nativeProps.setProperty(rt, "accessibilityElementsHidden", "boolean");
+        nativeProps.setProperty(rt, "accessibilityLabel", "string");
+        nativeProps.setProperty(rt, "accessibilityHint", "string");
+        nativeProps.setProperty(rt, "aria-hidden", "boolean");
+        nativeProps.setProperty(rt, "aria-label", "string");
+        nativeProps.setProperty(rt, "importantForAccessibility", "number");
         return nativeProps;
     }
 

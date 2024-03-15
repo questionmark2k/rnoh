@@ -116,7 +116,15 @@ namespace rnoh {
             this->getLocalRootArkUINode().setBorderStyle(borderMetrics.borderStyles);
 
             this->getLocalRootArkUINode().setOpacity(props->opacity);
+            this->getLocalRootArkUINode().setShadow(props->shadowColor, props->shadowOffset, props->shadowOpacity, props->shadowRadius);
             this->getLocalRootArkUINode().setTransform(props->transform, m_layoutMetrics.pointScaleFactor);
+            this->getLocalRootArkUINode().setHitTestMode(props->pointerEvents);
+            this->getLocalRootArkUINode().setAccessibilityDescription(props->accessibilityHint);
+            this->getLocalRootArkUINode().setAccessibilityLevel(props->importantForAccessibility);
+            this->getLocalRootArkUINode().setAccessibilityText(props->accessibilityLabel);
+            this->getLocalRootArkUINode().setAccessibilityGroup(props->accessible);
+            this->getLocalRootArkUINode().setId(m_tag);
+            this->getLocalRootArkUINode().setClip(props->getClipsContentToBounds());
         };
 
         virtual void onStateChanged(SharedConcreteState const &state){};

@@ -4,7 +4,8 @@
 #include "RNOH/arkui/StackNode.h"
 
 namespace rnoh {
-    class ViewComponentInstance : public CppComponentInstance<facebook::react::ViewShadowNode> {
+    class ViewComponentInstance : public CppComponentInstance<facebook::react::ViewShadowNode>,
+        public StackNodeDelegate {
     private:
         StackNode m_stackNode;
         facebook::react::SharedViewEventEmitter m_eventEmitter;
@@ -15,7 +16,7 @@ namespace rnoh {
         void insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) override;
 
         void removeChild(ComponentInstance::Shared childComponentInstance) override;
-
+        void onClick() override;
         StackNode &getLocalRootArkUINode() override;
     };
 } // namespace rnoh

@@ -105,6 +105,68 @@ namespace rnoh {
         return *this;
     }
 
+    ArkUINode &ArkUINode::setShadow(facebook::react::SharedColor const &shadowColor,
+        facebook::react::Size const &shadowOffset, float const shadowOpacity, float const shadowRadius) {
+        if (!facebook::react::isColorMeaningful(shadowColor)) {
+            return *this;;
+        }
+        uint32_t shadowColorValue = *shadowColor;
+        uint32_t alpha = static_cast<uint32_t>((float)((shadowColorValue >> 24) & (0xff)) * shadowOpacity);
+        shadowColorValue = (alpha << 24) + (shadowColorValue & 0xffffff);
+        ArkUI_NumberValue shadowValue[] = {{.f32 = shadowRadius}, {.i32 = 0},
+            {.f32 = static_cast<float>(shadowOffset.width)}, {.f32 = static_cast<float>(shadowOffset.height)},
+            {.i32 = 0},  {.u32 = shadowColorValue}, {.u32 = 0}};
+        ArkUI_AttributeItem shadowItem = {
+            .value = shadowValue, .size = sizeof(shadowValue) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_CUSTOM_SHADOW, &shadowItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setHitTestMode(facebook::react::PointerEventsMode const &pointerEvents) {
+        ArkuiHitTestMode hitTestMode = (pointerEvents == facebook::react::PointerEventsMode::None ||
+            pointerEvents == facebook::react::PointerEventsMode::BoxNone) ?
+            ArkuiHitTestMode::NONE : ArkuiHitTestMode::DEFAULT;
+        ArkUI_NumberValue hitTestModeValue[] = {{.i32 = static_cast<int32_t>(hitTestMode)}};
+        ArkUI_AttributeItem hitTestModeItem =
+            {.value = hitTestModeValue, .size = sizeof(hitTestModeValue) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_HIT_TEST_BEHAVIOR, &hitTestModeItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setAccessibilityDescription(std::string const &accessibilityDescription) {
+        ArkUI_AttributeItem descriptionItem = {.string = accessibilityDescription.c_str()};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+            m_nodeHandle, NODE_ACCESSIBILITY_DESCRIPTION, &descriptionItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setAccessibilityLevel(facebook::react::ImportantForAccessibility importance) {
+        ArkUI_NumberValue levelValue[] = {{.i32 = static_cast<int32_t>(importance)}};
+        ArkUI_AttributeItem levelItem = {.value = levelValue, .size = sizeof(levelValue) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_ACCESSIBILITY_MODE, &levelItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setAccessibilityText(std::string const &accessibilityLabel) {
+        ArkUI_AttributeItem textItem = {.string = accessibilityLabel.c_str()};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_ACCESSIBILITY_TEXT, &textItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setAccessibilityGroup(bool accessible) {
+        ArkUI_NumberValue groupValue[] = {{.i32 = static_cast<int32_t>(accessible)}};
+        ArkUI_AttributeItem groupItem = {.value = groupValue, .size = sizeof(groupValue) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_ACCESSIBILITY_GROUP, &groupItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setId(facebook::react::Tag const &tag) {
+        std::string tmpTag = std::to_string(tag);
+        ArkUI_AttributeItem idItem = {.string = tmpTag.c_str()};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_ID, &idItem));
+        return *this;
+    }
+
     ArkUINode &ArkUINode::setBackgroundColor(facebook::react::SharedColor const &color) {
         // TODO: figure out if we need to update (to a clear value), or return early here
         if (!facebook::react::isColorMeaningful(color)) {
@@ -148,6 +210,15 @@ namespace rnoh {
         ArkUI_AttributeItem opacityItem = {opacityValue, sizeof(opacityValue) / sizeof(ArkUI_NumberValue)};
 
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_OPACITY, &opacityItem));
+        return *this;
+    }
+
+    ArkUINode &ArkUINode::setClip(bool clip) {
+        uint32_t isClip = static_cast<uint32_t>(clip);
+        ArkUI_NumberValue clipValue[] = {{.u32 = isClip}};
+        ArkUI_AttributeItem clipItem = {clipValue, sizeof(clipValue) / sizeof(ArkUI_NumberValue)};
+
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_CLIP, &clipItem));
         return *this;
     }
 

@@ -8,9 +8,23 @@
 #include <stdexcept>
 #include "glog/logging.h"
 #include "react/renderer/components/view/primitives.h"
-#include "react/renderer/graphics/Transform.h"
+#include <react/renderer/graphics/Transform.h>
+#include <react/renderer/components/view/AccessibilityPrimitives.h>
+#include <react/renderer/core/ReactPrimitives.h>
+#include <react/renderer/graphics/Float.h>
+#include <folly/dynamic.h>
 
 namespace rnoh {
+
+namespace {
+    enum class ArkuiHitTestMode : int32_t {
+        DEFAULT,
+        BLOCK,
+        TRANSPARENT,
+        NONE,
+    };
+}
+
     class ArkUINode {
     protected:
         ArkUINode(ArkUI_NodeHandle nodeHandle);
@@ -34,7 +48,16 @@ namespace rnoh {
         virtual ArkUINode &setBorderStyle(facebook::react::BorderStyles const &borderStyles);
         virtual ArkUINode &setBackgroundColor(facebook::react::SharedColor const &color);
         virtual ArkUINode &setTransform(facebook::react::Transform const &transform, facebook::react::Float pointScaleFactor);
+        virtual ArkUINode &setShadow(facebook::react::SharedColor const &shadowColor,
+            facebook::react::Size const &shadowOffset, float const shadowOpacity, float const shadowRadius);
+        virtual ArkUINode &setHitTestMode(facebook::react::PointerEventsMode const &pointerEvents);
+        virtual ArkUINode &setAccessibilityDescription(std::string const &accessibilityDescription);
+        virtual ArkUINode &setAccessibilityLevel(facebook::react::ImportantForAccessibility importance);
+        virtual ArkUINode &setAccessibilityText(std::string const &accessibilityLabel);
+        virtual ArkUINode &setAccessibilityGroup(bool accessible);
+        virtual ArkUINode &setId(facebook::react::Tag const &tag);
         virtual ArkUINode &setOpacity(facebook::react::Float const &opacity);
+        virtual ArkUINode &setClip(bool clip);
 
         virtual void onNodeEvent(ArkUI_NodeEvent *event);
 
