@@ -1,6 +1,8 @@
 import {RemoteImageCache} from './RemoteImageCache';
 import fs from '@ohos.file.fs';
 
+const EMPTY_CACHE_KEY = '';
+
 export class RemoteImageDiskCache extends RemoteImageCache<boolean> {
   private cacheDir: string;
 
@@ -41,6 +43,10 @@ export class RemoteImageDiskCache extends RemoteImageCache<boolean> {
 
   set(key: string, value: boolean = true): void {
     const cachedKey = this.getCacheKey(key);
+    if (cachedKey === EMPTY_CACHE_KEY) {
+      console.warn('Cache key not provided, not using cache');
+      return;
+    }
     return super.set(cachedKey, value);
   }
 
@@ -68,6 +74,12 @@ export class RemoteImageDiskCache extends RemoteImageCache<boolean> {
   }
 
   private getCacheKey(uri: string): string {
+    if (uri === undefined) {
+      // if multiple images would have the same uri, they would overwrite each other
+      // but it's better than crashing the app
+      console.warn('Cache key not provided, defaulting to empty cache key');
+      return EMPTY_CACHE_KEY;
+    }
     const reg = /[^a-zA-Z0-9 -]/g;
     return uri.replace(reg, '');
   }
