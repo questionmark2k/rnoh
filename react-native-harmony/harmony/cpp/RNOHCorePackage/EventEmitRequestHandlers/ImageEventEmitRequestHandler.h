@@ -21,7 +21,7 @@ class ImageEventEmitRequestHandler : public EventEmitRequestHandler {
     }
 
     void handleEvent(EventEmitRequestHandler::Context const &ctx) override {
-        if (ctx.eventName != "loadStart" && ctx.eventName != "load" && ctx.eventName != "error") {
+        if (ctx.eventName != "loadStart" && ctx.eventName != "load" && ctx.eventName != "error" && ctx.eventName != "loadEnd") {
             return;
         }
 
@@ -44,6 +44,8 @@ class ImageEventEmitRequestHandler : public EventEmitRequestHandler {
                 payload.setProperty(runtime, "source", source);
                 return payload;
             });
+        } else if (ctx.eventName == "loadEnd") {
+            eventEmitter->onLoadEnd();
         } else if (ctx.eventName == "error") {
             auto message = arkJs.getString(ctx.payload);
             eventEmitter->dispatchEvent("error", [=](facebook::jsi::Runtime &runtime) {

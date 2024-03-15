@@ -14,11 +14,10 @@ class ImageComponentJSIBinder : public ViewComponentJSIBinder {
     }
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
         facebook::jsi::Object events = ViewComponentJSIBinder::createDirectEventTypes(rt);
-
         events.setProperty(rt, "topLoadStart", createDirectEvent(rt, "onLoadStart"));
         events.setProperty(rt, "topLoad", createDirectEvent(rt, "onLoad"));
         events.setProperty(rt, "topError", createDirectEvent(rt, "onError"));
-
+        events.setProperty(rt, "topLoadEnd", createDirectEvent(rt, "onLoadEnd"));
         return events;
     }
 };

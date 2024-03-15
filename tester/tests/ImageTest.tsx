@@ -161,6 +161,26 @@ export const ImageTest = () => {
         }}
       />
       <TestCase
+        itShould="call onLoadEnd"
+        initialState={'not called'}
+        arrange={({setState,state}) => {
+          return (
+            <View>
+              <Text>{JSON.stringify(state)}</Text>
+              <Image
+                source={LOCAL_IMAGE_ASSET_ID}
+                onLoadEnd={() => {
+                  setState('called');
+                }}
+              />
+            </View>
+          );
+        }}
+        assert={({expect, state}) => {
+          expect(state).to.be.eq('called');
+        }}
+      />
+      <TestCase
         itShould="call onError (local)"
         initialState={null}
         arrange={({setState, state}) => {

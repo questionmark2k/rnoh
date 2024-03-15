@@ -120,9 +120,11 @@ export struct RNImage {
         }
       } catch (error) {
         this.dispatchOnError(error.message);
+        this.onLoadEnd()
       }
     }).catch((error: RemoteImageLoaderError) => {
       this.dispatchOnError(error.message)
+      this.onLoadEnd()
     })
   }
 
@@ -155,6 +157,14 @@ export struct RNImage {
     this.ctx.rnInstanceManager.emitComponentEvent(
       this.descriptor.tag,
       "loadStart",
+      null
+    )
+  }
+
+  onLoadEnd() {
+    this.ctx.rnInstanceManager.emitComponentEvent(
+      this.descriptor.tag,
+      "loadEnd",
       null
     )
   }
@@ -207,10 +217,14 @@ export struct RNImage {
           ImageRepeat.XY : ImageRepeat.NoRepeat)
           .colorFilter(this.getColorFilter())
           .blur(this.descriptor.props.blurRadius)
-          .onComplete(event => this.onLoad(event))
+          .onComplete(event => {
+            this.onLoad(event)
+            this.onLoadEnd()
+          })
           .onError((event: ImageOnErrorEvent) => {
             if (this.imageSource !== undefined) {
               this.dispatchOnError(event.message)
+              this.onLoadEnd()
             }
             this.imageSource = undefined;
           })
