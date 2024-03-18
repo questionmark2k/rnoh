@@ -63,6 +63,7 @@
 #include "RNOHCorePackage/EventEmitRequestHandlers/ImageEventEmitRequestHandler.h"
 #include "RNOHCorePackage/EventEmitRequestHandlers/ViewEventEmitRequestHandler.h"
 #include "RNOHCorePackage/GlobalBinders/BlobCollectorJSIBinder.h"
+#include "RNOHCorePackage/ComponentInstances/ImageComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ViewComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/TextComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ScrollViewComponentInstance.h"
@@ -149,7 +150,10 @@ namespace rnoh {
             }
             if (ctx.componentName == "ScrollView") {
                 return std::make_shared<ScrollViewComponentInstance>(std::move(ctx));
-            } 
+            }
+            if (ctx.componentName == "Image") {
+                return std::make_shared<ImageComponentInstance>(std::move(ctx));
+            }
             if (ctx.componentName == "ActivityIndicatorView") {
                 return std::make_shared<ActivityIndicatorComponentInstance>(std::move(ctx));
             }

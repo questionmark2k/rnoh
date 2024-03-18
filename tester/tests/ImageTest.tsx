@@ -26,7 +26,7 @@ const FILE_URI = 'file:///data/storage/el2/base/files/pravatar-131.jpg';
 export const ImageTest = () => {
   return (
     <TestSuite name="Image">
-      <TestCase itShould="support loading local images">
+      <TestCase tags={['C_API']} itShould="support loading local images">
         <Image
           style={{borderRadius: 8, borderWidth: 1}}
           source={LOCAL_IMAGE_ASSET_ID}
@@ -52,7 +52,9 @@ export const ImageTest = () => {
         itShould="support loading remote animated gifs"
         source={{uri: REMOTE_GIF_URL}}
       />
-      <TestCase itShould="display alt when the image doesn't load">
+      <TestCase
+        tags={['C_API']}
+        itShould="display alt when the image doesn't load">
         <View style={{minHeight: 50}}>
           <Image
             source={require('../assets/fonts/Pacifico-Regular.ttf')}
@@ -118,6 +120,7 @@ export const ImageTest = () => {
         }}
       />
       <TestCase
+        tags={['C_API']}
         skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/246
         itShould="render circular image on a red rectangle (overlayColor)">
         <Image
@@ -126,6 +129,7 @@ export const ImageTest = () => {
         />
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="call onLoadStart"
         initialState={'not called'}
         arrange={({setState}) => {
@@ -141,6 +145,7 @@ export const ImageTest = () => {
         }}
       />
       <TestCase
+        tags={['C_API']}
         itShould="call onLoad"
         initialState={{}}
         arrange={({setState, state}) => {
@@ -181,6 +186,7 @@ export const ImageTest = () => {
         }}
       />
       <TestCase
+        tags={['C_API']}
         itShould="call onError (local)"
         initialState={null}
         arrange={({setState, state}) => {
@@ -201,6 +207,7 @@ export const ImageTest = () => {
         }}
       />
       <TestCase
+        tags={['C_API']}
         itShould="call onError (remote)"
         initialState={null}
         arrange={({setState, state}) => {
@@ -223,35 +230,45 @@ export const ImageTest = () => {
       <TestSuite
         name="resizeMode" // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/245
       >
-        <TestCase itShould="render small image in the center (center)">
+        <TestCase
+          tags={['C_API']}
+          itShould="render small image in the center (center)">
           <Image
             style={{width: '100%', height: 100}}
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="center"
           />
         </TestCase>
-        <TestCase itShould="render image touching top and bottom edges in the center (contain)">
+        <TestCase
+          tags={['C_API']}
+          itShould="render image touching top and bottom edges in the center (contain)">
           <Image
             style={{width: '100%', height: 100}}
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="contain"
           />
         </TestCase>
-        <TestCase itShould="fully cover test case area while preserving aspect ratio (cover)">
+        <TestCase
+          tags={['C_API']}
+          itShould="fully cover test case area while preserving aspect ratio (cover)">
           <Image
             style={{width: '100%', height: 100}}
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="cover"
           />
         </TestCase>
-        <TestCase itShould="cover test case area by repeating image (repeat)">
+        <TestCase
+          tags={['C_API']}
+          itShould="cover test case area by repeating image (repeat)">
           <Image
             style={{width: '100%', height: 100}}
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="repeat"
           />
         </TestCase>
-        <TestCase itShould="cover test case area by stretching (stretch)">
+        <TestCase
+          tags={['C_API']}
+          itShould="cover test case area by stretching (stretch)">
           <Image
             style={{width: '100%', height: 100}}
             source={LOCAL_IMAGE_ASSET_ID}
@@ -260,7 +277,9 @@ export const ImageTest = () => {
         </TestCase>
       </TestSuite>
       <TestSuite name="blurRadius">
-        <TestCase itShould="blur images with various blur radius">
+        <TestCase
+          tags={['C_API']}
+          itShould="blur images with various blur radius">
           <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
             <Image
               style={{width: 64, height: 64, margin: 4}}
@@ -295,7 +314,9 @@ export const ImageTest = () => {
           </View>
         </TestCase>
       </TestSuite>
-      <TestCase itShould="replace opaque pixels with the green color (tintColor)">
+      <TestCase
+        tags={['C_API']}
+        itShould="replace opaque pixels with the green color (tintColor)">
         <View
           style={{
             flex: 1,
@@ -322,7 +343,9 @@ export const ImageTest = () => {
       <TestCase modal itShould="stop displaying on press">
         <SwitchSourceTest />
       </TestCase>
-      <TestCase itShould="render top image in a bit lower quality (difference barely visible)">
+      <TestCase
+        tags={['C_API']}
+        itShould="render top image in a bit lower quality (difference barely visible)">
         <Image
           style={{width: 200, height: 200}}
           source={require('../assets/noise.png')}
@@ -410,7 +433,9 @@ export const ImageTest = () => {
           ))}
         </ScrollView>
       </TestCase>
-      <TestCase itShould="allow scrolling by touching the image">
+      <TestCase
+        tags={['C_API']}
+        itShould="allow scrolling by touching the image">
         <ImagePointerEventsTest />
       </TestCase>
       <TestCase itShould="Display placeholder image before loading image" modal>
