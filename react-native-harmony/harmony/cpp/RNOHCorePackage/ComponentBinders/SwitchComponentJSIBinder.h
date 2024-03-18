@@ -15,7 +15,7 @@ class SwitchComponentJSIBinder : public ViewComponentJSIBinder {
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
         facebook::jsi::Object events = ViewComponentJSIBinder::createDirectEventTypes(rt);
 
-        events.setProperty(rt, "onChange", createDirectEvent(rt, "onChange"));
+        events.setProperty(rt, "topChange", createDirectEvent(rt, "onChange"));
 
         return events;
     }

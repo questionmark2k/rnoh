@@ -453,12 +453,14 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOH/arkui/ArkUIDialogHandler.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/TouchEventDispatcher.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/LoadingProgressNode.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/ToggleNode.cpp"
     "${RNOH_CPP_DIR}/RNOH/ComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ViewComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/TextComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ScrollViewComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ActivityIndicatorComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ModalHostViewComponentInstance.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/SwitchComponentInstance.cpp"
 )
 target_include_directories(rnoh PUBLIC
     "${RNOH_CPP_DIR}"
