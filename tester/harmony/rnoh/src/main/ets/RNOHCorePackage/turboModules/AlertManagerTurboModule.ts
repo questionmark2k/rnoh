@@ -7,7 +7,7 @@ type AlertOptions = {
   message?: string
   primaryButton?: string
   secondaryButton?: string
-  cancellable: boolean
+  cancelable: boolean
 }
 
 export class AlertManagerTurboModule extends TurboModule {
@@ -52,7 +52,7 @@ export class AlertManagerTurboModule extends TurboModule {
         const alertParams = {
           title: options.title,
           message: options.message,
-          autoCancel: options.cancellable,
+          autoCancel: options.cancelable,
           primaryButton: primaryButton,
           secondaryButton: secondaryButton,
           cancel: () => {
