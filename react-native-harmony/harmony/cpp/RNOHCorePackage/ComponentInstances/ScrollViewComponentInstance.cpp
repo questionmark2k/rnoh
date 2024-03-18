@@ -80,17 +80,47 @@ void ScrollViewComponentInstance::onScroll() {
                << "; containerSize: " << scrollViewMetrics.containerSize.width << ", "
                << scrollViewMetrics.containerSize.height << ")";
     m_eventEmitter->onScroll(scrollViewMetrics);
-    updateStateWithContentOffset(scrollViewMetrics.contentOffset);
 }
 
-void ScrollViewComponentInstance::onScrollStart() {
-    auto scrollViewMetrics = getScrollViewMetrics();
-    m_eventEmitter->onMomentumScrollBegin(scrollViewMetrics);
-}
+void ScrollViewComponentInstance::onScrollStart() {}
 
 void ScrollViewComponentInstance::onScrollStop() {
+    if (m_scrollState == ScrollState::FLING) {
+        emitOnMomentumScrollEndEvent();
+    } else if (m_scrollState == ScrollState::SCROLL) {
+        emitOnScrollEndDragEvent();
+    }
+    m_scrollState = ScrollState::IDLE;
+}
+
+float ScrollViewComponentInstance::onScrollFrameBegin(float offset, int32_t scrollState) {
+    auto newScrollState = static_cast<ScrollState>(scrollState);
+    if (m_scrollState != newScrollState) {
+        if (m_scrollState == ScrollState::SCROLL) {
+            emitOnScrollEndDragEvent();
+        } else if (m_scrollState == ScrollState::FLING) {
+            emitOnMomentumScrollEndEvent();
+        }
+        auto scrollViewMetrics = getScrollViewMetrics();
+        if (scrollState == ScrollState::SCROLL) {
+            m_eventEmitter->onScrollBeginDrag(scrollViewMetrics);
+        } else if (scrollState == ScrollState::FLING) {
+            m_eventEmitter->onMomentumScrollBegin(scrollViewMetrics);
+        }
+    }
+    m_scrollState = newScrollState;
+    return offset;
+}
+
+void ScrollViewComponentInstance::emitOnScrollEndDragEvent() {
+    auto scrollViewMetrics = getScrollViewMetrics();
+    m_eventEmitter->onScrollEndDrag(scrollViewMetrics);
+    updateStateWithContentOffset(scrollViewMetrics.contentOffset);
+}
+void ScrollViewComponentInstance::emitOnMomentumScrollEndEvent() {
     auto scrollViewMetrics = getScrollViewMetrics();
     m_eventEmitter->onMomentumScrollEnd(scrollViewMetrics);
+    updateStateWithContentOffset(scrollViewMetrics.contentOffset);
 }
 
 facebook::react::Float ScrollViewComponentInstance::getFrictionFromDecelerationRate(facebook::react::Float decelerationRate) {

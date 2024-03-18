@@ -4,20 +4,24 @@
 #include "RNOH/arkui/StackNode.h"
 #include <react/renderer/components/scrollview/ScrollViewEventEmitter.h>
 #include <react/renderer/components/scrollview/ScrollViewShadowNode.h>
-#include <react/renderer/components/scrollview/ScrollViewProps.h>
 
 
 namespace rnoh {
+
     class ScrollViewComponentInstance 
         : public CppComponentInstance<facebook::react::ScrollViewShadowNode>,
           public ScrollNodeDelegate {
     private:
+        enum ScrollState : int32_t { IDLE, SCROLL, FLING };
         ScrollNode m_scrollNode;
         StackNode m_stackNode;
         facebook::react::Size m_contentSize;
         facebook::react::Size m_containerSize;
+        ScrollState m_scrollState;
         facebook::react::ScrollViewMetrics getScrollViewMetrics();
         facebook::react::Float getFrictionFromDecelerationRate(facebook::react::Float decelerationRate);
+        void emitOnScrollEndDragEvent();
+        void emitOnMomentumScrollEndEvent();
 
     public:
         ScrollViewComponentInstance(Context context);
@@ -37,6 +41,7 @@ namespace rnoh {
         void onScroll() override;
         void onScrollStart() override;
         void onScrollStop() override;
+        float onScrollFrameBegin(float offset, int32_t scrollState) override;
 
         // TouchTarget implementation
         facebook::react::Point computeChildPoint(facebook::react::Point const &point,

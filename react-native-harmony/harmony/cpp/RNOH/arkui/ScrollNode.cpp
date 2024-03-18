@@ -8,6 +8,7 @@ namespace rnoh {
         maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL, 0));
         maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_START, 0));
         maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_STOP, 0));
+        maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_FRAME_BEGIN, 0));
         setNestedScroll();
     }
 
@@ -15,6 +16,7 @@ namespace rnoh {
         NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL);
         NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_START);
         NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_STOP);
+        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_FRAME_BEGIN);
     }
 
     void ScrollNode::onNodeEvent(ArkUI_NodeEvent *event) {
@@ -29,6 +31,11 @@ namespace rnoh {
         } else if (event->kind == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL_STOP) {
             if (m_scrollNodeDelegate != nullptr) {
                 m_scrollNodeDelegate->onScrollStop();
+            }
+        } else if (event->kind == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL_FRAME_BEGIN) {
+            if (m_scrollNodeDelegate != nullptr) {
+                auto remainingOffset = m_scrollNodeDelegate->onScrollFrameBegin(event->componentEvent.data[0].f32, event->componentEvent.data[1].i32);
+                event->componentEvent.data[0].f32 = remainingOffset;        
             }
         }
     }

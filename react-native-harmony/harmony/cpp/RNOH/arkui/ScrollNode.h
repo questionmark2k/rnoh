@@ -7,9 +7,10 @@ namespace rnoh {
     class ScrollNodeDelegate {
     public:
         virtual ~ScrollNodeDelegate() = default;
-        virtual void onScroll() {};
+        virtual void onScroll(){};
         virtual void onScrollStart(){};
         virtual void onScrollStop(){};
+        virtual float onScrollFrameBegin(float offset, int32_t scrollState) { return offset; };
     };
 
 
@@ -21,7 +22,7 @@ namespace rnoh {
         ScrollNodeDelegate *m_scrollNodeDelegate;
         void setNestedScroll();
 
-      public:
+    public:
         ScrollNode();
         ~ScrollNode() override;
 
@@ -31,10 +32,10 @@ namespace rnoh {
 
         Point getScrollOffset() const;
         void setScrollNodeDelegate(ScrollNodeDelegate *scrollNodeDelegate);
-        ScrollNode& setHorizontal(bool horizontal);
-        ScrollNode& setEnableScrollInteraction(bool enableScrollInteraction);
-        ScrollNode& setFriction(float friction);
-        ScrollNode& setEdgeEffect(bool bounces, bool alwaysBounces);
+        ScrollNode &setHorizontal(bool horizontal);
+        ScrollNode &setEnableScrollInteraction(bool enableScrollInteraction);
+        ScrollNode &setFriction(float friction);
+        ScrollNode &setEdgeEffect(bool bounces, bool alwaysBounces);
     };
 
 } // namespace rnoh

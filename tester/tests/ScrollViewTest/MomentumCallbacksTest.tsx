@@ -56,6 +56,12 @@ function MomentumTestCase() {
             style={{backgroundColor: 'green', width: '100%', height: 150}}
           />
           <View style={{backgroundColor: 'red', width: '100%', height: 150}} />
+          <View style={{backgroundColor: 'blue', width: '100%', height: 150}} />
+          <View
+            style={{backgroundColor: 'green', width: '100%', height: 150}}
+          />
+          <View style={{backgroundColor: 'red', width: '100%', height: 150}} />
+          <View style={{backgroundColor: 'blue', width: '100%', height: 150}} />
         </ScrollView>
       </View>
     </>
