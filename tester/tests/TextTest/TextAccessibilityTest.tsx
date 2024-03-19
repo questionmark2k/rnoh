@@ -6,12 +6,14 @@ export function TextAccessibilityTest() {
   return (
     <TestSuite name="text accessibility">
       <TestCase
+        tags={['C_API']}
         modal
         skip // no screen reader to test it - issue not created
         itShould='make the screen reader say "This is accessible text"'>
         <Text accessible={true}>This is accessible text</Text>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // no screen reader to test it - issue not created
         itShould='make the screen reader say "Important Text"'>
@@ -25,6 +27,7 @@ export function TextAccessibilityTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/585
         itShould='make the screen reader say "Selected, First Text" and "Second Text"'>
@@ -38,6 +41,7 @@ export function TextAccessibilityTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/582
         itShould='make the screen reader say "Checked, First Text" and "Second Text"'>
@@ -51,6 +55,7 @@ export function TextAccessibilityTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // no screen reader to test it (but implemented) - issue not created
         itShould='make the screen reader say "Hello World" even if the text is "Hello User"'>
@@ -59,6 +64,7 @@ export function TextAccessibilityTest() {
         </Text>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // no screen reader to test it (but implemented) - issue not created
         itShould='make the screen reader say hint "There is a hint"'>
@@ -67,6 +73,7 @@ export function TextAccessibilityTest() {
         </Text>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // no screen reader to test it (but implemented) - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/584
         itShould='make the screen reader say "Hello World" even if the text is "Hello User" - aria-label'>
@@ -75,6 +82,7 @@ export function TextAccessibilityTest() {
         </Text>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // no screen reader to test it (not implemented) - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/581
         itShould='make the screen reader say/display "busy" after clicking on Loading Text'>
@@ -83,6 +91,7 @@ export function TextAccessibilityTest() {
         </Text>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // no screen reader to test it (not implemented) - not supported yet on ArkUI (issue not created yet)
         itShould='make the screen reader say/display "disabled"'>
@@ -94,6 +103,7 @@ export function TextAccessibilityTest() {
         </Text>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/586
         itShould="render Text with different text decoration styles">
@@ -112,15 +122,22 @@ export function TextAccessibilityTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase modal itShould="adjust text size to fit the container">
+      <TestCase
+        tags={['C_API']}
+        modal
+        itShould="adjust text size to fit the container">
         <TextAdjustsFontSizeToFitTest />
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         itShould="adjust text size with max height to fit the container">
         <TextAdjustsFontSizeToFitIssueTest />
       </TestCase>
-      <TestCase modal itShould="render text with allowFontScaling">
+      <TestCase
+        tags={['C_API']}
+        modal
+        itShould="render text with allowFontScaling">
         <Text allowFontScaling>Scaled</Text>
         <Text allowFontScaling={false}>Not scaled</Text>
         <Text style={{fontSize: 40}} allowFontScaling>

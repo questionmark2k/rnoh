@@ -14,19 +14,20 @@ export function TextTest() {
       <TextStyleTest />
       <TextPaddingTest />
       <TextAccessibilityTest />
-      <TestCase itShould="show selectable text">
+      <TestCase tags={['C_API']} itShould="show selectable text">
         <View style={styles.smallContainer}>
           <Text style={styles.smallText} selectable={true}>
             Selectable text
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="render text in one line">
+      <TestCase tags={['C_API']} itShould="render text in one line">
         <View style={{flexDirection: 'row'}}>
           <Text style={{fontSize: 10}}>/ {'100'}</Text>
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="show 3 texts each with a different line break startegy"
         skip
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/274
@@ -44,6 +45,7 @@ export function TextTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="wrap two texts differently (hangul-word linebreak stategy)"
         skip
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/274
@@ -59,7 +61,9 @@ export function TextTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="show two texts, both selectable, but one disabled ">
+      <TestCase
+        tags={['C_API']}
+        itShould="show two texts, both selectable, but one disabled ">
         <View
           style={{
             ...styles.smallContainer,
@@ -74,7 +78,9 @@ export function TextTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="show text with different ellipsize mode and clip in the middle of second sentence">
+      <TestCase
+        tags={['C_API']}
+        itShould="show text with different ellipsize mode and clip in the middle of second sentence">
         <View style={styles.hugeContainer}>
           <Text style={styles.smallText} ellipsizeMode="tail" numberOfLines={1}>
             head, AReallyReallyLongSentenceWithoutSeperatorsOrSpaces.
@@ -85,6 +91,7 @@ export function TextTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="fire onTextLayoutEvent after layout change"
         initialState={false}
         arrange={ctx => <OnTextLayoutView ctx={ctx} />}
@@ -95,6 +102,7 @@ export function TextTest() {
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/277
       />
       <TestCase
+        tags={['C_API']}
         itShould="fire onLayout event after layout change"
         initialState={{}}
         arrange={ctx => <OnLayoutView ctx={ctx} />}
@@ -103,6 +111,7 @@ export function TextTest() {
         }}
       />
       <TestCase
+        tags={['C_API']}
         itShould="display text with a selection color of Indian Red"
         skip={Platform.select({harmony: 'Missing prop on ArkUI side'})}>
         <Text selectionColor="#F15156" selectable>
@@ -110,6 +119,7 @@ export function TextTest() {
         </Text>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="display text with a selection color of Blue"
         skip={Platform.select({harmony: 'Missing prop on ArkUI side'})}>
         <Text selectionColor="blue" selectable>

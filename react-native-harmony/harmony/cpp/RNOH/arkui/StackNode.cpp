@@ -47,4 +47,11 @@ namespace rnoh {
     StackNode::~StackNode() {
         NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_ON_CLICK);
     }
+
+    StackNode &StackNode::setAlign(int32_t align) {
+        ArkUI_NumberValue value[] = {{.i32 = align}};
+        ArkUI_AttributeItem item = {.value = value, .size = 1};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_STACK_ALIGN_CONTENT, &item));
+        return *this;
+    }
 } // namespace rnoh

@@ -7,7 +7,9 @@ import {SAMPLE_PARAGRAPH_TEXT} from './fixtures';
 export function TextNestedTest() {
   return (
     <TestSuite name="nested texts">
-      <TestCase itShould="show INNER and OUTER texts on the same height (various lineHeights)">
+      <TestCase
+        tags={['C_API']}
+        itShould="show INNER and OUTER texts on the same height (various lineHeights)">
         <View
           style={{
             flexDirection: 'row',
@@ -20,13 +22,17 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="show text with ellipsize at the end of the first line">
+      <TestCase
+        tags={['C_API']}
+        itShould="show text with ellipsize at the end of the first line">
         <Text ellipsizeMode="tail" numberOfLines={1}>
           Cupidatat irure velit id consequat magna irure quis laborum aute anim
           est cillum aliqua dolor.
         </Text>
       </TestCase>
-      <TestCase itShould="use green background color for INNER (backgroundColor in text fragments)">
+      <TestCase
+        tags={['C_API']}
+        itShould="use green background color for INNER (backgroundColor in text fragments)">
         <View
           style={{
             flexDirection: 'row',
@@ -37,7 +43,9 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="show text with different vertical alignments (verticalAlign)">
+      <TestCase
+        tags={['C_API']}
+        itShould="show text with different vertical alignments (verticalAlign)">
         <View style={{...styles.smallContainerRow}}>
           <Text style={{verticalAlign: 'auto'}}>
             -<Text style={styles.blueShortText}>Auto</Text>-
@@ -53,7 +61,7 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="show text with different fontStyles">
+      <TestCase tags={['C_API']} itShould="show text with different fontStyles">
         <View style={{...styles.smallContainerRow}}>
           <Text style={{fontStyle: 'normal'}}>
             <Text style={styles.blueShortText}>Normal</Text>
@@ -63,7 +71,9 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="show text with different text decorations">
+      <TestCase
+        tags={['C_API']}
+        itShould="show text with different text decorations">
         <View style={{...styles.smallContainerRow}}>
           <Text
             style={{
@@ -82,6 +92,7 @@ export function TextNestedTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="show text with shadow"
         skip
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/278
@@ -98,6 +109,7 @@ export function TextNestedTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         itShould="show text with correct textTransform "
         //  123 1one is added to the end of text to see if the code correctly handles number
       >
@@ -129,7 +141,9 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="show text with different vertical alignments (textAlignVertical)">
+      <TestCase
+        tags={['C_API']}
+        itShould="show text with different vertical alignments (textAlignVertical)">
         <View style={{...styles.smallContainerRow}}>
           <Text style={{textAlignVertical: 'auto'}}>
             -<Text style={styles.blueShortText}>Auto</Text>-
@@ -145,7 +159,7 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="align text vertically">
+      <TestCase tags={['C_API']} itShould="align text vertically">
         <View style={{width: 300, borderRightWidth: 1}}>
           <Text>
             <Text style={{lineHeight: 64, backgroundColor: 'red'}}>
@@ -187,7 +201,9 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="show text with different horizontal alignments">
+      <TestCase
+        tags={['C_API']}
+        itShould="show text with different horizontal alignments">
         <Text style={{textAlign: 'left'}}>
           <Text>Left: </Text>
           <Text style={{fontSize: 8}}>{SAMPLE_PARAGRAPH_TEXT}</Text>
@@ -205,7 +221,7 @@ export function TextNestedTest() {
           <Text style={{fontSize: 8}}>{SAMPLE_PARAGRAPH_TEXT}</Text>
         </Text>
       </TestCase>
-      <TestCase itShould="display 1 line of text">
+      <TestCase tags={['C_API']} itShould="display 1 line of text">
         <View style={{width: 200, backgroundColor: 'silver'}}>
           <Text style={{textAlign: 'left'}} numberOfLines={1}>
             <Text style={{fontSize: 12, backgroundColor: 'cyan'}}>{'>'}</Text>
@@ -213,19 +229,21 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="display 2 lines of text">
+      <TestCase tags={['C_API']} itShould="display 2 lines of text">
         <Text style={{textAlign: 'left'}} numberOfLines={2}>
           <Text style={{fontSize: 12, backgroundColor: 'cyan'}}>{'@@@@@'}</Text>
           <Text style={{fontSize: 8}}>{SAMPLE_PARAGRAPH_TEXT}</Text>
         </Text>
       </TestCase>
-      <TestCase itShould="display 2 lines of text (placeholder test)">
+      <TestCase
+        tags={['C_API']}
+        itShould="display 2 lines of text (placeholder test)">
         <Text style={{textAlign: 'left'}} numberOfLines={2}>
           <View style={{width: 0, height: 8, backgroundColor: 'red'}} />
           <Text style={{fontSize: 8}}>{SAMPLE_PARAGRAPH_TEXT}</Text>
         </Text>
       </TestCase>
-      <TestCase itShould="wrap long words">
+      <TestCase tags={['C_API']} itShould="wrap long words">
         <View style={{backgroundColor: 'silver', width: 200}}>
           <Text style={{textAlign: 'left'}}>
             <View style={{width: 8, height: 8, backgroundColor: 'red'}} />
@@ -235,10 +253,13 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase>
-      <TestCase itShould="text should be disabled">
+      <TestCase tags={['C_API']} itShould="text should be disabled">
         <TextDisabledTest />
       </TestCase>
-      <TestCase modal itShould="show justified text (manually added spaces)">
+      <TestCase
+        tags={['C_API']}
+        modal
+        itShould="show justified text (manually added spaces)">
         <Text
           style={{
             textAlign: 'justify',
@@ -257,11 +278,13 @@ export function TextNestedTest() {
         </Text>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         itShould="activate onPress() on <Text /> if the touch moves up to 100px above or below the <Text /> body">
         <TextPressRetentionOffsetTest />
       </TestCase>
       <TestCase
+        tags={['C_API']}
         modal
         itShould="increase the counter when 'press me' is pressed (handling gestures in text fragments)">
         <TextPressNestedTest />

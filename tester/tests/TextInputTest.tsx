@@ -416,9 +416,7 @@ export function TextInputTest() {
         itShould="show textinput with 'Selection' substring selected">
         <SelectionTest />
       </TestCase>
-      <TestCase
-        modal
-        itShould="not show text context menu when long press">
+      <TestCase modal itShould="not show text context menu when long press">
         <ContextMenuHiddenTest />
       </TestCase>
       <TestCase modal itShould="select text on focus">

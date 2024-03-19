@@ -22,6 +22,7 @@ public:
     void onClick();
     void setStackNodeDelegate(StackNodeDelegate *stackNodeDelegate);
     StackNode& setMargin(float left, float top, float right, float bottom);
+    StackNode &setAlign(int32_t align);
 };
 
 } // namespace rnoh
