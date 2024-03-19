@@ -88,8 +88,14 @@ namespace rnoh {
 
         bool containsPoint(facebook::react::Point const &point) const override {
             // TODO: hitslops
+            if (m_props != nullptr) {
+                auto props = m_props;
+                return point.x >= -props->hitSlop.left && point.y >= -props->hitSlop.top &&
+                    point.x < m_layoutMetrics.frame.size.width + props->hitSlop.right &&
+                    point.y < m_layoutMetrics.frame.size.height + props->hitSlop.bottom;
+            }
             return point.x >= 0 && point.y >= 0 && point.x < m_layoutMetrics.frame.size.width &&
-                   point.y < m_layoutMetrics.frame.size.height;
+                point.y < m_layoutMetrics.frame.size.height;
         }
 
         bool containsPointInBoundingBox(facebook::react::Point const &point) const override {
@@ -107,30 +113,104 @@ namespace rnoh {
 
     protected:
         virtual void onPropsChanged(SharedConcreteProps const &props) {
-            this->getLocalRootArkUINode().setBackgroundColor(props->backgroundColor);
+            auto old = m_props;
+            if (props != nullptr) {
+                if (!old || *(props->backgroundColor) != *(old->backgroundColor)) {
+                    this->getLocalRootArkUINode().setBackgroundColor(props->backgroundColor);
+                }
 
-            facebook::react::BorderMetrics borderMetrics = props->resolveBorderMetrics(this->m_layoutMetrics);
-            this->getLocalRootArkUINode().setBorderWidth(borderMetrics.borderWidths);
-            this->getLocalRootArkUINode().setBorderColor(borderMetrics.borderColors);
-            this->getLocalRootArkUINode().setBorderRadius(borderMetrics.borderRadii);
-            this->getLocalRootArkUINode().setBorderStyle(borderMetrics.borderStyles);
+                facebook::react::BorderMetrics borderMetrics = props->resolveBorderMetrics(this->m_layoutMetrics);
+                facebook::react::BorderMetrics oldBorderMetrics;
+                if (!old || borderMetrics.borderWidths != m_oldBorderMetrics.borderWidths) {
+                    this->getLocalRootArkUINode().setBorderWidth(borderMetrics.borderWidths);
+                }
+                if (!old || borderMetrics.borderColors != m_oldBorderMetrics.borderColors) {
+                    this->getLocalRootArkUINode().setBorderColor(borderMetrics.borderColors);
+                }
+                if (!old || borderMetrics.borderRadii != m_oldBorderMetrics.borderRadii || !m_isRadiusSetValid) {
+                    if (this->m_layoutMetrics.frame.size != facebook::react::Size{0,0}) {
+                        m_isRadiusSetValid = true;
+                    }
+                    this->getLocalRootArkUINode().setBorderRadius(borderMetrics.borderRadii);
+                }
+                if (!old || borderMetrics.borderStyles != m_oldBorderMetrics.borderStyles) {
+                    this->getLocalRootArkUINode().setBorderStyle(borderMetrics.borderStyles);
+                }
 
-            this->getLocalRootArkUINode().setOpacity(props->opacity);
-            this->getLocalRootArkUINode().setShadow(props->shadowColor, props->shadowOffset, props->shadowOpacity, props->shadowRadius);
-            this->getLocalRootArkUINode().setTransform(props->transform, m_layoutMetrics.pointScaleFactor);
-            this->getLocalRootArkUINode().setHitTestMode(props->pointerEvents);
-            this->getLocalRootArkUINode().setAccessibilityDescription(props->accessibilityHint);
-            this->getLocalRootArkUINode().setAccessibilityLevel(props->importantForAccessibility);
-            this->getLocalRootArkUINode().setAccessibilityText(props->accessibilityLabel);
-            this->getLocalRootArkUINode().setAccessibilityGroup(props->accessible);
-            this->getLocalRootArkUINode().setId(m_tag);
-            this->getLocalRootArkUINode().setClip(props->getClipsContentToBounds());
+                if (!old || props->shadowColor != old->shadowColor 
+                    && props->shadowOffset != old->shadowOffset 
+                    && props->shadowOpacity != old->shadowOpacity
+                    && props->shadowRadius != old->shadowRadius) {
+                    this->getLocalRootArkUINode().setShadow(props->shadowColor, props->shadowOffset,
+                        props->shadowOpacity, props->shadowRadius);
+                }
+
+                if (!old || props->transform != old->transform ||
+                    abs(m_oldPointScaleFactor - m_layoutMetrics.pointScaleFactor) > 0.001f) {
+                    m_oldPointScaleFactor = m_layoutMetrics.pointScaleFactor;
+                    this->getLocalRootArkUINode().setTransform(props->transform, m_layoutMetrics.pointScaleFactor);
+                }
+
+                if (!old || props->pointerEvents != old->pointerEvents) {
+                    this->getLocalRootArkUINode().setHitTestMode(props->pointerEvents);
+                }
+
+                if (!old || props->accessibilityHint != old->accessibilityHint) {
+                    this->getLocalRootArkUINode().setAccessibilityDescription(props->accessibilityHint);
+                }
+
+                if (!old || props->importantForAccessibility != old->importantForAccessibility) {
+                    this->getLocalRootArkUINode().setAccessibilityLevel(props->importantForAccessibility);
+                }
+
+                if (!old || props->accessibilityLabel != old->accessibilityLabel) {
+                    this->getLocalRootArkUINode().setAccessibilityText(props->accessibilityLabel);
+                }
+            
+                if (!old || props->accessible != old->accessible) {
+                    this->getLocalRootArkUINode().setAccessibilityGroup(props->accessible);
+                }
+
+                if (!old) {
+                    this->getLocalRootArkUINode().setId(getTag());
+                }
+
+                if (!old || props->opacity != old->opacity || props->transform != old->transform || props->backfaceVisibility != old->backfaceVisibility) {
+                    this->setOpacity(props);
+                }
+
+                auto newOverflow = props->getClipsContentToBounds();
+                if (!old || (old->getClipsContentToBounds() != newOverflow)) {
+                    this->getLocalRootArkUINode().setClip(newOverflow);
+                }
+                m_oldBorderMetrics = props->resolveBorderMetrics(this->m_layoutMetrics);
+            }
         };
 
         virtual void onStateChanged(SharedConcreteState const &state){};
 
         virtual void onEventEmitterChanged(SharedConcreteEventEmitter const &eventEmitter){};
+    private:
+        void setOpacity(SharedConcreteProps const &props) {
+            auto opacity = props->opacity;
+            float validOpacity = std::max(0.0f, std::min((float)opacity, 1.0f));
+            auto matrix = props->transform.matrix;
+            if (props->backfaceVisibility == facebook::react::BackfaceVisibility::Hidden) {
+                std::array<int32_t, 4> vec{{0, 0, 1, 0}};
+                std::array<int32_t, 4> resVec{{0, 0, 0, 0}};
+                for (int32_t i = 0; i < 4; ++i) {
+                    for (int32_t j = 0; j < 4; ++j) {
+                    resVec[i] += matrix[i * 4 + j] * vec[j];
+                    }
+                }
+                if (resVec[2] < 0.0) {
+                    validOpacity = 0.0;
+                }
+            }
+            this->getLocalRootArkUINode().setOpacity(validOpacity);
+        }
 
+    protected:
         SharedConcreteProps m_props;
         SharedConcreteState m_state;
         SharedConcreteEventEmitter m_eventEmitter;

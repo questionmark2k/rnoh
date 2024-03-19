@@ -69,10 +69,26 @@ namespace rnoh {
     }
 
     ArkUINode &ArkUINode::setBorderColor(facebook::react::BorderColors const &borderColors) {
-        ArkUI_NumberValue borderColorValue[] = {{.u32 = static_cast<uint32_t>(*borderColors.top)},
-                                                {.u32 = static_cast<uint32_t>(*borderColors.right)},
-                                                {.u32 = static_cast<uint32_t>(*borderColors.bottom)},
-                                                {.u32 = static_cast<uint32_t>(*borderColors.left)}};
+        uint32_t borderTopColor = 0xff000000;
+        uint32_t bordeRightColor = 0xff000000;
+        uint32_t borderBottomColor = 0xff000000;
+        uint32_t borderLeftColor = 0xff000000;
+        if (borderColors.top) {
+            borderTopColor = (uint32_t)*borderColors.top;
+        }
+        if (borderColors.right) {
+            bordeRightColor = (uint32_t)*borderColors.right;
+        }
+        if (borderColors.bottom) {
+            borderBottomColor = (uint32_t)*borderColors.bottom;
+        }
+        if (borderColors.left) {
+            borderLeftColor = (uint32_t)*borderColors.left;
+        }
+        ArkUI_NumberValue borderColorValue[] = {{.u32 = borderTopColor},
+                                                {.u32 = bordeRightColor},
+                                                {.u32 = borderBottomColor},
+                                                {.u32 = borderLeftColor}};
 
         ArkUI_AttributeItem borderColorItem = {borderColorValue, sizeof(borderColorValue) / sizeof(ArkUI_NumberValue)};
 
@@ -107,10 +123,13 @@ namespace rnoh {
 
     ArkUINode &ArkUINode::setShadow(facebook::react::SharedColor const &shadowColor,
         facebook::react::Size const &shadowOffset, float const shadowOpacity, float const shadowRadius) {
-        if (!facebook::react::isColorMeaningful(shadowColor)) {
-            return *this;;
+        if (shadowOpacity <= 0.0 || shadowOpacity > 1.0) {
+            return *this;
         }
-        uint32_t shadowColorValue = *shadowColor;
+        uint32_t shadowColorValue = 0xff000000;
+        if (shadowColor) {
+            shadowColorValue = *shadowColor;
+        }
         uint32_t alpha = static_cast<uint32_t>((float)((shadowColorValue >> 24) & (0xff)) * shadowOpacity);
         shadowColorValue = (alpha << 24) + (shadowColorValue & 0xffffff);
         ArkUI_NumberValue shadowValue[] = {{.f32 = shadowRadius}, {.i32 = 0},
@@ -205,8 +224,9 @@ namespace rnoh {
         return *this;
     }
 
-    ArkUINode &ArkUINode::setOpacity(facebook::react::Float const &opacity) {
-        ArkUI_NumberValue opacityValue[] = {static_cast<float>(opacity)};
+
+    ArkUINode &ArkUINode::setOpacity(facebook::react::Float opacity) {
+        ArkUI_NumberValue opacityValue[] = {{.f32 = (float)opacity}};
         ArkUI_AttributeItem opacityItem = {opacityValue, sizeof(opacityValue) / sizeof(ArkUI_NumberValue)};
 
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_OPACITY, &opacityItem));

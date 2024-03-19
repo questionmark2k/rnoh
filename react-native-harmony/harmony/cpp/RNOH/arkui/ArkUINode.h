@@ -57,7 +57,7 @@ namespace {
         virtual ArkUINode &setAccessibilityText(std::string const &accessibilityLabel);
         virtual ArkUINode &setAccessibilityGroup(bool accessible);
         virtual ArkUINode &setId(facebook::react::Tag const &tag);
-        virtual ArkUINode &setOpacity(facebook::react::Float const &opacity);
+        virtual ArkUINode &setOpacity(facebook::react::Float opacity);
         virtual ArkUINode &setClip(bool clip);
         virtual ArkUINode &setTransition(facebook::react::ModalHostViewAnimationType animationType);
 

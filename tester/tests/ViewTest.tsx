@@ -584,7 +584,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="show view rotated by 180deg(backfaceVisibility: visible)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show view rotated by 180deg(backfaceVisibility: visible)">
         <View style={{width: '100%', height: 20}}>
           <View
             style={{
@@ -597,7 +599,9 @@ export function ViewTest() {
           </View>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="not show view rotated by 180deg(backfaceVisibility: hidden)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="not show view rotated by 180deg(backfaceVisibility: hidden)">
         <View style={{width: '100%', height: 20}}>
           <View
             style={{
