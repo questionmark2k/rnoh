@@ -34,7 +34,7 @@ export struct RNView {
       descriptorWrapper = new ViewDescriptorWrapperBase(descriptor)
     }
     if (this.ctx instanceof RNComponentContext) {
-      this.rnViewAttributeModifier = new RNViewBaseAttributeModifier(descriptorWrapper)
+      this.rnViewAttributeModifier = new RNViewBaseAttributeModifier(descriptorWrapper, this.ctx)
     }
     this.descriptorWrapper = descriptorWrapper
     this.childrenTags = descriptorWrapper.childrenTags
@@ -120,7 +120,7 @@ export function buildRNView(ctx: RNComponentContext, tag: Tag) {
   })
   .id(tag.toString())
   .onClick((event: ClickEvent) => onClickEvent(event, ctx, tag))
-  .attributeModifier(new RNViewBaseAttributeModifier(ctx.descriptorRegistry.findDescriptorWrapperByTag(tag) as ViewDescriptorWrapperBase))
+  .attributeModifier(new RNViewBaseAttributeModifier(ctx.descriptorRegistry.findDescriptorWrapperByTag(tag) as ViewDescriptorWrapperBase, ctx))
   .align(Alignment.TopStart)
 }
 

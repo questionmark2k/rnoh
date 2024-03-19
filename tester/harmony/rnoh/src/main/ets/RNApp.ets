@@ -11,6 +11,7 @@ import {
   RNDevLoadingView,
   RNComponentContext,
   WrappedCustomRNComponentBuilder,
+  CustomRNComponentFrameNodeFactory,
 } from './RNOH';
 import { RNSurface, SurfaceConfig2 } from './RNSurface';
 import { LogBoxDialog } from "./LogBoxDialog"
@@ -168,7 +169,8 @@ export struct RNApp {
     } else {
       const options = this.rnInstanceConfig
       this.shouldDestroyRNInstance = true
-      return this.rnAbility.createAndRegisterRNInstance(options as RNInstanceOptions)
+      return this.rnAbility.createAndRegisterRNInstance(options as RNInstanceOptions,
+        new CustomRNComponentFrameNodeFactory(this.getUIContext(), this.rnAbility.rnohCoreContext.logger, () => this.ctx))
     }
   }
 

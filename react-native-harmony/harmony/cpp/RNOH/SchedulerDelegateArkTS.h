@@ -7,16 +7,18 @@
 
 namespace rnoh {
 
-class SchedulerDelegate : public facebook::react::SchedulerDelegate {
+class SchedulerDelegateArkTS : public facebook::react::SchedulerDelegate {
   public:
-    SchedulerDelegate(MountingManager mountingManager, ArkTSChannel::Shared arkTsChannel)
+    using Unique = std::unique_ptr<SchedulerDelegateArkTS>;
+    
+    SchedulerDelegateArkTS(MountingManager::Shared mountingManager, ArkTSChannel::Shared arkTsChannel)
         : mountingManager(std::move(mountingManager)),
           m_arkTsChannel(arkTsChannel){};
 
-    ~SchedulerDelegate() = default;
+    ~SchedulerDelegateArkTS() = default;
 
     void schedulerDidFinishTransaction(facebook::react::MountingCoordinator::Shared mountingCoordinator) override {
-        mountingManager.scheduleTransaction(mountingCoordinator);
+        mountingManager->scheduleTransaction(mountingCoordinator);
     }
 
     void schedulerDidRequestPreliminaryViewAllocation(facebook::react::SurfaceId surfaceId, const facebook::react::ShadowNode &shadowView) override {}
@@ -25,7 +27,7 @@ class SchedulerDelegate : public facebook::react::SchedulerDelegate {
         const facebook::react::ShadowView &shadowView,
         std::string const &commandName,
         folly::dynamic const &args) override {
-        mountingManager.dispatchCommand(shadowView.tag, commandName, args);
+        mountingManager->dispatchCommand(shadowView.tag, commandName, args);
     }
 
     void schedulerDidSendAccessibilityEvent(const facebook::react::ShadowView &shadowView, std::string const &eventType) override {
@@ -41,7 +43,7 @@ class SchedulerDelegate : public facebook::react::SchedulerDelegate {
     }
 
   private:
-    MountingManager mountingManager;
+    MountingManager::Shared mountingManager;
     ArkTSChannel::Shared m_arkTsChannel;
 };
 

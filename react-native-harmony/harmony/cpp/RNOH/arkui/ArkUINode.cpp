@@ -33,12 +33,7 @@ namespace rnoh {
     }
 
     ArkUINode &ArkUINode::setPosition(facebook::react::Point const &position) {
-        if (position.x < 0 || position.y < 0) {
-            LOG(ERROR) << "ArkUI doesn't support negative coordinates when setting a position (x: " << position.x
-                       << ", y: " << position.y << ").";
-        }
-        ArkUI_NumberValue value[] = {std::max(static_cast<float>(position.x), 0.0f),
-                                     std::max(static_cast<float>(position.y), 0.0f)};
+        ArkUI_NumberValue value[] = {static_cast<float>(position.x), static_cast<float>(position.y)};
         ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_POSITION, &item));
         return *this;

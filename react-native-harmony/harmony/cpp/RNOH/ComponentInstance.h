@@ -17,18 +17,21 @@
 namespace rnoh {
 
     class ComponentInstance : public TouchTarget, public std::enable_shared_from_this<ComponentInstance> {
+    private:
+        std::string m_componentName;
+
     protected:
         using Tag = facebook::react::Tag;
         using ComponentHandle = facebook::react::ComponentHandle;
 
     public:
         struct Dependencies {
-            using Shared = std::shared_ptr<const Dependencies>;    
-            
+            using Shared = std::shared_ptr<const Dependencies>;
+
             ArkTSChannel::Shared arkTSChannel;
             RNInstance::Weak rnInstance;
         };
-    
+
         struct Context {
             Tag tag;
             ComponentHandle componentHandle;
@@ -46,6 +49,8 @@ namespace rnoh {
         virtual ~ComponentInstance() = default;
 
         Tag getTag() const { return m_tag; }
+
+        const std::string getComponentName() const { return m_componentName; }
 
         ComponentHandle getComponentHandle() const { return m_componentHandle; }
 

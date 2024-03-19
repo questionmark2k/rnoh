@@ -47,14 +47,27 @@ export abstract class BaseAttributeModifier<TPropertyHolder, TAttribute> impleme
 
 
 export class RNViewBaseAttributeModifier extends BaseAttributeModifier<ViewDescriptorWrapper, CommonAttribute> {
+  private ctx: RNComponentContext;
+
+  constructor(propertyHolder: ViewDescriptorWrapper, ctx: RNComponentContext) {
+    super(propertyHolder)
+    this.ctx = ctx
+  }
+
   applyNormalAttribute(instance: CommonAttribute): void {
     this.maybeAssignAttribute((dw => dw.width), (val) => instance.width(val), undefined)
     this.maybeAssignAttribute((dw => dw.height), (val) => instance.height(val), undefined)
     this.maybeAssignAttribute((dw => dw.backgroundColor), (val) => instance.backgroundColor(val), "#00000000")
-    this.maybeAssignAttribute<Position>((dw => dw.positionRelativeToParent), (val) => instance.position(val), {
-      x: 0,
-      y: 0
-    })
+    if (this.ctx.rnInstance.getArchitecture() !== "C_API") {
+      /**
+       * Position must be set only on C++ side.
+       */
+      this.maybeAssignAttribute<Position>((dw => dw.positionRelativeToParent), (val) => instance.position(val), {
+        x: 0,
+        y: 0
+      })
+    }
+
     this.maybeAssignAttribute<Edges<number | undefined>>((dw => dw.borderWidth), (val) => instance.borderWidth(val), {
       top: undefined,
       left: undefined,
@@ -147,7 +160,7 @@ export struct RNViewBase {
       descriptorWrapper = new ViewDescriptorWrapperBase(descriptor)
     }
     if (this.ctx instanceof RNComponentContext) {
-      this.rnViewAttributeModifier = new RNViewBaseAttributeModifier(descriptorWrapper)
+      this.rnViewAttributeModifier = new RNViewBaseAttributeModifier(descriptorWrapper, this.ctx)
     }
     this.descriptorWrapper = descriptorWrapper
   }

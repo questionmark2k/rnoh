@@ -144,6 +144,13 @@ export type RNInstanceOptions = {
   enableCAPIArchitecture?: boolean,
 }
 
+/**
+ * Used in the C-API architecture
+ */
+export interface FrameNodeFactory {
+  create(tag: Tag, componentName: string);
+}
+
 
 export class RNInstanceImpl implements RNInstance {
   private turboModuleProvider: TurboModuleProvider
@@ -173,6 +180,7 @@ export class RNInstanceImpl implements RNInstance {
     private id: number,
     private injectedLogger: RNOHLogger,
     public abilityContext: common.UIAbilityContext,
+    private frameNodeFactory: FrameNodeFactory | null,
     private napiBridge: NapiBridge,
     private defaultProps: Record<string, any>,
     private devToolsController: DevToolsController,
@@ -258,6 +266,7 @@ export class RNInstanceImpl implements RNInstance {
     this.napiBridge.createReactNativeInstance(
       this.id,
       this.turboModuleProvider,
+      this.frameNodeFactory,
       (mutations) => {
         try {
           this.descriptorRegistry.applyMutations(mutations)

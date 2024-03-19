@@ -20,6 +20,7 @@ class MountingManager {
   public:
     using TriggerUICallback = std::function<void(facebook::react::ShadowViewMutationList const &mutations)>;
     using CommandDispatcher = std::function<void(facebook::react::Tag tag, std::string const &commandName, folly::dynamic const args)>;
+    using Shared = std::shared_ptr<MountingManager>;
 
     MountingManager(TaskExecutor::Shared taskExecutor, ShadowViewRegistry::Shared shadowViewRegistry, TriggerUICallback &&triggerUICallback, CommandDispatcher &&commandDispatcher)
         : taskExecutor(std::move(taskExecutor)),
@@ -34,6 +35,8 @@ class MountingManager {
     void performTransaction(facebook::react::MountingCoordinator::Shared const &mountingCoordinator);
 
     void dispatchCommand(facebook::react::Tag tag, std::string const &commandName, folly::dynamic const args);
+    
+    void processMutations(facebook::react::ShadowViewMutationList mutations);
     
   private:
     TaskExecutor::Shared taskExecutor;

@@ -12,11 +12,10 @@
 #include <folly/dynamic.h>
 #include <react/renderer/scheduler/Scheduler.h>
 #include <react/renderer/animations/LayoutAnimationDriver.h>
-#include <react/renderer/uimanager/LayoutAnimationStatusDelegate.h>
 
 #include "RNOH/GlobalJSIBinder.h"
 #include "RNOH/MessageQueueThread.h"
-#include "RNOH/SchedulerDelegate.h"
+#include "RNOH/SchedulerDelegateArkTS.h"
 #include "RNOH/TurboModuleProvider.h"
 #include "RNOH/EventEmitRequestHandler.h"
 #include "RNOH/TaskExecutor/TaskExecutor.h"

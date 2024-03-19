@@ -61,7 +61,7 @@ static napi_value getNextRNInstanceId(napi_env env, napi_callback_info info) {
 static napi_value createReactNativeInstance(napi_env env, napi_callback_info info) {
     LOG(INFO) << "createReactNativeInstance";
     ArkJS arkJs(env);
-    auto args = arkJs.getCallbackArgs(info, 9);
+    auto args = arkJs.getCallbackArgs(info, 10);
     size_t instanceId = arkJs.getDouble(args[0]);
     auto arkTsTurboModuleProviderRef = arkJs.createReference(args[1]);
     auto mutationsListenerRef = arkJs.createReference(args[2]);
@@ -75,8 +75,9 @@ static napi_value createReactNativeInstance(napi_env env, napi_callback_info inf
         featureFlagRegistry->setFeatureFlagStatus(arkJs.getString(featureFlagNameAndStatus.first),
                                                   arkJs.getBoolean(featureFlagNameAndStatus.second));
     }
+    auto frameNodeFactoryRef = arkJs.createReference(args[9]);
     auto rnInstance = createRNInstance(
-        instanceId, env, arkTsTurboModuleProviderRef,
+        instanceId, env, arkTsTurboModuleProviderRef, frameNodeFactoryRef,
         [env, instanceId, mutationsListenerRef](auto const &mutationsToNapiConverter, auto const &mutations) {
             {
                 auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
@@ -150,16 +151,16 @@ static napi_value loadScript(napi_env env, napi_callback_info info) {
     }
     auto &rnInstance = it->second;
     auto onFinishRef = arkJs.createReference(args[3]);
-    rnInstance->loadScript(arkJs.getArrayBuffer(args[1]), arkJs.getString(args[2]),
-                           [taskExecutor = rnInstance->getTaskExecutor(), env, onFinishRef](const std::string errorMsg) {
-                               taskExecutor->runTask(TaskThread::MAIN,
-                                                     [env, onFinishRef, errorMsg = std::move(errorMsg)]() {
-                                                         ArkJS arkJs(env);
-                                                         auto listener = arkJs.getReferenceValue(onFinishRef);
-                                                         arkJs.call<1>(listener, {arkJs.createString(errorMsg)});
-                                                         arkJs.deleteReference(onFinishRef);
-                                                     });
-                           });
+    rnInstance->loadScript(
+        arkJs.getArrayBuffer(args[1]), arkJs.getString(args[2]),
+        [taskExecutor = rnInstance->getTaskExecutor(), env, onFinishRef](const std::string errorMsg) {
+            taskExecutor->runTask(TaskThread::MAIN, [env, onFinishRef, errorMsg = std::move(errorMsg)]() {
+                ArkJS arkJs(env);
+                auto listener = arkJs.getReferenceValue(onFinishRef);
+                arkJs.call<1>(listener, {arkJs.createString(errorMsg)});
+                arkJs.deleteReference(onFinishRef);
+            });
+        });
     return arkJs.getUndefined();
 }
 

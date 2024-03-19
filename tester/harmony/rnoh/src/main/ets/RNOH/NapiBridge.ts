@@ -7,6 +7,7 @@ import type { DisplayMode } from './CppBridgeUtils'
 import { RNOHLogger } from "./RNOHLogger"
 import type { InspectorInstance } from './types'
 import { FatalRNOHError } from "./RNOHError"
+import type { FrameNodeFactory } from "./RNInstance"
 
 export type CppFeatureFlag = "ENABLE_NDK_TEXT_MEASURING" | "C_API_ARCH"
 
@@ -35,6 +36,7 @@ export class NapiBridge {
 
   createReactNativeInstance(instanceId: number,
                             turboModuleProvider: TurboModuleProvider,
+                            frameNodeFactory: FrameNodeFactory,
                             mutationsListener: (mutations: Mutation[]) => void,
                             componentCommandsListener: (tag: Tag,
                                                         commandName: string,
@@ -68,6 +70,7 @@ export class NapiBridge {
       shouldEnableDebugger,
       shouldEnableBackgroundExecutor,
       cppFeatureFlagStatusByName,
+      frameNodeFactory,
     );
   }
 

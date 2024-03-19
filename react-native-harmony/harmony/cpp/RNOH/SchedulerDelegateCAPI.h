@@ -9,6 +9,8 @@
 #include "RNOH/ShadowViewRegistry.h"
 #include "RNOH/ComponentInstanceRegistry.h"
 #include "RNOH/ComponentInstanceFactory.h"
+#include "RNOH/SchedulerDelegateArkTS.h"
+#include "RNOH/MountingManager.h"
 
 namespace facebook {
     namespace react {
@@ -20,14 +22,15 @@ namespace rnoh {
 
     class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
     public:
-        SchedulerDelegateCAPI(TaskExecutor::Shared taskExecutor, ShadowViewRegistry::Shared shadowViewRegistry,
+        SchedulerDelegateCAPI(TaskExecutor::Shared taskExecutor,
                               ComponentInstanceRegistry::Shared componentInstanceRegistry,
-                              ComponentInstanceFactory::Shared componentInstanceFactory)
-            : m_taskExecutor(taskExecutor), m_shadowViewRegistry(shadowViewRegistry),
-              m_componentInstanceRegistry(std::move(componentInstanceRegistry)),
-              m_componentInstanceFactory(std::move(componentInstanceFactory))
-              {};
-
+                              ComponentInstanceFactory::Shared componentInstanceFactory,
+                              rnoh::SchedulerDelegateArkTS::Unique schedulerDelegateArkTS,
+                              MountingManager::Shared mountingManager)
+            : m_taskExecutor(taskExecutor), m_componentInstanceRegistry(std::move(componentInstanceRegistry)),
+              m_componentInstanceFactory(std::move(componentInstanceFactory)),
+              m_schedulerDelegateArkTS(std::move(schedulerDelegateArkTS)),
+              m_mountingManager(std::move(mountingManager)){};
 
         ~SchedulerDelegateCAPI() { DLOG(INFO) << "~SchedulerDelegateCAPI"; }
 
@@ -39,12 +42,15 @@ namespace rnoh {
                 },
                 [this](facebook::react::MountingTransaction const &transaction,
                        facebook::react::SurfaceTelemetry const &surfaceTelemetry) {
-
+                    // Mounting
+                    m_mountingManager->performMountInstructions(transaction.getMutations(), transaction.getSurfaceId());
                 },
                 [this](facebook::react::MountingTransaction const &transaction,
                        facebook::react::SurfaceTelemetry const &surfaceTelemetry) {
                     // Did mount
-                    m_taskExecutor->runTask(TaskThread::MAIN, [this, mutations = transaction.getMutations()] {
+                    auto mutations = transaction.getMutations();
+                    m_mountingManager->processMutations(mutations);
+                    m_taskExecutor->runTask(TaskThread::MAIN, [this, mutations] {
                         for (auto mutation : mutations) {
                             try {
                                 this->handleMutation(mutation);
@@ -62,6 +68,7 @@ namespace rnoh {
 
         void schedulerDidDispatchCommand(const facebook::react::ShadowView &shadowView, std::string const &commandName,
                                          folly::dynamic const &args) override {
+            m_schedulerDelegateArkTS->schedulerDidDispatchCommand(shadowView, commandName, args);
             auto componentInstance = m_componentInstanceRegistry->findByTag(shadowView.tag);
             if (componentInstance != nullptr) {
                 componentInstance->handleCommand(commandName, args);
@@ -72,47 +79,54 @@ namespace rnoh {
                                                 std::string const &eventType) override {}
 
         void schedulerDidSetIsJSResponder(facebook::react::ShadowView const &shadowView, bool isJSResponder,
-                                          bool blockNativeResponder) override {}
+                                          bool blockNativeResponder) override {
+            m_schedulerDelegateArkTS->schedulerDidSetIsJSResponder(shadowView, isJSResponder, blockNativeResponder);
+        }
 
         void synchronouslyUpdateViewOnUIThread(facebook::react::Tag tag, folly::dynamic props,
                                                facebook::react::ComponentDescriptor const &componentDescriptor);
 
     private:
         TaskExecutor::Shared m_taskExecutor;
-        ShadowViewRegistry::Shared m_shadowViewRegistry;
         ComponentInstanceRegistry::Shared m_componentInstanceRegistry;
         ComponentInstanceFactory::Shared m_componentInstanceFactory;
         facebook::react::ContextContainer::Shared m_contextContainer;
+        rnoh::SchedulerDelegateArkTS::Unique m_schedulerDelegateArkTS;
+        MountingManager::Shared m_mountingManager;
 
         void updateComponentWithShadowView(ComponentInstance::Shared const &componentInstance,
                                            facebook::react::ShadowView const &shadowView) {
             componentInstance->setLayout(shadowView.layoutMetrics);
-            componentInstance->setEventEmitter(shadowView.eventEmitter);
             componentInstance->setState(shadowView.state);
             componentInstance->setProps(shadowView.props);
+            componentInstance->setEventEmitter(shadowView.eventEmitter);
             componentInstance->finalizeUpdates();
         }
 
+
         void handleMutation(facebook::react::ShadowViewMutation mutation) {
             DLOG(INFO) << "mutation (type:" << this->getMutationNameFromType(mutation.type)
-                       << "; new: " << mutation.newChildShadowView.tag
-                       << " component type: " << mutation.newChildShadowView.componentName
+                       << "; new: " << mutation.newChildShadowView.tag << " component type: "
+                       << (mutation.newChildShadowView.componentName != nullptr
+                               ? mutation.newChildShadowView.componentName
+                               : "null")
                        << "; old: " << mutation.oldChildShadowView.tag << "; parent: " << mutation.parentShadowView.tag
                        << ")";
             switch (mutation.type) {
             case facebook::react::ShadowViewMutation::Create: {
                 auto newChild = mutation.newChildShadowView;
-                m_shadowViewRegistry->setShadowView(newChild.tag, newChild);
-                auto componentInstance = m_componentInstanceFactory->create(newChild.tag, newChild.componentHandle, newChild.componentName);
+                auto componentInstance =
+                    m_componentInstanceFactory->create(newChild.tag, newChild.componentHandle, newChild.componentName);
                 if (componentInstance != nullptr) {
                     updateComponentWithShadowView(componentInstance, newChild);
                     m_componentInstanceRegistry->insert(componentInstance);
+                } else {
+                    LOG(FATAL) << "Couldn't create ComponentInstance for: " << newChild.componentName;
                 }
                 break;
             }
             case facebook::react::ShadowViewMutation::Delete: {
                 auto oldChild = mutation.oldChildShadowView;
-                m_shadowViewRegistry->clearShadowView(oldChild.tag);
                 m_componentInstanceRegistry->deleteByTag(oldChild.tag);
                 break;
             }
@@ -141,7 +155,6 @@ namespace rnoh {
                 if (componentInstance != nullptr) {
                     updateComponentWithShadowView(componentInstance, mutation.newChildShadowView);
                 }
-                m_shadowViewRegistry->setShadowView(mutation.newChildShadowView.tag, mutation.newChildShadowView);
                 break;
             }
             }

@@ -28,16 +28,17 @@ namespace {
 
     class ArkUINode {
     protected:
-        ArkUINode(ArkUI_NodeHandle nodeHandle);
 
         ArkUINode(const ArkUINode &other) = delete;
         ArkUINode &operator=(const ArkUINode &other) = delete;
 
-        ArkUINode(ArkUINode &&other) noexcept;
         ArkUINode &operator=(ArkUINode &&other) noexcept;
+        ArkUINode(ArkUINode &&other) noexcept;
 
     public:
         ArkUI_NodeHandle getArkUINodeHandle();
+        ArkUINode(ArkUI_NodeHandle nodeHandle);
+
 
         void markDirty();
 

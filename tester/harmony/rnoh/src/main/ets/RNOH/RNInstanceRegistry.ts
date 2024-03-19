@@ -1,6 +1,6 @@
 import type common from '@ohos.app.ability.common';
 import type { RNInstance, RNInstanceOptions } from './RNInstance';
-import { RNInstanceImpl } from './RNInstance';
+import { RNInstanceImpl, FrameNodeFactory } from './RNInstance';
 import type { NapiBridge } from './NapiBridge';
 import type { RNOHContext } from './RNOHContext';
 import type { RNOHLogger } from './RNOHLogger';
@@ -20,6 +20,7 @@ export class RNInstanceRegistry {
   public async createInstance(
     options: RNInstanceOptions & {
       devToolsController: DevToolsController,
+      frameNodeFactory?: FrameNodeFactory,
     }
   ): Promise<RNInstance> {
     const id = this.napiBridge.getNextRNInstanceId();
@@ -27,6 +28,7 @@ export class RNInstanceRegistry {
       id,
       this.logger,
       this.abilityContext,
+      options.frameNodeFactory ?? null,
       this.napiBridge,
       this.getDefaultProps(),
       options.devToolsController,

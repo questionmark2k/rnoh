@@ -388,8 +388,8 @@ export function TextInputTest() {
       <TestCase modal itShould="use different clearButtonMode values">
         <TextInputWithText style={styles.textInput} clearButtonMode="always" />
         <Text>clearButtonMode="always"</Text>
-        { 
-          /* Except Android */ 
+        {
+          /* Except Android */
           Platform.OS !== 'android' && (
             <>
               <TextInputWithText

@@ -57,7 +57,7 @@ export struct RNParagraphExperimental {
     this.descriptorWrapper = new TextDescriptorWrapper(newDescriptor)
     this.spanAttributeModifiers = []
     if (this.ctx instanceof RNComponentContext) {
-      this.rnViewBaseAttributeModifier = new RNViewBaseAttributeModifier(this.descriptorWrapper)
+      this.rnViewBaseAttributeModifier = new RNViewBaseAttributeModifier(this.descriptorWrapper, this.ctx)
       this.textAttributeModifier = new RNParagraphExperimentalTextAttributeModifier(this.descriptorWrapper)
       this.descriptor.props.fragments.forEach(fragment => {
         const mod = new RNParagraphExperimentalSpanAttributeModifier(fragment, this.descriptor.rawProps.allowFontScaling)

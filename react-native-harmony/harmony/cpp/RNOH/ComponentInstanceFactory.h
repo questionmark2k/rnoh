@@ -6,6 +6,10 @@
 #include <vector>
 #include <react/renderer/core/ReactPrimitives.h>
 #include "RNOH/ComponentInstance.h"
+#include "RNOH/CustomComponentArkUINodeHandleFactory.h"
+#include "RNOH/FallbackComponentInstance.h"
+#include "RNOH/arkui/StackNode.h"
+#include "glog/logging.h"
 
 namespace rnoh {
     class ComponentInstanceFactoryDelegate {
@@ -22,27 +26,32 @@ namespace rnoh {
     private:
         std::vector<ComponentInstanceFactoryDelegate::Shared> m_delegates;
         ComponentInstance::Dependencies::Shared m_dependencies;
+        CustomComponentArkUINodeHandleFactory::Shared m_customComponentArkUINodeHandleFactory;
 
     public:
         using Shared = std::shared_ptr<ComponentInstanceFactory>;
 
         ComponentInstanceFactory(std::vector<ComponentInstanceFactoryDelegate::Shared> delegates,
-                                 ComponentInstance::Dependencies::Shared dependencies)
-            : m_delegates(std::move(delegates)), m_dependencies(dependencies) {}
+                                 ComponentInstance::Dependencies::Shared dependencies,
+                                 CustomComponentArkUINodeHandleFactory::Shared customComponentArkUINodeHandleFactory)
+            : m_delegates(std::move(delegates)), m_dependencies(dependencies),
+              m_customComponentArkUINodeHandleFactory(customComponentArkUINodeHandleFactory) {}
 
         ComponentInstance::Shared create(facebook::react::Tag tag, facebook::react::ComponentHandle componentHandle,
                                          std::string componentName) {
+            ComponentInstance::Context ctx = {.tag = tag,
+                                              .componentHandle = componentHandle,
+                                              .componentName = componentName,
+                                              .dependencies = m_dependencies};
             for (auto &delegate : m_delegates) {
-                ComponentInstance::Context ctx = {.tag = tag,
-                                                  .componentHandle = componentHandle,
-                                                  .componentName = componentName,
-                                                  .dependencies = m_dependencies};
                 auto componentInstance = delegate->create(ctx);
                 if (componentInstance != nullptr) {
                     return componentInstance;
                 }
             }
-            return nullptr;
+            LOG(WARNING) << "Creating FallbackComponentInstance for: " << componentName;
+            auto arkUINode = std::make_unique<ArkUINode>(m_customComponentArkUINodeHandleFactory->create(tag, componentName));
+            return std::make_shared<FallbackComponentInstance>(ctx, std::move(arkUINode));
         }
     };
 } // namespace rnoh

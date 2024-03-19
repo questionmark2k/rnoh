@@ -80,3 +80,20 @@ function buildRNChildren(ctx: RNComponentContext, parentTag: Tag) {
     )
   }
 }
+
+export class ComponentBuilderContextImpl implements ComponentBuilderContext {
+  public rnComponentContext: RNComponentContext
+  /** @deprecated: use rnComponentContext instead  */
+  public rnohContext: RNOHContext
+  public tag: Tag
+  public componentName: string
+  public descriptor: DescriptorEssence
+
+  constructor(rnComponentContext: RNComponentContext, rnohContext: RNOHContext, tag: Tag, componentName: string, descriptor: DescriptorEssence) {
+    this.rnComponentContext = rnComponentContext
+    this.rnohContext = rnohContext
+    this.tag = tag
+    this.componentName = componentName
+    this.descriptor = descriptor
+  }
+}

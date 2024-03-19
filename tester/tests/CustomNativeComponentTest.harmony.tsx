@@ -1,14 +1,15 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {
   SampleComponent,
   SampleComponentRef,
   GeneratedSampleComponent,
   GeneratedSampleComponentRef,
 } from 'react-native-sample-package';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import React from 'react';
-import {Button, Effect, Ref} from '../components';
+import {Button, Effect, Ref, TestCase} from '../components';
 import {IncomingData} from 'react-native-harmony-sample-package/src/GeneratedSampleNativeComponent';
+import {View} from 'react-native';
 
 export function CustomNativeComponentTest() {
   return (
@@ -20,24 +21,51 @@ export function CustomNativeComponentTest() {
 }
 
 function ManualCustomComponentImplementationTest() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setRefreshKey(prev => prev + 1);
+    }, 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
   return (
     <TestSuite name="no codegen">
-      <TestCase itShould="render red rectangle">
+      <TestCase.Example tags={['C_API']} itShould="render red rectangle">
         <SampleComponent backgroundColor="red" size={64} />
-      </TestCase>
-      <TestCase itShould="render green rectangle inside red rectangle">
+      </TestCase.Example>
+      <TestCase.Example itShould="render green rectangle inside red rectangle">
         <SampleComponent backgroundColor="red" size={64}>
           <SampleComponent backgroundColor="green" size={32} />
         </SampleComponent>
-      </TestCase>
-      <TestCase itShould="show/hide blue rectangle">
+      </TestCase.Example>
+      <TestCase.Example tags={['C_API']} itShould="change bgColor every second">
+        <SampleComponent
+          backgroundColor={refreshKey % 2 === 0 ? 'red' : 'green'}
+          size={64}
+        />
+      </TestCase.Example>
+      <TestCase.Example tags={['C_API']} itShould="show and hide red rectangle">
+        <View style={{height: 64}}>
+          {refreshKey % 2 === 0 && (
+            <SampleComponent
+              backgroundColor={refreshKey % 2 === 0 ? 'red' : 'green'}
+              size={64}
+            />
+          )}
+        </View>
+      </TestCase.Example>
+      <TestCase.Example itShould="show/hide blue rectangle">
         <SampleComponent backgroundColor="red" size={64}>
           <Blinker>
             <SampleComponent backgroundColor="blue" size={32} />
           </Blinker>
         </SampleComponent>
-      </TestCase>
-      <TestCase itShould="toggle font size in the component below button (native commands)">
+      </TestCase.Example>
+      <TestCase.Example itShould="toggle font size in the component below button (native commands)">
         <Ref<SampleComponentRef>
           render={ref => {
             return (
@@ -53,7 +81,7 @@ function ManualCustomComponentImplementationTest() {
             );
           }}
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }
@@ -77,7 +105,7 @@ function Blinker({children}: any) {
 function GeneratedCustomComponentTest() {
   return (
     <TestSuite name="generated custom component">
-      <TestCase<IncomingData | undefined>
+      <TestCase.Manual<IncomingData | undefined>
         itShould="ensure equality between provided and received data"
         initialState={undefined}
         arrange={({setState}) => {

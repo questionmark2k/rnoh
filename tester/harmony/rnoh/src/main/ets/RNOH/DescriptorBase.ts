@@ -176,13 +176,19 @@ export interface PropsBase {}
 
 export interface StateBase {}
 
+/** @deprecated */
+export interface DescriptorEssence<TType = string> {
+  tag: Tag,
+  type: TType
+}
+
 /**
- * (Component)Descriptor
+ * (ComponentInstance)Descriptor
  */
 export interface Descriptor<TType = string,
 TProps extends Object = Object,
 TState extends Object = Object,
-TRawProps extends Object = Object> {
+TRawProps extends Object = Object> extends DescriptorEssence<TType> {
   type: TType;
   tag: Tag;
   parentTag?: Tag;

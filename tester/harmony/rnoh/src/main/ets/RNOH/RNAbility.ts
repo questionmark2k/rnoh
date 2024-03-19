@@ -7,7 +7,7 @@ import { StandardRNOHLogger } from './RNOHLogger';
 import window from '@ohos.window';
 import type { TurboModuleProvider } from './TurboModuleProvider';
 import { RNInstanceRegistry } from './RNInstanceRegistry';
-import { RNInstance, RNInstanceImpl, RNInstanceOptions } from './RNInstance';
+import { RNInstance, RNInstanceImpl, RNInstanceOptions, FrameNodeFactory } from './RNInstance';
 import { RNOHContext } from './RNOHContext';
 import { JSPackagerClient, JSPackagerClientConfig } from './JSPackagerClient';
 import { RNOHError } from './RNOHError';
@@ -127,12 +127,14 @@ export abstract class RNAbility extends UIAbility {
     }
   }
 
-  public async createAndRegisterRNInstance(options: RNInstanceOptions): Promise<RNInstance> {
+  public async createAndRegisterRNInstance(options: RNInstanceOptions, frameNodeFactory?: FrameNodeFactory): Promise<RNInstance> {
     const stopTracing = this.logger.clone("createAndRegisterRNInstance").startTracing()
     const result = await this.rnInstanceRegistry.createInstance({
       enableDebugger: this.isDebugModeEnabled_,
       devToolsController: this.rnohCoreContext.devToolsController,
+      frameNodeFactory,
       ...options,
+
     })
     stopTracing()
     return result

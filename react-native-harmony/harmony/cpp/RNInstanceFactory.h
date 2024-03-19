@@ -8,6 +8,7 @@
 #include <react/renderer/components/text/ParagraphComponentDescriptor.h>
 #include "RNOH/ArkJS.h"
 #include "RNOH/RNInstance.h"
+#include "RNOH/SchedulerDelegateArkTS.h"
 #include "RNOH/RNInstanceArkTS.h"
 #include "RNOH/RNInstanceCAPI.h"
 #include "RNOH/MutationsToNapiConverter.h"
@@ -25,12 +26,14 @@
 #include "RNOH/SchedulerDelegateCAPI.h"
 #include "RNOH/ComponentInstanceRegistry.h"
 #include "RNOH/ComponentInstanceFactory.h"
+#include "RNOH/CustomComponentArkUINodeHandleFactory.h"
 #endif
 
 using namespace rnoh;
 
 std::shared_ptr<RNInstanceInternal>
-createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef, MutationsListener &&mutationsListener,
+createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef,
+                 napi_ref frameNodeFactoryRef, MutationsListener &&mutationsListener,
                  MountingManager::CommandDispatcher &&commandDispatcher, napi_ref measureTextFnRef,
                  napi_ref napiEventDispatcherRef, FeatureFlagRegistry::Shared featureFlagRegistry,
                  UITicker::Shared uiTicker, bool shouldEnableDebugger, bool shouldEnableBackgroundExecutor) {
@@ -113,20 +116,36 @@ createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef, Mut
     auto turboModuleFactory = TurboModuleFactory(env, arkTsTurboModuleProviderRef, std::move(componentJSIBinderByName),
                                                  taskExecutor, std::move(turboModuleFactoryDelegates));
     auto mutationsToNapiConverter = std::make_shared<MutationsToNapiConverter>(std::move(componentNapiBinderByName));
-
+    auto mountingManager = std::make_shared<MountingManager>(
+        taskExecutor, shadowViewRegistry,
+        [mutationsListener = std::move(mutationsListener),
+         mutationsToNapiConverter](facebook::react::ShadowViewMutationList mutations) {
+            mutationsListener(*mutationsToNapiConverter, mutations);
+        },
+        [weakExecutor = std::weak_ptr(taskExecutor), commandDispatcher = commandDispatcher](auto tag, auto commandName,
+                                                                                            auto args) {
+            if (auto taskExecutor = weakExecutor.lock()) {
+                taskExecutor->runTask(TaskThread::MAIN,
+                                      [tag, commandDispatcher, commandName = std::move(commandName),
+                                       args = std::move(args)]() { commandDispatcher(tag, commandName, args); });
+            }
+        });
+    auto schedulerDelegateArkTS = std::make_unique<SchedulerDelegateArkTS>(mountingManager, arkTSChannel);
     if (shouldUseCAPIArchitecture) {
 #ifdef C_API_ARCH
         auto componentInstanceDependencies = std::make_shared<ComponentInstance::Dependencies>();
         componentInstanceDependencies->arkTSChannel = arkTSChannel;
+        auto customComponentArkUINodeFactory =
+            std::make_shared<CustomComponentArkUINodeHandleFactory>(env, frameNodeFactoryRef, taskExecutor);
         auto componentInstanceFactory = std::make_shared<ComponentInstanceFactory>(
-            componentInstanceFactoryDelegates, componentInstanceDependencies);
+            componentInstanceFactoryDelegates, componentInstanceDependencies, customComponentArkUINodeFactory);
         auto componentInstanceRegistry = std::make_shared<ComponentInstanceRegistry>();
-        auto schedulerDelegate = std::make_unique<SchedulerDelegateCAPI>(
-            taskExecutor, shadowViewRegistry, componentInstanceRegistry, componentInstanceFactory);
+        auto schedulerDelegateCAPI = std::make_unique<SchedulerDelegateCAPI>(
+            taskExecutor, componentInstanceRegistry, componentInstanceFactory, std::move(schedulerDelegateArkTS), mountingManager);
         auto rnInstance = std::make_shared<RNInstanceCAPI>(
             id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
             mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
-            std::move(schedulerDelegate), componentInstanceRegistry, componentInstanceFactory, shouldEnableDebugger,
+            std::move(schedulerDelegateCAPI), componentInstanceRegistry, componentInstanceFactory, shouldEnableDebugger,
             shouldEnableBackgroundExecutor);
         componentInstanceDependencies->rnInstance = rnInstance;
         return rnInstance;
@@ -136,25 +155,8 @@ createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef, Mut
                       "run Build > Clean Project?";
 #endif
     }
-
-    auto schedulerDelegate = std::make_unique<SchedulerDelegate>(
-        MountingManager(
-            taskExecutor, shadowViewRegistry,
-            [mutationsListener = std::move(mutationsListener),
-             mutationsToNapiConverter](facebook::react::ShadowViewMutationList mutations) {
-                mutationsListener(*mutationsToNapiConverter, mutations);
-            },
-            [weakExecutor = std::weak_ptr(taskExecutor),
-             commandDispatcher = commandDispatcher](auto tag, auto commandName, auto args) {
-                if (auto taskExecutor = weakExecutor.lock()) {
-                    taskExecutor->runTask(TaskThread::MAIN,
-                                          [tag, commandDispatcher, commandName = std::move(commandName),
-                                           args = std::move(args)]() { commandDispatcher(tag, commandName, args); });
-                }
-            }),
-        arkTSChannel);
     return std::make_shared<RNInstanceArkTS>(
         id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
         mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,
-        std::move(schedulerDelegate), shouldEnableDebugger, shouldEnableBackgroundExecutor);
+        std::move(schedulerDelegateArkTS), shouldEnableDebugger, shouldEnableBackgroundExecutor);
 }

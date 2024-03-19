@@ -4,7 +4,8 @@ import {
   RNComponentContext,
   DescriptorWrapper,
   CustomComponentBuilder,
-  ComponentBuilderContext
+  ComponentBuilderContextImpl,
+  DescriptorEssence,
 } from "../../RNOH"
 import { buildRNView, RNView } from "./RNView"
 import { RNImage } from "./RNImage"
@@ -15,30 +16,6 @@ import { Descriptor } from "../../RNOH/DescriptorBase";
 import { RNModalHostView } from './RNModalHostView'
 import { RNSwitch } from './RNSwitch'
 import { RNActivityIndicator } from './RNActivityIndicator'
-
-/** @deprecated */
-interface DescriptorEssence {
-  tag: Tag,
-  type: string
-}
-
-
-class ComponentBuilderContextImpl implements ComponentBuilderContext {
-  public rnComponentContext: RNComponentContext
-  /** @deprecated: use rnComponentContext instead  */
-  public rnohContext: RNOHContext
-  public tag: Tag
-  public componentName: string
-  public descriptor: DescriptorEssence
-
-  constructor(rnComponentContext: RNComponentContext, rnohContext: RNOHContext, tag: Tag, componentName: string, descriptor: DescriptorEssence) {
-    this.rnComponentContext = rnComponentContext
-    this.rnohContext = rnohContext
-    this.tag = tag
-    this.componentName = componentName
-    this.descriptor = descriptor
-  }
-}
 
 
 @Builder
