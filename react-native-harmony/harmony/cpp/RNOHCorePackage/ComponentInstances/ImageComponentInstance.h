@@ -20,6 +20,7 @@ public:
 
     void onComplete(float width, float height) override;
     void onError(int32_t errorCode) override;
+    void onLoadStart();
 
     ImageNode &getLocalRootArkUINode() override;
 };

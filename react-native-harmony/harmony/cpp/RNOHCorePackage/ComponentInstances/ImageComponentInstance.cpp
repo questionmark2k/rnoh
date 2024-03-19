@@ -14,6 +14,9 @@ void ImageComponentInstance::onPropsChanged(SharedConcreteProps const &props) {
     CppComponentInstance::onPropsChanged(props);
     if (!m_props || m_props->sources != props->sources) {
         this->getLocalRootArkUINode().setSources(props->sources);
+        if (!this->getLocalRootArkUINode().getUri().empty()) {
+            onLoadStart();
+        }
     }
 
     if (!m_props || m_props->tintColor != props->tintColor) {
@@ -122,5 +125,11 @@ void ImageComponentInstance::onError(int32_t errorCode) {
         payload.setProperty(runtime, "source", source);
         return payload;
     });
+}
+
+void ImageComponentInstance::onLoadStart() {
+    if (m_eventEmitter) {
+        m_eventEmitter->onLoadStart();
+    }
 }
 } // namespace rnoh

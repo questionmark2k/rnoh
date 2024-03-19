@@ -87,9 +87,9 @@ namespace rnoh {
         void updateComponentWithShadowView(ComponentInstance::Shared const &componentInstance,
                                            facebook::react::ShadowView const &shadowView) {
             componentInstance->setLayout(shadowView.layoutMetrics);
+            componentInstance->setEventEmitter(shadowView.eventEmitter);
             componentInstance->setState(shadowView.state);
             componentInstance->setProps(shadowView.props);
-            componentInstance->setEventEmitter(shadowView.eventEmitter);
             componentInstance->finalizeUpdates();
         }
 
