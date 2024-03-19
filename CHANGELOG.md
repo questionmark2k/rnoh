@@ -1,4 +1,25 @@
 # Changelog
+## v0.72.18
+### ArkTS architecture
+- added LogBox support
+- added Image::onLoadEnd support
+- added Image::defaultSource support
+- fixed Image position not being updated properly
+- fixed dimensions not being set correctly when they were set to 0
+- fixed crashes due to Image cache issues
+- fixed displaying error dialog
+- fixed dismissing alerts
+
+### Experimental C-API architecture
+- added common View props support
+- added Native animations support
+- added transform style prop support
+- added ActivityIndicator support
+- added common ScrollView props support
+- added common Switch props support
+- added common Image props support
+- added basic backward compatibility with ArkTS arch
+- changed the design of CppComponentInstance class
 
 ## v0.72.17
 - added foundations for an experimental C-API based architecture
