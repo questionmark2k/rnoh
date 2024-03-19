@@ -61,4 +61,7 @@ export class TextInputDescriptorWrapper extends ViewDescriptorWrapperBase<string
     return this.rawProps.selectTextOnFocus ?? false;
   }
 
+  public get contextMenuHidden(): boolean {
+    return this.rawProps.contextMenuHidden ?? false;
+  }
 }

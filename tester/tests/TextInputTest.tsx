@@ -416,6 +416,11 @@ export function TextInputTest() {
         itShould="show textinput with 'Selection' substring selected">
         <SelectionTest />
       </TestCase>
+      <TestCase
+        modal
+        itShould="not show text context menu when long press">
+        <ContextMenuHiddenTest />
+      </TestCase>
       <TestCase modal itShould="select text on focus">
         <TextInput
           value="selectTextOnFocus"
@@ -434,6 +439,24 @@ const SelectionTest = () => {
         style={styles.textInput}
         value="TextSelectionTest"
         selection={{start: 4, end: 13}}
+      />
+    </View>
+  );
+};
+
+const ContextMenuHiddenTest = () => {
+  return (
+    <View>
+      <TextInput
+        style={styles.textInput}
+        value="ContextMenuHiddenTest"
+        contextMenuHidden={true}
+      />
+      <TextInput
+        style={[styles.textInput, {marginTop: 5}]}
+        value="ContextMenuHiddenTest_multiline"
+        multiline={true}
+        contextMenuHidden={true}
       />
     </View>
   );

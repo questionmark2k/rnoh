@@ -30,6 +30,7 @@ export interface TextInputRawProps extends ViewRawProps {
   mostRecentEventCount?: number
   clearButtonMode?: ClearButtonMode
   selectTextOnFocus?: boolean
+  contextMenuHidden?: boolean
 }
 
 export interface TextInputState {

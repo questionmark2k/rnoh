@@ -346,7 +346,8 @@ export struct RNTextInput {
           .onPaste(() => this.onPaste())
           .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
           .type(getTextAreaType(this.descriptor.props.keyboardType))
-          .onEditChange((isEditing) => { this.isEditing = isEditing; })
+	  .onEditChange((isEditing) => { this.isEditing = isEditing; })
+          .selectionMenuHidden(this.descriptorWrapper?.contextMenuHidden)
       } else {
         TextInput({
           controller: this.inputController,
@@ -402,7 +403,8 @@ export struct RNTextInput {
           .cancelButton(this.getCancelButton())
           .onPaste(() => this.onPaste())
           .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
-          .onEditChange((isEditing) => { this.isEditing = isEditing; })
+	  .onEditChange((isEditing) => { this.isEditing = isEditing; })
+          .selectionMenuHidden(this.descriptorWrapper?.contextMenuHidden)
       }
     }
   }

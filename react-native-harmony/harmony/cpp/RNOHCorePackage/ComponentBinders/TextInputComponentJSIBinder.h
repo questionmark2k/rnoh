@@ -24,6 +24,7 @@ class TextInputComponentJSIBinder : public ViewComponentJSIBinder {
         nativeProps.setProperty(rt, "mostRecentEventCount", "number");
         nativeProps.setProperty(rt, "clearButtonMode", "string");
         nativeProps.setProperty(rt, "selectTextOnFocus", "boolean");
+        nativeProps.setProperty(rt, "contextMenuHidden", "boolean");
 
         return nativeProps;
     };
