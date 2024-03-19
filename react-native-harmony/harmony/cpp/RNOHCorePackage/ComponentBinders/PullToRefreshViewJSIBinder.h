@@ -7,7 +7,7 @@ class PullToRefreshViewJSIBinder : public ViewComponentJSIBinder {
         auto nativeProps = ViewComponentJSIBinder::createNativeProps(rt);
         nativeProps.setProperty(rt, "refreshing", "boolean");
         nativeProps.setProperty(rt, "progressViewOffset", "number");
-        nativeProps.setProperty(rt, "tintColor", "ColorValue");
+        nativeProps.setProperty(rt, "tintColor", "Color");
         return nativeProps;
     }
     facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {

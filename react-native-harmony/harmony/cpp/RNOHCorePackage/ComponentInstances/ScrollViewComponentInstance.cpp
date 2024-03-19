@@ -4,6 +4,7 @@
 #include <react/renderer/components/scrollview/ScrollViewShadowNode.h>
 #include "conversions.h"
 #include <cmath>
+#include "PullToRefreshViewComponentInstance.h"
 
 using namespace rnoh;
 
@@ -26,7 +27,8 @@ void ScrollViewComponentInstance::onChildRemoved(ComponentInstance::Shared const
 }
 
 void ScrollViewComponentInstance::setLayout(facebook::react::LayoutMetrics layoutMetrics) {
-    CppComponentInstance::setLayout(layoutMetrics);
+    this->getLocalRootArkUINode().setSize(layoutMetrics.frame.size);
+    m_layoutMetrics = layoutMetrics;
     m_containerSize = layoutMetrics.frame.size;
 }
 
@@ -208,4 +210,15 @@ void ScrollViewComponentInstance::setScrollSnap(bool snapToStart, bool snapToEnd
 }
 bool ScrollViewComponentInstance::scrollMovedBySignificantOffset(facebook::react::Point newOffset) {
     return std::abs(newOffset.x - m_currentOffset.x) >= 1 || std::abs(newOffset.y - m_currentOffset.y) >= 1;
+}
+
+void ScrollViewComponentInstance::finalizeUpdates() { 
+    ComponentInstance::finalizeUpdates();
+
+    // when parent isn't refresh node, set the position
+    auto parent = this->getParent().lock();
+    bool isRefresh = std::dynamic_pointer_cast<const PullToRefreshViewComponentInstance>(this->getParent().lock()) != nullptr;
+    if (parent && !isRefresh) {
+        m_scrollNode.setPosition(m_layoutMetrics.frame.origin);
+    }
 }

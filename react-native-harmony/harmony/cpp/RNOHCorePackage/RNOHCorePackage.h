@@ -70,6 +70,7 @@
 #include "RNOHCorePackage/ComponentInstances/ActivityIndicatorComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ModalHostViewComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/SwitchComponentInstance.h"
+#include "RNOHCorePackage/ComponentInstances/PullToRefreshViewComponentInstance.h"
 
 namespace rnoh {
 
@@ -162,6 +163,9 @@ namespace rnoh {
             }
             if (ctx.componentName == "Switch") {
                 return std::make_shared<SwitchComponentInstance>(std::move(ctx));
+            }
+            if (ctx.componentName == "PullToRefreshView") {
+                return std::make_shared<PullToRefreshViewComponentInstance>(std::move(ctx));
             }
             return nullptr;
         }

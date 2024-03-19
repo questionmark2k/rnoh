@@ -455,6 +455,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOH/arkui/TouchEventDispatcher.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/LoadingProgressNode.cpp"
     "${RNOH_CPP_DIR}/RNOH/arkui/ToggleNode.cpp"
+    "${RNOH_CPP_DIR}/RNOH/arkui/RefreshNode.cpp"
     "${RNOH_CPP_DIR}/RNOH/ComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ImageComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ViewComponentInstance.cpp"
@@ -463,6 +464,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ActivityIndicatorComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/ModalHostViewComponentInstance.cpp"
     "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/SwitchComponentInstance.cpp"
+    "${RNOH_CPP_DIR}/RNOHCorePackage/ComponentInstances/PullToRefreshViewComponentInstance.cpp"
 )
 target_include_directories(rnoh PUBLIC
     "${RNOH_CPP_DIR}"

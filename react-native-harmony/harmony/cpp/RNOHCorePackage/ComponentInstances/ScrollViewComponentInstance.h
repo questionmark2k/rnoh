@@ -55,6 +55,8 @@ namespace rnoh {
         void onScrollStop() override;
         float onScrollFrameBegin(float offset, int32_t scrollState) override;
 
+        void finalizeUpdates() override;
+
         // TouchTarget implementation
         facebook::react::Point computeChildPoint(facebook::react::Point const &point,
                                                  TouchTarget::Shared const &child) const override;
