@@ -112,6 +112,7 @@ export struct RNTextInput {
   inputController: TextInputController = new TextInputController();
   areaController: TextAreaController = new TextAreaController();
   @State value: string = '';
+  @State isEditing: boolean = false;
   private cleanUpCallbacks: (() => void)[] = []
   private shouldIgnoreNextValueChange: boolean = false
   private componentManager!: RNViewManager
@@ -242,10 +243,16 @@ export struct RNTextInput {
 
   getCancelButton(): CancelButtonOptions {
     const clearButtonMode = this.descriptorWrapper?.clearButtonMode;
-    if (clearButtonMode === 'always') {
-      return { style: CancelButtonStyle.INPUT };
+    switch (clearButtonMode) {
+      case 'always':
+        return { style: CancelButtonStyle.INPUT };
+      case 'while-editing':
+        return { style: this.isEditing ? CancelButtonStyle.INPUT : CancelButtonStyle.INVISIBLE };
+      case 'unless-editing':
+        return { style: this.isEditing ? CancelButtonStyle.INVISIBLE : CancelButtonStyle.INPUT };
+      default :
+        return { style: CancelButtonStyle.INVISIBLE };
     }
-    return { style: CancelButtonStyle.INVISIBLE };
   }
 
   onPaste(): void {
@@ -339,6 +346,7 @@ export struct RNTextInput {
           .onPaste(() => this.onPaste())
           .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
           .type(getTextAreaType(this.descriptor.props.keyboardType))
+          .onEditChange((isEditing) => { this.isEditing = isEditing; })
       } else {
         TextInput({
           controller: this.inputController,
@@ -394,6 +402,7 @@ export struct RNTextInput {
           .cancelButton(this.getCancelButton())
           .onPaste(() => this.onPaste())
           .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
+          .onEditChange((isEditing) => { this.isEditing = isEditing; })
       }
     }
   }
