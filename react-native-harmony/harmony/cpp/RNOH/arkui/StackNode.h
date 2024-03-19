@@ -21,6 +21,7 @@ public:
     void onNodeEvent(ArkUI_NodeEvent *event) override;
     void onClick();
     void setStackNodeDelegate(StackNodeDelegate *stackNodeDelegate);
+    StackNode& setMargin(float left, float top, float right, float bottom);
 };
 
 } // namespace rnoh

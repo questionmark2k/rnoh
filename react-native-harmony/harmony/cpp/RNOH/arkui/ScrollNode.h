@@ -36,6 +36,12 @@ namespace rnoh {
         ScrollNode &setEnableScrollInteraction(bool enableScrollInteraction);
         ScrollNode &setFriction(float friction);
         ScrollNode &setEdgeEffect(bool bounces, bool alwaysBounces);
+        ScrollNode &setScrollBarDisplayMode(ArkUI_ScrollBarDisplayMode scrollBarDisplayMode);
+        ScrollNode &setScrollBarColor(uint32_t scrollBarColor);
+        ScrollNode &setScrollSnap(ArkUI_ScrollSnapAlign scrollSnapAlign, bool snapToStart, bool snapToEnd,
+                                  const std::vector<facebook::react::Float> &snapPoints);
+        ScrollNode &setEnablePaging(bool enablePaging);
+        void scrollTo(float x, float y, bool animated);
     };
 
 } // namespace rnoh

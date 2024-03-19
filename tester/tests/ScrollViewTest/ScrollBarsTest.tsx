@@ -1,4 +1,4 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {
   COMMON_PROPS,
   getScrollViewContent,
@@ -6,32 +6,40 @@ import {
 } from './fixtures';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import React from 'react';
-import {Button} from '../../components';
+import {Button, TestCase} from '../../components';
 
 export function ScrollBarsTest() {
   return (
     <TestSuite name="scroll indicators / scrollbar">
-      <TestCase modal itShould="have persistent scrollbar">
+      <TestCase.Example tags={['C_API']} itShould="have persistent scrollbar">
         <View style={styles.wrapperView}>
           <ScrollView persistentScrollbar={true} {...COMMON_PROPS} />
         </View>
-      </TestCase>
-      <TestCase modal itShould="shows white vertical scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="shows white vertical scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView {...COMMON_PROPS} indicatorStyle={'white'} />
         </View>
-      </TestCase>
-      <TestCase modal itShould="show vertical scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show vertical scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView {...COMMON_PROPS} showsVerticalScrollIndicator={true} />
         </View>
-      </TestCase>
-      <TestCase modal itShould="hide vertical scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="hide vertical scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView showsVerticalScrollIndicator={false} {...COMMON_PROPS} />
         </View>
-      </TestCase>
-      <TestCase modal itShould="show horizontal scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show horizontal scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView
             showsHorizontalScrollIndicator={true}
@@ -40,8 +48,10 @@ export function ScrollBarsTest() {
             {getScrollViewContentHorizontal({})}
           </ScrollView>
         </View>
-      </TestCase>
-      <TestCase modal itShould="hide horizontal scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="hide horizontal scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView
             showsHorizontalScrollIndicator={false}
@@ -50,22 +60,22 @@ export function ScrollBarsTest() {
             {getScrollViewContentHorizontal({})}
           </ScrollView>
         </View>
-      </TestCase>
-      <TestCase modal itShould="flash scroll indicators">
+      </TestCase.Example>
+      <TestCase.Example tags={['C_API']} itShould="flash scroll indicators">
         <FlashIndicatorsTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip
+        skip={''}
         itShould="[FAILS on Harmony/Android] It should move the scroll bar by 50px from the right and by 200px from the top and bottom">
         <ScrollViewScrollIndicatorInsetsTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip
+        skip={''}
         itShould="[FAILS on Harmony/Android] It should move the scroll bar and the scroll content by 50px from the left and by 100px from the left and right">
         <ScrollViewContentInsetsTest />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

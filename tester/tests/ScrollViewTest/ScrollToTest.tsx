@@ -1,4 +1,4 @@
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {
   View,
   ScrollView,
@@ -8,19 +8,21 @@ import {
 } from 'react-native';
 import {COMMON_PROPS} from './fixtures';
 import React, {useRef} from 'react';
-import {Button} from '../../components';
+import {Button, TestCase} from '../../components';
 
 export function ScrollToTest() {
   return (
     <TestSuite name="scrollTo">
-      <TestCase modal itShould="scroll down on button press (no animation)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="scroll down on button press (no animation)">
         <ScrollToTestCase animated={false} />
-      </TestCase>
-      <TestCase modal itShould="scroll down on button press (with animation)">
+      </TestCase.Example>
+      <TestCase.Example itShould="scroll down on button press (with animation)">
         <ScrollToTestCase animated={true} />
-      </TestCase>
-      <TestCase
-        modal
+      </TestCase.Example>
+      <TestCase.Manual
+        tags={['C_API']}
         itShould="call onScroll once when scrolling without animation"
         initialState={0}
         arrange={({setState}) => (
@@ -33,8 +35,7 @@ export function ScrollToTest() {
           expect(state).to.eq(1);
         }}
       />
-      <TestCase
-        modal
+      <TestCase.Manual
         itShould="call onScroll multiple times when scrolling with animation"
         initialState={0}
         arrange={AnimatedScrollToEventCountTestCase}
@@ -42,20 +43,20 @@ export function ScrollToTest() {
           expect(state).to.be.greaterThan(10);
         }}
       />
-      <TestCase
+      <TestCase.Example
         modal
         itShould="scroll overflow top/bottom when clicking a button"
-        skip // iOS only - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/315
+        skip={''} // iOS only - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/315
       >
         <ScrollToOverflowEnabledBasicTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="scroll overflow left/right when clicking a button"
-        skip // iOS only - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/315
+        skip={''} // iOS only - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/315
       >
         <ScrollToOverflowEnabledHorizontalTest />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

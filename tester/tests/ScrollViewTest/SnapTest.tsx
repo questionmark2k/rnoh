@@ -1,6 +1,7 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {ScrollViewProps} from 'react-native';
 import {ScrollViewComparator, getScrollViewContent} from './fixtures';
+import {TestCase} from '../../components';
 
 const ITEM_HEIGHT = 50;
 
@@ -24,7 +25,7 @@ export function SnapTest() {
 function SnapTestCases(props: {scrollViewProps: ScrollViewProps}) {
   return (
     <>
-      <TestCase
+      <TestCase.Example
         modal
         itShould="not snap after item 6 when snapToEnd is set to false">
         <ScrollViewComparator
@@ -37,8 +38,8 @@ function SnapTestCases(props: {scrollViewProps: ScrollViewProps}) {
           lhsProps={{snapToEnd: true}}
           rhsProps={{snapToEnd: false}}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="not snap before item 6 when snapToStart is set to false">
         <ScrollViewComparator
@@ -51,8 +52,8 @@ function SnapTestCases(props: {scrollViewProps: ScrollViewProps}) {
           lhsProps={{snapToStart: true}}
           rhsProps={{snapToStart: false}}
         />
-      </TestCase>
-      <TestCase modal itShould="snap to page">
+      </TestCase.Example>
+      <TestCase.Example tags={['C_API']} itShould="snap to page">
         <ScrollViewComparator
           scrollViewLength={ITEM_HEIGHT * 5}
           commonProps={{
@@ -62,8 +63,10 @@ function SnapTestCases(props: {scrollViewProps: ScrollViewProps}) {
           lhsProps={{pagingEnabled: false}}
           rhsProps={{pagingEnabled: true}}
         />
-      </TestCase>
-      <TestCase modal itShould="snap to item 1, 3, 5, 7, 9, ...">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="snap to item 1, 3, 5, 7, 9, ...">
         <ScrollViewComparator
           scrollViewLength={ITEM_HEIGHT * 5}
           commonProps={{
@@ -73,8 +76,10 @@ function SnapTestCases(props: {scrollViewProps: ScrollViewProps}) {
           lhsProps={{}}
           rhsProps={{snapToInterval: ITEM_HEIGHT * 2}}
         />
-      </TestCase>
-      <TestCase modal itShould="snap to item 2, 3, 7, and 11 and 21">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="snap to item 2, 3, 7, and 11 and 21">
         <ScrollViewComparator
           scrollViewLength={ITEM_HEIGHT * 5}
           commonProps={{
@@ -91,9 +96,11 @@ function SnapTestCases(props: {scrollViewProps: ScrollViewProps}) {
             ],
           }}
         />
-      </TestCase>
+      </TestCase.Example>
       <TestSuite name="snapToAlignment">
-        <TestCase modal itShould="snap to item {lhs: start, rhs: center}">
+        <TestCase.Example
+          tags={['C_API']}
+          itShould="snap to item {lhs: start, rhs: center}">
           <ScrollViewComparator
             scrollViewLength={ITEM_HEIGHT * 1.5}
             commonProps={{
@@ -104,8 +111,10 @@ function SnapTestCases(props: {scrollViewProps: ScrollViewProps}) {
             lhsProps={{snapToAlignment: 'start'}}
             rhsProps={{snapToAlignment: 'center'}}
           />
-        </TestCase>
-        <TestCase modal itShould="snap to item {lhs: start, rhs: end}">
+        </TestCase.Example>
+        <TestCase.Example
+          tags={['C_API']}
+          itShould="snap to item {lhs: start, rhs: end}">
           <ScrollViewComparator
             scrollViewLength={ITEM_HEIGHT * 1.5}
             commonProps={{
@@ -116,7 +125,7 @@ function SnapTestCases(props: {scrollViewProps: ScrollViewProps}) {
             lhsProps={{snapToAlignment: 'start'}}
             rhsProps={{snapToAlignment: 'end'}}
           />
-        </TestCase>
+        </TestCase.Example>
       </TestSuite>
     </>
   );

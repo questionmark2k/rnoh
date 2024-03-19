@@ -681,6 +681,9 @@ export type Props = $ReadOnly<{|
 
 type State = {|
   layoutHeight: ?number,
+  // RNOH patch - resolving flashScrollIndicators command on the JS side
+  // as it is currently not feasible on the native side
+  showScrollIndicator: boolean,
 |};
 
 const IS_ANIMATING_TOUCH_START_THRESHOLD_MS = 16;
@@ -766,6 +769,9 @@ class ScrollView extends React.Component<Props, State> {
 
   state: State = {
     layoutHeight: null,
+    // RNOH patch - resolving flashScrollIndicators command on the JS side
+    // as it is currently not feasible on the native side
+    showScrollIndicator: false,
   };
 
   componentDidMount() {
@@ -947,10 +953,20 @@ class ScrollView extends React.Component<Props, State> {
    * @platform ios
    */
   flashScrollIndicators: () => void = () => {
-    if (this._scrollView.nativeInstance == null) {
-      return;
-    }
-    Commands.flashScrollIndicators(this._scrollView.nativeInstance);
+    // RNOH patch - resolving flashScrollIndicators command on the JS side
+    // as it is currently not feasible on the native side
+
+    // if (this._scrollView.nativeInstance == null) {
+    //   return;
+    // }
+    // Commands.flashScrollIndicators(this._scrollView.nativeInstance);
+
+    this.state.showScrollIndicator = true;
+    setTimeout(() => {
+      this.state.showScrollIndicator = false;
+      this.forceUpdate();
+    }, 500);
+    this.forceUpdate();
   };
 
   /**
@@ -1814,6 +1830,11 @@ class ScrollView extends React.Component<Props, State> {
         this.props.pagingEnabled === true &&
         this.props.snapToInterval == null &&
         this.props.snapToOffsets == null,
+      // RNOH patch - resolving flashScrollIndicators command on the JS side
+      // as it is currently not feasible on the native side 
+      showsVerticalScrollIndicator: this.props.showsVerticalScrollIndicator || this.state.showScrollIndicator,
+      showsHorizontalScrollIndicator: this.props.showsHorizontalScrollIndicator || this.state.showScrollIndicator,
+      persistentScrollbar: this.props.persistentScrollbar || this.state.showScrollIndicator,
     };
 
     const { decelerationRate } = this.props;

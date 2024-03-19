@@ -68,13 +68,14 @@ export function MiscPropsTest() {
         <OnContentSizeChangeTestCase />
       </TestCase.Example>
       <TestCase.Example
-        modal
+        tags={['C_API']}
         itShould="display onScroll native event throttled every second">
         <ObjectDisplayer
           renderContent={setObject => {
             return (
               <ScrollView
                 {...COMMON_PROPS}
+                style={{height: 300}}
                 scrollEventThrottle={1000}
                 onScroll={(e: {nativeEvent: Object}) => {
                   setObject(e.nativeEvent);
