@@ -2,9 +2,12 @@
 #include <react/renderer/core/ReactPrimitives.h>
 #include "RNOH/ArkJS.h"
 #include "RNOH/TaskExecutor/TaskExecutor.h"
+#include "glog/logging.h"
+
+#ifdef C_API_ARCH
 #include <arkui/native_node.h>
 #include "arkui/native_node_napi.h"
-#include "glog/logging.h"
+#endif
 
 namespace rnoh {
     class CustomComponentArkUINodeHandleFactory {
@@ -22,6 +25,7 @@ namespace rnoh {
               m_customRNComponentFrameNodeFactoryRef(customRNComponentFrameNodeFactoryRef) {}
 
         ArkUI_NodeHandle create(facebook::react::Tag tag, std::string componentName) {
+            #ifdef C_API_ARCH
             ArkUI_NodeHandle arkTSNodeHandle;
             m_taskExecutor->runSyncTask(
                 TaskThread::MAIN, [=, &arkTSNodeHandle, componentName = std::move(componentName)] {
@@ -34,6 +38,10 @@ namespace rnoh {
                     }
                 });
             return arkTSNodeHandle;
+            #else
+            return nullptr;
+            #endif
+            
         }
     };
 } // namespace rnoh
