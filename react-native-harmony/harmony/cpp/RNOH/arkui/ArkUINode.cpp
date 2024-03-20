@@ -236,7 +236,14 @@ namespace rnoh {
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_CLIP, &clipItem));
         return *this;
     }
-    
+
+    ArkUINode &ArkUINode::setAlignment(Alignment alignment) {
+        ArkUI_NumberValue alignmentValue[] = {{.i32 = static_cast<int32_t>(alignment)}};
+        ArkUI_AttributeItem alignmentItem = {alignmentValue, sizeof(alignmentValue) / sizeof(ArkUI_NumberValue)};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_ALIGNMENT, &alignmentItem));
+        return *this;
+    }
+
     ArkUINode &ArkUINode::setTransition(facebook::react::ModalHostViewAnimationType animationType) {
         constexpr int32_t MODAL_ANIMATION_DURATION = 500;
         ArkUI_AttributeItem selfOffset = *NativeNodeApi::getInstance()->getAttribute(m_nodeHandle, NODE_OFFSET);

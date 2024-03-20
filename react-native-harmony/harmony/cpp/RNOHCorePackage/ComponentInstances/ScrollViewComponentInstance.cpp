@@ -10,6 +10,8 @@ using namespace rnoh;
 
 ScrollViewComponentInstance::ScrollViewComponentInstance(Context context) : CppComponentInstance(std::move(context)) {
     m_scrollNode.insertChild(m_stackNode);
+    // NOTE: perhaps this needs to take rtl into account?
+    m_scrollNode.setAlignment(ARKUI_ALIGNMENT_TOP_START);
     m_scrollNode.setScrollNodeDelegate(this);
 }
 

@@ -17,18 +17,17 @@
 
 namespace rnoh {
 
-namespace {
-    enum class ArkuiHitTestMode : int32_t {
-        DEFAULT,
-        BLOCK,
-        TRANSPARENT,
-        NONE,
-    };
-}
+    namespace {
+        enum class ArkuiHitTestMode : int32_t {
+            DEFAULT,
+            BLOCK,
+            TRANSPARENT,
+            NONE,
+        };
+    }
 
     class ArkUINode {
     protected:
-
         ArkUINode(const ArkUINode &other) = delete;
         ArkUINode &operator=(const ArkUINode &other) = delete;
 
@@ -36,6 +35,8 @@ namespace {
         ArkUINode(ArkUINode &&other) noexcept;
 
     public:
+        using Alignment = ArkUI_Alignment;
+
         ArkUI_NodeHandle getArkUINodeHandle();
         ArkUINode(ArkUI_NodeHandle nodeHandle);
 
@@ -49,9 +50,11 @@ namespace {
         virtual ArkUINode &setBorderRadius(facebook::react::BorderRadii const &borderRadius);
         virtual ArkUINode &setBorderStyle(facebook::react::BorderStyles const &borderStyles);
         virtual ArkUINode &setBackgroundColor(facebook::react::SharedColor const &color);
-        virtual ArkUINode &setTransform(facebook::react::Transform const &transform, facebook::react::Float pointScaleFactor);
+        virtual ArkUINode &setTransform(facebook::react::Transform const &transform,
+                                        facebook::react::Float pointScaleFactor);
         virtual ArkUINode &setShadow(facebook::react::SharedColor const &shadowColor,
-            facebook::react::Size const &shadowOffset, float const shadowOpacity, float const shadowRadius);
+                                     facebook::react::Size const &shadowOffset, float const shadowOpacity,
+                                     float const shadowRadius);
         virtual ArkUINode &setHitTestMode(facebook::react::PointerEventsMode const &pointerEvents);
         virtual ArkUINode &setAccessibilityDescription(std::string const &accessibilityDescription);
         virtual ArkUINode &setAccessibilityLevel(facebook::react::ImportantForAccessibility importance);
@@ -60,6 +63,7 @@ namespace {
         virtual ArkUINode &setId(facebook::react::Tag const &tag);
         virtual ArkUINode &setOpacity(facebook::react::Float opacity);
         virtual ArkUINode &setClip(bool clip);
+        virtual ArkUINode &setAlignment(Alignment alignment);
         virtual ArkUINode &setTransition(facebook::react::ModalHostViewAnimationType animationType);
 
         virtual void onNodeEvent(ArkUI_NodeEvent *event);
@@ -70,8 +74,9 @@ namespace {
         void maybeThrow(int32_t status) {
             // TODO: map status to error message, maybe add a new error type
             if (status != 0) {
-                throw std::runtime_error(std::string("ArkUINode operation failed with status: ") +
-                                         std::to_string(status));
+                auto message = std::string("ArkUINode operation failed with status: ") + std::to_string(status);
+                LOG(ERROR) << message;
+                throw std::runtime_error(std::move(message));
             }
         }
 
