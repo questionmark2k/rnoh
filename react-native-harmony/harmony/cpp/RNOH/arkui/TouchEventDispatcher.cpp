@@ -65,16 +65,9 @@ std::pair<std::unique_ptr<ArkUI_NodeTouchPoint[]>, int32_t> getTouchesFromEvent(
 }
 
 void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchTarget::Shared const &rootTarget) {
-    // at the moment, the `id` field of `actionTouch` is different on each event
-    // -- there doesn't seem to be a way to track the same touch across events.
-    // We assume there's only one active touch at a time
-    event.actionTouch.id = 0;
-
     DLOG(INFO) << "Touch event received: id=" << event.actionTouch.id << ", action type:" << event.action;
 
-    // apparently, this enum is ill-defined? 
-    // The events passed to this function are not consistent with the enum values
-    if (event.action == 0 /* NODE_ACTION_DOWN */) {
+    if (event.action == NODE_ACTION_DOWN) {
         registerTargetForTouch(event.actionTouch, rootTarget);
     }
 
@@ -125,7 +118,7 @@ void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchT
         return;
     }
 
-    if (event.action == 1 /* NODE_ACTION_UP */) {
+    if (event.action == NODE_ACTION_UP) {
         touches.erase(changedTouch.value());
         targetTouches.erase(changedTouch.value());
         m_touchTargetTagById.erase(changedTouch.value().identifier);
@@ -138,16 +131,16 @@ void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchT
     };
 
     switch (event.action) {
-        case 0 /* NODE_ACTION_DOWN */:
+        case NODE_ACTION_DOWN:
             eventTarget->getTouchEventEmitter()->onTouchStart(touchEvent);
             break;
-        case 2 /* NODE_ACTION_MOVE */:
+        case NODE_ACTION_MOVE:
             eventTarget->getTouchEventEmitter()->onTouchMove(touchEvent);
             break;
-        case 1 /* NODE_ACTION_UP */:
+        case NODE_ACTION_UP:
             eventTarget->getTouchEventEmitter()->onTouchEnd(touchEvent);
             break;
-        // case NODE_ACTION_CANCEL:
+        case NODE_ACTION_CANCEL:
         default:
             eventTarget->getTouchEventEmitter()->onTouchCancel(touchEvent);
             break;
