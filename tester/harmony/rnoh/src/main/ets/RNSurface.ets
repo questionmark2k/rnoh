@@ -154,7 +154,6 @@ export struct RNSurface {
         })
           .width("100%")
           .height("100%")
-          .border({ width: 1, color: 'black' })
       } else {
         if (this.ctx instanceof RNComponentContext) {
           RNView({
