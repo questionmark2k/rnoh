@@ -37,6 +37,7 @@
 #include "RNOHCorePackage/TurboModules/DevLoadingViewTurboModule.h"
 #include "RNOHCorePackage/TurboModules/VibrationTurboModule.h"
 #include "RNOHCorePackage/TurboModules/ToastAndroidTurboModule.h"
+#include "RNOHCorePackage/TurboModules/ShareTurboModule.h"
 #include "RNOHCorePackage/ComponentBinders/ViewComponentJSIBinder.h"
 #include "RNOHCorePackage/ComponentBinders/ViewComponentNapiBinder.h"
 #include "RNOHCorePackage/ComponentBinders/ImageComponentJSIBinder.h"
@@ -133,6 +134,8 @@ namespace rnoh {
                 return std::make_shared<VibrationTurboModule>(ctx, name);
             } else if (name == "ToastAndroid") {
                 return std::make_shared<ToastAndroidTurboModule>(ctx, name);
+            } else if (name == "ShareModule") {
+                return std::make_shared<ShareTurboModule>(ctx, name);
             }
             return nullptr;
         };
@@ -141,7 +144,7 @@ namespace rnoh {
     class RNOHCorePackageComponentInstanceFactoryDelegate : public ComponentInstanceFactoryDelegate {
       public:
         using ComponentInstanceFactoryDelegate::ComponentInstanceFactoryDelegate;
-    
+
         ComponentInstance::Shared create(ComponentInstance::Context ctx) override {
             if (ctx.componentName == "RootView" || ctx.componentName == "View") {
                 return std::make_shared<ViewComponentInstance>(std::move(ctx));

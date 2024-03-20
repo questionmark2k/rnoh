@@ -38,3 +38,4 @@ export * from "./DevLoadingViewTurboModule"
 export * from "./VibrationTurboModule";
 
 export * from "./ToastAndroidTurboModule";
+export * from "./ShareTurboModule";

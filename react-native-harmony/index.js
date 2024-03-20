@@ -114,7 +114,7 @@ module.exports = {
     return require('./Libraries/Components/SafeAreaView/SafeAreaView').default;
   },
   get Share() {
-    return require('react-native/Libraries/Share/Share');
+    return require('./Libraries/Share/Share');
   },
   get ScrollView() {
     return require('./Libraries/Components/ScrollView/ScrollView');
