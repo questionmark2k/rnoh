@@ -259,7 +259,7 @@ namespace rnoh {
         }
         if (animationType == facebook::react::ModalHostViewAnimationType::Fade) {
             ArkUI_NumberValue opacityValue[] = {
-                {.f32 = 0}, {.i32 = MODAL_ANIMATION_DURATION}, {.i32 = static_cast<int32_t>(ARKUI_CURVE_LINEAR)}};
+                {.f32 = 1}, {.i32 = MODAL_ANIMATION_DURATION}, {.i32 = static_cast<int32_t>(ARKUI_CURVE_LINEAR)}};
             ArkUI_AttributeItem opacityItem = {opacityValue, sizeof(opacityValue) / sizeof(ArkUI_NumberValue)};
             maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_OPACITY_TRANSITION, &opacityItem));
         }

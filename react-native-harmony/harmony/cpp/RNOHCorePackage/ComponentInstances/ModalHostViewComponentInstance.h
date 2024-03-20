@@ -1,13 +1,12 @@
 #pragma once
 
 #include "RNOH/arkui/StackNode.h"
-#include "RNOH/arkui/NativeNodeApi.h"
 #include "RNOH/arkui/ArkUIDialogHandler.h"
 #include "RNOH/CppComponentInstance.h"
 #include "react/renderer/components/modal/ModalHostViewShadowNode.h"
 
 namespace rnoh {
-class ModalHostViewComponentInstance : public CppComponentInstance<facebook::react::ModalHostViewShadowNode> {
+class ModalHostViewComponentInstance : public CppComponentInstance<facebook::react::ModalHostViewShadowNode>, public ArkUIDialogDelegate {
   private:
     StackNode m_virtualNode;
     StackNode m_rootStackNode;
@@ -20,6 +19,14 @@ class ModalHostViewComponentInstance : public CppComponentInstance<facebook::rea
 
     void onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) override;
     void onChildRemoved(ComponentInstance::Shared const &childComponentInstance) override;
+
+    void finalizeUpdates() override;
+
+    void showDialog();
+
+    void onShow() override;
+
+    void onRequestClose() override;
 
     StackNode &getLocalRootArkUINode() override;
 };
