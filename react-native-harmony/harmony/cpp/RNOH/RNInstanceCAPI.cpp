@@ -281,7 +281,7 @@ void RNInstanceCAPI::startSurface(facebook::react::Tag surfaceId, float width, f
     if (it == m_surfaceById.end()) {
         return;
     }
-    it->second.start(width, height, viewportOffsetX, viewportOffsetY, pixelRatio, std::move(initialProps));
+    it->second.start(width, height, viewportOffsetX, viewportOffsetY, pixelRatio, std::move(initialProps), m_animationDriver);
 }
 
 void RNInstanceCAPI::setSurfaceProps(facebook::react::Tag surfaceId, folly::dynamic &&props) {

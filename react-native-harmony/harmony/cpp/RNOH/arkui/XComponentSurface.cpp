@@ -128,13 +128,16 @@ namespace rnoh {
         m_surfaceHandler.constraintLayout(layoutConstraints, layoutContext);
     }
 
-    void XComponentSurface::start(float width, float height, float viewportOffsetX, float viewportOffsetY,
-                                  float pixelRatio, folly::dynamic &&initialProps) {
-        this->setProps(std::move(initialProps));
-        this->updateConstraints(width, height, viewportOffsetX, viewportOffsetY, pixelRatio);
-        m_surfaceHandler.start();
-        maybeAttachRootNode(m_nativeXComponent, *m_rootView);
-    }
+void XComponentSurface::start(float width, float height, float viewportOffsetX, float viewportOffsetY,
+                              float pixelRatio, folly::dynamic &&initialProps,
+                              std::shared_ptr<facebook::react::LayoutAnimationDriver> animationDriver) {
+    this->setProps(std::move(initialProps));
+    this->updateConstraints(width, height, viewportOffsetX, viewportOffsetY, pixelRatio);
+    m_surfaceHandler.start();
+    auto mountingCoordinator = m_surfaceHandler.getMountingCoordinator();
+    mountingCoordinator->setMountingOverrideDelegate(animationDriver); 
+    maybeAttachRootNode(m_nativeXComponent, *m_rootView);
+}
 
     void XComponentSurface::setProps(folly::dynamic &&props) { m_surfaceHandler.setProps(std::move(props)); }
 

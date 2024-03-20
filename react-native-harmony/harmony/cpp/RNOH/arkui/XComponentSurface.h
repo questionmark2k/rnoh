@@ -7,6 +7,7 @@
 #include "RNOH/ComponentInstanceFactory.h"
 #include "RNOH/ComponentInstanceRegistry.h"
 #include "ArkUINodeRegistry.h"
+#include <react/renderer/animations/LayoutAnimationDriver.h>
 
 namespace rnoh {
 
@@ -30,7 +31,7 @@ class XComponentSurface {
 
       void updateConstraints(float width, float height, float viewportOffsetX, float viewportOffsetY, float pixelRatio);
       void start(float width, float height, float viewportOffsetX, float viewportOffsetY, float pixelRatio,
-                 folly::dynamic &&initialProps);
+                 folly::dynamic &&initialProps, std::shared_ptr<facebook::react::LayoutAnimationDriver> animationDriver);
       void setProps(folly::dynamic &&props);
       void stop();
       void setDisplayMode(facebook::react::DisplayMode displayMode);
