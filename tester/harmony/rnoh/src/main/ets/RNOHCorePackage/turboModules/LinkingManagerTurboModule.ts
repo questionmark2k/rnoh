@@ -17,7 +17,7 @@ export class LinkingManagerTurboModule extends TurboModule {
   }
 
   async getInitialURL(): Promise<string | undefined> {
-    return this.initialUrl;
+    return this.initialUrl ? this.initialUrl : null;
   }
 
   async canOpenURL(urlString: string): Promise<boolean> {
@@ -59,7 +59,9 @@ export class LinkingManagerTurboModule extends TurboModule {
 
   openSettings(): Promise<void> {
     return this.ctx.uiAbilityContext.startAbility({
-      "action": "action.settings.app.info",
+      bundleName: 'com.huawei.hmos.settings',
+      abilityName:'com.huawei.hmos.settings.MainAbility',
+      uri: 'application_info_entry',
       parameters: {
         settingsParamBundleName: this.ctx.uiAbilityContext.abilityInfo.bundleName
       }
