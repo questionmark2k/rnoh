@@ -10,7 +10,10 @@ ArkUIDialogHandler::ArkUIDialogHandler() : handler_(NativeDialogApi::getInstance
 }
 
 ArkUIDialogHandler::~ArkUIDialogHandler() {
-    dialogs.erase(std::remove(dialogs.begin(), dialogs.end(), this), dialogs.end());
+    auto it = std::find(dialogs.begin(), dialogs.end(), this);
+    if (it != dialogs.end()) {
+        dialogs.erase(it);
+    }
     destroy();
 }
 
@@ -69,9 +72,7 @@ void ArkUIDialogHandler::initDialogProperties() {
     NativeDialogApi::getInstance()->registerOnWillDismiss(handler_, [](int32_t reason) -> bool {
         if (!dialogs.empty()) {
             auto dialog = dialogs.back();
-            dialog->close();
             dialog->onRequestClose();
-            dialogs.pop_back();
             return false;
         }
         return true;

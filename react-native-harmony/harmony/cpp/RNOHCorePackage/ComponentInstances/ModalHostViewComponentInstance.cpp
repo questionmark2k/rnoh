@@ -3,11 +3,40 @@
 #include <react/renderer/components/rncore/Props.h>
 #include <glog/logging.h>
 #include "RNOH/ArkTSBridge.h"
+#include "RNOH/arkui/ArkUINodeRegistry.h"
+#include <RNOH/arkui/NativeNodeApi.h>
+#include <RNOH/arkui/TouchEventDispatcher.h>
 
 namespace rnoh {
 
+class ModalHostTouchHandler : public TouchEventHandler {
+  private:
+    ModalHostViewComponentInstance *m_rootView;
+    TouchEventDispatcher m_touchEventDispatcher;
+
+  public:
+    ModalHostTouchHandler(ModalHostTouchHandler const &other) = delete;
+    ModalHostTouchHandler &operator=(ModalHostTouchHandler const &other) = delete;
+
+    ModalHostTouchHandler(ModalHostViewComponentInstance *rootView) : m_rootView(rootView) {
+        auto *rootNode = &rootView->m_rootStackNode;
+        ArkUINodeRegistry::getInstance().registerTouchHandler(rootNode, this);
+        NativeNodeApi::getInstance()->registerNodeEvent(rootNode->getArkUINodeHandle(), NODE_TOUCH_EVENT, 0);
+    }
+
+    ~ModalHostTouchHandler() override {
+        auto *rootNode = &m_rootView->m_rootStackNode;
+        NativeNodeApi::getInstance()->unregisterNodeEvent(rootNode->getArkUINodeHandle(), NODE_TOUCH_EVENT);
+        ArkUINodeRegistry::getInstance().unregisterTouchHandler(rootNode);
+    }
+
+    void onTouchEvent(ArkUI_NodeTouchEvent event) override {
+        m_touchEventDispatcher.dispatchTouchEvent(event, m_rootView->shared_from_this());
+    }
+};
+
 ModalHostViewComponentInstance::ModalHostViewComponentInstance(Context context)
-    : CppComponentInstance(std::move(context)) {
+    : CppComponentInstance(std::move(context)), m_touchHandler(std::make_unique<ModalHostTouchHandler>(this)) {
     m_virtualNode.setSize(facebook::react::Size{0, 0});
     m_dialogHandler.setDialogDelegate(this);
 }
@@ -29,7 +58,7 @@ void ModalHostViewComponentInstance::onStateChanged(SharedConcreteState const &s
         auto displayMetrics = ArkTSBridge::getInstance().getDisplayMetrics();
         auto screenMetrics = displayMetrics.screenPhysicalPixels;
         facebook::react::Size screenSize = {.width = screenMetrics.width / screenMetrics.scale, .height = screenMetrics.height / screenMetrics.scale};
-        state->updateState({ screenSize });
+        state->updateState({screenSize});
     }
 }
 
@@ -47,7 +76,9 @@ void ModalHostViewComponentInstance::finalizeUpdates() {
     // only show modal after the screen size has been set and processed by RN
     auto isScreenSizeSet = m_state && m_state->getData().screenSize.height != 0 && m_state->getData().screenSize.width != 0;
     auto shouldShowDialog = !m_dialogHandler.isShow() && isScreenSizeSet;
-    if (shouldShowDialog) { showDialog(); }
+    if (shouldShowDialog) {
+        showDialog();
+    }
     CppComponentInstance::finalizeUpdates();
 }
 

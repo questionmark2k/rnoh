@@ -7,10 +7,10 @@ namespace rnoh {
 
 class ModalHostViewJSIBinder : public ViewComponentJSIBinder {
 protected:
-    facebook::jsi::Object createBubblingEventTypes(facebook::jsi::Runtime &rt) override {
-        auto events = ViewComponentJSIBinder::createBubblingEventTypes(rt);
-        events.setProperty(rt, "topRequestClose", createBubblingCapturedEvent(rt, "onRequestClose"));
-        events.setProperty(rt, "topShow", createBubblingCapturedEvent(rt, "onShow"));
+    facebook::jsi::Object createDirectEventTypes(facebook::jsi::Runtime &rt) override {
+        auto events = ViewComponentJSIBinder::createDirectEventTypes(rt);
+        events.setProperty(rt, "topRequestClose", createDirectEvent(rt, "onRequestClose"));
+        events.setProperty(rt, "topShow", createDirectEvent(rt, "onShow"));
         return events;
     }
 
