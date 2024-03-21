@@ -2,6 +2,7 @@
 
 #include <react/renderer/components/rncore/Props.h>
 #include <glog/logging.h>
+#include "RNOH/ArkTSBridge.h"
 
 namespace rnoh {
 
@@ -21,6 +22,17 @@ void ModalHostViewComponentInstance::onPropsChanged(SharedConcreteProps const &p
     }
 }
 
+void ModalHostViewComponentInstance::onStateChanged(SharedConcreteState const &state) {
+    CppComponentInstance::onStateChanged(state);
+    if (!m_state) {
+        // set screen size the first time the component is initialized
+        auto displayMetrics = ArkTSBridge::getInstance().getDisplayMetrics();
+        auto screenMetrics = displayMetrics.screenPhysicalPixels;
+        facebook::react::Size screenSize = {.width = screenMetrics.width / screenMetrics.scale, .height = screenMetrics.height / screenMetrics.scale};
+        state->updateState({ screenSize });
+    }
+}
+
 void ModalHostViewComponentInstance::onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) {
     CppComponentInstance::onChildInserted(childComponentInstance, index);
     m_rootStackNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
@@ -32,10 +44,11 @@ void ModalHostViewComponentInstance::onChildRemoved(ComponentInstance::Shared co
 };
 
 void ModalHostViewComponentInstance::finalizeUpdates() {
-    if (!m_dialogHandler.isShow()) {
-        showDialog();
-    }
-    ComponentInstance::finalizeUpdates();
+    // only show modal after the screen size has been set and processed by RN
+    auto isScreenSizeSet = m_state && m_state->getData().screenSize.height != 0 && m_state->getData().screenSize.width != 0;
+    auto shouldShowDialog = !m_dialogHandler.isShow() && isScreenSizeSet;
+    if (shouldShowDialog) { showDialog(); }
+    CppComponentInstance::finalizeUpdates();
 }
 
 void ModalHostViewComponentInstance::showDialog() {

@@ -16,6 +16,7 @@ class ModalHostViewComponentInstance : public CppComponentInstance<facebook::rea
     ModalHostViewComponentInstance(Context context);
 
     void onPropsChanged(SharedConcreteProps const &props) override;
+    void onStateChanged(SharedConcreteState const &state) override;
 
     void onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) override;
     void onChildRemoved(ComponentInstance::Shared const &childComponentInstance) override;
