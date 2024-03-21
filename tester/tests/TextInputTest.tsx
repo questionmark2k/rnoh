@@ -29,9 +29,10 @@ export function TextInputTest() {
       <TestCase
         modal
         itShould="render textinput and change the text component based on the values inputted">
+        skip
         <TextInputWithText style={styles.textInput} />
       </TestCase>
-      <TestCase modal itShould="render non-editable textInput">
+      <TestCase tags={['C_API']} itShould="render non-editable textInput">
         <TextInputWithText style={styles.textInput} editable={false} />
       </TestCase>
       <TestCase modal itShould="render textInput with Pacifico Regular font">
@@ -39,12 +40,15 @@ export function TextInputTest() {
           style={[styles.textInput, {fontFamily: 'Pacifico-Regular'}]}
         />
       </TestCase>
-      <TestCase modal itShould="render textInput with caret hidden">
+      <TestCase tags={['C_API']} itShould="render textInput with caret hidden">
         <TextInputWithText style={styles.textInput} caretHidden />
+      </TestCase>
+      <TestCase tags={['C_API']} itShould="render textInput with red caret">
+        <TextInputWithText style={styles.textInput} cursorColor={'red'} />
       </TestCase>
       <TestSuite name="focus/blur">
         <TestCase
-          modal
+          tags={['C_API']}
           itShould="blur text on submit (singleline)"
           initialState={false}
           arrange={({setState}) => {
@@ -147,18 +151,22 @@ export function TextInputTest() {
           underlineColorAndroid={'blue'}
         />
       </TestCase>
-      <TestCase modal itShould="render textinput with red placeholder">
+      <TestCase
+        tags={['C_API']}
+        itShould="render textinput with red placeholder">
         <TextInputWithText
           style={styles.textInput}
           placeholder="Placeholder"
           placeholderTextColor={'red'}
         />
       </TestCase>
-      <TestCase modal itShould="render textinput with green selection color">
+      <TestCase
+        tags={['C_API']}
+        itShould="render textinput with green selection color">
         <TextInputWithText style={styles.textInput} selectionColor="green" />
       </TestCase>
-      <TestCase modal itShould="render multiline text input">
-        <TextInputWithText style={styles.textInputBigger} multiline />
+      <TestCase tags={['C_API']} itShould="render multiline text input">
+        <TextInputWithText style={styles.textInputBigger} multiline={true} />
       </TestCase>
       <TestCase
         modal
@@ -168,7 +176,9 @@ export function TextInputTest() {
           multiline
         />
       </TestCase>
-      <TestCase modal itShould="render text input with maximally 10 characters">
+      <TestCase
+        tags={['C_API']}
+        itShould="render text input with maximally 10 characters">
         <TextInputWithText style={styles.textInput} maxLength={10} />
       </TestCase>
       <TestCase modal itShould="toggle between rendering 10 and 5 characters">

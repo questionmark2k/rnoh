@@ -67,6 +67,7 @@
 #include "RNOHCorePackage/ComponentInstances/ImageComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ViewComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/TextComponentInstance.h"
+#include "RNOHCorePackage/ComponentInstances/TextInputComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ScrollViewComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ActivityIndicatorComponentInstance.h"
 #include "RNOHCorePackage/ComponentInstances/ModalHostViewComponentInstance.h"
@@ -151,6 +152,9 @@ namespace rnoh {
             }
             if (ctx.componentName == "Paragraph") {
                 return std::make_shared<TextComponentInstance>(std::move(ctx));
+            }
+            if (ctx.componentName == "TextInput") {
+                return std::make_shared<TextInputComponentInstance>(std::move(ctx));
             }
             if (ctx.componentName == "ScrollView") {
                 return std::make_shared<ScrollViewComponentInstance>(std::move(ctx));

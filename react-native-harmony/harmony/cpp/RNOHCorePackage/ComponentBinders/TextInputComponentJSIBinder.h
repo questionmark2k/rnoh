@@ -11,6 +11,7 @@ class TextInputComponentJSIBinder : public ViewComponentJSIBinder {
         nativeProps.setProperty(rt, "multiline", "boolean");
         nativeProps.setProperty(rt, "placeholder", "string");
         nativeProps.setProperty(rt, "placeholderTextColor", "Color");
+        nativeProps.setProperty(rt, "cursorColor", "Color");
         nativeProps.setProperty(rt, "caretHidden", "boolean");
         nativeProps.setProperty(rt, "secureTextEntry", "boolean");
         nativeProps.setProperty(rt, "maxLength", "number");
@@ -23,6 +24,7 @@ class TextInputComponentJSIBinder : public ViewComponentJSIBinder {
         nativeProps.setProperty(rt, "clearTextOnFocus", "boolean");
         nativeProps.setProperty(rt, "mostRecentEventCount", "number");
         nativeProps.setProperty(rt, "clearButtonMode", "string");
+        nativeProps.setProperty(rt, "defaultValue", "string");
         nativeProps.setProperty(rt, "selectTextOnFocus", "boolean");
         nativeProps.setProperty(rt, "contextMenuHidden", "boolean");
 
