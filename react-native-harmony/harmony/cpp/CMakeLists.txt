@@ -389,6 +389,7 @@ add_library(rnoh SHARED
     "${RNOH_CPP_DIR}/RNOH/LogSink.cpp"
     "${RNOH_CPP_DIR}/RNOH/NativeLogger.cpp"
     "${RNOH_CPP_DIR}/RNOH/ArkJS.cpp"
+    "${RNOH_CPP_DIR}/RNOH/ArkTSBridge.cpp"
     "${RNOH_CPP_DIR}/RNOH/Inspector.cpp"
     "${RNOH_CPP_DIR}/RNOH/MountingManager.cpp"
     "${RNOH_CPP_DIR}/RNOH/ShadowViewRegistry.cpp"

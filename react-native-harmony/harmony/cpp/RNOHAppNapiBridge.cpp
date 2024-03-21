@@ -16,6 +16,7 @@
 #include "RNOH/TaskExecutor/ThreadTaskRunner.h"
 #include "RNOH/Inspector.h"
 #include "RNOH/RNInstanceCAPI.h"
+#include "RNOH/ArkTSBridge.h"
 
 using namespace rnoh;
 
@@ -389,6 +390,14 @@ static void registerNativeXComponent(napi_env env, napi_value exports) {
     LOG(INFO) << "registerNativeXComponent: id = " << instanceId << "\n";
 }
 
+napi_value initializeArkTSBridge(napi_env env, napi_callback_info info) {
+    ArkJS arkJs(env);
+    auto args = arkJs.getCallbackArgs(info, 1);
+    auto bridgeRef = arkJs.createReference(args[0]);
+    ArkTSBridge::initializeInstance(env, bridgeRef);
+    return arkJs.getUndefined();
+}
+
 EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor desc[] = {
@@ -410,7 +419,8 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"callRNFunction", nullptr, callRNFunction, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"onMemoryLevel", nullptr, onMemoryLevel, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"updateState", nullptr, updateState, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"getInspectorWrapper", nullptr, rnoh::getInspectorWrapper, nullptr, nullptr, nullptr, napi_default, nullptr}};
+        {"getInspectorWrapper", nullptr, rnoh::getInspectorWrapper, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"initializeArkTSBridge", nullptr, ::initializeArkTSBridge, nullptr, nullptr, nullptr, napi_default, nullptr}};
 
     napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc);
     registerNativeXComponent(env, exports); // NOTE: shouldn't this be called when creating surface?

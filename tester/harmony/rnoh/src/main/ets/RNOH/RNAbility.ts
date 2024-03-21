@@ -75,6 +75,9 @@ export abstract class RNAbility extends UIAbility {
       this.providedLogger,
       this.context
     );
+    this.napiBridge.initializeArkTSBridge({
+      getDisplayMetrics: this.getDisplayMetrics.bind(this)
+    });
     this.jsPackagerClient = new JSPackagerClient(
       this.providedLogger,
       this.rnohCoreContext.devToolsController,

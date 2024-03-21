@@ -8,6 +8,7 @@ import { RNOHLogger } from "./RNOHLogger"
 import type { InspectorInstance } from './types'
 import { FatalRNOHError } from "./RNOHError"
 import type { FrameNodeFactory } from "./RNInstance"
+import type { ArkTSBridgeHandler } from './ArkTSBridgeHandler';
 
 export type CppFeatureFlag = "ENABLE_NDK_TEXT_MEASURING" | "C_API_ARCH"
 
@@ -193,5 +194,9 @@ export class NapiBridge {
 
   getInspectorWrapper(): InspectorInstance {
     return this.libRNOHApp?.getInspectorWrapper();
+  }
+
+  initializeArkTSBridge(bridge: ArkTSBridgeHandler) {
+    this.libRNOHApp?.initializeArkTSBridge(bridge);
   }
 }
