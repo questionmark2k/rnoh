@@ -11,7 +11,7 @@ constexpr std::string_view ASSET_PREFIX = "asset://"sv;
 ImageNode::ImageNode() : ArkUINode(NativeNodeApi::getInstance()->createNode(ArkUI_NodeType::ARKUI_NODE_IMAGE)),
                          m_childArkUINodeHandle(nullptr), m_imageNodeDelegate(nullptr) {
     maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_IMAGE_ON_COMPLETE, 0));
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_IMAGE_ON_ERROR, 0));
+    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_IMAGE_ON_ERROR, 1));
 }
 
 ImageNode::~ImageNode() {
