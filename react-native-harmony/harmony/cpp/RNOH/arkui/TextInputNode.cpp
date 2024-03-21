@@ -1,26 +1,29 @@
 #include "TextInputNode.h"
 #include "NativeNodeApi.h"
 
+static constexpr ArkUI_NodeEventType TEXT_INPUT_NODE_EVENT_TYPES[] = {
+    NODE_TEXT_INPUT_ON_PASTE,
+    NODE_TEXT_INPUT_ON_CHANGE,
+    NODE_TEXT_INPUT_ON_SUBMIT,
+    NODE_ON_FOCUS,
+    NODE_ON_BLUR,
+    NODE_TEXT_INPUT_ON_TEXT_SELECTION_CHANGE
+};
+
 namespace rnoh {
 
 TextInputNode::TextInputNode()
     : TextInputNodeBase(ArkUI_NodeType::ARKUI_NODE_TEXT_INPUT),
       m_childArkUINodeHandle(nullptr) {
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_TEXT_INPUT_ON_PASTE, 0));
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_TEXT_INPUT_ON_CHANGE, 1));
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_TEXT_INPUT_ON_SUBMIT, 2));
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_ON_FOCUS, 3));
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_ON_BLUR, 4));
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_TEXT_INPUT_ON_TEXT_SELECTION_CHANGE, 5));
+    for (auto eventType : TEXT_INPUT_NODE_EVENT_TYPES) {
+        maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, eventType, eventType));
+    }
 }
 
 TextInputNode::~TextInputNode() {
-    NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_TEXT_INPUT_ON_PASTE);
-    NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_TEXT_INPUT_ON_CHANGE);
-    NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_TEXT_INPUT_ON_SUBMIT);
-    NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_ON_FOCUS);
-    NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_ON_BLUR);
-    NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_TEXT_INPUT_ON_TEXT_SELECTION_CHANGE);
+    for (auto eventType : TEXT_INPUT_NODE_EVENT_TYPES) {
+        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, eventType);
+    }
 }
 
 void TextInputNode::onNodeEvent(ArkUI_NodeEvent *event) {

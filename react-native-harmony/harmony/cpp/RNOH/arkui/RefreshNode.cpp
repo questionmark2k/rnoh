@@ -1,10 +1,22 @@
 #include "RefreshNode.h"
 
+static constexpr ArkUI_NodeEventType REFRESH_NODE_EVENT_TYPES[] = {
+    NODE_REFRESH_ON_REFRESH,
+    NODE_REFRESH_STATE_CHANGE
+};
+
 namespace rnoh {
     RefreshNode::RefreshNode()
         : ArkUINode(NativeNodeApi::getInstance()->createNode(ArkUI_NodeType::ARKUI_NODE_REFRESH)) {
-        maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_REFRESH_ON_REFRESH, 0));
-        maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_REFRESH_STATE_CHANGE, 1));
+        for (auto eventType : REFRESH_NODE_EVENT_TYPES) {
+            maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, eventType, eventType));
+        }
+    }
+
+    RefreshNode::~RefreshNode() {
+        for (auto eventType : REFRESH_NODE_EVENT_TYPES) {
+            NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, eventType);
+        }
     }
 
     RefreshNode& RefreshNode::setRefreshContent(ArkUINode &refreshContent) {
@@ -18,11 +30,6 @@ namespace rnoh {
         ArkUI_AttributeItem loadingItem = {.object = refreshContent.getArkUINodeHandle()};
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_REFRESH_CONTENT, &loadingItem));
         return *this;
-    }
-
-    RefreshNode::~RefreshNode() {
-        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_REFRESH_ON_REFRESH);
-        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_REFRESH_STATE_CHANGE);
     }
 
     RefreshNode& RefreshNode::setRefreshNodeDelegate(RefreshNodeDelegate *refreshNodeDelegate){

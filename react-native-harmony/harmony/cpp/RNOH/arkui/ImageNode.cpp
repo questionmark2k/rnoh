@@ -3,6 +3,11 @@
 #include <string_view>
 #include "NativeNodeApi.h"
 
+static constexpr ArkUI_NodeEventType IMAGE_NODE_EVENT_TYPES[] = {
+    NODE_IMAGE_ON_COMPLETE,
+    NODE_IMAGE_ON_ERROR
+};
+
 namespace rnoh {
 
 using namespace std::literals;
@@ -10,13 +15,15 @@ constexpr std::string_view ASSET_PREFIX = "asset://"sv;
 
 ImageNode::ImageNode() : ArkUINode(NativeNodeApi::getInstance()->createNode(ArkUI_NodeType::ARKUI_NODE_IMAGE)),
                          m_childArkUINodeHandle(nullptr), m_imageNodeDelegate(nullptr) {
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_IMAGE_ON_COMPLETE, 0));
-    maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_IMAGE_ON_ERROR, 1));
+    for (auto eventType : IMAGE_NODE_EVENT_TYPES) {
+        maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, eventType, eventType));
+    }
 }
 
 ImageNode::~ImageNode() {
-    NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_IMAGE_ON_COMPLETE);
-    NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_IMAGE_ON_ERROR);
+    for (auto eventType : IMAGE_NODE_EVENT_TYPES) {
+        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, eventType);
+    }
 }
 
 void ImageNode::setNodeDelegate(ImageNodeDelegate *imageNodeDelegate) {

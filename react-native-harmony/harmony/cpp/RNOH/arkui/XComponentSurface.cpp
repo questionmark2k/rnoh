@@ -39,7 +39,7 @@ namespace rnoh {
         SurfaceTouchEventHandler(ComponentInstance::Shared rootView) : m_rootView(std::move(rootView)) {
             ArkUINodeRegistry::getInstance().registerTouchHandler(&m_rootView->getLocalRootArkUINode(), this);
             NativeNodeApi::getInstance()->registerNodeEvent(m_rootView->getLocalRootArkUINode().getArkUINodeHandle(),
-                                                            NODE_TOUCH_EVENT, 0);
+                                                            NODE_TOUCH_EVENT, NODE_TOUCH_EVENT);
         }
 
         SurfaceTouchEventHandler(SurfaceTouchEventHandler const &other) = delete;

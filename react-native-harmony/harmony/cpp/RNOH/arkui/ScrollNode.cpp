@@ -1,23 +1,27 @@
 #include "ScrollNode.h"
 #include <glog/logging.h>
 
+static constexpr ArkUI_NodeEventType SCROLL_NODE_EVENT_TYPES[] = {
+    NODE_SCROLL_EVENT_ON_SCROLL,
+    NODE_SCROLL_EVENT_ON_SCROLL_START,
+    NODE_SCROLL_EVENT_ON_SCROLL_STOP,
+    NODE_SCROLL_EVENT_ON_SCROLL_FRAME_BEGIN
+};
+
 namespace rnoh {
     ScrollNode::ScrollNode()
         : ArkUINode(NativeNodeApi::getInstance()->createNode(ArkUI_NodeType::ARKUI_NODE_SCROLL)),
           m_childArkUINodeHandle(nullptr), m_scrollNodeDelegate(nullptr) {
-        maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL, 0));
-        maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_START, 0));
-        maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_STOP, 0));
-        maybeThrow(
-            NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_FRAME_BEGIN, 0));
-        setNestedScroll();
+
+        for (auto eventType : SCROLL_NODE_EVENT_TYPES) {
+            maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(m_nodeHandle, eventType, eventType));
+        }
     }
 
     ScrollNode::~ScrollNode() {
-        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL);
-        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_START);
-        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_STOP);
-        NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, NODE_SCROLL_EVENT_ON_SCROLL_FRAME_BEGIN);
+        for (auto eventType : SCROLL_NODE_EVENT_TYPES) {
+            NativeNodeApi::getInstance()->unregisterNodeEvent(m_nodeHandle, eventType);
+        }
     }
 
     void ScrollNode::onNodeEvent(ArkUI_NodeEvent *event) {
