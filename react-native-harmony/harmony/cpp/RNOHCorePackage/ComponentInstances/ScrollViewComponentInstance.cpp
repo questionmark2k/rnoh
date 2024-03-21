@@ -49,7 +49,7 @@ void rnoh::ScrollViewComponentInstance::onPropsChanged(SharedConcreteProps const
     }
     m_scrollEventThrottle = props->scrollEventThrottle;
     m_scrollNode.setHorizontal(horizontal)
-        .setEnableScrollInteraction(props->scrollEnabled)
+        .setEnableScrollInteraction(!m_isNativeResponderBlocked && props->scrollEnabled)
         .setFriction(getFrictionFromDecelerationRate(props->decelerationRate))
         .setEdgeEffect(props->bounces, horizontal ? props->alwaysBounceHorizontal : props->alwaysBounceVertical)
         .setScrollBarDisplayMode(getScrollBarDisplayMode(horizontal, m_persistentScrollbar,
@@ -71,6 +71,15 @@ void ScrollViewComponentInstance::handleCommand(std::string const &commandName, 
         m_scrollNode.scrollTo(args[0].asDouble(), args[1].asDouble(), args[2].asBool());
     } else if (commandName == "scrollToEnd") {
         scrollToEnd(args[0].asBool());
+    }
+}
+
+void rnoh::ScrollViewComponentInstance::setNativeResponderBlocked(bool blocked) {
+    m_isNativeResponderBlocked = blocked;
+    if (blocked) {
+        m_scrollNode.setEnableScrollInteraction(false);
+    } else {
+        m_scrollNode.setEnableScrollInteraction(m_props->scrollEnabled);
     }
 }
 

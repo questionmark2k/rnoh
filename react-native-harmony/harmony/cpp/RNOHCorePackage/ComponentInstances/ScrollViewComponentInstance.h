@@ -21,6 +21,7 @@ namespace rnoh {
         long long m_lastScrollDispatchTime = 0;
         bool m_allowNextScrollEvent = false;
         facebook::react::Float m_scrollEventThrottle = 0;
+        bool m_isNativeResponderBlocked = false;
         facebook::react::ScrollViewMetrics getScrollViewMetrics();
         facebook::react::Float getFrictionFromDecelerationRate(facebook::react::Float decelerationRate);
         void emitOnScrollEndDragEvent();
@@ -48,6 +49,8 @@ namespace rnoh {
         void onPropsChanged(SharedConcreteProps const &props) override;
 
         void handleCommand(std::string const &commandName, folly::dynamic const &args) override;
+
+        void setNativeResponderBlocked(bool blocked) override;
 
         // ScrollNodeDelegate implementation
         void onScroll() override;

@@ -21,25 +21,35 @@ std::optional<react::SurfaceId> findSurfaceIdForComponentInstance(ComponentInsta
     return std::nullopt;
 }
 
+void SchedulerDelegateCAPI::schedulerDidSetIsJSResponder(facebook::react::ShadowView const &shadowView, bool isJSResponder, bool blockNativeResponder)  {
+    m_schedulerDelegateArkTS->schedulerDidSetIsJSResponder(shadowView, isJSResponder, blockNativeResponder);
+
+    auto componentInstance = m_componentInstanceRegistry->findByTag(shadowView.tag);
+    while (componentInstance != nullptr) {
+        componentInstance->setNativeResponderBlocked(blockNativeResponder);
+        componentInstance = componentInstance->getParent().lock();
+    }
+}
+
 void SchedulerDelegateCAPI::synchronouslyUpdateViewOnUIThread(
     react::Tag tag,
     folly::dynamic props,
     react::ComponentDescriptor const &componentDescriptor) {
-        auto componentInstance = m_componentInstanceRegistry->findByTag(tag);
-        if (componentInstance == nullptr) {
-            return;
-        }
+    auto componentInstance = m_componentInstanceRegistry->findByTag(tag);
+    if (componentInstance == nullptr) {
+        return;
+    }
 
-        auto surfaceId = findSurfaceIdForComponentInstance(componentInstance);
-        if (!surfaceId.has_value()) {
-            return;
-        }
+    auto surfaceId = findSurfaceIdForComponentInstance(componentInstance);
+    if (!surfaceId.has_value()) {
+        return;
+    }
 
-        auto oldProps = componentInstance->getProps();
-        auto newProps = componentDescriptor.cloneProps(react::PropsParserContext{surfaceId.value(), *m_contextContainer}, oldProps, std::move(props));
+    auto oldProps = componentInstance->getProps();
+    auto newProps = componentDescriptor.cloneProps(react::PropsParserContext{surfaceId.value(), *m_contextContainer}, oldProps, std::move(props));
 
-        componentInstance->setProps(newProps);
-        componentInstance->finalizeUpdates();
+    componentInstance->setProps(newProps);
+    componentInstance->finalizeUpdates();
 }
 
 } // namespace rnoh

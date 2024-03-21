@@ -79,9 +79,7 @@ namespace rnoh {
                                                 std::string const &eventType) override {}
 
         void schedulerDidSetIsJSResponder(facebook::react::ShadowView const &shadowView, bool isJSResponder,
-                                          bool blockNativeResponder) override {
-            m_schedulerDelegateArkTS->schedulerDidSetIsJSResponder(shadowView, isJSResponder, blockNativeResponder);
-        }
+                                          bool blockNativeResponder) override;
 
         void synchronouslyUpdateViewOnUIThread(facebook::react::Tag tag, folly::dynamic props,
                                                facebook::react::ComponentDescriptor const &componentDescriptor);

@@ -78,6 +78,8 @@ namespace rnoh {
 
         virtual void setParent(ComponentInstance::Shared parent) { m_parent = parent; }
 
+        virtual void setNativeResponderBlocked(bool blocked) {}
+
         // TouchTarget implementation
         Tag getTouchTargetTag() const override { return getTag(); }
 
