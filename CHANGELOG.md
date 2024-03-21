@@ -1,4 +1,18 @@
 # Changelog
+## v0.72.19
+- added basic Share module support
+- fixed Linking::openSettings
+
+### ArkTS architecture
+- added TextInput::contextMenuHidden support
+
+### C-API architecture
+- added RefreshControl support
+- added Text specific props support
+- added Modal support
+- added ArkTSTurboModule::callSync method that can be used to call turbo modules from ComponentInstances
+- added a way to block scrolling
+
 ## v0.72.18
 ### ArkTS architecture
 - added LogBox support
