@@ -26,6 +26,12 @@ ArkTSTurboModule::ArkTSTurboModule(Context ctx, std::string name) : m_ctx(ctx), 
 
 // calls a TurboModule method and blocks until it returns, returning its result
 jsi::Value ArkTSTurboModule::call(jsi::Runtime &runtime, const std::string &methodName, const jsi::Value *jsiArgs, size_t argsCount) {
+    auto args = convertJSIValuesToIntermediaryValues(runtime, m_ctx.jsInvoker, jsiArgs, argsCount);
+    return jsi::valueFromDynamic(runtime, callSync(methodName, args));
+}
+
+// the cpp side calls a ArkTs TurboModule method and blocks until it returns, returning its result
+folly::dynamic ArkTSTurboModule::callSync(const std::string &methodName, std::vector<IntermediaryArg> args) {
     if (!m_ctx.arkTsTurboModuleInstanceRef) {
         auto errorMsg = "Couldn't find turbo module '" + name_ + "' on ArkUI side. Did you link RNPackage that provides this turbo module?";
         LOG(FATAL) << errorMsg;
@@ -33,8 +39,7 @@ jsi::Value ArkTSTurboModule::call(jsi::Runtime &runtime, const std::string &meth
     }
     folly::dynamic result;
     std::optional<std::exception> thrownError = std::nullopt;
-    auto args = convertJSIValuesToIntermediaryValues(runtime, m_ctx.jsInvoker, jsiArgs, argsCount);
-    m_ctx.taskExecutor->runSyncTask(TaskThread::MAIN, [ctx = m_ctx, &name = name_, &thrownError, &methodName, &args, &result, &runtime]() {
+    m_ctx.taskExecutor->runSyncTask(TaskThread::MAIN, [ctx = m_ctx, &thrownError, &methodName, &args, &result]() {
         try {
             ArkJS arkJs(ctx.env);
             auto napiArgs = arkJs.convertIntermediaryValuesToNapiValues(args);
@@ -48,7 +53,7 @@ jsi::Value ArkTSTurboModule::call(jsi::Runtime &runtime, const std::string &meth
     if (thrownError.has_value()) {
         throw thrownError;
     }
-    return jsi::valueFromDynamic(runtime, result);
+    return result;
 }
 
 // calls a TurboModule method without blocking and ignores its result

@@ -61,6 +61,9 @@ class ArkTSTurboModule : public TurboModule {
                               const facebook::jsi::Value *args,
                               size_t argsCount);
 
+    
+    folly::dynamic callSync(const std::string &methodName, std::vector<ArkJS::IntermediaryArg> args);
+
     void scheduleCall(facebook::jsi::Runtime &runtime,
                       const std::string &methodName,
                       const facebook::jsi::Value *args,
