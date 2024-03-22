@@ -114,15 +114,9 @@ namespace rnoh {
     }
     void ScrollNode::scrollTo(float x, float y, bool animated) {
         ArkUI_AttributeItem item;
-        if (animated) {
-            ArkUI_NumberValue value[] = {
-                {.f32 = x}, {.f32 = y}, {.i32 = 1000}, {.i32 = ArkUI_AnimationCurve::ARKUI_CURVE_SMOOTH}, {.i32 = 0}};
-            item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
-        } else {
-            ArkUI_NumberValue value[] = {
-                {.f32 = x}, {.f32 = y}, {.i32 = 0}, {.i32 = ArkUI_AnimationCurve::ARKUI_CURVE_SMOOTH}, {.i32 = 0}};
-            item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
-        };
+        ArkUI_NumberValue value[] = {
+                {.f32 = x}, {.f32 = y}, {.i32 = animated ? 1000 : 0}, {.i32 = ArkUI_AnimationCurve::ARKUI_CURVE_SMOOTH}, {.i32 = 0}};
+        item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_SCROLL_OFFSET, &item));
     }
     ScrollNode &ScrollNode::setScrollBarDisplayMode(ArkUI_ScrollBarDisplayMode scrollBarDisplayMode) {
