@@ -13,7 +13,9 @@ namespace rnoh {
             void dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchTarget::Shared const &rootTarget);
         private:
             void registerTargetForTouch(ArkUI_NodeTouchPoint touchPoint, TouchTarget::Shared const &rootTarget);
+            bool canIgnoreMoveEvent(facebook::react::TouchEvent currentEvent);
 
             std::unordered_map<TouchId, TouchTarget::Weak> m_touchTargetTagById;
+            facebook::react::TouchEvent m_previousEvent;
     };
 }

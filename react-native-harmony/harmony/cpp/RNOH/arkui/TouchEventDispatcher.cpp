@@ -64,6 +64,25 @@ std::pair<std::unique_ptr<ArkUI_NodeTouchPoint[]>, int32_t> getTouchesFromEvent(
     return std::make_pair(std::unique_ptr<ArkUI_NodeTouchPoint[]>(touchPointsPtr), touchPointsCount);
 }
 
+bool TouchEventDispatcher::canIgnoreMoveEvent(facebook::react::TouchEvent currentEvent) {
+    if (m_previousEvent.touches.empty()) {
+        return false;
+    }
+    for (auto touch : currentEvent.changedTouches) {
+        auto previousTouch = m_previousEvent.touches.find(touch);
+        if (previousTouch != m_previousEvent.touches.end()) {
+            auto dx = previousTouch->pagePoint.x - touch.pagePoint.x;
+            auto dy = previousTouch->pagePoint.y - touch.pagePoint.y;
+            if ((dx*dx + dy*dy) > 1) {
+                return false;
+            }
+        } else {
+            LOG(ERROR) << "Moved touch with id: " << touch.identifier << " could not be found in previous touch event.";
+        }
+    }
+    return true;
+}
+
 void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchTarget::Shared const &rootTarget) {
     DLOG(INFO) << "Touch event received: id=" << event.actionTouch.id << ", action type:" << event.action;
 
@@ -129,6 +148,12 @@ void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchT
         .changedTouches = {changedTouch.value()},
         .targetTouches = std::move(targetTouches)
     };
+
+    if (event.action == NODE_ACTION_MOVE && canIgnoreMoveEvent(touchEvent)) {
+        DLOG(INFO) << "Should ignore current touchEvent";
+        return;
+    }
+    m_previousEvent = touchEvent;
 
     switch (event.action) {
         case NODE_ACTION_DOWN:
