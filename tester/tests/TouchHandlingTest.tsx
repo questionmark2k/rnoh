@@ -18,6 +18,7 @@ export function TouchHandlingTest() {
   return (
     <TestSuite name="Touch Handling">
       <TestCase
+        tags={['C_API']}
         itShould="pass when pressed red rectangle"
         initialState={false}
         arrange={({setState}) => {
@@ -35,6 +36,7 @@ export function TouchHandlingTest() {
       />
 
       <TestCase
+        tags={['C_API']}
         itShould="register a touch after native transform animation"
         initialState={false}
         arrange={({setState}) => (
@@ -49,6 +51,7 @@ export function TouchHandlingTest() {
         }}
       />
       <TestCase
+        tags={['C_API']}
         itShould="handle press on rotated view"
         initialState={false}
         arrange={({setState}) => (
@@ -62,6 +65,7 @@ export function TouchHandlingTest() {
         }}
       />
       <TestCase
+        tags={['C_API']}
         itShould="handle press on scaled view"
         initialState={false}
         arrange={({setState}) => (

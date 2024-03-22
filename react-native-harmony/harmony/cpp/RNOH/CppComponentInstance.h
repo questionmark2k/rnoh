@@ -77,17 +77,7 @@ namespace rnoh {
         // TouchTarget implementation
         facebook::react::LayoutMetrics getLayoutMetrics() const override { return m_layoutMetrics; }
 
-        facebook::react::Point computeChildPoint(facebook::react::Point const &point,
-                                                 TouchTarget::Shared const &child) const override {
-            auto childLayout = child->getLayoutMetrics();
-
-            // TODO: apply inverse transform
-
-            return point - childLayout.frame.origin;
-        }
-
         bool containsPoint(facebook::react::Point const &point) const override {
-            // TODO: hitslops
             if (m_props != nullptr) {
                 auto props = m_props;
                 return point.x >= -props->hitSlop.left && point.y >= -props->hitSlop.top &&
@@ -109,6 +99,13 @@ namespace rnoh {
         std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
             auto children = getChildren();
             return std::vector<TouchTarget::Shared>(children.begin(), children.end());
+        }
+
+        facebook::react::Transform getTransform() const override {
+            if (m_props != nullptr) {
+                return m_props->transform;
+            }
+            return facebook::react::Transform::Identity();
         }
 
     protected:
@@ -194,16 +191,11 @@ namespace rnoh {
         void setOpacity(SharedConcreteProps const &props) {
             auto opacity = props->opacity;
             float validOpacity = std::max(0.0f, std::min((float)opacity, 1.0f));
-            auto matrix = props->transform.matrix;
+            facebook::react::Transform transform = props->transform;
             if (props->backfaceVisibility == facebook::react::BackfaceVisibility::Hidden) {
-                std::array<int32_t, 4> vec{{0, 0, 1, 0}};
-                std::array<int32_t, 4> resVec{{0, 0, 0, 0}};
-                for (int32_t i = 0; i < 4; ++i) {
-                    for (int32_t j = 0; j < 4; ++j) {
-                    resVec[i] += matrix[i * 4 + j] * vec[j];
-                    }
-                }
-                if (resVec[2] < 0.0) {
+                facebook::react::Vector vec{0, 0, 1, 0};
+                auto resVec = transform * vec;
+                if (resVec.z < 0.0) {
                     validOpacity = 0.0;
                 }
             }
