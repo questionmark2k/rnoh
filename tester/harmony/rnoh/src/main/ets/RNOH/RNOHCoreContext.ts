@@ -27,7 +27,7 @@ export class RNOHCoreContext {
       devToolsController,
       devMenu,
       safeAreaInsetsProvider,
-      launchUri
+      launchUri,
     )
   }
 

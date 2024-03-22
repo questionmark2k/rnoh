@@ -91,7 +91,7 @@ export struct RNImage {
   async updateImageSource() {
     const uri = this.descriptor.props.uri;
     if (uri.startsWith("asset://")) {
-      this.imageSource = new ImageSourceHolder($rawfile(uri.replace("asset://", "assets/")));
+      this.imageSource = new ImageSourceHolder($rawfile(uri.replace("asset://", this.ctx.rnInstance.getAssetsDest())));
       return;
     }
     if (uri.startsWith("data:")) {
@@ -135,7 +135,7 @@ export struct RNImage {
       return undefined;
     }
     if (defaultSource.startsWith("asset://")) {
-      return $rawfile(defaultSource.replace("asset://", "assets/"));
+      return $rawfile(defaultSource.replace("asset://", this.ctx.rnInstance.getAssetsDest()));
     }
     return defaultSource;
   }

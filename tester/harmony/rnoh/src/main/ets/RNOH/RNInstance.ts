@@ -72,6 +72,8 @@ const rootDescriptor = {
   }
 }
 
+const DEFAULT_ASSETS_DEST: string = "assets/"; // assets destination path "assets/subpath/"
+
 type FeatureFlagName = "ENABLE_RN_INSTANCE_CLEAN_UP" | "NDK_TEXT_MEASUREMENTS" | "IMAGE_LOADER" | "C_API_ARCH"
 
 export interface RNInstance {
@@ -128,6 +130,8 @@ export interface RNInstance {
   getInitialBundleUrl(): string | undefined
 
   getArchitecture(): "ARK_TS" | "C_API"
+
+  getAssetsDest(): string
 }
 
 /**
@@ -142,6 +146,7 @@ export type RNInstanceOptions = {
   enableNDKTextMeasuring?: boolean,
   enableImageLoader?: boolean,
   enableCAPIArchitecture?: boolean,
+  assetsDest?: string,
 }
 
 /**
@@ -189,7 +194,8 @@ export class RNInstanceImpl implements RNInstance {
     private shouldEnableBackgroundExecutor: boolean,
     private shouldUseNDKToMeasureText: boolean,
     private shouldUseImageLoader: boolean,
-    private shouldUseCApiArchitecture: boolean
+    private shouldUseCApiArchitecture: boolean,
+    private assetsDest: string,
   ) {
     this.logger = injectedLogger.clone("RNInstance")
     if (this.shouldUseNDKToMeasureText) {
@@ -206,6 +212,10 @@ export class RNInstanceImpl implements RNInstance {
 
   public getArchitecture() {
     return this.shouldUseCApiArchitecture ? "C_API" : "ARK_TS"
+  }
+
+  public getAssetsDest(): string {
+    return this.assetsDest ?? DEFAULT_ASSETS_DEST
   }
 
   public onCreate() {
