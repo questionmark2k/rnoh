@@ -5,7 +5,6 @@ import {
   StatusBar,
   StyleSheet,
   View,
-  Platform,
 } from 'react-native';
 import * as exampleByName from './examples';
 import {NavigationContainer, Page} from './components';
@@ -17,17 +16,6 @@ import {Tester} from '@rnoh/testerino';
 const {TesterExample, ...remainingExampleByName} = exampleByName;
 
 function App() {
-  if (
-    'rnohArchitecture' in Platform.constants &&
-    Platform.constants.rnohArchitecture === 'C_API'
-  ) {
-    return (
-      <View style={{paddingTop: 38, backgroundColor: 'black'}}>
-        <TesterExample filter={{tags: ['C_API']}} />
-      </View>
-    );
-  }
-
   return (
     <View style={{backgroundColor: 'black'}}>
       <StatusBar barStyle="light-content" />

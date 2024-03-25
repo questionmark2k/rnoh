@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {
   FlatList,
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -116,6 +117,9 @@ export function IndexPage() {
               padding: 16,
             }}>
             RN Tester
+            {'rnohArchitecture' in Platform.constants
+              ? (` (${Platform.constants.rnohArchitecture})` as string)
+              : ''}
           </Text>
         </View>
       }

@@ -21,7 +21,17 @@ type TesterSkipProp =
     }
   | string;
 
-function prepareSkipProp(skipProp: TesterSkipProp | undefined) {
+function prepareSkipProp(
+  skipProp: TesterSkipProp | undefined,
+  tags: TesterTag[] | undefined,
+) {
+  const isCAPI =
+    'rnohArchitecture' in Platform.constants &&
+    Platform.constants.rnohArchitecture === 'C_API';
+  if (isCAPI && !tags?.includes('C_API')) {
+    return 'Not supported in C-Api architecture';
+  }
+
   return skipProp
     ? typeof skipProp === 'string'
       ? skipProp
@@ -54,7 +64,7 @@ export function Example({
       itShould={itShould}
       modal={modal}
       tags={tags}
-      skip={prepareSkipProp(skip)}>
+      skip={prepareSkipProp(skip, tags)}>
       {children}
     </_TestCase>
   );
@@ -82,7 +92,7 @@ export function Manual<TState = undefined>({
       itShould={itShould}
       modal={modal}
       tags={tags}
-      skip={prepareSkipProp(skip)}
+      skip={prepareSkipProp(skip, tags)}
       initialState={initialState}
       arrange={arrange}
       assert={assert}
@@ -103,7 +113,7 @@ export function Logical({
 }) {
   <_TestCase
     itShould={itShould}
-    skip={prepareSkipProp(skip)}
+    skip={prepareSkipProp(skip, tags)}
     tags={tags}
     fn={fn}
   />;
