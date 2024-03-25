@@ -515,3 +515,8 @@ if("$ENV{RNOH_C_API_ARCH}" STREQUAL "1")
     message("Experimental C-API architecture enabled")
     target_compile_definitions(rnoh PUBLIC C_API_ARCH)
 endif()
+
+if(DEFINED LOG_VERBOSITY_LEVEL)
+  message("LOG_VERBOSITY_LEVEL is set to: ${LOG_VERBOSITY_LEVEL}")
+  target_compile_definitions(rnoh PUBLIC LOG_VERBOSITY_LEVEL=${LOG_VERBOSITY_LEVEL})
+endif()

@@ -3,7 +3,8 @@
 
 namespace rnoh {
     ComponentInstance::ComponentInstance(Context ctx)
-        : m_tag(ctx.tag), m_componentHandle(ctx.componentHandle), m_componentName(std::move(ctx.componentName)), m_deps(std::move(ctx.dependencies)) {}
+        : m_tag(ctx.tag), m_componentHandle(ctx.componentHandle), m_componentName(std::move(ctx.componentName)),
+          m_deps(std::move(ctx.dependencies)) {}
 
     void ComponentInstance::insertChild(ComponentInstance::Shared childComponentInstance, std::size_t index) {
         auto it = m_children.begin() + index;

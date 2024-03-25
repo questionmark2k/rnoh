@@ -85,7 +85,7 @@ bool TouchEventDispatcher::canIgnoreMoveEvent(facebook::react::TouchEvent curren
 }
 
 void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchTarget::Shared const &rootTarget) {
-    DLOG(INFO) << "Touch event received: id=" << event.actionTouch.id << ", action type:" << event.action;
+    VLOG(2) << "Touch event received: id=" << event.actionTouch.id << ", action type:" << event.action;
 
     if (event.action == NODE_ACTION_DOWN) {
         registerTargetForTouch(event.actionTouch, rootTarget);
@@ -151,7 +151,7 @@ void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchT
     };
 
     if (event.action == NODE_ACTION_MOVE && canIgnoreMoveEvent(touchEvent)) {
-        DLOG(INFO) << "Should ignore current touchEvent";
+        VLOG(2) << "Should ignore current touchEvent";
         return;
     }
     m_previousEvent = touchEvent;

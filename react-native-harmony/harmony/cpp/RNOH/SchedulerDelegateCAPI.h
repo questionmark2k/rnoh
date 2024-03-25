@@ -32,7 +32,7 @@ namespace rnoh {
               m_schedulerDelegateArkTS(std::move(schedulerDelegateArkTS)),
               m_mountingManager(std::move(mountingManager)){};
 
-        ~SchedulerDelegateCAPI() { DLOG(INFO) << "~SchedulerDelegateCAPI"; }
+        ~SchedulerDelegateCAPI() { VLOG(1) << "~SchedulerDelegateCAPI"; }
 
         void schedulerDidFinishTransaction(facebook::react::MountingCoordinator::Shared mountingCoordinator) override {
             mountingCoordinator->getTelemetryController().pullTransaction(
@@ -103,12 +103,12 @@ namespace rnoh {
 
 
         void handleMutation(facebook::react::ShadowViewMutation mutation) {
-            DLOG(INFO) << "mutation (type:" << this->getMutationNameFromType(mutation.type)
-                       << "; new: " << mutation.newChildShadowView.tag << " component type: "
+            VLOG(1) << "Mutation (type:" << this->getMutationNameFromType(mutation.type) << "; componentName: "
                        << (mutation.newChildShadowView.componentName != nullptr
                                ? mutation.newChildShadowView.componentName
                                : "null")
-                       << "; old: " << mutation.oldChildShadowView.tag << "; parent: " << mutation.parentShadowView.tag
+                       << "; newTag: " << mutation.newChildShadowView.tag 
+                       << "; oldTag: " << mutation.oldChildShadowView.tag << "; parentTag: " << mutation.parentShadowView.tag
                        << ")";
             switch (mutation.type) {
             case facebook::react::ShadowViewMutation::Create: {

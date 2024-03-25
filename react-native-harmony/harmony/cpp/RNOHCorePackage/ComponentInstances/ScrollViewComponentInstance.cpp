@@ -120,7 +120,7 @@ void ScrollViewComponentInstance::onScroll() {
             .count();
     if (m_allowNextScrollEvent || (m_scrollEventThrottle < now - m_lastScrollDispatchTime && scrollMovedBySignificantOffset(scrollViewMetrics.contentOffset))) {
         m_lastScrollDispatchTime = now;
-        DLOG(INFO) << "onScroll (contentOffset: " << scrollViewMetrics.contentOffset.x << ", "
+        VLOG(2) << "onScroll (contentOffset: " << scrollViewMetrics.contentOffset.x << ", "
                    << scrollViewMetrics.contentOffset.y << "; contentSize: " << scrollViewMetrics.contentSize.width
                    << ", " << scrollViewMetrics.contentSize.height
                    << "; containerSize: " << scrollViewMetrics.containerSize.width << ", "
