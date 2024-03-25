@@ -119,7 +119,7 @@ namespace rnoh {
                     updateComponentWithShadowView(componentInstance, newChild);
                     m_componentInstanceRegistry->insert(componentInstance);
                 } else {
-                    LOG(FATAL) << "Couldn't create ComponentInstance for: " << newChild.componentName;
+                    LOG(INFO) << "Couldn't create CppComponentInstance for: " << newChild.componentName;
                 }
                 break;
             }
@@ -132,6 +132,20 @@ namespace rnoh {
                 auto parentComponentInstance = m_componentInstanceRegistry->findByTag(mutation.parentShadowView.tag);
                 auto newChildComponentInstance =
                     m_componentInstanceRegistry->findByTag(mutation.newChildShadowView.tag);
+                // Building subtrees through insert is bottom-up. 
+                // C++ nodes and ArkTS subtrees cannot be inserted into their ArkTS parent unless the parent is a C++ node.  
+                // builderNode is then constructed in the ArkTS subtree of C++ nodes.
+                if (newChildComponentInstance == nullptr) {
+                    newChildComponentInstance = m_componentInstanceFactory->createArkTSComponent(mutation.newChildShadowView.tag, 
+                                                                                                mutation.newChildShadowView.componentHandle, 
+                                                                                                mutation.newChildShadowView.componentName);
+                    if (newChildComponentInstance != nullptr) {
+                        m_componentInstanceRegistry->insert(newChildComponentInstance);
+                    } else {
+                        LOG(FATAL) << "Couldn't create ArkTSComponentInstance for: " << mutation.newChildShadowView.componentName;
+                    }
+                }
+
                 if (parentComponentInstance != nullptr && newChildComponentInstance != nullptr) {
                     parentComponentInstance->insertChild(newChildComponentInstance, mutation.index);
                     parentComponentInstance->finalizeUpdates();
@@ -145,6 +159,12 @@ namespace rnoh {
                     parentComponentInstance->removeChild(
                         m_componentInstanceRegistry->findByTag(mutation.oldChildShadowView.tag));
                     parentComponentInstance->finalizeUpdates();
+                }
+                
+                auto newChildComponentInstance =
+                    m_componentInstanceRegistry->findByTag(mutation.newChildShadowView.tag);
+                if (newChildComponentInstance && std::dynamic_pointer_cast<FallbackComponentInstance>(newChildComponentInstance)) {
+                    m_componentInstanceRegistry->deleteByTag(mutation.newChildShadowView.tag);
                 }
                 break;
             }

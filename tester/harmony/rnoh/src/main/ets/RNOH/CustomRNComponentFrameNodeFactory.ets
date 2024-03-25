@@ -11,13 +11,11 @@ export class CustomRNComponentFrameNodeFactory implements FrameNodeFactory {
   private uiCtx: UIContext;
   private getRNComponentContext: () => (RNComponentContext | undefined)
   private componentContext: RNComponentContext | undefined;
-  private builderNode: BuilderNode<[ComponentBuilderContext]>
   private logger: RNOHLogger
 
   constructor(uiCtx: UIContext, logger: RNOHLogger, getRNComponentContext: () => (RNComponentContext | undefined)) {
     this.uiCtx = uiCtx;
     this.getRNComponentContext = getRNComponentContext;
-    this.builderNode = new BuilderNode<[ComponentBuilderContext]>(this.uiCtx);
     this.logger = logger.clone("CustomRNComponentFrameNodeFactory")
   }
 
@@ -35,8 +33,9 @@ export class CustomRNComponentFrameNodeFactory implements FrameNodeFactory {
       componentName,
       this.componentContext!.descriptorRegistry.getDescriptor<Descriptor>(tag),
     );
-    this.builderNode.build(this.componentContext!.wrappedCustomRNComponentBuilder, builderCtx);
-    const frameNode = this.builderNode.getFrameNode();
+    const builderNode = new BuilderNode<[ComponentBuilderContext]>(this.uiCtx);
+    builderNode.build(this.componentContext!.wrappedCustomRNComponentBuilder, builderCtx);
+    const frameNode = builderNode.getFrameNode();
     if (frameNode === null) {
       this.componentContext!.logger.fatal(`Couldn't create frameNode for: ${componentName}`);
     }

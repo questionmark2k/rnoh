@@ -20,8 +20,7 @@ namespace rnoh {
         ArkUINode &getLocalRootArkUINode() override { return *m_arkUINode; };
 
         void setLayout(facebook::react::LayoutMetrics layoutMetrics) override {
-            m_layoutMetrics = layoutMetrics;
-            m_arkUINode->setPosition(layoutMetrics.frame.origin);
+            // Attributes are not set on the C++ side to prevent conflicts with ArkUI front-end state management.
         }
     
     protected:

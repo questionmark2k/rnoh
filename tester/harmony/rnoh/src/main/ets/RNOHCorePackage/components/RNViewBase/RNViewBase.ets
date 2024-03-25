@@ -58,15 +58,10 @@ export class RNViewBaseAttributeModifier extends BaseAttributeModifier<ViewDescr
     this.maybeAssignAttribute((dw => dw.width), (val) => instance.width(val), undefined)
     this.maybeAssignAttribute((dw => dw.height), (val) => instance.height(val), undefined)
     this.maybeAssignAttribute((dw => dw.backgroundColor), (val) => instance.backgroundColor(val), "#00000000")
-    if (this.ctx.rnInstance.getArchitecture() !== "C_API") {
-      /**
-       * Position must be set only on C++ side.
-       */
-      this.maybeAssignAttribute<Position>((dw => dw.positionRelativeToParent), (val) => instance.position(val), {
-        x: 0,
-        y: 0
-      })
-    }
+    this.maybeAssignAttribute<Position>((dw => dw.positionRelativeToParent), (val) => instance.position(val), {
+      x: 0,
+      y: 0
+    })
 
     this.maybeAssignAttribute<Edges<number | undefined>>((dw => dw.borderWidth), (val) => instance.borderWidth(val), {
       top: undefined,

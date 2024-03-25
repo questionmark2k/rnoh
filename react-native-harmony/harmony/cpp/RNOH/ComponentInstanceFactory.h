@@ -37,6 +37,18 @@ namespace rnoh {
             : m_delegates(std::move(delegates)), m_dependencies(dependencies),
               m_customComponentArkUINodeHandleFactory(customComponentArkUINodeHandleFactory) {}
 
+        ComponentInstance::Shared createArkTSComponent(facebook::react::Tag tag, facebook::react::ComponentHandle componentHandle,
+                                         std::string componentName) {
+            ComponentInstance::Context ctx = {.tag = tag,
+                                              .componentHandle = componentHandle,
+                                              .componentName = componentName,
+                                              .dependencies = m_dependencies};
+
+            LOG(WARNING) << "Creating FallbackComponentInstance for: " << componentName << ""  "" << tag;
+            auto arkUINode = std::make_unique<ArkUINode>(m_customComponentArkUINodeHandleFactory->create(tag, componentName));
+            return std::make_shared<FallbackComponentInstance>(ctx, std::move(arkUINode));
+        }
+
         ComponentInstance::Shared create(facebook::react::Tag tag, facebook::react::ComponentHandle componentHandle,
                                          std::string componentName) {
             ComponentInstance::Context ctx = {.tag = tag,
@@ -49,9 +61,7 @@ namespace rnoh {
                     return componentInstance;
                 }
             }
-            LOG(WARNING) << "Creating FallbackComponentInstance for: " << componentName;
-            auto arkUINode = std::make_unique<ArkUINode>(m_customComponentArkUINodeHandleFactory->create(tag, componentName));
-            return std::make_shared<FallbackComponentInstance>(ctx, std::move(arkUINode));
+            return nullptr;
         }
     };
 } // namespace rnoh

@@ -16,24 +16,29 @@ import { createRNPackages } from '../RNPackagesFactory';
 
 @Builder
 export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
-  if (ctx.componentName === SampleView.NAME) {
-    SampleView({
-      ctx: ctx.rnComponentContext,
-      tag: ctx.tag,
-    })
+  // There seems to be a problem with the placement of ArkTS components in mixed mode. Nested Stack temporarily avoided.
+  Stack(){
+    if (ctx.componentName === SampleView.NAME) {
+      SampleView({
+        ctx: ctx.rnComponentContext,
+        tag: ctx.tag,
+      })
+    }
+    if (ctx.componentName === GeneratedSampleView.NAME) {
+      GeneratedSampleView({
+        ctx: ctx.rnComponentContext,
+        tag: ctx.tag,
+      })
+    }
+    if (ctx.componentName === PropsDisplayer.NAME) {
+      PropsDisplayer({
+        ctx: ctx.rnComponentContext,
+        tag: ctx.tag
+      })
+    }
   }
-  if (ctx.componentName === GeneratedSampleView.NAME) {
-    GeneratedSampleView({
-      ctx: ctx.rnComponentContext,
-      tag: ctx.tag,
-    })
-  }
-  if (ctx.componentName === PropsDisplayer.NAME) {
-    PropsDisplayer({
-      ctx: ctx.rnComponentContext,
-      tag: ctx.tag
-    })
-  }
+  .position({x:0, y: 0})
+
 }
 
 const wrappedCustomRNComponentBuilder = wrapBuilder(buildCustomRNComponent)
