@@ -16,7 +16,9 @@ export function AnimatedTest() {
       <TestCase.Example tags={['C_API']} itShould="animate width">
         <AnimatedRectangle />
       </TestCase.Example>
-      <TestCase.Example itShould="move red square horizontally relatively to the scroll offset">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="move red square horizontally relatively to the scroll offset">
         <AnimatedScrollViewTestCase />
       </TestCase.Example>
       <TestCase.Example

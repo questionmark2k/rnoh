@@ -5,6 +5,7 @@
 #include "conversions.h"
 #include <cmath>
 #include "PullToRefreshViewComponentInstance.h"
+#include "RNOHCorePackage/TurboModules/Animated/NativeAnimatedTurboModule.h"
 
 using namespace rnoh;
 
@@ -124,6 +125,12 @@ void ScrollViewComponentInstance::onScroll() {
                    << "; containerSize: " << scrollViewMetrics.containerSize.width << ", "
                    << scrollViewMetrics.containerSize.height << ")";
         m_eventEmitter->onScroll(scrollViewMetrics);
+        if (auto rnInstance = m_deps->rnInstance.lock()) {
+            auto nativeAnimatedTurboModule = rnInstance->getTurboModule<NativeAnimatedTurboModule>("NativeAnimatedTurboModule");
+            if (nativeAnimatedTurboModule != nullptr) {
+                nativeAnimatedTurboModule->handleComponentEvent(m_tag, "onScroll", getScrollEventPayload(scrollViewMetrics));
+            }
+        }
         m_currentOffset = scrollViewMetrics.contentOffset;
     };
 }
@@ -232,4 +239,22 @@ void ScrollViewComponentInstance::finalizeUpdates() {
     if (parent && !isRefresh) {
         m_scrollNode.setPosition(m_layoutMetrics.frame.origin);
     }
+}
+
+folly::dynamic ScrollViewComponentInstance::getScrollEventPayload(facebook::react::ScrollViewMetrics &scrollViewMetrics) {
+    using folly::dynamic;
+
+    dynamic contentSize = dynamic::object("width", scrollViewMetrics.contentSize.width)(
+        "height", scrollViewMetrics.contentSize.height);
+    dynamic contentOffset =
+        dynamic::object("x", scrollViewMetrics.contentOffset.x)("y", scrollViewMetrics.contentOffset.y);
+    dynamic contentInset =
+        dynamic::object("left", scrollViewMetrics.contentInset.left)("top", scrollViewMetrics.contentInset.top)(
+            "right", scrollViewMetrics.contentInset.right)("bottom", scrollViewMetrics.contentInset.bottom);
+    dynamic containerSize = dynamic::object("width", scrollViewMetrics.containerSize.width)(
+        "height", scrollViewMetrics.containerSize.height);
+    dynamic payload = dynamic::object("contentSize", contentSize)("contentOffset", contentOffset)(
+        "contentInset", contentInset)("containerSize", containerSize)("zoomScale", scrollViewMetrics.zoomScale)(
+        "responderIgnoreScroll", scrollViewMetrics.responderIgnoreScroll);
+    return payload;
 }

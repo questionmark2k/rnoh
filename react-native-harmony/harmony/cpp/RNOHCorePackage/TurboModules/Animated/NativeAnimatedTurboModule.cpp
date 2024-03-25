@@ -474,4 +474,8 @@ void NativeAnimatedTurboModule::initializeEventListener() {
     m_initializedEventListener = true;
 }
 
+void NativeAnimatedTurboModule::handleComponentEvent(facebook::react::Tag tag, std::string const &eventName, folly::dynamic payload) {
+    auto lock = acquireLock();
+    m_animatedNodesManager.handleEvent(tag, eventName, payload);
+}
 } // namespace rnoh

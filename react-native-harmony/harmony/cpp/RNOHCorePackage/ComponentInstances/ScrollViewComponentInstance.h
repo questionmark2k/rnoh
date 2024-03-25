@@ -34,6 +34,7 @@ namespace rnoh {
                            facebook::react::Float snapToInterval,
                            facebook::react::ScrollViewSnapToAlignment snapToAlignment);
         bool scrollMovedBySignificantOffset(facebook::react::Point newOffset);
+        folly::dynamic getScrollEventPayload(facebook::react::ScrollViewMetrics &scrollViewMetrics);
 
       public:
         ScrollViewComponentInstance(Context context);

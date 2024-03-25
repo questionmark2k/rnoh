@@ -36,6 +36,11 @@ namespace rnoh {
 
         virtual ContextContainer const &getContextContainer() const = 0;
         virtual TurboModule::Shared getTurboModule(const std::string &name) = 0;
+        template <typename T>
+        std::shared_ptr<T> getTurboModule(const std::string &name) {
+            auto turboModule = getTurboModule(name);
+            return std::dynamic_pointer_cast<T>(turboModule);
+        }
         virtual void synchronouslyUpdateViewOnUIThread(facebook::react::Tag tag, folly::dynamic props) = 0;
     };
 

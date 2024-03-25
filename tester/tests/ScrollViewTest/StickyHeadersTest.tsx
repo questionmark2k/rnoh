@@ -8,6 +8,7 @@ export function StickyHeadersTest() {
       name="sticky headers" /* (sticky headers fail on Android when Fabric is enabled) */
     >
       <TestCase
+        tags={['C_API']}
         itShould="stick item 1 and 4 (stickyHeaderIndices)"
         skip={Platform.OS === 'android'}>
         <View style={styles.wrapperView}>
@@ -17,6 +18,7 @@ export function StickyHeadersTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         skip={Platform.OS === 'android'}
         itShould="hide sticked item 1 or 4 when scrolling down (stickyHeaderHiddenOnScroll)">
         <View style={styles.wrapperView}>
@@ -29,6 +31,7 @@ export function StickyHeadersTest() {
         </View>
       </TestCase>
       <TestCase
+        tags={['C_API']}
         skip={Platform.OS === 'android'}
         itShould="stick item 13 and 20 to the bottom (invertStickyHeaders)"
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/309
@@ -42,7 +45,9 @@ export function StickyHeadersTest() {
           </ScrollView>
         </View>
       </TestCase>
-      <TestCase itShould="display Text 'custom sticky header' in the place of components 1 and 4 (shouldn't stick) (StickyHeaderComponent)">
+      <TestCase
+        tags={['C_API']}
+        itShould="display Text 'custom sticky header' in the place of components 1 and 4 (shouldn't stick) (StickyHeaderComponent)">
         <View style={styles.wrapperView}>
           <ScrollView
             stickyHeaderIndices={[0, 3]}

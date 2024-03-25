@@ -80,6 +80,8 @@ class NativeAnimatedTurboModule : public rnoh::ArkTSTurboModule, public rnoh::Ev
     // EventEmitRequestHandler
     void handleEvent(EventEmitRequestHandler::Context const &ctx) override;
 
+    void handleComponentEvent(facebook::react::Tag tag, std::string const &eventName, folly::dynamic payload);
+
   private:
     std::unique_lock<std::mutex> acquireLock() {
         return std::unique_lock(m_nodesManagerLock);
