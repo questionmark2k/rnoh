@@ -6,8 +6,9 @@ namespace rnoh {
 using Point = facebook::react::Point;
 
 static std::pair<TouchTarget::Shared, Point> findTargetForTouchPoint(Point const &point, TouchTarget::Shared const &target) {
-    bool canHandleTouch = target->containsPoint(point) && (target->getTouchEventEmitter() != nullptr);
-    bool canChildrenHandleTouch = target->containsPointInBoundingBox(point);
+    bool canHandleTouch = target->canHandleTouch() &&
+        target->containsPoint(point) && (target->getTouchEventEmitter() != nullptr);
+    bool canChildrenHandleTouch = target->canChildrenHandleTouch() && target->containsPointInBoundingBox(point);
 
     if (canChildrenHandleTouch) {
         auto children = target->getTouchTargetChildren();

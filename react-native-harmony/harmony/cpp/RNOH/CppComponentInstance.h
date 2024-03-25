@@ -92,6 +92,24 @@ namespace rnoh {
             return containsPoint(point);
         }
 
+        bool canHandleTouch() const override {
+            if (m_props != nullptr) {
+                auto props = std::dynamic_pointer_cast<const facebook::react::ViewProps>(m_props);
+                return props->pointerEvents == facebook::react::PointerEventsMode::Auto ||
+                    props->pointerEvents == facebook::react::PointerEventsMode::BoxOnly;
+            }
+            return true;
+        };
+
+        bool canChildrenHandleTouch() const override {
+            if (m_props != nullptr) {
+                auto props = std::dynamic_pointer_cast<const facebook::react::ViewProps>(m_props);
+                return props->pointerEvents == facebook::react::PointerEventsMode::Auto ||
+                    props->pointerEvents == facebook::react::PointerEventsMode::BoxNone;
+            }
+            return true;
+        };
+
         facebook::react::Tag getTouchTargetTag() const override { return getTag(); }
 
         facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { return m_eventEmitter; }

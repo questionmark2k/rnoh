@@ -395,6 +395,7 @@ export function ViewTest() {
       </TestCase.Example>
       <TestSuite name="pointerEvents">
         <TestCase.Manual
+          tags={['C_API']}
           itShould="call inner and outer view when pressing inner"
           initialState={{inner: false, outer: false, outerContainer: false}}
           arrange={({setState, reset}) => {
@@ -415,6 +416,7 @@ export function ViewTest() {
           }}
         />
         <TestCase.Manual
+          tags={['C_API']}
           itShould="call only outer when pressing inner view"
           initialState={{inner: false, outer: false, outerContainer: true}}
           arrange={({setState, reset}) => {
@@ -435,6 +437,7 @@ export function ViewTest() {
           }}
         />
         <TestCase.Manual
+          tags={['C_API']}
           itShould="call inner and outer only when pressing inner view"
           initialState={{inner: false, outer: false, outerContainer: false}}
           arrange={({setState, reset}) => {
@@ -453,6 +456,7 @@ export function ViewTest() {
           }}
         />
         <TestCase.Manual
+          tags={['C_API']}
           itShould="not call inner or outer when pressing inner or outer views"
           initialState={{inner: false, outer: false, outerContainer: false}}
           arrange={({setState, reset}) => {

@@ -15,6 +15,8 @@ class TouchTarget {
     virtual Point computeChildPoint(Point const &point, TouchTarget::Shared const &child) const;
     virtual bool containsPoint(Point const &point) const = 0;
     virtual bool containsPointInBoundingBox(Point const &point) const = 0;
+    virtual bool canHandleTouch() const = 0;
+    virtual bool canChildrenHandleTouch() const = 0;
     virtual facebook::react::Tag getTouchTargetTag() const = 0;
     virtual facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const = 0;
     virtual std::vector<Shared> getTouchTargetChildren() const = 0;
