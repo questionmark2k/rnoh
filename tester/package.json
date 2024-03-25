@@ -23,10 +23,14 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint App.tsx ./benchmarks ./components ./examples ./jests ./scripts ./tests --max-warnings 0",
     "lint:fix": "npm run lint -- --fix",
+    "lint:cpp": "clang-tidy ../react-native-harmony/harmony/cpp/*.h ../react-native-harmony/harmony/cpp/*.cpp ../react-native-harmony/harmony/cpp/RNOH/**/*.h ../react-native-harmony/harmony/cpp/RNOH/**/*.cpp ../react-native-harmony/harmony/cpp/RNOHCorePackage/**/*.h ../react-native-harmony/harmony/cpp/RNOHCorePackage/**/*.cpp -p ./harmony/entry/.cxx/default/default/arm64-v8a/ -extra-arg=-Wno-unused-command-line-argument > ./lintCppResult.txt && cat ./lintCppResult.txt",
+    "lint:cpp:fast": "node ./scripts/lint-cpp-fast.js",
     "verify": "npm run typecheck && npm run test && npm run lint",
     "start": "npm run codegen && hdc rport tcp:8081 tcp:8081 && react-native start",
     "codegen": "react-native codegen-harmony --rnoh-module-path ./harmony/rnoh",
     "benchmark-fps": "node ./scripts/get-frame-times | node ./scripts/create-fps-stats",
+    "find_changed_files": "{ git diff --name-only main...; git diff --name-only; git diff --name-only --cached; } | sort | uniq",
+    "find_changed_files:cpp": "npm run find_changed_files | grep -E \"\\.(h|cpp)$\"",
     "test": "jest"
   },
   "dependencies": {
