@@ -12,7 +12,8 @@ namespace rnoh {
     private:
         enum ScrollState : int32_t { IDLE, SCROLL, FLING };
         ScrollNode m_scrollNode;
-        StackNode m_stackNode;
+        StackNode m_contentContainerNode;
+        StackNode m_scrollContainerNode;
         facebook::react::Size m_contentSize;
         facebook::react::Size m_containerSize;
         ScrollState m_scrollState;
@@ -22,7 +23,6 @@ namespace rnoh {
         bool m_allowNextScrollEvent = false;
         facebook::react::Float m_scrollEventThrottle = 0;
         bool m_isNativeResponderBlocked = false;
-        facebook::react::ScrollViewMetrics getScrollViewMetrics();
         facebook::react::Float getFrictionFromDecelerationRate(facebook::react::Float decelerationRate);
         void emitOnScrollEndDragEvent();
         void emitOnMomentumScrollEndEvent();
@@ -39,7 +39,7 @@ namespace rnoh {
       public:
         ScrollViewComponentInstance(Context context);
 
-        ScrollNode &getLocalRootArkUINode() override;
+        StackNode &getLocalRootArkUINode() override;
 
         void onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) override;
         void onChildRemoved(ComponentInstance::Shared const &childComponentInstance) override;
@@ -65,7 +65,9 @@ namespace rnoh {
         facebook::react::Point computeChildPoint(facebook::react::Point const &point,
                                                  TouchTarget::Shared const &child) const override;
 
-    private:
+        facebook::react::ScrollViewMetrics getScrollViewMetrics();
+
+      private:
         void updateStateWithContentOffset(facebook::react::Point contentOffset);
     };
 } // namespace rnoh

@@ -10,23 +10,24 @@
 using namespace rnoh;
 
 ScrollViewComponentInstance::ScrollViewComponentInstance(Context context) : CppComponentInstance(std::move(context)) {
-    m_scrollNode.insertChild(m_stackNode);
+    m_scrollContainerNode.insertChild(m_scrollNode, 0);
+    m_scrollNode.insertChild(m_contentContainerNode);
     // NOTE: perhaps this needs to take rtl into account?
     m_scrollNode.setAlignment(ARKUI_ALIGNMENT_TOP_START);
     m_scrollNode.setScrollNodeDelegate(this);
 }
 
-ScrollNode &ScrollViewComponentInstance::getLocalRootArkUINode() { return m_scrollNode; }
+StackNode &ScrollViewComponentInstance::getLocalRootArkUINode() { return m_scrollContainerNode; }
 
 void ScrollViewComponentInstance::onChildInserted(ComponentInstance::Shared const &childComponentInstance,
                                                   std::size_t index) {
     CppComponentInstance::onChildInserted(childComponentInstance, index);
-    m_stackNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
+    m_contentContainerNode.insertChild(childComponentInstance->getLocalRootArkUINode(), index);
 }
 
 void ScrollViewComponentInstance::onChildRemoved(ComponentInstance::Shared const &childComponentInstance) {
     CppComponentInstance::onChildRemoved(childComponentInstance);
-    m_stackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
+    m_contentContainerNode.removeChild(childComponentInstance->getLocalRootArkUINode());
 }
 
 void ScrollViewComponentInstance::setLayout(facebook::react::LayoutMetrics layoutMetrics) {
@@ -38,7 +39,7 @@ void ScrollViewComponentInstance::setLayout(facebook::react::LayoutMetrics layou
 void rnoh::ScrollViewComponentInstance::onStateChanged(SharedConcreteState const &state) {
     CppComponentInstance::onStateChanged(state);
     auto stateData = state->getData();
-    m_stackNode.setSize(stateData.getContentSize());
+    m_contentContainerNode.setSize(stateData.getContentSize());
     m_contentSize = stateData.getContentSize();
 }
 
@@ -64,7 +65,7 @@ void rnoh::ScrollViewComponentInstance::onPropsChanged(SharedConcreteProps const
                   props->snapToAlignment);
 
     auto borderMetrics = props->resolveBorderMetrics(m_layoutMetrics);
-    m_stackNode.setMargin(-borderMetrics.borderWidths.left, -borderMetrics.borderWidths.top, 0.f, 0.f);
+    m_contentContainerNode.setMargin(-borderMetrics.borderWidths.left, -borderMetrics.borderWidths.top, 0.f, 0.f);
 }
 
 void ScrollViewComponentInstance::handleCommand(std::string const &commandName, folly::dynamic const &args) {
@@ -237,7 +238,7 @@ void ScrollViewComponentInstance::finalizeUpdates() {
     auto parent = this->getParent().lock();
     bool isRefresh = std::dynamic_pointer_cast<const PullToRefreshViewComponentInstance>(this->getParent().lock()) != nullptr;
     if (parent && !isRefresh) {
-        m_scrollNode.setPosition(m_layoutMetrics.frame.origin);
+        this->getLocalRootArkUINode().setPosition(m_layoutMetrics.frame.origin);
     }
 }
 
