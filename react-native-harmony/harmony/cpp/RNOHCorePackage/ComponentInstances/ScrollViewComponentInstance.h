@@ -2,6 +2,7 @@
 #include "RNOH/CppComponentInstance.h"
 #include "RNOH/arkui/ScrollNode.h"
 #include "RNOH/arkui/StackNode.h"
+#include "RNOHCorePackage/TurboModules/Animated/NativeAnimatedTurboModule.h"
 #include <react/renderer/components/scrollview/ScrollViewEventEmitter.h>
 #include <react/renderer/components/scrollview/ScrollViewShadowNode.h>
 
@@ -16,13 +17,15 @@ namespace rnoh {
         StackNode m_scrollContainerNode;
         facebook::react::Size m_contentSize;
         facebook::react::Size m_containerSize;
-        ScrollState m_scrollState;
+        ScrollState m_scrollState = IDLE;
         facebook::react::Point m_currentOffset = {0, 0};
         bool m_persistentScrollbar = false;
         long long m_lastScrollDispatchTime = 0;
         bool m_allowNextScrollEvent = false;
         facebook::react::Float m_scrollEventThrottle = 0;
         bool m_isNativeResponderBlocked = false;
+        std::weak_ptr<NativeAnimatedTurboModule> m_nativeAnimatedTurboModule{};
+
         facebook::react::Float getFrictionFromDecelerationRate(facebook::react::Float decelerationRate);
         void emitOnScrollEndDragEvent();
         void emitOnMomentumScrollEndEvent();
@@ -34,7 +37,9 @@ namespace rnoh {
                            facebook::react::Float snapToInterval,
                            facebook::react::ScrollViewSnapToAlignment snapToAlignment);
         bool scrollMovedBySignificantOffset(facebook::react::Point newOffset);
-        folly::dynamic getScrollEventPayload(facebook::react::ScrollViewMetrics &scrollViewMetrics);
+        folly::dynamic getScrollEventPayload(facebook::react::ScrollViewMetrics const &scrollViewMetrics);
+
+        void sendEventForNativeAnimations(facebook::react::ScrollViewMetrics const &scrollViewMetrics);
 
       public:
         ScrollViewComponentInstance(Context context);

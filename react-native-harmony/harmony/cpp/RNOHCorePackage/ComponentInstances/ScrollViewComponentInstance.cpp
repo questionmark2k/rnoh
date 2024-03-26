@@ -5,9 +5,8 @@
 #include "conversions.h"
 #include <cmath>
 #include "PullToRefreshViewComponentInstance.h"
-#include "RNOHCorePackage/TurboModules/Animated/NativeAnimatedTurboModule.h"
 
-using namespace rnoh;
+namespace rnoh {
 
 ScrollViewComponentInstance::ScrollViewComponentInstance(Context context) : CppComponentInstance(std::move(context)) {
     m_scrollContainerNode.insertChild(m_scrollNode, 0);
@@ -31,7 +30,8 @@ void ScrollViewComponentInstance::onChildRemoved(ComponentInstance::Shared const
 }
 
 void ScrollViewComponentInstance::setLayout(facebook::react::LayoutMetrics layoutMetrics) {
-    this->getLocalRootArkUINode().setSize(layoutMetrics.frame.size);
+    m_scrollContainerNode.setSize(layoutMetrics.frame.size);
+    m_scrollNode.setSize(layoutMetrics.frame.size);
     m_layoutMetrics = layoutMetrics;
     m_containerSize = layoutMetrics.frame.size;
 }
@@ -102,7 +102,6 @@ void rnoh::ScrollViewComponentInstance::updateStateWithContentOffset(facebook::r
     });
 }
 
-
 facebook::react::ScrollViewMetrics ScrollViewComponentInstance::getScrollViewMetrics() {
     auto scrollViewMetrics = facebook::react::ScrollViewMetrics();
     scrollViewMetrics.responderIgnoreScroll = true;
@@ -121,17 +120,12 @@ void ScrollViewComponentInstance::onScroll() {
     if (m_allowNextScrollEvent || (m_scrollEventThrottle < now - m_lastScrollDispatchTime && scrollMovedBySignificantOffset(scrollViewMetrics.contentOffset))) {
         m_lastScrollDispatchTime = now;
         VLOG(2) << "onScroll (contentOffset: " << scrollViewMetrics.contentOffset.x << ", "
-                   << scrollViewMetrics.contentOffset.y << "; contentSize: " << scrollViewMetrics.contentSize.width
-                   << ", " << scrollViewMetrics.contentSize.height
-                   << "; containerSize: " << scrollViewMetrics.containerSize.width << ", "
-                   << scrollViewMetrics.containerSize.height << ")";
+                << scrollViewMetrics.contentOffset.y << "; contentSize: " << scrollViewMetrics.contentSize.width
+                << ", " << scrollViewMetrics.contentSize.height
+                << "; containerSize: " << scrollViewMetrics.containerSize.width << ", "
+                << scrollViewMetrics.containerSize.height << ")";
         m_eventEmitter->onScroll(scrollViewMetrics);
-        if (auto rnInstance = m_deps->rnInstance.lock()) {
-            auto nativeAnimatedTurboModule = rnInstance->getTurboModule<NativeAnimatedTurboModule>("NativeAnimatedTurboModule");
-            if (nativeAnimatedTurboModule != nullptr) {
-                nativeAnimatedTurboModule->handleComponentEvent(m_tag, "onScroll", getScrollEventPayload(scrollViewMetrics));
-            }
-        }
+        sendEventForNativeAnimations(scrollViewMetrics);
         m_currentOffset = scrollViewMetrics.contentOffset;
     };
 }
@@ -218,7 +212,7 @@ void ScrollViewComponentInstance::setScrollSnap(bool snapToStart, bool snapToEnd
                                                 const std::vector<facebook::react::Float> &snapToOffsets,
                                                 facebook::react::Float snapToInterval,
                                                 facebook::react::ScrollViewSnapToAlignment snapToAlignment) {
-    if (snapToOffsets.size() > 0) {
+    if (!snapToOffsets.empty()) {
         m_scrollNode.setScrollSnap(ArkUI_ScrollSnapAlign::ARKUI_SCROLL_SNAP_ALIGN_START, snapToStart, snapToEnd,
                                    snapToOffsets);
     }
@@ -231,7 +225,7 @@ bool ScrollViewComponentInstance::scrollMovedBySignificantOffset(facebook::react
     return std::abs(newOffset.x - m_currentOffset.x) >= 1 || std::abs(newOffset.y - m_currentOffset.y) >= 1;
 }
 
-void ScrollViewComponentInstance::finalizeUpdates() { 
+void ScrollViewComponentInstance::finalizeUpdates() {
     ComponentInstance::finalizeUpdates();
 
     // when parent isn't refresh node, set the position
@@ -242,7 +236,7 @@ void ScrollViewComponentInstance::finalizeUpdates() {
     }
 }
 
-folly::dynamic ScrollViewComponentInstance::getScrollEventPayload(facebook::react::ScrollViewMetrics &scrollViewMetrics) {
+folly::dynamic ScrollViewComponentInstance::getScrollEventPayload(facebook::react::ScrollViewMetrics const &scrollViewMetrics) {
     using folly::dynamic;
 
     dynamic contentSize = dynamic::object("width", scrollViewMetrics.contentSize.width)(
@@ -259,3 +253,20 @@ folly::dynamic ScrollViewComponentInstance::getScrollEventPayload(facebook::reac
         "responderIgnoreScroll", scrollViewMetrics.responderIgnoreScroll);
     return payload;
 }
+
+void rnoh::ScrollViewComponentInstance::sendEventForNativeAnimations(facebook::react::ScrollViewMetrics const &scrollViewMetrics) {
+    auto nativeAnimatedTurboModule = m_nativeAnimatedTurboModule.lock();
+    if (nativeAnimatedTurboModule == nullptr) {
+        auto instance = m_deps->rnInstance.lock();
+        if (instance == nullptr) {
+            return;
+        }
+        nativeAnimatedTurboModule = instance->getTurboModule<NativeAnimatedTurboModule>("NativeAnimatedTurboModule");
+        m_nativeAnimatedTurboModule = nativeAnimatedTurboModule;
+    }
+    if (nativeAnimatedTurboModule != nullptr) {
+        nativeAnimatedTurboModule->handleComponentEvent(m_tag, "onScroll", getScrollEventPayload(scrollViewMetrics));
+    }
+}
+
+} // namespace rnoh
