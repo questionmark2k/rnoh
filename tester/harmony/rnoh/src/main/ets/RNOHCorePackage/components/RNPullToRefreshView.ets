@@ -1,5 +1,6 @@
+import { ViewDescriptorWrapperBase } from '.';
 import { Descriptor, RawPropsBase } from '../../RNOH';
-import { RNOHContext } from '../../RNOH'
+import { RNOHContext } from '../../RNOH';
 
 export interface PullToRefreshProps {}
 
@@ -26,7 +27,7 @@ export struct RNPullToRefreshView {
   tag: number = 0
   @BuilderParam renderDescriptors: () => void
   @State private descriptor: PullToRefreshDescriptor = Object() as PullToRefreshDescriptor
-  private unregisterDescriptorChangesListener?: () => void = undefined
+  @State descriptorWrapper: ViewDescriptorWrapperBase | undefined = undefined
   private cleanUpCallbacks: (() => void)[] = []
   @State private isRefreshing: boolean = false // ignore linter, this variable is read
   private prevAndCurrentRefreshStatus: [RefreshStatus, RefreshStatus] = [RefreshStatus.Inactive, RefreshStatus.Inactive]
@@ -93,6 +94,7 @@ export struct RNPullToRefreshView {
     }) {
       this.renderDescriptors();
     }
+    .backgroundColor(Color.Transparent)
     .onStateChange((refreshStatus) => {
       this.prevAndCurrentRefreshStatus = [this.prevAndCurrentRefreshStatus[1], refreshStatus]
 

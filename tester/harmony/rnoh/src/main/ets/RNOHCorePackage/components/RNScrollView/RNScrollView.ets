@@ -10,7 +10,7 @@ import {
   Tag,
 } from '../../../RNOH';
 import { _RNScrollViewManager } from './RNScrollViewManager';
-import { RNViewBase, ViewDescriptorWrapperBase } from '../RNViewBase';
+import { RNViewBase, ViewDescriptorWrapperBase, RNViewBaseAttributeModifier } from '../RNViewBase';
 import { RN_PULL_TO_REFRESH_VIEW_NAME, RNPullToRefreshView } from '../RNPullToRefreshView';
 import { RNComponentFactory } from '../RNComponentFactory';
 import {
@@ -125,6 +125,7 @@ export struct RNScrollView {
     }
     this.childrenTags = newDescriptor.childrenTags
     this.parentTag = newDescriptor.parentTag
+
     const contentSizeChanged = contentSizeWidth !== prevState?.contentSizeWidth
       || contentSizeHeight !== prevState?.contentSizeHeight
     if (newDescriptor.props.contentOffsetX !== prevProps.contentOffsetX || newDescriptor.props.contentOffsetY !== prevProps.contentOffsetY) {
@@ -390,10 +391,10 @@ export struct RNScrollView {
       return;
     }
 
-    if(!this.isScrolling && (this.positionBeforeScrolling) !==undefined){
+    if (!this.isScrolling && (this.positionBeforeScrolling) !== undefined) {
       // The offset precision has a bug. Sometimes, there is a slight deviation,
       // After the problem is solved in the os, change the values to strict equal,
-      if(Math.abs(this.positionBeforeScrolling.x - currentOffset.xOffset) > 1 || Math.abs(this.positionBeforeScrolling.y - currentOffset.yOffset) >  1){
+      if (Math.abs(this.positionBeforeScrolling.x - currentOffset.xOffset) > 1 || Math.abs(this.positionBeforeScrolling.y - currentOffset.yOffset) > 1) {
         this.isScrolling = true;
       }
     }
@@ -519,20 +520,19 @@ export struct RNScrollView {
     return true
   }
 
-  shouldBounce(): boolean{
+  shouldBounce(): boolean {
     let alwaysBounces = this.scrollDirection() === ScrollDirection.Vertical ? this.descriptor.rawProps.alwaysBounceVertical : this.descriptor.rawProps.alwaysBounceHorizontal;
-    if(alwaysBounces === undefined){
+    if (alwaysBounces === undefined) {
       alwaysBounces = true
     }
     const hasLittleContent = this.scrollDirection() === ScrollDirection.Vertical ?
-          this.contentSize.height <= this.descriptor.layoutMetrics.frame.size.height : this.contentSize.width <= this.descriptor.layoutMetrics.frame.size.width;
+      this.contentSize.height <= this.descriptor.layoutMetrics.frame.size.height : this.contentSize.width <= this.descriptor.layoutMetrics.frame.size.width;
     if (this.props.bounces && (!hasLittleContent || alwaysBounces)) {
       return true
     } else {
       return false
     }
   }
-
 
   getEdgeEffect(): EdgeEffect {
     if (this.shouldBounce()) {
@@ -624,7 +624,7 @@ export struct RNScrollView {
 
   build() {
     if (this.shouldWrapWithPullToRefresh()) {
-      RNViewBase({ ctx: this.ctx, tag: this.parentTag }) {
+      RNViewBase({ ctx: this.ctx, tag: this.tag }) {
         RNPullToRefreshView({ ctx: this.ctx, tag: this.parentTag }) {
           this.buildScrollCore()
         }

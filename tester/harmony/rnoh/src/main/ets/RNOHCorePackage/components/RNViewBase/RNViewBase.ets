@@ -4,6 +4,7 @@ import { ViewDescriptorWrapper, ViewDescriptorWrapperBase } from './ViewDescript
 import { RNViewManager } from '../../componentManagers';
 import { areFirstLevelElementsEqual, areFirstLevelPropsEqual } from './etsHacks';
 import matrix4 from '@ohos.matrix4';
+import { RN_PULL_TO_REFRESH_VIEW_NAME } from "../RNPullToRefreshView"
 
 export interface ViewBaseState {}
 
@@ -151,9 +152,19 @@ export struct RNViewBase {
 
   private onDescriptorChange(descriptor: ViewBaseDescriptor) {
     let descriptorWrapper = this.ctx.descriptorRegistry.findDescriptorWrapperByTag<ViewDescriptorWrapperBase>(descriptor.tag)
+
+    if (this.isWrappingPullToRefresh(descriptor)) {
+      let parentTag = descriptor.parentTag ?? this.tag;
+      let parentDescriptor = this.ctx.descriptorRegistry.getDescriptor(parentTag);
+
+      // Set layout metrics of PullToRefeshView to current RNView
+      descriptor.layoutMetrics = parentDescriptor.layoutMetrics
+    }
+
     if (!descriptorWrapper || !(descriptorWrapper instanceof ViewDescriptorWrapperBase)) {
       descriptorWrapper = new ViewDescriptorWrapperBase(descriptor)
     }
+
     if (this.ctx instanceof RNComponentContext) {
       this.rnViewAttributeModifier = new RNViewBaseAttributeModifier(descriptorWrapper, this.ctx)
     }
@@ -164,6 +175,17 @@ export struct RNViewBase {
     if ((this.descriptorWrapper?.hints ?? []).includes("ready")) {
       this.ctx.markReadiness()
     }
+  }
+
+  private isWrappingPullToRefresh(descriptor: ViewBaseDescriptor) {
+    let parentTag = descriptor.parentTag ?? this.tag;
+    let parentDescriptor = this.ctx.descriptorRegistry.getDescriptor(parentTag);
+
+    if (parentDescriptor.type === RN_PULL_TO_REFRESH_VIEW_NAME) {
+      return true
+    }
+
+    return false
   }
 
   aboutToDisappear() {

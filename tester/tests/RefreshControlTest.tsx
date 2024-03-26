@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import {TestSuite} from '@rnoh/testerino';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {TestCase} from '../components';
 
 export const RefreshControlTest = () => {
@@ -63,11 +63,13 @@ export const RefreshControlTest = () => {
         tags={['C_API']}
         itShould="refresh with progressViewOffset = undefined"
         skip={{
+          harmony: {
+            cAPI: true,
+            arkTS:
+              'there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624',
+          },
           android: false,
-          harmony:
-            'there is a restriction on how tall the progress view can be - should be removed in API 11',
-        }} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
-      >
+        }}>
         <PullToRefreshProgressViewOffset />
       </TestCase.Example>
       <TestCase.Example
@@ -75,11 +77,13 @@ export const RefreshControlTest = () => {
         tags={['C_API']}
         itShould="refresh with progressViewOffset = 50"
         skip={{
+          harmony: {
+            cAPI: true,
+            arkTS:
+              'there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624',
+          },
           android: false,
-          harmony:
-            'there is a restriction on how tall the progress view can be - should be removed in API 11',
-        }} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
-      >
+        }}>
         <PullToRefreshProgressViewOffset progressViewOffset={50} />
       </TestCase.Example>
       <TestCase.Example
@@ -87,11 +91,13 @@ export const RefreshControlTest = () => {
         tags={['C_API']}
         itShould="refresh with progressViewOffset = 100"
         skip={{
+          harmony: {
+            cAPI: true,
+            arkTS:
+              'there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624',
+          },
           android: false,
-          harmony:
-            'there is a restriction on how tall the progress view can be - should be removed in API 11',
-        }} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
-      >
+        }}>
         <PullToRefreshProgressViewOffset progressViewOffset={100} />
       </TestCase.Example>
       <TestCase.Example
@@ -111,6 +117,16 @@ export const RefreshControlTest = () => {
         itShould="Refresh control in nested scroll view - two sources of truth - one for each RefreshControl (two states) - with the content between"
         modal>
         <PullToRefreshInNestedScrollViewsDifferentSourceContentBetween />
+      </TestCase.Example>
+      <TestCase.Example
+        itShould="display ScrollView with green border, pink background and yellow items when RefreshControl component is set"
+        modal>
+        <RefreshControlInsideScrollViewWithStylesExample />
+      </TestCase.Example>
+      <TestCase.Example
+        itShould="display FlatList with with green border, pink background and yellow items when RefreshControl component is set"
+        modal>
+        <RefreshControlInsideFlatListWithStylesExample />
       </TestCase.Example>
     </TestSuite>
   );
@@ -409,6 +425,83 @@ const PullToRefreshInNestedScrollViewsDifferentSourceContentBetween = () => {
     </View>
   );
 };
+
+function RefreshControlInsideScrollViewWithStylesExample() {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    wait(3000).then(() => {
+      setRefreshing(false);
+    });
+  }, []);
+
+  return (
+    <View style={{padding: 20, height: 500, backgroundColor: 'lightblue'}}>
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: 'pink',
+          borderColor: 'green',
+          borderWidth: 5,
+          borderRadius: 50,
+          marginTop: 50,
+          paddingTop: 100,
+        }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }>
+        {Array(50)
+          .fill('Item')
+          .map((item, index) => (
+            <Text
+              style={{backgroundColor: 'yellow', padding: 10, marginBottom: 10}}
+              key={index}>
+              {item} {index}
+            </Text>
+          ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+function RefreshControlInsideFlatListWithStylesExample() {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    wait(3000).then(() => {
+      setRefreshing(false);
+    });
+  }, []);
+
+  return (
+    <View style={{height: 500, padding: 20, backgroundColor: 'lightblue'}}>
+      <FlatList
+        style={{
+          flex: 1,
+          backgroundColor: 'pink',
+          borderColor: 'green',
+          borderWidth: 5,
+          borderRadius: 50,
+          marginTop: 50,
+          paddingTop: 100,
+        }}
+        data={Array(50).fill('Item')}
+        keyExtractor={(item, index) => `${item}-${index}`}
+        renderItem={({item, index}) => (
+          <Text
+            style={{backgroundColor: 'yellow', padding: 10, marginBottom: 10}}>
+            {item} {index}
+          </Text>
+        )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      />
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
