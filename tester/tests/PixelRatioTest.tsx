@@ -1,10 +1,11 @@
 import {PixelRatio, Text} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export const PixelRatioTest = () => {
   return (
     <TestSuite name="PixelRatio">
-      <TestCase
+      <TestCase.Logical
         itShould="return plausible pixel ratio (greater than or equal  1, less than 4)"
         fn={({expect}) => {
           expect(PixelRatio.get())
@@ -12,7 +13,7 @@ export const PixelRatioTest = () => {
             .and.to.be.lessThan(4);
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="return plausible fontScale (greater than 0, less than 4)"
         fn={({expect}) => {
           expect(PixelRatio.getFontScale())
@@ -20,7 +21,7 @@ export const PixelRatioTest = () => {
             .and.to.be.lessThan(4);
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="convert layout size to pixel size correctly"
         fn={({expect}) => {
           expect(PixelRatio.getPixelSizeForLayoutSize(10)).to.be.equal(
@@ -28,7 +29,7 @@ export const PixelRatioTest = () => {
           );
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="round to nearest pixel correctly"
         fn={({expect}) => {
           const ratio = PixelRatio.get();
@@ -36,7 +37,7 @@ export const PixelRatioTest = () => {
           expect(PixelRatio.roundToNearestPixel(8.4)).to.be.equal(nearestPixel);
         }}
       />
-      <TestCase itShould="display PixelRatio results">
+      <TestCase.Example itShould="display PixelRatio results">
         <Text>
           {JSON.stringify(
             {
@@ -50,7 +51,7 @@ export const PixelRatioTest = () => {
             2,
           )}
         </Text>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

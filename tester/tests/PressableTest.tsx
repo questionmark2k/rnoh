@@ -1,13 +1,12 @@
 import React, {useState} from 'react';
-
 import {Pressable, StyleSheet, View} from 'react-native';
-
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export function PressableTest() {
   return (
     <TestSuite name="Pressable">
-      <TestCase
+      <TestCase.Manual
         itShould="handle short presses"
         initialState={{
           onPressIn: false,
@@ -29,7 +28,7 @@ export function PressableTest() {
           });
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="handle long press"
         initialState={{
           onLongPress: false,
@@ -47,7 +46,7 @@ export function PressableTest() {
           });
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="handle pressing out"
         initialState={{
           onPressOut: false,
@@ -65,7 +64,7 @@ export function PressableTest() {
           });
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="inner view should not react to presses"
         initialState={{
           tested: false,
@@ -91,14 +90,13 @@ export function PressableTest() {
           });
         }}
       />
-      <TestCase
+      <TestCase.Example
         itShould="change color to blue on hover"
-        skip
-        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/417
+        skip={{android: false, harmony: true}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/417
       >
         <HoverView />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         itShould="pass when blue background is pressed"
         initialState={false}
         arrange={({setState}) => (

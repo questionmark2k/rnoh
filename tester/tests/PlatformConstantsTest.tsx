@@ -1,28 +1,29 @@
 import {Platform} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export function PlatformConstantsTest() {
   return (
     <TestSuite name="PlatformConstants">
-      <TestCase
+      <TestCase.Logical
         itShould="use 'harmony' as platform name"
         fn={({expect}) => {
           expect(Platform.OS).to.be.eq('harmony');
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="specify platform version"
         fn={({expect}) => {
           expect(Platform.Version.toString().split('.').length - 1).to.be.eq(3);
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="not be running in tv mode"
         fn={({expect}) => {
           expect(Platform.isTV).to.be.false;
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="select Platform properly"
         fn={({expect}) => {
           expect(
@@ -35,7 +36,7 @@ export function PlatformConstantsTest() {
           ).to.be.eq('h');
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="provide some RN version"
         fn={({expect}) => {
           expect(Platform.constants.reactNativeVersion).to.be.not.undefined;
@@ -47,13 +48,13 @@ export function PlatformConstantsTest() {
             .undefined;
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="provide some value for isTesting"
         fn={({expect}) => {
           expect(typeof Platform.constants.isTesting).to.be.eq('boolean');
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="specify product model"
         fn={({expect}) => {
           if (Platform.OS === 'harmony') {

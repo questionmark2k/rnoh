@@ -5,9 +5,9 @@ import {
   UIManager,
   StyleSheet,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useState} from 'react';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 
 if (
   Platform.OS === 'android' &&
@@ -19,9 +19,9 @@ if (
 export function LayoutAnimationsTest() {
   return (
     <TestSuite name="LayoutAnimations">
-      <TestCase itShould="fade in orange rect, move it to right, then left, and fade it out">
+      <TestCase.Example itShould="fade in orange rect, move it to right, then left, and fade it out">
         <LayoutAnimationExample />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

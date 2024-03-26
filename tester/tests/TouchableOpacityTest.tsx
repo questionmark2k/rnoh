@@ -1,42 +1,43 @@
 import {Text, TouchableOpacity, View, ViewProps} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useState} from 'react';
+import {TestCase} from '../components';
 
 export const TouchableOpacityTest = () => {
   const [pressCountOpacity, setPressCountOpacity] = useState(0);
   const [onLayoutTestText, setOnLayoutTestText] = useState('');
   return (
     <TestSuite name="TouchableOpacity">
-      <TestCase itShould="make the text less visible on press">
+      <TestCase.Example itShould="make the text less visible on press">
         <TouchableOpacity onPress={() => {}}>
           <PressMe />
         </TouchableOpacity>
-      </TestCase>
-      <TestCase itShould="make the text slightly less visible on press (activeOpacity)">
+      </TestCase.Example>
+      <TestCase.Example itShould="make the text slightly less visible on press (activeOpacity)">
         <TouchableOpacity activeOpacity={0.5} onPress={() => {}}>
           <PressMe />
         </TouchableOpacity>
-      </TestCase>
-      <TestCase itShould="show number of presses on press">
+      </TestCase.Example>
+      <TestCase.Example itShould="show number of presses on press">
         <TouchableOpacity
           onPress={() => setPressCountOpacity(pressCountOpacity + 1)}>
           <PressMe endLabel={pressCountOpacity} />
         </TouchableOpacity>
-      </TestCase>
-      <TestCase itShould="render disabled">
+      </TestCase.Example>
+      <TestCase.Example itShould="render disabled">
         <TouchableOpacity disabled>
           <PressMe endLabel={'disabled'} />
         </TouchableOpacity>
-      </TestCase>
-      <TestCase itShould="show layout data onLayout">
+      </TestCase.Example>
+      <TestCase.Example itShould="show layout data onLayout">
         <TouchableOpacity
           onLayout={event => {
             setOnLayoutTestText(JSON.stringify(event.nativeEvent.layout));
           }}>
           <PressMe endLabel={onLayoutTestText} />
         </TouchableOpacity>
-      </TestCase>
-      <TestCase itShould="show square (red background, white border, rounded corners)">
+      </TestCase.Example>
+      <TestCase.Example itShould="show square (red background, white border, rounded corners)">
         <TouchableOpacity
           style={{
             backgroundColor: 'rgb(255, 0, 0)',
@@ -51,7 +52,7 @@ export const TouchableOpacityTest = () => {
           }}>
           <PressMe />
         </TouchableOpacity>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

@@ -1,7 +1,7 @@
 import {BackHandler, Text, TouchableOpacity, View} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useCallback, useState} from 'react';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 
 export const BackHandlerTest = () => {
   const [counter, setCounter] = useState(0);
@@ -12,13 +12,13 @@ export const BackHandlerTest = () => {
   }, []);
   return (
     <TestSuite name="BackHandler">
-      <TestCase
+      <TestCase.Logical
         itShould="be exported"
         fn={({expect}) => {
           expect(BackHandler).to.be.not.undefined;
         }}
       />
-      <TestCase itShould="exit app on press">
+      <TestCase.Example itShould="exit app on press">
         <TouchableOpacity
           style={{height: 64}}
           onPress={() => {
@@ -26,8 +26,8 @@ export const BackHandlerTest = () => {
           }}>
           <Text style={{width: '100%', height: '100%'}}>Exit</Text>
         </TouchableOpacity>
-      </TestCase>
-      <TestCase itShould="allow to add, remove eventListener and display number of system back presses/gestures accordingly">
+      </TestCase.Example>
+      <TestCase.Example itShould="allow to add, remove eventListener and display number of system back presses/gestures accordingly">
         <Text style={{width: '100%'}}>
           Back pressed {counter} time{counter === 1 ? '' : 's'}
         </Text>
@@ -51,7 +51,7 @@ export const BackHandlerTest = () => {
             }}
           />
         </View>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

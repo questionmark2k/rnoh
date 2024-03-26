@@ -1,7 +1,7 @@
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React from 'react';
 import {AppParamsContext} from '../contexts';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 import {AppRegistry, Text} from 'react-native';
 import {name as appName} from '../app.json';
 
@@ -12,13 +12,13 @@ export function AppRegistryTest() {
 
   return (
     <TestSuite name="AppRegistry">
-      <TestCase
+      <TestCase.Logical
         itShould="receive initialParams from the native side"
         fn={({expect}) => {
           expect(initialProps).not.to.be.undefined;
         }}
       />
-      <TestCase itShould="set surface props">
+      <TestCase.Example itShould="set surface props">
         <Button
           label="set surface props"
           onPress={() => {
@@ -29,11 +29,11 @@ export function AppRegistryTest() {
             AppRegistry.setSurfaceProps(appName, newProps);
           }}
         />
-      </TestCase>
-      <TestCase itShould="display registry">
+      </TestCase.Example>
+      <TestCase.Example itShould="display registry">
         <Text>{JSON.stringify(registry, null, 2)}</Text>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         itShould="register section when button is pressed"
         initialState={false}
         arrange={({setState}) => (
@@ -51,7 +51,7 @@ export function AppRegistryTest() {
           expect(sectionKeys).to.include('foo');
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="register runnable when button is pressed"
         initialState={false}
         arrange={({setState}) => (
@@ -69,7 +69,7 @@ export function AppRegistryTest() {
           expect(runnable).to.not.be.undefined;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="execute runnable when button is pressed"
         initialState={undefined}
         arrange={({setState}) => (
@@ -89,7 +89,7 @@ export function AppRegistryTest() {
           expect(state).to.deep.eq({foo: 'bar'});
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="return app keys"
         fn={({expect}) => {
           expect(AppRegistry.getAppKeys()).to.include(appName);

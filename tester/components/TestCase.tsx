@@ -11,13 +11,18 @@ export const TestCase = {
 
 type TesterTag = 'dev' | 'C_API';
 
+type TesterHarmonySkipProp =
+  | boolean
+  | string
+  | {
+      arkTS: string | boolean;
+      cAPI: string | boolean;
+    };
+
 type TesterSkipProp =
   | {
       android: string | boolean;
-      harmony: {
-        arkTS: string | boolean;
-        cAPI: string | boolean;
-      };
+      harmony: TesterHarmonySkipProp;
     }
   | string;
 
@@ -37,13 +42,22 @@ function prepareSkipProp(
       ? skipProp
       : Platform.select({
           android: skipProp?.android,
-          harmony:
-            'rnohArchitecture' in Platform.constants &&
-            Platform.constants.rnohArchitecture === 'C_API'
-              ? skipProp?.harmony.cAPI
-              : skipProp?.harmony.arkTS,
+          harmony: prepareHarmonySkipProp(skipProp?.harmony),
         })
     : undefined;
+}
+
+function prepareHarmonySkipProp(
+  skipProp: TesterHarmonySkipProp,
+): string | boolean {
+  if (typeof skipProp === 'string' || typeof skipProp === 'boolean') {
+    return skipProp;
+  } else {
+    return 'rnohArchitecture' in Platform.constants &&
+      Platform.constants.rnohArchitecture === 'C_API'
+      ? skipProp?.cAPI
+      : skipProp?.arkTS;
+  }
 }
 
 export function Example({
@@ -111,10 +125,12 @@ export function Logical({
   tags?: TesterTag[];
   fn: React.ComponentProps<typeof LogicalTestCase>['fn'];
 }) {
-  <_TestCase
-    itShould={itShould}
-    skip={prepareSkipProp(skip, tags)}
-    tags={tags}
-    fn={fn}
-  />;
+  return (
+    <_TestCase
+      itShould={itShould}
+      skip={prepareSkipProp(skip, tags)}
+      tags={tags}
+      fn={fn}
+    />
+  );
 }

@@ -1,4 +1,4 @@
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React from 'react';
 import {useState} from 'react';
 import {
@@ -6,7 +6,7 @@ import {
   registerViewConfig,
   ReactNativeViewAttributes,
 } from 'react-native';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 
 const PropsDisplayer: typeof View = registerViewConfig('PropsDisplayer', () => {
   return {
@@ -22,7 +22,7 @@ const PropsDisplayer: typeof View = registerViewConfig('PropsDisplayer', () => {
 export function RenderingTest() {
   return (
     <TestSuite name="Rendering">
-      <TestCase itShould="change the rectangle's color every second">
+      <TestCase.Example itShould="change the rectangle's color every second">
         <Timeout
           ms={1000}
           renderItem={refreshKey => (
@@ -31,8 +31,8 @@ export function RenderingTest() {
             />
           )}
         />
-      </TestCase>
-      <TestCase itShould="show and hide rectangle every second">
+      </TestCase.Example>
+      <TestCase.Example itShould="show and hide rectangle every second">
         <Timeout
           ms={1000}
           renderItem={refreshKey => (
@@ -43,8 +43,8 @@ export function RenderingTest() {
             </View>
           )}
         />
-      </TestCase>
-      <TestCase itShould="display all props after pressing the button, not only the recently updated one">
+      </TestCase.Example>
+      <TestCase.Example itShould="display all props after pressing the button, not only the recently updated one">
         <Timeout
           ms={0}
           renderItem={refreshColor => {
@@ -74,7 +74,7 @@ export function RenderingTest() {
             );
           }}
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

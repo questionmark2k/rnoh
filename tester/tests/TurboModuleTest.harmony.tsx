@@ -1,4 +1,4 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {
   SampleTurboModule,
   GeneratedSampleTurboModule,
@@ -8,18 +8,19 @@ import {
   SomeEnum2,
   SomeEnum3,
 } from 'react-native-sample-package/src/NativeGeneratedSampleTurboModule';
+import {TestCase} from '../components';
 
 export function TurboModuleTest() {
   return (
     <TestSuite name="TurboModule">
       <TestSuite name="manual implementation">
-        <TestCase
+        <TestCase.Logical
           itShould="return null when calling getNull()"
           fn={({expect}) => {
             expect(SampleTurboModule.getNull(null)).to.be.null;
           }}
         />
-        <TestCase
+        <TestCase.Logical
           itShould="return [1, 2, 3] when calling getArray"
           fn={({expect}) => {
             expect(SampleTurboModule.getArray([1, 2, 3])).to.eql([1, 2, 3]);
@@ -31,7 +32,7 @@ export function TurboModuleTest() {
         <CommonTurboModuleTestCases
           sampleTurboModule={GeneratedSampleTurboModule}
         />
-        <TestCase
+        <TestCase.Logical
           itShould="get union value"
           fn={async ({expect}) => {
             expect(GeneratedSampleTurboModule.getUnionValue('foo')).to.be.eq(
@@ -39,7 +40,7 @@ export function TurboModuleTest() {
             );
           }}
         />
-        <TestCase
+        <TestCase.Logical
           itShould="support enums"
           fn={async ({expect}) => {
             const result = GeneratedSampleTurboModule.getEnum(
@@ -52,7 +53,7 @@ export function TurboModuleTest() {
             expect(result.enum3).to.be.eq(SomeEnum3.FOO);
           }}
         />
-        <TestCase
+        <TestCase.Logical
           itShould="handle enums without specified values correctly"
           skip="RN codegen doesn't parse enums without explicit values correctly"
           fn={async ({expect}) => {
@@ -76,20 +77,20 @@ function CommonTurboModuleTestCases({
 }) {
   return (
     <>
-      <TestCase
+      <TestCase.Logical
         itShould="return null when calling voidFunc()"
         fn={({expect}) => {
           expect(sampleTurboModule.voidFunc()).to.be.null;
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="return true when calling getBool(true)"
         fn={({expect}) => {
           expect(sampleTurboModule.getBool(true)).to.be.true;
         }}
       />
 
-      <TestCase
+      <TestCase.Logical
         itShould="return { x: { y: 1 } } when calling getObject"
         fn={({expect}) => {
           expect(sampleTurboModule.getObject({x: {y: 1}})).to.eql({
@@ -97,7 +98,7 @@ function CommonTurboModuleTestCases({
           });
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="call the callback and providing string argument"
         fn={async ({expect}) => {
           const promise = new Promise<string>(resolve => {
@@ -106,14 +107,14 @@ function CommonTurboModuleTestCases({
           expect(typeof (await promise)).to.be.eq('string');
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="handle async jobs"
         fn={async ({expect}) => {
           const result = await sampleTurboModule?.doAsyncJob(true);
           expect(typeof result).to.be.eq('string');
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="handle errors in async jobs"
         fn={async ({expect}) => {
           let errMsg: string | undefined;
@@ -126,7 +127,7 @@ function CommonTurboModuleTestCases({
           expect(errMsg).to.be.eq('rejected on native side');
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="get an array asynchronously"
         fn={async ({expect}) => {
           expect(await sampleTurboModule.getPromisedArray()).to.be.eql([

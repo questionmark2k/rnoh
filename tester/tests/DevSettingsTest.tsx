@@ -1,12 +1,13 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React from 'react';
 import {StyleSheet, View, DevSettings} from 'react-native';
 import {Button} from '../components';
+import {TestCase} from '../components';
 
 export const DevSettingsTest = () => {
   return (
     <TestSuite name="DevSettings">
-      <TestCase
+      <TestCase.Manual
         itShould="add custom DevMenu item and react to presses after opening DevMenu"
         initialState={false}
         arrange={({setState}) => <AddMenuItemTest setState={setState} />}
@@ -14,14 +15,14 @@ export const DevSettingsTest = () => {
           expect(state).to.be.true;
         }}
       />
-      <TestCase itShould="reload the app after pressing the button">
+      <TestCase.Example itShould="reload the app after pressing the button">
         <View style={styles.container}>
           <Button
             label="Reload application"
             onPress={() => DevSettings.reload('Test reload')}
           />
         </View>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

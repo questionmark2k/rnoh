@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
-
 import {StyleSheet, StatusBar, Text, View, StatusBarStyle} from 'react-native';
-
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export function StatusBarTest() {
   return (
@@ -53,7 +52,7 @@ function StatusBarView() {
         hidden={hidden}
         translucent={translucent}
       />
-      <TestCase itShould="toggle status bar visibility">
+      <TestCase.Example itShould="toggle status bar visibility">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -61,8 +60,8 @@ function StatusBarView() {
           }}>
           <Text style={styles.buttonText}>{hidden ? 'hidden' : 'visible'}</Text>
         </View>
-      </TestCase>
-      <TestCase itShould="toggle status bar background color(red/green), with alpha 88">
+      </TestCase.Example>
+      <TestCase.Example itShould="toggle status bar background color(red/green), with alpha 88">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -70,8 +69,8 @@ function StatusBarView() {
           }}>
           <Text style={styles.buttonText}>{backgroundColor}</Text>
         </View>
-      </TestCase>
-      <TestCase itShould="toggle status bar style (light-content(default)/dark-content) ">
+      </TestCase.Example>
+      <TestCase.Example itShould="toggle status bar style (light-content(default)/dark-content) ">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -79,8 +78,8 @@ function StatusBarView() {
           }}>
           <Text style={styles.buttonText}>{statusBarStyle}</Text>
         </View>
-      </TestCase>
-      <TestCase itShould="toggle status bar translucent">
+      </TestCase.Example>
+      <TestCase.Example itShould="toggle status bar translucent">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -90,8 +89,8 @@ function StatusBarView() {
             {translucent ? 'translucent' : 'non-translucent'}
           </Text>
         </View>
-      </TestCase>
-      <TestCase itShould="set status bar color to blue (StatusBar.setBackgroundColor)">
+      </TestCase.Example>
+      <TestCase.Example itShould="set status bar color to blue (StatusBar.setBackgroundColor)">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -99,8 +98,8 @@ function StatusBarView() {
           }}>
           <Text style={styles.buttonText}>Set blue</Text>
         </View>
-      </TestCase>
-      <TestCase itShould="set status bar dark style (light-content(default)/dark-content) (StatusBar.setBarStyle) ">
+      </TestCase.Example>
+      <TestCase.Example itShould="set status bar dark style (light-content(default)/dark-content) (StatusBar.setBarStyle) ">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -108,8 +107,8 @@ function StatusBarView() {
           }}>
           <Text style={styles.buttonText}>Set dark-content</Text>
         </View>
-      </TestCase>
-      <TestCase itShould="set status bar translucent (StatusBar.setTranslucent)">
+      </TestCase.Example>
+      <TestCase.Example itShould="set status bar translucent (StatusBar.setTranslucent)">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -117,8 +116,8 @@ function StatusBarView() {
           }}>
           <Text style={styles.buttonText}>Set translucent</Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Logical
         itShould="return correct status bar height for device"
         fn={({expect}) => {
           expect(StatusBar.currentHeight).to.be.closeTo(38.8, 0.1);

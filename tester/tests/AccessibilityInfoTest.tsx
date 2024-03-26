@@ -1,15 +1,16 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useEffect, useState} from 'react';
 import {AccessibilityInfo, Text, View} from 'react-native';
+import {TestCase} from '../components';
 
 export function AccessibilityInfoTest() {
   return (
     <TestSuite name="AccessibilityInfo">
-      <TestCase
-        skip
+      <TestCase.Example
+        skip={{android: true, harmony: {arkTS: true, cAPI: true}}}
         itShould="display red background if Screen Reader is enabled">
         <AccessibilityInfoScreenReaderStatus />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

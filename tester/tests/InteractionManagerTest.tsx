@@ -1,10 +1,11 @@
 import {InteractionManager} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export function InteractionManagerTest() {
   return (
     <TestSuite name="InteractionManager">
-      <TestCase
+      <TestCase.Logical
         itShould="execute callback to be executed without crashing"
         fn={async () => {
           return new Promise(resolve => {

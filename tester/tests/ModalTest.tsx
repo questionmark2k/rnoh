@@ -1,4 +1,4 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React, {useState} from 'react';
 import {
   Modal,
@@ -9,16 +9,16 @@ import {
   TextInput,
   FlatList,
 } from 'react-native';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 
 export function ModalTest() {
   return (
     <TestSuite name="Modal">
-      <TestCase itShould="show modal">
+      <TestCase.Example itShould="show modal">
         tags={['C_API']}
         <ModalExample />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         tags={['C_API']}
         itShould="trigger onShow event after modal is shown"
         initialState={false}
@@ -33,7 +33,7 @@ export function ModalTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="show modal with slide animation"
         initialState={false}
@@ -49,7 +49,7 @@ export function ModalTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="show modal with fade animation"
         initialState={false}
@@ -65,18 +65,18 @@ export function ModalTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase itShould="soft keyboard should cover modal">
+      <TestCase.Example itShould="soft keyboard should cover modal">
         tags={['C_API']}
         <ModalExample withTextInput />
-      </TestCase>
-      <TestCase itShould="allow to display one modal on top of another">
+      </TestCase.Example>
+      <TestCase.Example itShould="allow to display one modal on top of another">
         tags={['C_API']}
         <NestedModalinModal />
-      </TestCase>
-      <TestCase itShould="display modal from flatlist item">
+      </TestCase.Example>
+      <TestCase.Example itShould="display modal from flatlist item">
         tags={['C_API']}
         <NestedModalInFlatlist />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

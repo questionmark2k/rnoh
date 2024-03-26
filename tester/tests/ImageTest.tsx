@@ -1,14 +1,7 @@
-import {
-  Image,
-  ImageSourcePropType,
-  Platform,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {Image, ImageSourcePropType, ScrollView, Text, View} from 'react-native';
+import {TestSuite} from '@rnoh/testerino';
 import React from 'react';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 import {getScrollViewContentHorizontal} from './ScrollViewTest/fixtures';
 
 const WRONG_IMAGE_SRC = 'not_image';
@@ -26,12 +19,14 @@ const FILE_URI = 'file:///data/storage/el2/base/files/pravatar-131.jpg';
 export const ImageTest = () => {
   return (
     <TestSuite name="Image">
-      <TestCase tags={['C_API']} itShould="support loading local images">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="support loading local images">
         <Image
           style={{borderRadius: 8, borderWidth: 1}}
           source={LOCAL_IMAGE_ASSET_ID}
         />
-      </TestCase>
+      </TestCase.Example>
       <ImageExampleCase
         itShould="support loading remote images"
         source={{uri: REMOTE_IMAGE_URL}}
@@ -52,7 +47,7 @@ export const ImageTest = () => {
         itShould="support loading remote animated gifs"
         source={{uri: REMOTE_GIF_URL}}
       />
-      <TestCase
+      <TestCase.Example
         tags={['C_API']}
         itShould="display alt when the image doesn't load">
         <View style={{minHeight: 50}}>
@@ -61,8 +56,8 @@ export const ImageTest = () => {
             alt="This image could not be loaded!"
           />
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Logical
         itShould="retrieve remote image size"
         fn={({expect}) => {
           return new Promise((resolve, reject) => {
@@ -81,7 +76,7 @@ export const ImageTest = () => {
         }}
       />
       <FileExampleCase />
-      <TestCase
+      <TestCase.Logical
         itShould="retrieve local image size"
         fn={({expect}) => {
           const resolvedAsset = Image.resolveAssetSource(LOCAL_IMAGE_ASSET_ID);
@@ -89,7 +84,7 @@ export const ImageTest = () => {
           expect(resolvedAsset.height).to.be.eq(150);
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="prefetch image"
         fn={async ({expect}) => {
           let ex: any;
@@ -103,7 +98,7 @@ export const ImageTest = () => {
           expect(await Image.prefetch(REMOTE_IMAGE_URL)).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="query cache"
         fn={async ({expect}) => {
           await Image.prefetch(REMOTE_IMAGE_URL);
@@ -119,16 +114,16 @@ export const ImageTest = () => {
           expect(result?.[WRONG_IMAGE_SRC]).to.be.undefined;
         }}
       />
-      <TestCase
+      <TestCase.Example
         tags={['C_API']}
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/246
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/246
         itShould="render circular image on a red rectangle (overlayColor)">
         <Image
           source={LOCAL_IMAGE_ASSET_ID}
           style={{overlayColor: 'red', borderRadius: Number.MAX_SAFE_INTEGER}}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         tags={['C_API']}
         itShould="call onLoadStart"
         initialState={'not called'}
@@ -144,7 +139,7 @@ export const ImageTest = () => {
           expect(state).to.be.eq('called');
         }}
       />
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="call onLoad"
         initialState={{}}
@@ -165,7 +160,7 @@ export const ImageTest = () => {
           expect(state).to.contain.all.keys('width', 'height', 'uri');
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="call onLoadEnd"
         initialState={'not called'}
         arrange={({setState, state}) => {
@@ -185,7 +180,7 @@ export const ImageTest = () => {
           expect(state).to.be.eq('called');
         }}
       />
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="call onError (local)"
         initialState={null}
@@ -206,7 +201,7 @@ export const ImageTest = () => {
           expect(state).to.be.not.null;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="call onError (remote)"
         initialState={null}
@@ -230,7 +225,7 @@ export const ImageTest = () => {
       <TestSuite
         name="resizeMode" // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/245
       >
-        <TestCase
+        <TestCase.Example
           tags={['C_API']}
           itShould="render small image in the center (center)">
           <Image
@@ -238,8 +233,8 @@ export const ImageTest = () => {
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="center"
           />
-        </TestCase>
-        <TestCase
+        </TestCase.Example>
+        <TestCase.Example
           tags={['C_API']}
           itShould="render image touching top and bottom edges in the center (contain)">
           <Image
@@ -247,8 +242,8 @@ export const ImageTest = () => {
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="contain"
           />
-        </TestCase>
-        <TestCase
+        </TestCase.Example>
+        <TestCase.Example
           tags={['C_API']}
           itShould="fully cover test case area while preserving aspect ratio (cover)">
           <Image
@@ -256,8 +251,8 @@ export const ImageTest = () => {
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="cover"
           />
-        </TestCase>
-        <TestCase
+        </TestCase.Example>
+        <TestCase.Example
           tags={['C_API']}
           itShould="cover test case area by repeating image (repeat)">
           <Image
@@ -265,8 +260,8 @@ export const ImageTest = () => {
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="repeat"
           />
-        </TestCase>
-        <TestCase
+        </TestCase.Example>
+        <TestCase.Example
           tags={['C_API']}
           itShould="cover test case area by stretching (stretch)">
           <Image
@@ -274,10 +269,10 @@ export const ImageTest = () => {
             source={LOCAL_IMAGE_ASSET_ID}
             resizeMode="stretch"
           />
-        </TestCase>
+        </TestCase.Example>
       </TestSuite>
       <TestSuite name="blurRadius">
-        <TestCase
+        <TestCase.Example
           tags={['C_API']}
           itShould="blur images with various blur radius">
           <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
@@ -312,9 +307,9 @@ export const ImageTest = () => {
               blurRadius={25}
             />
           </View>
-        </TestCase>
+        </TestCase.Example>
       </TestSuite>
-      <TestCase
+      <TestCase.Example
         tags={['C_API']}
         itShould="replace opaque pixels with the green color (tintColor)">
         <View
@@ -339,11 +334,11 @@ export const ImageTest = () => {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase modal itShould="stop displaying on press">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="stop displaying on press">
         <SwitchSourceTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="render top image in a bit lower quality (difference barely visible)">
         <Image
@@ -359,10 +354,10 @@ export const ImageTest = () => {
           resizeMethod="scale"
           resizeMode="stretch"
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/483
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/483
         itShould="fade images with varying durations">
         <View style={{flexDirection: 'row', gap: 24}}>
           <View style={{width: 100}}>
@@ -419,8 +414,8 @@ export const ImageTest = () => {
             <Text>This image will fade in over the time of 5s.</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="load many large images without causing out-of-memory issues">
         <ScrollView>
@@ -432,13 +427,15 @@ export const ImageTest = () => {
             />
           ))}
         </ScrollView>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="allow scrolling by touching the image">
         <ImagePointerEventsTest />
-      </TestCase>
-      <TestCase itShould="Display placeholder image before loading image" modal>
+      </TestCase.Example>
+      <TestCase.Example
+        itShould="Display placeholder image before loading image"
+        modal>
         <Image
           style={{width: 200, height: 200}}
           source={{
@@ -448,7 +445,7 @@ export const ImageTest = () => {
           }}
           defaultSource={require('../assets/expo.png')}
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };
@@ -489,22 +486,22 @@ const ImageExampleCase = ({
   itShould: string;
   source: ImageSourcePropType;
 }) => (
-  <TestCase itShould={itShould}>
+  <TestCase.Example itShould={itShould}>
     <Image
       style={{borderRadius: 8, borderWidth: 1, height: 150}}
       source={source}
       onError={e => console.error(e.nativeEvent.error)}
       // resizeMode="contain"
     />
-  </TestCase>
+  </TestCase.Example>
 );
 
 const FileExampleCase = () => {
   const [error, setError] = React.useState<string | undefined>(undefined);
 
   return (
-    <TestCase
-      skip={Platform.OS !== 'harmony'}
+    <TestCase.Example
+      skip={{android: true, harmony: {arkTS: false, cAPI: false}}}
       itShould="load image from local file">
       {error !== undefined ? (
         <Text>{error}</Text>
@@ -522,7 +519,7 @@ const FileExampleCase = () => {
           // resizeMode="contain"
         />
       )}
-    </TestCase>
+    </TestCase.Example>
   );
 };
 

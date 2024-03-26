@@ -6,8 +6,9 @@ import {
   Text,
   View,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useEffect, useState} from 'react';
+import {TestCase} from '../components';
 
 export const RefreshControlTest = () => {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -18,7 +19,7 @@ export const RefreshControlTest = () => {
 
   return (
     <TestSuite name="RefreshControl">
-      <TestCase
+      <TestCase.Example
         tags={['C_API']}
         itShould="display refresh control every second">
         <ScrollView
@@ -30,8 +31,8 @@ export const RefreshControlTest = () => {
             />
           }
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="display refresh control with tintColor">
         <ScrollView
@@ -44,61 +45,73 @@ export const RefreshControlTest = () => {
             />
           }
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         tags={['C_API']}
         itShould="be refreshing for one second after pull to refresh">
         <PullToRefreshExample />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         tags={['C_API']}
         itShould="immediately stop refreshing after pulling to refresh">
         <PullToRefreshExample doNothingOnRefresh />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         tags={['C_API']}
         itShould="refresh with progressViewOffset = undefined"
-        skip // there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
+        skip={{
+          android: false,
+          harmony:
+            'there is a restriction on how tall the progress view can be - should be removed in API 11',
+        }} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
       >
         <PullToRefreshProgressViewOffset />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         tags={['C_API']}
         itShould="refresh with progressViewOffset = 50"
-        skip // there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
+        skip={{
+          android: false,
+          harmony:
+            'there is a restriction on how tall the progress view can be - should be removed in API 11',
+        }} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
       >
         <PullToRefreshProgressViewOffset progressViewOffset={50} />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         tags={['C_API']}
         itShould="refresh with progressViewOffset = 100"
-        skip // there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
+        skip={{
+          android: false,
+          harmony:
+            'there is a restriction on how tall the progress view can be - should be removed in API 11',
+        }} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624
       >
         <PullToRefreshProgressViewOffset progressViewOffset={100} />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="Refresh control in nested scroll view - one source of truth for both RefreshControl (one state)"
         modal>
         <PullToRefreshInNestedScrollViews />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="Refresh control in nested scroll view - two sources of truth - one for each RefreshControl (two states)"
         modal>
         <PullToRefreshInNestedScrollViewsDifferentSource />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="Refresh control in nested scroll view - two sources of truth - one for each RefreshControl (two states) - with the content between"
         modal>
         <PullToRefreshInNestedScrollViewsDifferentSourceContentBetween />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

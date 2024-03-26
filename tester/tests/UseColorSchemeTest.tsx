@@ -1,5 +1,6 @@
 import {Appearance, useColorScheme} from 'react-native';
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export function UseColorSchemeTest() {
   const colorScheme = useColorScheme();
@@ -7,13 +8,13 @@ export function UseColorSchemeTest() {
 
   return (
     <TestSuite name="useColorScheme">
-      <TestCase
+      <TestCase.Logical
         itShould="return sensible value"
         fn={({expect}) => {
           expect(colorScheme).to.oneOf(['light', 'dark', null]);
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="return equal value to Appearance.getColorScheme"
         fn={({expect}) => {
           expect(colorScheme).to.be.equal(colorSchemeFromAppearance);

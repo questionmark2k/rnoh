@@ -1,10 +1,11 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React from 'react';
+import {TestCase} from '../components';
 
 export const BlobTest = () => {
   return (
     <TestSuite name="Blob">
-      <TestCase
+      <TestCase.Logical
         itShould="return blob size and type correctly"
         fn={async ({expect}) => {
           const blob = new Blob(['aaabbbccc'], {

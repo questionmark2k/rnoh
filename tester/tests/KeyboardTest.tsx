@@ -1,4 +1,4 @@
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {
   Keyboard,
   StyleSheet,
@@ -7,20 +7,20 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 import {useEffect} from 'react';
 import {EmitterSubscription} from 'react-native/Libraries/vendor/emitter/EventEmitter';
 
 export function KeyboardTest() {
   return (
     <TestSuite name="Keyboard">
-      <TestCase
+      <TestCase.Logical
         itShould="not crash when using keyboard module"
         fn={({expect}) => {
           expect(Keyboard.isVisible()).to.be.false;
         }}
       />
-      <TestCase
+      <TestCase.Example
         modal
         itShould="dismiss keyboard on button press"
         skip={Platform.select({
@@ -30,10 +30,10 @@ export function KeyboardTest() {
         })}>
         <Button label="Dismiss keyboard" onPress={() => Keyboard.dismiss()} />
         <TextInput style={styles.textInput} />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         modal
-        skip
+        skip={{android: true, harmony: {arkTS: true, cAPI: true}}}
         initialState={{
           keyboardDidHide: false,
           keyboardDidShow: true,
@@ -56,7 +56,7 @@ export function KeyboardTest() {
         }}
         // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/380
       />
-      <TestCase
+      <TestCase.Manual
         modal
         initialState={{
           keyboardDidHide: false,
@@ -87,7 +87,7 @@ export function KeyboardTest() {
           expect(state.keyboardEvent.endCoordinates.screenX).to.be.equal(0);
         }}
       />
-      <TestCase
+      <TestCase.Manual
         modal
         initialState={{
           keyboardDidHide: false,

@@ -5,21 +5,22 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useRef} from 'react';
+import {TestCase} from '../components';
 
 export const PanResponderTest = () => {
   return (
     <TestSuite name="PanResponder">
-      <TestCase
+      <TestCase.Logical
         itShould="create PanResponder"
         fn={({expect}) => {
           expect(PanResponder.create({})).to.be.not.empty;
         }}
       />
-      <TestCase itShould="allow panning inside ScrollView">
+      <TestCase.Example itShould="allow panning inside ScrollView">
         <PanResponderInScrollView />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

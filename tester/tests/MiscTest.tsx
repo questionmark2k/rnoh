@@ -12,34 +12,34 @@ import {
   RootTagContext,
   View,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useContext} from 'react';
 import React from 'react';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 
 export const MiscPropsTest = () => {
   const rootTag: RootTag = useContext(RootTagContext);
 
   return (
     <TestSuite name="Misc">
-      <TestCase itShould="Display the __DEV__ value">
+      <TestCase.Example itShould="Display the __DEV__ value">
         <Text>{`__DEV__ is ${__DEV__}`}</Text>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Logical
         itShould="pass when __DEV__ is defined and have boolean type"
         fn={({expect}) => {
           expect(typeof __DEV__).to.be.eq('boolean');
         }}
       />
-      <TestCase
-        skip={Platform.OS === 'android'}
+      <TestCase.Logical
+        skip={{android: true, harmony: {arkTS: false, cAPI: false}}}
         itShould="represent a color as a number"
         fn={({expect}) => {
           expect(processColor('red')).to.be.eq(0xffff0000);
         }}
       />
       {Platform.OS === 'harmony' && (
-        <TestCase
+        <TestCase.Logical
           itShould="export harmony specific utils: registerViewConfig, ReactNativeViewAttributes and dispatchCommand"
           fn={({expect}) => {
             expect(registerViewConfig).to.be.not.undefined;
@@ -48,33 +48,33 @@ export const MiscPropsTest = () => {
           }}
         />
       )}
-      <TestCase
+      <TestCase.Logical
         itShould="export DeviceEventEmitter"
         fn={({expect}) => {
           expect(DeviceEventEmitter).to.be.not.undefined;
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="export findNodeHandle"
         fn={({expect}) => {
           expect(findNodeHandle).to.be.not.undefined;
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="export DrawerLayoutAndroid"
         fn={({expect}) => {
           expect(DrawerLayoutAndroid).to.be.not.undefined;
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="pass when RootTagContext is defined and have sensible value"
         fn={({expect}) => {
           expect(rootTag).to.be.greaterThan(0);
         }}
       />
-      <TestCase itShould="have red background color after hiding, updating and showing again">
+      <TestCase.Example itShould="have red background color after hiding, updating and showing again">
         <DisplayNoneUpdateTest />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

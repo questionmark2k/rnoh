@@ -1,13 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, View, Text, PanResponder} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
-import {Button, Effect} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, Effect, TestCase} from '../components';
 
 export function AnimatedValueTest() {
   return (
     <>
       <TestSuite name="Animated.Value">
-        <TestCase
+        <TestCase.Manual
           itShould="move square 200px to the right and stop animation on pressing setValue"
           initialState={0}
           arrange={({setState}) => (
@@ -17,15 +17,15 @@ export function AnimatedValueTest() {
             expect(state).to.be.eq(200);
           }}
         />
-        <TestCase itShould="add and remove listeners on click">
+        <TestCase.Example itShould="add and remove listeners on click">
           <ListenerView singular={true} />
-        </TestCase>
-        <TestCase itShould="move square 200px to the right on pressing setOffset">
+        </TestCase.Example>
+        <TestCase.Example itShould="move square 200px to the right on pressing setOffset">
           <SetOffsetView singular={true} />
-        </TestCase>
+        </TestCase.Example>
       </TestSuite>
       <TestSuite name="Animated.ValueXY">
-        <TestCase
+        <TestCase.Manual
           itShould="move square 100px to the right and stop animation on pressing setValue"
           initialState={0}
           arrange={({setState}) => <SetValueView setState={setState} />}
@@ -33,13 +33,13 @@ export function AnimatedValueTest() {
             expect(state).to.be.eq(100);
           }}
         />
-        <TestCase itShould="add and remove listeners on click">
+        <TestCase.Example itShould="add and remove listeners on click">
           <ListenerView singular={false} />
-        </TestCase>
-        <TestCase itShould="move square 100px to the right on pressing setOffset">
+        </TestCase.Example>
+        <TestCase.Example itShould="move square 100px to the right on pressing setOffset">
           <SetOffsetView singular={false} />
-        </TestCase>
-        <TestCase<Object>
+        </TestCase.Example>
+        <TestCase.Manual<Object>
           itShould="get layout of animated value"
           initialState={{}}
           arrange={({setState}) => {
@@ -58,18 +58,18 @@ export function AnimatedValueTest() {
             );
           }}
         />
-        <TestCase itShould="move square to the right after extract offset">
+        <TestCase.Example itShould="move square to the right after extract offset">
           <ExtractOffsetView />
-        </TestCase>
-        <TestCase itShould="move square to the left after flatten offset">
+        </TestCase.Example>
+        <TestCase.Example itShould="move square to the left after flatten offset">
           <FlattenOffsetView />
-        </TestCase>
-        <TestCase itShould="blue square should move the same as red square">
+        </TestCase.Example>
+        <TestCase.Example itShould="blue square should move the same as red square">
           <AnimatedGetLayout />
-        </TestCase>
-        <TestCase itShould="move the blue square on drag">
+        </TestCase.Example>
+        <TestCase.Example itShould="move the blue square on drag">
           <AnimatedDraggableView />
-        </TestCase>
+        </TestCase.Example>
       </TestSuite>
     </>
   );

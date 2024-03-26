@@ -1,10 +1,11 @@
 import {StyleSheet, Text, View} from 'react-native';
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export function TransformTest() {
   return (
     <TestSuite name="Transform">
-      <TestCase itShould="Show boxes with different scaling">
+      <TestCase.Example itShould="Show boxes with different scaling">
         <View style={styles.wrapper}>
           <View style={styles.box}>
             <Text style={styles.text}>Original Object</Text>
@@ -37,8 +38,8 @@ export function TransformTest() {
             <Text style={styles.text}>ScaleY by 2</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase itShould="Show boxes with different rotations">
+      </TestCase.Example>
+      <TestCase.Example itShould="Show boxes with different rotations">
         <View style={styles.wrapper}>
           <View style={styles.box}>
             <Text style={styles.text}>Original Object</Text>
@@ -73,8 +74,8 @@ export function TransformTest() {
             <Text style={styles.text}>Rotate Y&Z by 45 deg</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase itShould="Show boxes with different skews [fails]">
+      </TestCase.Example>
+      <TestCase.Example itShould="Show boxes with different skews [fails]">
         <View style={styles.wrapper}>
           <View style={styles.box}>
             <Text style={styles.text}>Original Object</Text>
@@ -108,8 +109,8 @@ export function TransformTest() {
             <Text style={styles.text}>Skew X&Y by 30 deg</Text>
           </View>
         </View>
-      </TestCase>
-      <TestCase itShould="Show boxes translated by 20 dp (half of box size)">
+      </TestCase.Example>
+      <TestCase.Example itShould="Show boxes translated by 20 dp (half of box size)">
         <View style={styles.wrapper}>
           <View style={styles.box}>
             <Text style={styles.text}>Original Object</Text>
@@ -134,7 +135,7 @@ export function TransformTest() {
             <Text style={styles.text}>TranslateY by 20 </Text>
           </View>
         </View>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

@@ -1,5 +1,5 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
-import {Button} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, TestCase} from '../components';
 import {SampleTurboModule} from 'react-native-harmony-sample-package';
 
 export function ErrorHandlingTest() {
@@ -39,23 +39,23 @@ export function ErrorHandlingTest() {
           extraData: {foo: 'bar'},
         }}
       />
-      <TestCase itShould="display exception thrown from turbomodule (CPP)">
+      <TestCase.Example itShould="display exception thrown from turbomodule (CPP)">
         <Button
           label="Throw Exception"
           onPress={() => {
             SampleTurboModule.throwExceptionCpp();
           }}
         />
-      </TestCase>
-      <TestCase itShould="display exception thrown from turbomodule (ArkTS)">
+      </TestCase.Example>
+      <TestCase.Example itShould="display exception thrown from turbomodule (ArkTS)">
         <Button
           label="Throw Exception"
           onPress={() => {
             SampleTurboModule.throwExceptionArk();
           }}
         />
-      </TestCase>
-      <TestCase itShould="not display error when exception is caught">
+      </TestCase.Example>
+      <TestCase.Example itShould="not display error when exception is caught">
         <Button
           label="Throw Exception"
           onPress={() => {
@@ -66,7 +66,7 @@ export function ErrorHandlingTest() {
             }
           }}
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }
@@ -84,13 +84,13 @@ function ErrorBoxTestCase({
   };
 }) {
   return (
-    <TestCase itShould={itShould}>
+    <TestCase.Example itShould={itShould}>
       <Button
         label="Show Error Box"
         onPress={() => {
           SampleTurboModule.displayRNOHError(errorData);
         }}
       />
-    </TestCase>
+    </TestCase.Example>
   );
 }

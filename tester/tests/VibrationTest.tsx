@@ -1,7 +1,7 @@
 import React from 'react';
 import {Vibration} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
-import {Button} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, TestCase} from '../components';
 
 export const VibrationTest = () => {
   const ONE_SECOND_IN_MS = 1000;
@@ -18,31 +18,31 @@ export const VibrationTest = () => {
 
   return (
     <TestSuite name="Button">
-      <TestCase itShould="vibrate once for 400ms">
+      <TestCase.Example itShould="vibrate once for 400ms">
         <Button
           onPress={() => {
             Vibration.vibrate();
           }}
           label="Vibrate once"
         />
-      </TestCase>
-      <TestCase itShould="vibrate for five seconds after button press">
+      </TestCase.Example>
+      <TestCase.Example itShould="vibrate for five seconds after button press">
         <Button
           onPress={() => {
             Vibration.vibrate(ONE_SECOND_IN_MS * 5);
           }}
           label="Vibrate for five seconds"
         />
-      </TestCase>
-      <TestCase itShould="vibrate with pattern in increasing multiples of one second with a one second pause">
+      </TestCase.Example>
+      <TestCase.Example itShould="vibrate with pattern in increasing multiples of one second with a one second pause">
         <Button
           onPress={() => {
             Vibration.vibrate(PATTERN);
           }}
           label="vibrate with pattern"
         />
-      </TestCase>
-      <TestCase itShould="vibrate until cancelled">
+      </TestCase.Example>
+      <TestCase.Example itShould="vibrate until cancelled">
         <Button
           onPress={() => {
             Vibration.vibrate([500, ONE_SECOND_IN_MS], true);
@@ -55,7 +55,7 @@ export const VibrationTest = () => {
           }}
           label="cancel vibration"
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

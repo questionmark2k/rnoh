@@ -8,40 +8,40 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React from 'react';
-import {Modal} from '../components';
+import {Modal, TestCase} from '../components';
 
 export const KeyboardAvoidingViewTest = () => {
   return (
     <TestSuite name="KeyboardAvoidingView">
-      <TestCase itShould="don't avoid keyboard">
+      <TestCase.Example itShould="don't avoid keyboard">
         <KeyboardAvoidingViewTestCase
           behavior="height"
           justifyContent="space-around"
           enabled={false}
         />
-      </TestCase>
-      <TestCase itShould="avoid keyboard by changing height">
+      </TestCase.Example>
+      <TestCase.Example itShould="avoid keyboard by changing height">
         <KeyboardAvoidingViewTestCase
           behavior="height"
           justifyContent="space-around"
         />
-      </TestCase>
-      <TestCase itShould="avoid keyboard by changing position. The firebrick border should move, the green one shouldn't">
+      </TestCase.Example>
+      <TestCase.Example itShould="avoid keyboard by changing position. The firebrick border should move, the green one shouldn't">
         <KeyboardAvoidingViewTestCase
           behavior="position"
           justifyContent="flex-end"
           contentContainerStyle={{borderWidth: 4, borderColor: 'firebrick'}}
           style={{borderWidth: 4, borderColor: 'green'}}
         />
-      </TestCase>
-      <TestCase itShould="avoid keyboard by changing padding">
+      </TestCase.Example>
+      <TestCase.Example itShould="avoid keyboard by changing padding">
         <KeyboardAvoidingViewTestCase
           behavior="padding"
           justifyContent="flex-end"
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

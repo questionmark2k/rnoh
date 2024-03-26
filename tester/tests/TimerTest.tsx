@@ -1,7 +1,7 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React, {useEffect} from 'react';
 import {AppState, AppStateStatus, Text} from 'react-native';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 
 async function wait(ms: number) {
   return new Promise(resolve => {
@@ -14,7 +14,7 @@ const PRECISION_IN_MS = 100;
 export function TimerTest() {
   return (
     <TestSuite name="Timer">
-      <TestCase
+      <TestCase.Manual
         itShould="take three seconds to finish this test (setTimeout)"
         initialState={0}
         arrange={({setState}) => {
@@ -40,7 +40,7 @@ export function TimerTest() {
           );
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="take three seconds to finish this test (setInterval)"
         initialState={0}
         arrange={({setState}) => {
@@ -73,7 +73,7 @@ export function TimerTest() {
           );
         }}
       />
-      <TestCase<{date: Date; appStateStatus: AppStateStatus}[]>
+      <TestCase.Manual<{date: Date; appStateStatus: AppStateStatus}[]>
         modal
         itShould="not trigger updates when the application is in background"
         initialState={[]}

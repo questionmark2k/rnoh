@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {View, Switch, StyleSheet, Text} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export function SwitchTest() {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -9,7 +10,7 @@ export function SwitchTest() {
 
   return (
     <TestSuite name="Switch">
-      <TestCase
+      <TestCase.Example
         tags={['C_API']}
         itShould="Render a working switch and display it's state and SwitchChangeEvent details">
         <View style={styles.container}>
@@ -25,8 +26,8 @@ export function SwitchTest() {
             onChange={e => setEvent(JSON.stringify(e.nativeEvent))}
           />
         </View>
-      </TestCase>
-      <TestCase tags={['C_API']} itShould="Render a disabled switch">
+      </TestCase.Example>
+      <TestCase.Example tags={['C_API']} itShould="Render a disabled switch">
         <View style={styles.container}>
           <Switch
             trackColor={{false: 'green', true: 'firebrick'}}
@@ -34,8 +35,8 @@ export function SwitchTest() {
             disabled
           />
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="Render a disabled switch with true value">
         <View style={styles.container}>
@@ -46,7 +47,7 @@ export function SwitchTest() {
             disabled
           />
         </View>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

@@ -1,7 +1,7 @@
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React, {useState, useEffect} from 'react';
 import {Appearance, ColorSchemeName, Text, useColorScheme} from 'react-native';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 
 export function AppearanceTest() {
   const [colorScheme, setColorScheme] = useState<ColorSchemeName>(
@@ -28,13 +28,13 @@ export function AppearanceTest() {
 
   return (
     <TestSuite name="Appearance">
-      <TestCase
+      <TestCase.Logical
         itShould="return sensible value from appearance API"
         fn={({expect}) => {
           expect(Appearance.getColorScheme()).to.oneOf(['light', 'dark', null]);
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="return sensible value from useColorScheme hook"
         fn={({expect}) => {
           expect(colorSchemeFromHook).to.be.oneOf(['light', 'dark', null]);
@@ -42,7 +42,7 @@ export function AppearanceTest() {
       />
       <ColorSchemeTestCase colorScheme="light" />
       <ColorSchemeTestCase colorScheme="dark" />
-      <TestCase itShould="show current colorScheme and history">
+      <TestCase.Example itShould="show current colorScheme and history">
         <Button
           label="set dark"
           onPress={() => {
@@ -68,21 +68,14 @@ export function AppearanceTest() {
             .map(oldColorScheme => (oldColorScheme ? oldColorScheme : 'null'))
             .join(', ')}
         </Text>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }
 
-const ColorSchemeTestCase = ({
-  colorScheme,
-  skip,
-}: {
-  colorScheme: ColorSchemeName;
-  skip?: boolean | string;
-}) => {
+const ColorSchemeTestCase = ({colorScheme}: {colorScheme: ColorSchemeName}) => {
   return (
-    <TestCase
-      skip={skip}
+    <TestCase.Manual
       itShould={`set colorScheme to ${colorScheme}`}
       initialState={undefined as ColorSchemeName}
       arrange={({setState}) => (

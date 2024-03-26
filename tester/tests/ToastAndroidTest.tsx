@@ -1,12 +1,12 @@
 import React from 'react';
 import {View, ToastAndroid, StyleSheet} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
-import {Button} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, TestCase} from '../components';
 
 export const ToastAndroidTest = () => {
   return (
     <TestSuite name="ToastAndroid">
-      <TestCase
+      <TestCase.Logical
         itShould="have constants defined"
         fn={({expect}) => {
           expect(ToastAndroid.BOTTOM).to.not.be.undefined;
@@ -16,21 +16,21 @@ export const ToastAndroidTest = () => {
           expect(ToastAndroid.LONG).to.not.be.undefined;
         }}
       />
-      <TestCase itShould="show Toast with message (show)">
+      <TestCase.Example itShould="show Toast with message (show)">
         <ToastExample options="basic" />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         skip={'`showWithGravity` fallbacks to `show` on Harmony and Android ^R'}
         itShould="show Toast with message (showWithGravity)">
         <ToastExample options="withGravity" />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         skip={
           '`showWithGravityAndOffset` fallbacks to `show` on Harmony and Android ^R'
         }
         itShould="show Toast with message (showWithGravityAndOffset)">
         <ToastExample options="withGravityAndOffset" />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

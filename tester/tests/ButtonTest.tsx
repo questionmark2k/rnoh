@@ -1,25 +1,32 @@
 import React from 'react';
 import {View, Button, StyleSheet, Text} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export const ButtonTest = () => {
   return (
     <TestSuite name="Button">
-      <TestCase itShould="render a button with a title ">
+      <TestCase.Example itShould="render a button with a title ">
         <ButtonView />
-      </TestCase>
-      <TestCase itShould="render a button that should be disabled">
+      </TestCase.Example>
+      <TestCase.Example itShould="render a button that should be disabled">
         <ButtonDisabled />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         itShould="render a button with touchSoundDisabled"
-        skip // prop doesnt exist on native side https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/476
+        skip={{
+          android: false,
+          harmony: {
+            arkTS: "prop doesn't exist on native side",
+            cAPI: "prop doesn't exist on native side",
+          },
+        }} // https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/476
       >
         <ButtonTouchSoundDisabled />
-      </TestCase>
-      <TestCase itShould="render a button with accessibility label">
+      </TestCase.Example>
+      <TestCase.Example itShould="render a button with accessibility label">
         <ButtonAccessibilityLabel />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

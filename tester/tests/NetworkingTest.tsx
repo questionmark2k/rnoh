@@ -1,6 +1,7 @@
 import {StyleSheet, Text, View} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React from 'react';
+import {TestCase} from '../components';
 
 const WebSocketEcho = () => {
   const [status, setStatus] = React.useState('Loading...');
@@ -59,7 +60,7 @@ export const NetworkingTest = () => {
 
   return (
     <TestSuite name="Networking">
-      <TestCase
+      <TestCase.Logical
         itShould="download data"
         fn={async ({expect}) => {
           const response = await fetch('https://reactnative.dev/movies.json');
@@ -68,7 +69,7 @@ export const NetworkingTest = () => {
           expect(parsed.title).to.be.eq('The Basics - Networking');
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="download and parse JSON data"
         fn={async ({expect}) => {
           const response = await fetch('https://reactnative.dev/movies.json');
@@ -76,7 +77,7 @@ export const NetworkingTest = () => {
           expect(result.title).to.be.eq('The Basics - Networking');
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="download data to an ArrayBuffer"
         fn={async ({expect}) => {
           const response = await fetch('https://reactnative.dev/movies.json');
@@ -84,7 +85,7 @@ export const NetworkingTest = () => {
           expect(result.byteLength).to.be.eq(458);
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="download data to a blob"
         fn={async ({expect}) => {
           const response = await fetch('https://reactnative.dev/movies.json');
@@ -92,7 +93,7 @@ export const NetworkingTest = () => {
           expect(result.size).to.be.eq(458);
         }}
       />
-      <TestCase
+      <TestCase.Logical
         itShould="fail on bad url"
         fn={async ({expect}) => {
           const received = await canFetch(
@@ -101,9 +102,9 @@ export const NetworkingTest = () => {
           expect(received).to.be.false;
         }}
       />
-      <TestCase itShould="connect to websocks">
+      <TestCase.Example itShould="connect to websocks">
         <WebSocketEcho />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

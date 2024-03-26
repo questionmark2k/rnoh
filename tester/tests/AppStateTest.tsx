@@ -1,4 +1,4 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import React, {useEffect, useState} from 'react';
 import {GestureResponderEvent, ScrollView, TextInput} from 'react-native';
 import {
@@ -10,25 +10,27 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import {Button, Effect} from '../components';
+import {Button, Effect, TestCase} from '../components';
 
 export function AppStateTest() {
   return (
     <TestSuite name="AppState">
-      <TestCase
+      <TestCase.Logical
         itShould="return active"
         fn={({expect}) => {
           expect(AppState.currentState).to.equal('active');
         }}
       />
-      <TestCase itShould="show AppState history">
+      <TestCase.Example itShould="show AppState history">
         <AppStateHistoryView />
-      </TestCase>
-      <TestCase skip itShould="show focus history">
+      </TestCase.Example>
+      <TestCase.Example
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}}
+        itShould="show focus history">
         <FocusHistoryView />
-      </TestCase>
-      <TestCase
-        skip
+      </TestCase.Example>
+      <TestCase.Manual
+        skip={{android: false, harmony: {arkTS: false, cAPI: false}}}
         itShould="throw memory warning event after adding too much items"
         initialState={{
           didEmitMemoryEvent: false,

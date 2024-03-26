@@ -1,5 +1,6 @@
 import React from 'react';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 const CHINESE_SELECTED_CHARACTERS = `
 一 乙 二 十 丁 厂 七 卜 人 入 八 九 几 儿 了 力 乃 又
@@ -14,7 +15,7 @@ const CHINESE_SELECTED_CHARACTERS = `
 export const FileTest = () => {
   return (
     <TestSuite name="File & FileReader">
-      <TestCase
+      <TestCase.Logical
         itShould="read basic file content correctly"
         fn={async ({expect}) => {
           const fileTextString = 'Hello, World!';
@@ -43,7 +44,7 @@ export const FileTest = () => {
         }}
       />
 
-      <TestCase
+      <TestCase.Logical
         itShould="read basic file with chinese characters correctly"
         fn={async ({expect}) => {
           const file = new File([CHINESE_SELECTED_CHARACTERS], 'chinese.txt', {
@@ -72,7 +73,7 @@ export const FileTest = () => {
         }}
       />
 
-      <TestCase
+      <TestCase.Logical
         itShould="read the concatenated blob and file text correctly"
         fn={async ({expect}) => {
           const blobString = "I'am blob string";
@@ -107,7 +108,7 @@ export const FileTest = () => {
         }}
       />
 
-      <TestCase
+      <TestCase.Logical
         itShould="read basic file content correctly and return data: URL"
         fn={async ({expect}) => {
           const Buffer = require('buffer').Buffer;

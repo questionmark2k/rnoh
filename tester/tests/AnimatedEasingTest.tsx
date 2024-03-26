@@ -1,21 +1,20 @@
 import React, {useRef} from 'react';
-
 import {Animated, View, Easing, EasingFunction} from 'react-native';
-
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export function AnimatedEasingTest() {
   return (
     <TestSuite name="Easing">
-      <TestCase itShould="move square linearly">
+      <TestCase.Example itShould="move square linearly">
         <EasingView easing={Easing.linear} />
-      </TestCase>
-      <TestCase itShould="move square slowly accelerating">
+      </TestCase.Example>
+      <TestCase.Example itShould="move square slowly accelerating">
         <EasingView easing={Easing.ease} />
-      </TestCase>
-      <TestCase itShould="move square with backwards cubic function">
+      </TestCase.Example>
+      <TestCase.Example itShould="move square with backwards cubic function">
         <EasingView easing={Easing.out(Easing.cubic)} />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

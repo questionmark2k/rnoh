@@ -9,8 +9,8 @@ import {
   Platform,
   ViewabilityConfig,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
-import {Button, Modal, ObjectDisplayer} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, Modal, ObjectDisplayer, TestCase} from '../components';
 
 interface SectionData {
   id: string;
@@ -58,7 +58,7 @@ const commonProps = {
 export const SectionListTest = () => {
   return (
     <TestSuite name="SectionList">
-      <TestCase itShould="display items in the SectionList">
+      <TestCase.Example itShould="display items in the SectionList">
         <Modal>
           <View style={styles.container}>
             <SectionList
@@ -75,8 +75,8 @@ export const SectionListTest = () => {
             />
           </View>
         </Modal>
-      </TestCase>
-      <TestCase itShould="display an array of visible items">
+      </TestCase.Example>
+      <TestCase.Example itShould="display an array of visible items">
         <Modal>
           <ObjectDisplayer
             renderContent={setObject => {
@@ -92,8 +92,8 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase itShould="render no more than 2 new items per batch when scrolling down">
+      </TestCase.Example>
+      <TestCase.Example itShould="render no more than 2 new items per batch when scrolling down">
         <Modal>
           <SectionList
             {...commonProps}
@@ -114,8 +114,8 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase itShould="display nativeEvent when onMomentumScrollBegin">
+      </TestCase.Example>
+      <TestCase.Example itShould="display nativeEvent when onMomentumScrollBegin">
         <Modal>
           <ObjectDisplayer
             renderContent={setObject => {
@@ -130,8 +130,8 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase itShould="display nativeEvent when onMomentumScrollEnd">
+      </TestCase.Example>
+      <TestCase.Example itShould="display nativeEvent when onMomentumScrollEnd">
         <Modal>
           <ObjectDisplayer
             renderContent={setObject => {
@@ -146,36 +146,36 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase itShould="display event sent to by onScrollToIndexFailed when pressing the button before scrolling">
+      </TestCase.Example>
+      <TestCase.Example itShould="display event sent to by onScrollToIndexFailed when pressing the button before scrolling">
         <Modal>
           <ScrollToIndexFailureTestCase />
         </Modal>
-      </TestCase>
+      </TestCase.Example>
       {/* sticky headers seems to work on Android when App.tsx was replaced with content of this test */}
-      <TestCase
+      <TestCase.Example
         itShould="stick section headers (fails on Android when fabric is enabled)"
-        skip={Platform.OS === 'android'}>
+        skip={{android: true, harmony: false}}>
         <Modal>
           <SectionList {...commonProps} stickySectionHeadersEnabled />
         </Modal>
-      </TestCase>
-      <TestCase itShould="support viewOffset when scrolling to location">
+      </TestCase.Example>
+      <TestCase.Example itShould="support viewOffset when scrolling to location">
         <Modal>
           <ScrollToLocationOffset />
         </Modal>
-      </TestCase>
-      <TestCase itShould="show vertical scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example itShould="show vertical scroll indicator">
         <Modal>
           <SectionList {...commonProps} showsVerticalScrollIndicator={true} />
         </Modal>
-      </TestCase>
-      <TestCase itShould="hide vertical scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example itShould="hide vertical scroll indicator">
         <Modal>
           <SectionList {...commonProps} showsVerticalScrollIndicator={false} />
         </Modal>
-      </TestCase>
-      <TestCase itShould="show horizontal scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example itShould="show horizontal scroll indicator">
         <Modal>
           <View style={{width: 200, height: '100%'}}>
             <SectionList
@@ -185,8 +185,8 @@ export const SectionListTest = () => {
             />
           </View>
         </Modal>
-      </TestCase>
-      <TestCase itShould="hide horizontal scroll indicator">
+      </TestCase.Example>
+      <TestCase.Example itShould="hide horizontal scroll indicator">
         <Modal>
           <View style={{width: 200, height: '100%'}}>
             <SectionList
@@ -196,14 +196,16 @@ export const SectionListTest = () => {
             />
           </View>
         </Modal>
-      </TestCase>
-      <TestCase itShould="[SKIP] display overscroll effect">
+      </TestCase.Example>
+      <TestCase.Example
+        itShould="display overscroll effect"
+        skip={{android: false, harmony: true}}>
         <Modal>
           {/* On Android this settings enables stretching the ScrollView content. On Harmony `bounces` prop can be used instead. */}
           <SectionList {...commonProps} overScrollMode="always" />
         </Modal>
-      </TestCase>
-      <TestCase itShould="render custom RefreshControl on pull to refresh">
+      </TestCase.Example>
+      <TestCase.Example itShould="render custom RefreshControl on pull to refresh">
         <Modal>
           <ObjectDisplayer
             renderContent={setObject => {
@@ -226,8 +228,8 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase itShould="render standard RefreshControl on pull to refresh">
+      </TestCase.Example>
+      <TestCase.Example itShould="render standard RefreshControl on pull to refresh">
         <Modal>
           <ObjectDisplayer
             renderContent={setObject => {
@@ -243,8 +245,8 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         itShould="display onScroll native event throttled every second"
         skip={Platform.select({
           android: 'RN bug',
@@ -266,8 +268,8 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase itShould="allow scrolling beneath the content due to large lengths returned in getItemLayout">
+      </TestCase.Example>
+      <TestCase.Example itShould="allow scrolling beneath the content due to large lengths returned in getItemLayout">
         <Modal>
           <SectionList
             {...commonProps}
@@ -281,8 +283,8 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase itShould="display onEndReached event when scroll reached bottom">
+      </TestCase.Example>
+      <TestCase.Example itShould="display onEndReached event when scroll reached bottom">
         <Modal>
           <ObjectDisplayer
             renderContent={setObject => {
@@ -297,12 +299,12 @@ export const SectionListTest = () => {
             }}
           />
         </Modal>
-      </TestCase>
-      <TestCase itShould="click on 'Record interaction' button changes the first three items background color to blue">
+      </TestCase.Example>
+      <TestCase.Example itShould="click on 'Record interaction' button changes the first three items background color to blue">
         <Modal contentContainerStyle={{width: '85%'}}>
           <SectionListRecordInteractionTest />
         </Modal>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };

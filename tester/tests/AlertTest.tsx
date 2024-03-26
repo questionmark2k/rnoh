@@ -1,12 +1,12 @@
-import {TestSuite, TestCase} from '@rnoh/testerino';
-import {Button} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, TestCase} from '../components';
 import {Alert, Text, View} from 'react-native';
 import {useState} from 'react';
 
 export function AlertTest() {
   return (
     <TestSuite name="Alert">
-      <TestCase
+      <TestCase.Manual
         itShould="show simple alert on click"
         initialState={false}
         arrange={({setState, reset}) => (
@@ -26,7 +26,7 @@ export function AlertTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="display name of the button clicked in alert"
         initialState={false}
         arrange={({setState, reset}) => (
@@ -36,7 +36,7 @@ export function AlertTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="cancel alert on press outside its window"
         initialState={false}
         arrange={({setState, reset}) => (
@@ -57,15 +57,15 @@ export function AlertTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase itShould="show an alert with OK button (when a developer doesn't declare any buttons)">
+      <TestCase.Example itShould="show an alert with OK button (when a developer doesn't declare any buttons)">
         <Button
           label="show alert"
           onPress={() => {
             Alert.alert('Test Alert');
           }}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         initialState={false}
         itShould="pass after pressing the OK button in the Alert Box"
         arrange={({setState}) => {

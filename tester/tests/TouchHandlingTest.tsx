@@ -1,4 +1,4 @@
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useEffect, useRef, useState} from 'react';
 import {
   Animated,
@@ -10,14 +10,14 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import {Button} from '../components';
+import {Button, TestCase} from '../components';
 import React from 'react';
 import {PALETTE} from '../components/palette';
 
 export function TouchHandlingTest() {
   return (
     <TestSuite name="Touch Handling">
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="pass when pressed red rectangle"
         initialState={false}
@@ -35,7 +35,7 @@ export function TouchHandlingTest() {
         }}
       />
 
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="register a touch after native transform animation"
         initialState={false}
@@ -50,7 +50,7 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="handle press on rotated view"
         initialState={false}
@@ -64,7 +64,7 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="handle press on scaled view"
         initialState={false}
@@ -78,7 +78,7 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase itShould="report transformed touch coordinates">
+      <TestCase.Example itShould="report transformed touch coordinates">
         <TouchCoordinatesTest
           transform={[
             {rotate: '45deg'},
@@ -88,8 +88,8 @@ export function TouchHandlingTest() {
             {scale: 0.75},
           ]}
         />
-      </TestCase>
-      <TestCase itShould="report transformed touch coordinates">
+      </TestCase.Example>
+      <TestCase.Example itShould="report transformed touch coordinates">
         <TouchCoordinatesTest
           transform={[
             {rotate: '-45deg'},
@@ -99,8 +99,8 @@ export function TouchHandlingTest() {
             {scaleY: 1.25},
           ]}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         itShould="respond to touches on disabled components when wrapped in Touchables"
         initialState={false}
         arrange={({setState}) => (
@@ -122,12 +122,12 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Example
         modal
         itShould="allow vertical scroll when flinging fast after horizontal swipe on gray area">
         <ScrollViewLockedIssue />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         itShould="pass after tapping cyan area but not red area (child's hitSlop)"
         initialState={false}
         arrange={({setState}) => {

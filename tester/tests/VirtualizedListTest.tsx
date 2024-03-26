@@ -7,8 +7,8 @@ import {
   ViewabilityConfig,
   VirtualizedList,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
-import {Button} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, TestCase} from '../components';
 
 type OnScrollToIndexFailed = {
   index: number;
@@ -43,7 +43,7 @@ const HorizontalItem = ({title}: {title: string}) => (
 export function VirtualizedListTest() {
   return (
     <TestSuite name="VirtualizedList">
-      <TestCase itShould="display list of 3 items">
+      <TestCase.Example itShould="display list of 3 items">
         <VirtualizedList<number[]>
           style={{height: 64}}
           data={[1, 2, 3]}
@@ -56,8 +56,8 @@ export function VirtualizedListTest() {
           )}
           keyExtractor={(_, index) => String(index)}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         modal
         itShould="trigger onStartReached event when start of the content is within half the visible length of the list"
         initialState={-1}
@@ -89,7 +89,7 @@ export function VirtualizedListTest() {
           expect(state).to.be.lessThanOrEqual(100);
         }}
       />
-      <TestCase
+      <TestCase.Manual
         modal
         itShould="display event sent to by onScrollToIndexFailed when pressing the button before scrolling"
         initialState={undefined}
@@ -110,24 +110,24 @@ export function VirtualizedListTest() {
           ]);
         }}
       />
-      <TestCase modal itShould="invert the list">
+      <TestCase.Example modal itShould="invert the list">
         <InvertedVirtualizedListTest />
-      </TestCase>
-      <TestCase modal itShould="start at the 81st item">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="start at the 81st item">
         <InitialScrollIndexTest />
-      </TestCase>
+      </TestCase.Example>
       <TestSuite name="ref">
-        <TestCase
+        <TestCase.Example
           modal
           itShould="scroll to the element with the index 10 (Item 11) - scrollToIndex()">
           <VirtualizedListScrollToIndexTest />
-        </TestCase>
-        <TestCase
+        </TestCase.Example>
+        <TestCase.Example
           modal
           itShould="scroll to the specific element (Item 3) - scrollToItem()">
           <VirtualizedListScrollToItemTest />
-        </TestCase>
-        <TestCase
+        </TestCase.Example>
+        <TestCase.Manual
           modal
           itShould="scroll to the end of the list - scrollToEnd()"
           initialState={false}
@@ -143,7 +143,7 @@ export function VirtualizedListTest() {
             expect(state).to.be.true;
           }}
         />
-        <TestCase
+        <TestCase.Manual
           modal
           itShould="get the node number - getScrollableNode()"
           initialState={undefined}
@@ -161,7 +161,7 @@ export function VirtualizedListTest() {
           }}
         />
 
-        <TestCase
+        <TestCase.Manual
           modal
           itShould="get the scroll ref - getScrollRef()"
           initialState={undefined}
@@ -175,7 +175,7 @@ export function VirtualizedListTest() {
           }}
         />
       </TestSuite>
-      <TestCase
+      <TestCase.Manual
         modal
         itShould="click (call on ref.recordInteraction()) on button before first scroll should trigger onViewableItemsChanged and change the first two items background color to blue"
         initialState={[]}
@@ -193,81 +193,83 @@ export function VirtualizedListTest() {
           expect(state).to.have.lengthOf(2);
         }}
       />
-      <TestCase
+      <TestCase.Example
         modal
         itShould="change background color of visible items after scrolling slightly (to blue when fully visible and lightblue when at least 20% is visible)">
         <VirtualizedListTestViewabiliyConfigCallbackPairs />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="change background color of fully visible items after 2 seconds">
         <VirtualizedListViewabilityConfigViewTime />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="display even items with a lightgray background and odd items should have lightblue background (CellRenderedComponent)">
         <VirtualizedListCellRendererComponent />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould='display "Separator" text on lightgray background between items'>
         <VirtualizedListItemSeparatorTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould='display "Empty Component" text on lightgray background when data is empty'>
         <VirtualizedListListEmptyComponentTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould='display "Item Component" text on lightgray background'>
         <VirtualizedListListItemComponent />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould='display "List Footer Component" text on lightgray background at the end of the list'>
         <VirtualizedListListFooterComponent />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould='display "List Footer Component" text on red background at the end of the list'>
         <VirtualizedListListFooterComponentStyles />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould='display "List Header Component" text on small lightgray background on red background at the start of the list'>
         <VirtualizedListListHeaderComponent />
-      </TestCase>
-      <TestCase itShould="display debugging scroll bars (debug = true)">
+      </TestCase.Example>
+      <TestCase.Example itShould="display debugging scroll bars (debug = true)">
         <VirtualizedListDebugTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="change background color of selected items to red">
         <VirtualizedListExtraDataTest />
-      </TestCase>
-      <TestCase modal itShould="display items horizontally">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="display items horizontally">
         <VirtualizedListHorizontalTest />
-      </TestCase>
-      <TestCase modal itShould="display items horizontally and invert the list">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="display items horizontally and invert the list">
         <VirtualizedListHorizontalInvertedTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="display 'refreshing' on red background when pulling down (onRefresh method)">
         <VirtualizedListOnRefreshTest />
-      </TestCase>
-      <TestCase modal itShould="display persistent scrollbar">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="display persistent scrollbar">
         <VirtualizedListPersistentScrollbarTest />
-      </TestCase>
-      <TestCase modal itShould="render cell in 2 second batches">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="render cell in 2 second batches">
         <VirtualizedListUpdateCellsBatchingPeriodTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="display refreshing indicator when pulling down (refreshControl)">
         <VirtualizedListRefreshControlTest />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

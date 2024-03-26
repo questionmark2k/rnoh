@@ -7,43 +7,44 @@ import {
   View,
   ViewProps,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useState} from 'react';
+import {TestCase} from '../components';
 
 export const TouchablesTest = () => {
   const [pressCountHighlight, setPressCountHighlight] = useState(0);
   return (
     <TestSuite name="Touchables">
-      <TestCase
+      <TestCase.Logical
         itShould="export Touchable"
         fn={({expect}) => {
           expect(Touchable).to.be.not.undefined;
         }}
       />
-      <TestCase itShould="use cyan background on press in (TouchableHighlight)">
+      <TestCase.Example itShould="use cyan background on press in (TouchableHighlight)">
         <TouchableHighlight
           activeOpacity={1}
           underlayColor="cyan"
           onPress={() => {}}>
           <PressMe />
         </TouchableHighlight>
-      </TestCase>
-      <TestCase itShould="show number of presses on press in (TouchableHighlight)">
+      </TestCase.Example>
+      <TestCase.Example itShould="show number of presses on press in (TouchableHighlight)">
         <TouchableHighlight
           onPress={() => setPressCountHighlight(pressCountHighlight + 1)}>
           <PressMe endLabel={pressCountHighlight} />
         </TouchableHighlight>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Logical
         itShould="export TouchableNativeFeedback (Android only)"
         fn={({expect}) => {
           expect(TouchableNativeFeedback).to.be.not.undefined;
         }}
       />
-      <TestCase itShould="handle press without showing feedback">
+      <TestCase.Example itShould="handle press without showing feedback">
         <TouchableWithoutFeedbackDemo />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         tags={['C_API']}
         itShould="handle presses on empty views"
         initialState={false}
@@ -60,7 +61,7 @@ export const TouchablesTest = () => {
           expect(state).to.be.true;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="pass when blue background is pressed"
         initialState={false}
         arrange={({setState}) => (

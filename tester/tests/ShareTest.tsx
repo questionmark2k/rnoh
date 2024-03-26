@@ -1,22 +1,27 @@
 import {useState} from 'react';
 import {Button, Share, StyleSheet, Text, View} from 'react-native';
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 // Skipped - https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/357
 export function ShareTest() {
   return (
     <TestSuite name="Linking (Stub)">
-      <TestCase skip itShould="Share text message">
+      <TestCase.Example
+        skip={{android: false, harmony: true}}
+        itShould="Share text message">
         <ShareMessageWithoutTitleTest />
-      </TestCase>
-      <TestCase skip itShould="Share message, URL (iOS) and title (Android)">
+      </TestCase.Example>
+      <TestCase.Example
+        skip={{android: false, harmony: true}}
+        itShould="Share message, URL (iOS) and title (Android)">
         <ShareMessageWithTitleTest />
-      </TestCase>
-      <TestCase
-        skip
+      </TestCase.Example>
+      <TestCase.Example
+        skip={{android: false, harmony: true}}
         itShould="sharedAction: If the content was successfully shared">
         <SharedActionTest />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

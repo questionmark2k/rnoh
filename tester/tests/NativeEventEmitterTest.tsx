@@ -1,10 +1,11 @@
 import {NativeEventEmitter} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 export const NativeEventEmitterTest = () => {
   return (
     <TestSuite name="NativeEventEmitter">
-      <TestCase
+      <TestCase.Logical
         itShould="emit and react to events"
         fn={async ({expect}) => {
           const eventEmitter = new NativeEventEmitter();

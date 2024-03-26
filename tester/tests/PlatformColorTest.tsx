@@ -1,5 +1,6 @@
 import {PlatformColor, View, Text, Platform} from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
+import {TestCase} from '../components';
 
 const SYSTEM_COLORS = [
   'ohos_id_color_foreground',
@@ -94,39 +95,39 @@ const SYSTEM_PALETTES = [
 export function PlatformColorTest() {
   return (
     <TestSuite name="PlatformColor">
-      <TestCase
+      <TestCase.Example
         itShould="display system colors from system resources"
-        skip={Platform.select({
+        skip={{
           android: 'Works only for Open Harmony system colors',
-          ios: 'Works only for Open Harmony system colors',
-        })}>
+          harmony: false,
+        }}>
         <DisplayColors title="System Colors" colors={SYSTEM_COLORS} />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         itShould="display system icons colors from system resources"
-        skip={Platform.select({
+        skip={{
           android: 'Works only for Open Harmony system colors',
-          ios: 'Works only for Open Harmony system colors',
-        })}>
+          harmony: false,
+        }}>
         <DisplayColors title="Icons Colors" colors={ICONS_COLORS} />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         itShould="display system text colors from system resources"
-        skip={Platform.select({
+        skip={{
           android: 'Works only for Open Harmony system colors',
-          ios: 'Works only for Open Harmony system colors',
-        })}>
+          harmony: false,
+        }}>
         <DisplayColors title="Text Colors" colors={TEXT_COLORS} />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         itShould="display system palette colors from system resources"
-        skip={Platform.select({
+        skip={{
           android: 'Works only for Open Harmony system colors',
-          ios: 'Works only for Open Harmony system colors',
-        })}>
+          harmony: false,
+        }}>
         <DisplayColors title="System Palette Colors" colors={SYSTEM_PALETTES} />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         itShould="fallback to second color and display green box"
         skip={Platform.select({
           android: 'Works only for Open Harmony system colors',
@@ -141,7 +142,7 @@ export function PlatformColorTest() {
             height: 50,
           }}
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

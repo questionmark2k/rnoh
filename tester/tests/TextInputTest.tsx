@@ -9,9 +9,9 @@ import {
   TextInputProps,
   View,
 } from 'react-native';
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {useState, useRef} from 'react';
-import {Button, Effect, StateKeeper} from '../components';
+import {Button, Effect, StateKeeper, TestCase} from '../components';
 
 const KEYBOARD_TYPES: KeyboardTypeOptions[] = [
   'default',
@@ -26,28 +26,35 @@ const KEYBOARD_TYPES: KeyboardTypeOptions[] = [
 export function TextInputTest() {
   return (
     <TestSuite name="TextInput">
-      <TestCase
+      <TestCase.Example
         modal
         itShould="render textinput and change the text component based on the values inputted">
-        skip
         <TextInputWithText style={styles.textInput} />
-      </TestCase>
-      <TestCase tags={['C_API']} itShould="render non-editable textInput">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render non-editable textInput">
         <TextInputWithText style={styles.textInput} editable={false} />
-      </TestCase>
-      <TestCase modal itShould="render textInput with Pacifico Regular font">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="render textInput with Pacifico Regular font">
         <TextInputWithText
           style={[styles.textInput, {fontFamily: 'Pacifico-Regular'}]}
         />
-      </TestCase>
-      <TestCase tags={['C_API']} itShould="render textInput with caret hidden">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render textInput with caret hidden">
         <TextInputWithText style={styles.textInput} caretHidden />
-      </TestCase>
-      <TestCase tags={['C_API']} itShould="render textInput with red caret">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render textInput with red caret">
         <TextInputWithText style={styles.textInput} cursorColor={'red'} />
-      </TestCase>
+      </TestCase.Example>
       <TestSuite name="focus/blur">
-        <TestCase
+        <TestCase.Manual
           tags={['C_API']}
           itShould="blur text on submit (singleline)"
           initialState={false}
@@ -66,7 +73,7 @@ export function TextInputTest() {
             expect(state).to.be.true;
           }}
         />
-        <TestCase
+        <TestCase.Manual
           modal
           itShould="blur text after switching to another textinput"
           initialState={false}
@@ -88,10 +95,10 @@ export function TextInputTest() {
             expect(state).to.be.true;
           }}
         />
-        <TestCase
+        <TestCase.Example
           modal
           itShould="not blur text on submit"
-          skip
+          skip={{android: false, harmony: true}}
           //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/403
         >
           <TextInputWithText style={styles.textInput} blurOnSubmit={false} />
@@ -100,8 +107,8 @@ export function TextInputTest() {
             blurOnSubmit={false}
             multiline
           />
-        </TestCase>
-        <TestCase
+        </TestCase.Example>
+        <TestCase.Manual
           modal
           itShould="automatically focus textInput when displayed"
           initialState={false}
@@ -116,7 +123,7 @@ export function TextInputTest() {
             expect(state).to.be.true;
           }}
         />
-        <TestCase
+        <TestCase.Manual
           modal
           itShould="focus textInput on click"
           initialState={false}
@@ -130,7 +137,7 @@ export function TextInputTest() {
             expect(state).to.be.true;
           }}
         />
-        <TestCase
+        <TestCase.Manual
           modal
           itShould="focus textInput when pressing the button"
           initialState={false}
@@ -140,18 +147,18 @@ export function TextInputTest() {
           }}
         />
       </TestSuite>
-      <TestCase
+      <TestCase.Example
         modal
         itShould="render textInput with blue underline"
-        skip
+        skip={{android: false, harmony: true}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/404
       >
         <TextInputWithText
           style={styles.textInput}
           underlineColorAndroid={'blue'}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="render textinput with red placeholder">
         <TextInputWithText
@@ -159,29 +166,31 @@ export function TextInputTest() {
           placeholder="Placeholder"
           placeholderTextColor={'red'}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="render textinput with green selection color">
         <TextInputWithText style={styles.textInput} selectionColor="green" />
-      </TestCase>
-      <TestCase tags={['C_API']} itShould="render multiline text input">
+      </TestCase.Example>
+      <TestCase.Example tags={['C_API']} itShould="render multiline text input">
         <TextInputWithText style={styles.textInputBigger} multiline={true} />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="render multiline text input with Pacifico Regular font">
         <TextInputWithText
           style={[styles.textInputBigger, {fontFamily: 'Pacifico-Regular'}]}
           multiline
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="render text input with maximally 10 characters">
         <TextInputWithText style={styles.textInput} maxLength={10} />
-      </TestCase>
-      <TestCase modal itShould="toggle between rendering 10 and 5 characters">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="toggle between rendering 10 and 5 characters">
         <StateKeeper
           initialValue={10}
           renderContent={(maxLength, setMaxLength) => {
@@ -204,16 +213,16 @@ export function TextInputTest() {
             );
           }}
         />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="toggle between different capitalization modes"
-        skip
+        skip={{android: false, harmony: true}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/408
       >
         <AutoCapitalize />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         modal
         itShould="trigger onSubmitEditing event after submiting"
         initialState={false}
@@ -227,13 +236,15 @@ export function TextInputTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase modal itShould="toggle between different return keys">
+      <TestCase.Example modal itShould="toggle between different return keys">
         <ReturnKeyTypeView />
-      </TestCase>
-      <TestCase modal itShould="render secure text input (text obscured)">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="render secure text input (text obscured)">
         <TextInputWithText style={styles.textInput} secureTextEntry />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         modal
         itShould="trigger onKeyPress event after pressing key (press 'A' to pass)"
         initialState={''}
@@ -248,9 +259,9 @@ export function TextInputTest() {
           expect(state).to.be.eq('A');
         }}
       />
-      <TestCase
+      <TestCase.Manual
         modal
-        skip
+        skip={{android: false, harmony: true}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/736
         itShould="trigger onKeyPress event after pressing backspace"
         initialState={''}
@@ -265,17 +276,17 @@ export function TextInputTest() {
           expect(state).to.be.eq('Backspace');
         }}
       />
-      <TestCase
+      <TestCase.Example
         modal
         itShould="show text input with default value (defaultProps)">
         <DefaultProps />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="show text input with default value (defaultValue)">
         <TextInput style={styles.textInput} defaultValue="defaultText" />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         modal
         itShould="trigger onLayout event on mount"
         initialState={{}}
@@ -296,7 +307,7 @@ export function TextInputTest() {
           expect(state).to.include.all.keys('width', 'height', 'x', 'y');
         }}
       />
-      <TestCase
+      <TestCase.Example
         modal
         itShould="render textinputs with different keyboard types">
         <View>
@@ -307,8 +318,8 @@ export function TextInputTest() {
             />
           ))}
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="render multiline textinputs with different keyboard types">
         <View>
@@ -320,8 +331,8 @@ export function TextInputTest() {
             />
           ))}
         </View>
-      </TestCase>
-      <TestCase modal itShould="render textinput with allowFontScaling">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="render textinput with allowFontScaling">
         <TextInputWithText
           style={styles.textInput}
           allowFontScaling
@@ -342,8 +353,8 @@ export function TextInputTest() {
           allowFontScaling={false}
           defaultValue="Not scaled big"
         />
-      </TestCase>
-      <TestCase itShould="show textInput with padding" modal>
+      </TestCase.Example>
+      <TestCase.Example itShould="show textInput with padding" modal>
         <View style={{width: 300, height: 200}}>
           <TextInputWithText
             style={{
@@ -355,8 +366,8 @@ export function TextInputTest() {
             }}
           />
         </View>
-      </TestCase>
-      <TestCase itShould="show textInput multiline with padding" modal>
+      </TestCase.Example>
+      <TestCase.Example itShould="show textInput multiline with padding" modal>
         <View style={{width: 300, height: 200}}>
           <TextInputWithText
             style={{
@@ -370,12 +381,12 @@ export function TextInputTest() {
             multiline
           />
         </View>
-      </TestCase>
-      <TestCase modal itShould="render textinput with readonly">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="render textinput with readonly">
         {/* @ts-ignore */}
         <TextInputWithText style={styles.textInput} readOnly />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="display bold, italic, large placeholder with a custom font">
         <TextInput
@@ -387,15 +398,15 @@ export function TextInputTest() {
           }}
           placeholder="placeholder"
         />
-      </TestCase>
-      <TestCase modal itShould="render textinput with red text color">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="render textinput with red text color">
         <TextInputWithText style={[styles.textInput, {color: 'red'}]} />
-      </TestCase>
-      <TestCase modal itShould="clear text on focus">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="clear text on focus">
         {/* iOS only */}
         <TextInputWithText style={styles.textInput} clearTextOnFocus />
-      </TestCase>
-      <TestCase modal itShould="use different clearButtonMode values">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="use different clearButtonMode values">
         <TextInputWithText style={styles.textInput} clearButtonMode="always" />
         <Text>clearButtonMode="always"</Text>
         {
@@ -417,25 +428,27 @@ export function TextInputTest() {
         }
         <TextInputWithText style={styles.textInput} clearButtonMode="never" />
         <Text>clearButtonMode="never"</Text>
-      </TestCase>
-      <TestCase modal itShould="show selection start and end values">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="show selection start and end values">
         <TextSelectionChangeTest />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="show textinput with 'Selection' substring selected">
         <SelectionTest />
-      </TestCase>
-      <TestCase modal itShould="not show text context menu when long press">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="not show text context menu when long press">
         <ContextMenuHiddenTest />
-      </TestCase>
-      <TestCase modal itShould="select text on focus">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="select text on focus">
         <TextInput
           value="selectTextOnFocus"
           selectTextOnFocus
           style={styles.textInput}
         />
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

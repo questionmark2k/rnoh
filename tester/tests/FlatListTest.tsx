@@ -9,10 +9,9 @@ import {
   ViewToken,
   ScrollViewComponent,
   ScrollResponderMixin,
-  Platform,
 } from 'react-native';
-import {TestCase, TestSuite} from '@rnoh/testerino';
-import {Button, ObjectDisplayer} from '../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, ObjectDisplayer, TestCase} from '../components';
 interface ItemData {
   title: string;
   id: string;
@@ -60,10 +59,10 @@ const commonProps = {
 export const FlatListTest = () => {
   return (
     <TestSuite name="FlatList">
-      <TestCase itShould="display items in the FlatList (data, renderItem)">
+      <TestCase.Example itShould="display items in the FlatList (data, renderItem)">
         <FlatList {...commonProps} />
-      </TestCase>
-      <TestCase itShould="display items with separator between them in the FlatList">
+      </TestCase.Example>
+      <TestCase.Example itShould="display items with separator between them in the FlatList">
         <FlatList
           {...commonProps}
           ItemSeparatorComponent={() => (
@@ -77,26 +76,30 @@ export const FlatListTest = () => {
             />
           )}
         />
-      </TestCase>
-      <TestCase modal itShould="render only the first two items">
+      </TestCase.Example>
+      <TestCase.Example modal itShould="render only the first two items">
         <InitialNumToRenderTestCase />
-      </TestCase>
-      <TestCase modal itShould="display an array of fully visible items">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="display an array of fully visible items">
         <ObjectDisplayer
           renderContent={setObject => {
             return <ViewabilityConfigTest setObject={setObject} />;
           }}
         />
-      </TestCase>
-      <TestCase modal itShould="turn the items red on press (extraData)">
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="turn the items red on press (extraData)">
         <ExtraDataTestCase />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
         itShould="the left list should render the added items one by one, while the right list should render almost all at once (maxToRenderPerBatch)">
         <MaxToRenderPerBatchTestCase />
-      </TestCase>
-      <TestCase itShould="display empty list with a text saying that the list is empty ">
+      </TestCase.Example>
+      <TestCase.Example itShould="display empty list with a text saying that the list is empty ">
         <View style={{height: 40}}>
           <FlatList
             data={[]}
@@ -107,21 +110,23 @@ export const FlatListTest = () => {
             }
           />
         </View>
-      </TestCase>
-      <TestCase
-        skip
+      </TestCase.Example>
+      <TestCase.Example
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}}
         itShould="scroll to the third item at the middle (scrollToIndex)">
         <ScrollToIndexTestCase />
-      </TestCase>
-      <TestCase itShould="scroll to the third item at the middle (scrollToOffset)">
+      </TestCase.Example>
+      <TestCase.Example itShould="scroll to the third item at the middle (scrollToOffset)">
         <ScrollToOffsetTestCase />
-      </TestCase>
-      <TestCase modal itShould="scroll to the third item (scrollToItem)">
-        <ScrollToItemTestCase />
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         modal
-        skip={Platform.OS === 'android'}
+        itShould="scroll to the third item (scrollToItem)">
+        <ScrollToItemTestCase />
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        skip={{android: true, harmony: {arkTS: false, cAPI: false}}}
         itShould="support sticky headers (fails on Android with enabled Fabric)">
         <View style={{height: 100, backgroundColor: '#fff'}}>
           <FlatList
@@ -153,8 +158,8 @@ export const FlatListTest = () => {
             stickyHeaderIndices={[0]} // Make the header sticky
           />
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         itShould="Get the node number - getScrollableNode()"
         initialState={undefined}
         arrange={({state, setState}) => {
@@ -166,7 +171,7 @@ export const FlatListTest = () => {
           expect(state).to.be.an('number');
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="Get the nativeScrollRef - getNativeScrollRef()"
         initialState={undefined}
         arrange={({state, setState}) => {
@@ -178,7 +183,7 @@ export const FlatListTest = () => {
           expect(state).to.be.not.undefined;
         }}
       />
-      <TestCase
+      <TestCase.Manual
         itShould="Get the scroll responder - getScrollResponder()"
         initialState={undefined}
         arrange={({state, setState}) => {
@@ -190,10 +195,13 @@ export const FlatListTest = () => {
           expect(state).to.be.not.undefined;
         }}
       />
-      <TestCase
+      <TestCase.Example
         modal
-        skip={Platform.OS === 'android'}
-        itShould="stick first item to the bottom (invertStickyHeaders, fails on Android with enabled Fabric)">
+        skip={{
+          android: 'fails on Android with enabled Fabric',
+          harmony: {arkTS: false, cAPI: false},
+        }}
+        itShould="stick first item to the bottom (invertStickyHeaders)">
         <View style={{height: 100, backgroundColor: '#fff'}}>
           <FlatList
             data={DATA}
@@ -223,7 +231,7 @@ export const FlatListTest = () => {
             invertStickyHeaders
           />
         </View>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 };
