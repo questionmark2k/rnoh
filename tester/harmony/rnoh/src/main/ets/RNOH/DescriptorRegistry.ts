@@ -358,9 +358,17 @@ export class DescriptorRegistry {
       childDescriptor.parentTag = undefined;
       return [mutation.parentTag];
     } else if (mutation.type === MutationType.DELETE) {
+      const currentDescriptor = this.descriptorByTag.get(mutation.tag);
+      if (currentDescriptor?.parentTag) {
+        const parentDescriptor = this.descriptorByTag.get(currentDescriptor.parentTag ?? 0)
+        const childIndex = parentDescriptor?.childrenTags.indexOf(currentDescriptor.tag)
+        if (childIndex != -1) {
+          parentDescriptor?.childrenTags.splice(childIndex, 1);
+        }
+      }
       this.deleteDescriptor(mutation.tag)
       this.animatedRawPropsByTag.delete(mutation.tag);
-      return [];
+      return currentDescriptor?.parentTag ? [currentDescriptor.parentTag] : [];
     } else if (mutation.type === MutationType.REMOVE_DELETE_TREE) {
       return [];
     }
