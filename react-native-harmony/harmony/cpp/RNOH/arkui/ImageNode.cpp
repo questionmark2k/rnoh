@@ -32,7 +32,7 @@ void ImageNode::setNodeDelegate(ImageNodeDelegate *imageNodeDelegate) {
 
 void ImageNode::onNodeEvent(ArkUI_NodeEvent *event) {
     if (event->kind == ArkUI_NodeEventType::NODE_IMAGE_ON_COMPLETE) {
-        if (m_imageNodeDelegate != nullptr) {
+        if (m_imageNodeDelegate != nullptr && event->componentEvent.data[0].i32 == 1) {
             m_imageNodeDelegate->onComplete(event->componentEvent.data[1].f32, event->componentEvent.data[2].f32);
         }
     }
@@ -76,7 +76,7 @@ ImageNode &ImageNode::setResizeMode(facebook::react::ImageResizeMode const &mode
     return *this;
 }
 
-ImageNode &ImageNode::SetTintColor(facebook::react::SharedColor const &sharedColor) {
+ImageNode &ImageNode::setTintColor(facebook::react::SharedColor const &sharedColor) {
     if (!sharedColor) { // restore default value
         maybeThrow(NativeNodeApi::getInstance()->resetAttribute(m_nodeHandle, NODE_IMAGE_COLOR_FILTER));
         return *this;
@@ -103,9 +103,9 @@ ImageNode &ImageNode::setBlur(facebook::react::Float blur) {
 }
 
 ImageNode &ImageNode::setObjectRepeat(facebook::react::ImageResizeMode const &resizeMode) {
-    int32_t val = ARKUI_IMAGE_REPEAT_NONE; // no repeat
+    int32_t val = ARKUI_IMAGE_REPEAT_NONE;
     if (resizeMode == facebook::react::ImageResizeMode::Repeat) {
-        val = ARKUI_IMAGE_REPEAT_XY; // repeat xy
+        val = ARKUI_IMAGE_REPEAT_XY;
     }
 
     ArkUI_NumberValue value[] = {{.i32 = val}};
@@ -135,15 +135,31 @@ ImageNode &ImageNode::setFocusable(bool focusable) {
     return *this;
 }
 
-ImageNode &ImageNode::setResizeMethod(std::string const &method) {
-    int32_t val = 0;
-    if (method != "scale") {
-        val = 1;
-    }
-
-    ArkUI_NumberValue value[] = {{.i32 = val}};
+ImageNode &ImageNode::setResizeMethod(std::string const &resizeMethod) {
+    auto autoResize = (resizeMethod != "scale") ? 1 : 0;
+    ArkUI_NumberValue value[] = {{.i32 = autoResize}};
     ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
     maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_IMAGE_AUTO_RESIZE, &item));
+    return *this;
+}
+
+ImageNode &ImageNode::setAlt(facebook::react::ImageSources const &src) {
+    if (!src.empty()) {
+        auto uri = src[0].uri;
+        std::string resourceStr = std::string("resource://RAWFILE/") + "assets/";
+        resourceStr += uri.substr(ASSET_PREFIX.size());
+        ArkUI_AttributeItem item = {.string = resourceStr.c_str()};
+        maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_IMAGE_ALT, &item));
+    }
+    return *this;
+}
+
+ImageNode &ImageNode::resetFocusable() {
+    maybeThrow(NativeNodeApi::getInstance()->resetAttribute(m_nodeHandle, NODE_FOCUSABLE));
+    return *this;
+}
+ImageNode &ImageNode::resetResizeMethod() {
+    maybeThrow(NativeNodeApi::getInstance()->resetAttribute(m_nodeHandle, NODE_IMAGE_AUTO_RESIZE));
     return *this;
 }
 

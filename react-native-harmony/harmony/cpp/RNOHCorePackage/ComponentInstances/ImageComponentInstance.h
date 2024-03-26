@@ -7,13 +7,17 @@
 
 namespace rnoh {
 class ImageComponentInstance : public CppComponentInstance<facebook::react::ImageShadowNode>, public ImageNodeDelegate {
-private:
+  private:
     ImageNode m_imageNode;
-    bool m_isSetDefaultConfig = false;
-    std::string m_resizeMethod = "auto";
-    bool m_focusable = false;
-    std::string m_alt;
-public:
+    struct ImageRawProps {
+        std::optional<std::string> resizeMethod;
+        std::optional<bool> focusable;
+        std::optional<std::string> alt;
+        static ImageRawProps getFromDynamic(folly::dynamic value);
+    };
+    ImageRawProps m_rawProps;
+
+  public:
     ImageComponentInstance(Context context);
     void onPropsChanged(SharedConcreteProps const &props) override;
     void onStateChanged(SharedConcreteState const &state) override;

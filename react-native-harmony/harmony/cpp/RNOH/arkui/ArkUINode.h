@@ -66,6 +66,8 @@ namespace rnoh {
         virtual ArkUINode &setAlignment(Alignment alignment);
         virtual ArkUINode &setTransition(facebook::react::ModalHostViewAnimationType animationType);
 
+        virtual ArkUINode &resetAccessibilityText();
+
         virtual void onNodeEvent(ArkUI_NodeEvent *event);
 
         virtual ~ArkUINode();

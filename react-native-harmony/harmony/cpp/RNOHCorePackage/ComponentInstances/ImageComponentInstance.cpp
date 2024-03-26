@@ -8,10 +8,15 @@ namespace rnoh {
 
 ImageComponentInstance::ImageComponentInstance(Context context) : CppComponentInstance(std::move(context)) {
     this->getLocalRootArkUINode().setNodeDelegate(this);
+    this->getLocalRootArkUINode().setInterpolation(ARKUI_IMAGE_INTERPOLATION_HIGH);
+    this->getLocalRootArkUINode().setDraggable(false);
 }
 
 void ImageComponentInstance::onPropsChanged(SharedConcreteProps const &props) {
     CppComponentInstance::onPropsChanged(props);
+
+    auto rawProps = ImageRawProps::getFromDynamic(props->rawProps);
+
     if (!m_props || m_props->sources != props->sources) {
         this->getLocalRootArkUINode().setSources(props->sources);
         if (!this->getLocalRootArkUINode().getUri().empty()) {
@@ -20,7 +25,7 @@ void ImageComponentInstance::onPropsChanged(SharedConcreteProps const &props) {
     }
 
     if (!m_props || m_props->tintColor != props->tintColor) {
-        this->getLocalRootArkUINode().SetTintColor(props->tintColor);
+        this->getLocalRootArkUINode().setTintColor(props->tintColor);
     }
 
     if (!m_props || m_props->blurRadius != props->blurRadius) {
@@ -32,48 +37,35 @@ void ImageComponentInstance::onPropsChanged(SharedConcreteProps const &props) {
         this->getLocalRootArkUINode().setResizeMode(props->resizeMode);
     }
 
-    if (m_isSetDefaultConfig == false) {
-        this->getLocalRootArkUINode().setInterpolation(ARKUI_IMAGE_INTERPOLATION_HIGH);
-        this->getLocalRootArkUINode().setDraggable(false);
-
-        if (props->rawProps.count("resizeMethod") > 0) {
-            this->getLocalRootArkUINode().setResizeMethod(props->rawProps["resizeMethod"].asString());
-            m_resizeMethod = props->rawProps["resizeMethod"].asString();
-        } else {
-            this->getLocalRootArkUINode().setResizeMethod(m_resizeMethod);
-        }
-
-        if (props->rawProps.count("focusable") > 0 ) {
-            this->getLocalRootArkUINode().setFocusable(props->rawProps["focusable"].asBool());
-            m_focusable = props->rawProps["focusable"].asBool();
-        } else {
-            this->getLocalRootArkUINode().setFocusable(m_focusable);
-        }
-
-        if (props->rawProps.count("alt") > 0) {
-            this->getLocalRootArkUINode().setAccessibilityText(props->rawProps["alt"].asString());
-            m_alt = props->rawProps["alt"].asString();
-        } else {
-            this->getLocalRootArkUINode().setAccessibilityText(m_alt);
-        }
-
-        m_isSetDefaultConfig = true;
-        return;
+    if (!m_props || m_props->defaultSources != props->defaultSources) {
+        this->getLocalRootArkUINode().setAlt(props->defaultSources);
     }
 
-    if (props->rawProps.count("resizeMethod") > 0 && props->rawProps["resizeMethod"].asString() != m_resizeMethod) {
-        this->getLocalRootArkUINode().setResizeMethod(props->rawProps["resizeMethod"].asString());
-        m_resizeMethod = props->rawProps["resizeMethod"].asString();
+    if (m_rawProps.resizeMethod != rawProps.resizeMethod) {
+        m_rawProps.resizeMethod = rawProps.resizeMethod;
+        if (m_rawProps.resizeMethod.has_value()) {
+            this->getLocalRootArkUINode().setResizeMethod(m_rawProps.resizeMethod.value());
+        } else {
+            this->getLocalRootArkUINode().resetResizeMethod();
+        }
     }
 
-    if (props->rawProps.count("focusable") > 0 && props->rawProps["focusable"].asBool() != m_focusable) {
-        this->getLocalRootArkUINode().setFocusable(props->rawProps["focusable"].asBool());
-        m_focusable = props->rawProps["focusable"].asBool();
+    if (m_rawProps.focusable != rawProps.focusable) {
+        m_rawProps.focusable = rawProps.focusable;
+        if (m_rawProps.focusable.has_value()) {
+            this->getLocalRootArkUINode().setFocusable(m_rawProps.focusable.value());
+        } else {
+            this->getLocalRootArkUINode().resetFocusable();
+        }
     }
 
-    if (props->rawProps.count("alt") > 0 && props->rawProps["alt"].asString() != m_alt) {
-        this->getLocalRootArkUINode().setAccessibilityText(props->rawProps["alt"].asString());
-        m_alt = props->rawProps["alt"].asString();
+    if (m_rawProps.alt != rawProps.alt) {
+        m_rawProps.alt = rawProps.alt;
+        if (m_rawProps.alt.has_value()) {
+            this->getLocalRootArkUINode().setAccessibilityText(m_rawProps.alt.value());
+        } else {
+            this->getLocalRootArkUINode().resetAccessibilityText();
+        }
     }
 }
 
@@ -103,6 +95,7 @@ void ImageComponentInstance::onComplete(float width, float height) {
         payload.setProperty(runtime, "source", source);
         return payload;
     });
+    m_eventEmitter->onLoadEnd();
 }
 
 void ImageComponentInstance::onError(int32_t errorCode) {
@@ -125,6 +118,7 @@ void ImageComponentInstance::onError(int32_t errorCode) {
         payload.setProperty(runtime, "source", source);
         return payload;
     });
+    m_eventEmitter->onLoadEnd();
 }
 
 void ImageComponentInstance::onLoadStart() {
@@ -132,4 +126,12 @@ void ImageComponentInstance::onLoadStart() {
         m_eventEmitter->onLoadStart();
     }
 }
+
+ImageComponentInstance::ImageRawProps ImageComponentInstance::ImageRawProps::getFromDynamic(folly::dynamic value) {
+    auto resizeMethod = (value.count("resizeMethod") > 0) ? std::optional(value["resizeMethod"].asString()) : std::nullopt;
+    auto focusable = (value.count("focusable") > 0) ? std::optional(value["focusable"].asBool()) : std::nullopt;
+    auto alt = (value.count("alt") > 0) ? std::optional(value["alt"].asString()) : std::nullopt;
+    return {resizeMethod, focusable, alt};
+}
+
 } // namespace rnoh

@@ -49,7 +49,8 @@ export const ImageTest = () => {
       />
       <TestCase.Example
         tags={['C_API']}
-        itShould="display alt when the image doesn't load">
+        itShould="display alt when the image doesn't load"
+        skip={'screenReader is not available'}>
         <View style={{minHeight: 50}}>
           <Image
             source={require('../assets/fonts/Pacifico-Regular.ttf')}

@@ -266,6 +266,11 @@ namespace rnoh {
         return *this;
     }
 
+    ArkUINode &ArkUINode::resetAccessibilityText() {
+        maybeThrow(NativeNodeApi::getInstance()->resetAttribute(m_nodeHandle, NODE_ACCESSIBILITY_TEXT));
+        return *this;
+    }
+
     ArkUINode::~ArkUINode() {
         if (m_nodeHandle) {
             ArkUINodeRegistry::getInstance().unregisterNode(this);

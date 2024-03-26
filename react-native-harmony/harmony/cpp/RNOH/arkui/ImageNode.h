@@ -25,14 +25,18 @@ public:
     ~ImageNode();
     ImageNode &setSources(facebook::react::ImageSources const &src);
     ImageNode &setResizeMode(facebook::react::ImageResizeMode const &mode);
-    ImageNode &SetTintColor(facebook::react::SharedColor const &sharedColor);
+    ImageNode &setTintColor(facebook::react::SharedColor const &sharedColor);
     ImageNode &setBlur(facebook::react::Float blur);
     ImageNode &setObjectRepeat(facebook::react::ImageResizeMode const &resizeMode);
 
     ImageNode &setInterpolation(int32_t interpolation);
     ImageNode &setDraggable(bool draggable);
     ImageNode &setFocusable(bool focusable);
-    ImageNode &setResizeMethod(std::string const &method);
+    ImageNode &setResizeMethod(std::string const &resizeMethod);
+    ImageNode &setAlt(facebook::react::ImageSources const &src);
+
+    ImageNode &resetFocusable();
+    ImageNode &resetResizeMethod();
 
     void onNodeEvent(ArkUI_NodeEvent *event) override;
     void setNodeDelegate(ImageNodeDelegate *imageNodeDelegate);
