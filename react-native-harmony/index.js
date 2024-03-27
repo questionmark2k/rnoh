@@ -158,6 +158,10 @@ module.exports = {
   get UIManager() {
     return require('./Libraries/ReactNative/UIManager');
   },
+  get unstable_batchedUpdates() {
+    return require('react-native/Libraries/ReactNative/RendererProxy')
+      .unstable_batchedUpdates;
+  },
   get useAnimatedValue() {
     return require('react-native/Libraries/Animated/useAnimatedValue').default;
   },
