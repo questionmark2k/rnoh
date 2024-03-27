@@ -6,9 +6,10 @@
  */
 
 #pragma once
-
 #ifdef WITH_FBSYSTRACE
 #include <fbsystrace.h>
+#elif defined(WITH_HITRACE_SYSTRACE)
+#include <extras/HiTraceSystraceSection.h>
 #endif
 
 namespace facebook {
@@ -46,6 +47,8 @@ struct ConcreteSystraceSection {
   fbsystrace::FbSystraceSection m_section;
 };
 using SystraceSection = ConcreteSystraceSection;
+#elif defined(WITH_HITRACE_SYSTRACE)
+using SystraceSection = HiTraceSystraceSection;
 #else
 struct DummySystraceSection {
  public:

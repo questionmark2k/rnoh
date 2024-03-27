@@ -31,7 +31,8 @@
     "benchmark-fps": "node ./scripts/get-frame-times | node ./scripts/create-fps-stats",
     "find_changed_files": "{ git diff --name-only main...; git diff --name-only; git diff --name-only --cached; } | sort | uniq",
     "find_changed_files:cpp": "npm run find_changed_files | grep -E \"\\.(h|cpp)$\"",
-    "test": "jest"
+    "test": "jest",
+    "hiprofiler": "./scripts/run-hiprofiler-cmd.sh"
   },
   "dependencies": {
     "@gorhom/portal": "^1.0.14",

@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.4.1)
+cmake_policy(SET CMP0079 NEW) # Allow to link libraries from different directories than targets
 
 set(NATIVERENDER_ROOT_PATH "${RNOH_CPP_DIR}")
 set(third_party_dir "${RNOH_CPP_DIR}/third-party")
@@ -483,6 +484,12 @@ target_include_directories(rnoh PUBLIC
     "${hermes_include_dirs}"
     "${RNOH_APP_DIR}"
 )
+# add hitrace systrace implementation for debugging
+if(DEFINED WITH_HITRACE_SYSTRACE)
+    target_link_libraries(reactnative libhitrace_ndk.z.so)
+    target_link_libraries(react_nativemodule_core libhitrace_ndk.z.so)
+    target_link_libraries(react_render_debug libhitrace_ndk.z.so)
+endif()
 target_link_libraries(rnoh PUBLIC
     libace_napi.z.so
     libace_ndk.z.so
