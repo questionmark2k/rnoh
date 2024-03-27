@@ -11,7 +11,7 @@ namespace facebook {
 namespace react {
 
 void *TextLayoutManager::getNativeTextLayoutManager() const {
-    return (void *)this;
+    return (void *)m_textLayoutManagerDelegate.get();
 }
 
 TextMeasurement TextLayoutManager::measure(
