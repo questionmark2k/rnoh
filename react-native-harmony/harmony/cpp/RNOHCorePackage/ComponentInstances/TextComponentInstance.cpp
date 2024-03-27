@@ -38,7 +38,6 @@ void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react
     if (textProps == nullptr) {
         return;
     }
-    
     // padding
     TextPaddingInfo info = TextConversions::getArkUIPadding(textProps);
     VLOG(3) << "[text-debug] textProps->setPadding top=" << info.top << ", right=" << info.right
@@ -101,6 +100,7 @@ void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react
             VLOG(3) << "[text-debug] minFontSize=" << minFontSize.value();
         }
     }
+    this->setParagraphAttributes(textProps->paragraphAttributes);
     VLOG(3) << "[text-debug] setProps end";
 }
 
@@ -137,7 +137,6 @@ void TextComponentInstance::onStateChanged(
         }
     }
     this->setTextAttributes(textState->getData().attributedString.getFragments()[0].textAttributes);
-    this->setParagraphAttributes(textState->getData().paragraphAttributes);
 }
 
 void TextComponentInstance::setTextAttributes(const facebook::react::TextAttributes &textAttributes) {
@@ -269,7 +268,7 @@ void TextComponentInstance::setImageSpanSize(const facebook::react::Size &imageS
 }
 
 void TextComponentInstance::setParagraphAttributes(const facebook::react::ParagraphAttributes &paragraphAttributes) {
-    // TextMaxLines
+    // maximumNumberOfLines
     VLOG(3) << "[text-debug] paragraphAttributes.maximumNumberOfLines=" << paragraphAttributes.maximumNumberOfLines;
     if (paragraphAttributes.maximumNumberOfLines > 0) {
         m_textNode.setTextMaxLines(paragraphAttributes.maximumNumberOfLines);

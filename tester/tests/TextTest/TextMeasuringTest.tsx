@@ -1,6 +1,7 @@
-import {Text, View} from 'react-native';
+import {Text, View, Button} from 'react-native';
 import {TestSuite, TestCase} from '@rnoh/testerino';
 import {SAMPLE_PARAGRAPH_TEXT} from './fixtures';
+import {useState} from 'react';
 
 export function TextMeasuringTest() {
   return (
@@ -360,6 +361,9 @@ export function TextMeasuringTest() {
         <TestCase tags={['C_API']} itShould="show 2 lines of text">
           <Text numberOfLines={2}>{SAMPLE_PARAGRAPH_TEXT}</Text>
         </TestCase>
+        <TestCase tags={['C_API']} itShould="click to update numberOfLines">
+          <TextUpdateNumberOfLinesTest/>
+        </TestCase>
         <TestCase
           tags={['C_API']}
           itShould="show text without a space below or above (fragments)">
@@ -400,5 +404,20 @@ export function TextMeasuringTest() {
         </TestCase>
       </TestSuite>
     </TestSuite>
+  );
+}
+
+const TextUpdateNumberOfLinesTest = () => {
+  const [maxLines, setMaxLines] = useState(1);
+  return (
+    <View>
+      <Button
+        title='Click'
+        onPress={() => {
+          setMaxLines(prev => prev % 8 + 1);
+        }}
+      />
+      <Text numberOfLines={maxLines}>{SAMPLE_PARAGRAPH_TEXT}</Text>
+    </View>
   );
 }
