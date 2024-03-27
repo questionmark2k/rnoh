@@ -362,7 +362,7 @@ export function TextMeasuringTest() {
           <Text numberOfLines={2}>{SAMPLE_PARAGRAPH_TEXT}</Text>
         </TestCase>
         <TestCase tags={['C_API']} itShould="click to update numberOfLines">
-          <TextUpdateNumberOfLinesTest/>
+          <TextUpdateNumberOfLinesTest />
         </TestCase>
         <TestCase
           tags={['C_API']}
@@ -412,12 +412,12 @@ const TextUpdateNumberOfLinesTest = () => {
   return (
     <View>
       <Button
-        title='Click'
+        title="Click"
         onPress={() => {
-          setMaxLines(prev => prev % 8 + 1);
+          setMaxLines(prev => (prev % 8) + 1);
         }}
       />
       <Text numberOfLines={maxLines}>{SAMPLE_PARAGRAPH_TEXT}</Text>
     </View>
   );
-}
+};

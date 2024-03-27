@@ -11,6 +11,8 @@ protected:
     TextInputNodeBase(ArkUI_NodeType nodeType);
 
 public:
+    void setPadding(int32_t padding);
+
     void setFocusable(bool const &focusable);
 
     void setAutoFocus(bool const &autoFocus);

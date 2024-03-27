@@ -6,6 +6,12 @@ namespace rnoh {
 TextInputNodeBase::TextInputNodeBase(ArkUI_NodeType nodeType)
     : ArkUINode(NativeNodeApi::getInstance()->createNode(nodeType)) {}
 
+void TextInputNodeBase::setPadding(int32_t padding) {
+    ArkUI_NumberValue value[] = { (float)padding };
+    ArkUI_AttributeItem item = { value, sizeof(value)/sizeof(ArkUI_NumberValue) };
+    maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_PADDING, &item));
+}
+
 void TextInputNodeBase::setFocusable(bool const &focusable) {
     int32_t focusableValue = 1;
     if (!focusable) {

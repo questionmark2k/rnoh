@@ -46,6 +46,10 @@ void TextInputComponentInstance::onPropsChanged(std::shared_ptr<const facebook::
     CppComponentInstance::onPropsChanged(props);
     auto p = std::dynamic_pointer_cast<const facebook::react::TextInputProps>(props);
     multiline_ = props->traits.multiline;
+    if (!m_props) {
+        m_textAreaNode.setPadding(0);
+        m_textInputNode.setPadding(0);
+    }
     if (!m_props || *(props->textAttributes.foregroundColor) != *(m_props->textAttributes.foregroundColor)) {
         if (props->textAttributes.foregroundColor) {
             m_textAreaNode.setFontColor(props->textAttributes.foregroundColor);
@@ -130,6 +134,10 @@ void TextInputComponentInstance::onPropsChanged(std::shared_ptr<const facebook::
 
     if (!m_props || *(props->selectionColor) != *(m_props->selectionColor)) {
         m_textInputNode.setSelectedBackgroundColor(props->selectionColor);
+        if (!props->cursorColor) {
+            m_textAreaNode.setCaretColor(props->selectionColor, multiline_);
+            m_textInputNode.setCaretColor(props->selectionColor, multiline_);
+        }
     }
     if (!m_props || props->traits.secureTextEntry != m_props->traits.secureTextEntry
         || props->traits.keyboardType != m_props->traits.keyboardType) {
