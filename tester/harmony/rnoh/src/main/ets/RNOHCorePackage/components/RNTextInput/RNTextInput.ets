@@ -141,6 +141,18 @@ export struct RNTextInput {
     return event;
   }
 
+  createTextInputSelectionEvent(): TextInputEvent {
+    const event: TextInputEvent = {
+      text: this.value,
+      eventCount: this.nativeEventCount,
+      selectionRange: {
+        location: this.selection.start,
+        length: this.selection.end - this.selection.start,
+      }
+    };
+    return event;
+  }
+
   handleChangeEvent(value: string) {
     this.value = value
     if (this.shouldIgnoreNextValueChange) {
@@ -250,7 +262,7 @@ export struct RNTextInput {
         return { style: this.isEditing ? CancelButtonStyle.INPUT : CancelButtonStyle.INVISIBLE };
       case 'unless-editing':
         return { style: this.isEditing ? CancelButtonStyle.INVISIBLE : CancelButtonStyle.INPUT };
-      default :
+      default:
         return { style: CancelButtonStyle.INVISIBLE };
     }
   }
@@ -262,8 +274,7 @@ export struct RNTextInput {
   dispatchKeyEvent(currentSelection: Selection): void {
     if (this.textWasPastedOrCut) {
       this.textWasPastedOrCut = false;
-    }
-    else if (this.valueChanged) {
+    } else if (this.valueChanged) {
       const noPreviousSelection = this.selection.start === this.selection.end;
       const cursorDidNotMove = currentSelection.start === this.selection.start;
       const cursorMovedBackwardsOrAtBeginningOfInput = (currentSelection.start < this.selection.start) || currentSelection.start <= 0;
@@ -296,7 +307,7 @@ export struct RNTextInput {
     this.dispatchKeyEvent({ start: currentSelectionStart, end: currentSelectionEnd });
     this.selection = { start: currentSelectionStart, end: currentSelectionEnd };
     this.dispatchChangeEvent();
-    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onSelectionChange", this.createTextInputEvent());
+    this.ctx.rnInstance.emitComponentEvent(this.descriptor.tag, "onSelectionChange", this.createTextInputSelectionEvent());
   }
 
   build() {
@@ -346,7 +357,9 @@ export struct RNTextInput {
           .onPaste(() => this.onPaste())
           .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
           .type(getTextAreaType(this.descriptor.props.keyboardType))
-	  .onEditChange((isEditing) => { this.isEditing = isEditing; })
+          .onEditChange((isEditing) => {
+            this.isEditing = isEditing;
+          })
           .selectionMenuHidden(this.descriptorWrapper?.contextMenuHidden)
       } else {
         TextInput({
@@ -403,7 +416,9 @@ export struct RNTextInput {
           .cancelButton(this.getCancelButton())
           .onPaste(() => this.onPaste())
           .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
-	  .onEditChange((isEditing) => { this.isEditing = isEditing; })
+          .onEditChange((isEditing) => {
+            this.isEditing = isEditing;
+          })
           .selectionMenuHidden(this.descriptorWrapper?.contextMenuHidden)
       }
     }

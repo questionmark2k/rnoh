@@ -404,7 +404,11 @@ export function TextInputTest() {
       </TestCase.Example>
       <TestCase.Example modal itShould="clear text on focus">
         {/* iOS only */}
-        <TextInputWithText style={styles.textInput} clearTextOnFocus />
+        <TextInputWithText
+          style={styles.textInput}
+          defaultValue="Hello, World!"
+          clearTextOnFocus
+        />
       </TestCase.Example>
       <TestCase.Example modal itShould="use different clearButtonMode values">
         <TextInputWithText style={styles.textInput} clearButtonMode="always" />
@@ -439,6 +443,11 @@ export function TextInputTest() {
       </TestCase.Example>
       <TestCase.Example
         modal
+        itShould="show controlled textinput with 'Selection' substring selected">
+        <ControlledSelectionTest />
+      </TestCase.Example>
+      <TestCase.Example
+        modal
         itShould="not show text context menu when long press">
         <ContextMenuHiddenTest />
       </TestCase.Example>
@@ -448,6 +457,11 @@ export function TextInputTest() {
           selectTextOnFocus
           style={styles.textInput}
         />
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        itShould="allow to change the text input value via props">
+        <TextInputValueSetProgrammatically />
       </TestCase.Example>
     </TestSuite>
   );
@@ -586,6 +600,49 @@ const DefaultProps = () => {
   };
 
   return <TextInput style={styles.textInput} />;
+};
+
+const TextInputValueSetProgrammatically = () => {
+  const [value, setValue] = useState('Default Text Input Value');
+
+  return (
+    <View style={{height: 400}}>
+      <View style={{marginBottom: 16}}>
+        <Button
+          label="Set 'Hello, World!' as text input value "
+          onPress={() => setValue('Hello, World!')}
+        />
+        <Button
+          label="Set 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' as text input value "
+          onPress={() =>
+            setValue('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')
+          }
+        />
+        <Button label="Clear text input value" onPress={() => setValue('')} />
+      </View>
+      <TextInput
+        style={styles.textInput}
+        defaultValue={value}
+        value={value}
+        onChangeText={setValue}
+      />
+    </View>
+  );
+};
+
+const ControlledSelectionTest = () => {
+  const [value, setValue] = useState('TextSelectionTest');
+
+  return (
+    <View>
+      <TextInput
+        style={styles.textInput}
+        value={value}
+        onChange={event => setValue(event.nativeEvent.text)}
+        selection={{start: 4, end: 13}}
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
