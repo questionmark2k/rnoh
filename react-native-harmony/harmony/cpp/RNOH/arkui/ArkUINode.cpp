@@ -183,11 +183,7 @@ namespace rnoh {
 
     ArkUINode &ArkUINode::setBackgroundColor(facebook::react::SharedColor const &color) {
         // TODO: figure out if we need to update (to a clear value), or return early here
-        if (!facebook::react::isColorMeaningful(color)) {
-            return *this;
-        }
-        uint32_t colorValue =
-            *color; // facebook::react::isColorMeaningful(color) ? *color : *facebook::react::clearColor();
+        uint32_t colorValue = facebook::react::isColorMeaningful(color) ? *color : *facebook::react::clearColor();
         ArkUI_NumberValue preparedColorValue[] = {{.u32 = colorValue}};
         ArkUI_AttributeItem colorItem = {preparedColorValue, sizeof(preparedColorValue) / sizeof(ArkUI_NumberValue)};
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_BACKGROUND_COLOR, &colorItem));
