@@ -69,9 +69,11 @@ namespace rnoh {
         void schedulerDidDispatchCommand(const facebook::react::ShadowView &shadowView, std::string const &commandName,
                                          folly::dynamic const &args) override {
             m_schedulerDelegateArkTS->schedulerDidDispatchCommand(shadowView, commandName, args);
-            auto componentInstance = m_componentInstanceRegistry->findByTag(shadowView.tag);
+            auto const &componentInstance = m_componentInstanceRegistry->findByTag(shadowView.tag);
             if (componentInstance != nullptr) {
-                componentInstance->handleCommand(commandName, args);
+                m_taskExecutor->runTask(TaskThread::MAIN, [componentInstance, commandName, args] {
+                    componentInstance->handleCommand(commandName, args);
+                });
             }
         }
 
