@@ -12,13 +12,17 @@ import {Button, ObjectDisplayer, TestCase} from '../../components';
 export function MiscPropsTest() {
   return (
     <TestSuite name="misc props">
-      <TestCase.Example itShould="scroll should be disabled" tags={['C_API']}>
+      <TestCase.Example
+        itShould="scroll should be disabled"
+        tags={['C_API']}
+        modal>
         <View style={styles.wrapperView}>
           <ScrollView {...COMMON_PROPS} scrollEnabled={false} />
         </View>
       </TestCase.Example>
       <TestCase.Example
         itShould="display horizontal scroll view"
+        modal
         tags={['C_API']}>
         <View
           style={{
@@ -69,6 +73,7 @@ export function MiscPropsTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="display onScroll native event throttled every second">
         <ObjectDisplayer
           renderContent={setObject => {
@@ -87,6 +92,7 @@ export function MiscPropsTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="the left scrollview should decelerate faster (stops earlier) than the right one (decelarationRate)">
         <View style={[styles.wrapperView, {flexDirection: 'row'}]}>
           <ScrollView {...COMMON_PROPS} decelerationRate={0.8} />

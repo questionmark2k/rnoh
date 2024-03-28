@@ -15,14 +15,19 @@ export function ScrollToTest() {
     <TestSuite name="scrollTo">
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="scroll down on button press (no animation)">
         <ScrollToTestCase animated={false} />
       </TestCase.Example>
-      <TestCase.Example itShould="scroll down on button press (with animation)">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="scroll down on button press (with animation)">
         <ScrollToTestCase animated={true} />
       </TestCase.Example>
       <TestCase.Manual
         tags={['C_API']}
+        modal
         itShould="call onScroll once when scrolling without animation"
         initialState={0}
         arrange={({setState}) => (
@@ -36,6 +41,8 @@ export function ScrollToTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
+        modal
         itShould="call onScroll multiple times when scrolling with animation"
         initialState={0}
         arrange={AnimatedScrollToEventCountTestCase}

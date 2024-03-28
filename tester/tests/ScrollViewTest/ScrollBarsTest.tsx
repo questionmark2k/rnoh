@@ -11,13 +11,17 @@ import {Button, TestCase} from '../../components';
 export function ScrollBarsTest() {
   return (
     <TestSuite name="scroll indicators / scrollbar">
-      <TestCase.Example tags={['C_API']} itShould="have persistent scrollbar">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="have persistent scrollbar">
         <View style={styles.wrapperView}>
           <ScrollView persistentScrollbar={true} {...COMMON_PROPS} />
         </View>
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="shows white vertical scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView {...COMMON_PROPS} indicatorStyle={'white'} />
@@ -25,6 +29,7 @@ export function ScrollBarsTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="show vertical scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView {...COMMON_PROPS} showsVerticalScrollIndicator={true} />
@@ -32,6 +37,7 @@ export function ScrollBarsTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="hide vertical scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView showsVerticalScrollIndicator={false} {...COMMON_PROPS} />
@@ -39,6 +45,7 @@ export function ScrollBarsTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="show horizontal scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView
@@ -51,6 +58,7 @@ export function ScrollBarsTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="hide horizontal scroll indicator">
         <View style={styles.wrapperView}>
           <ScrollView
@@ -61,7 +69,10 @@ export function ScrollBarsTest() {
           </ScrollView>
         </View>
       </TestCase.Example>
-      <TestCase.Example tags={['C_API']} itShould="flash scroll indicators">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="flash scroll indicators">
         <FlashIndicatorsTest />
       </TestCase.Example>
       <TestCase.Example

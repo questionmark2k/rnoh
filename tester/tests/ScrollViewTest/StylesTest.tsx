@@ -7,6 +7,7 @@ export function StylesTest() {
     <TestSuite name="styles">
       <TestCase
         tags={['C_API']}
+        modal
         itShould="render scroll view with different border radii (topLeft, topRight, ...)">
         <View style={styles.wrapperView}>
           <ScrollView
@@ -25,6 +26,7 @@ export function StylesTest() {
       </TestCase>
       <TestCase
         tags={['C_API']}
+        modal
         itShould="render scroll view with different border widths (left, right, top, bottom)">
         <View style={styles.wrapperView}>
           <ScrollView
@@ -42,6 +44,7 @@ export function StylesTest() {
       </TestCase>
       <TestCase
         tags={['C_API']}
+        modal
         itShould="render scroll view with different border colors (left, right, top, bottom)">
         <View style={styles.wrapperView}>
           <ScrollView
@@ -59,6 +62,7 @@ export function StylesTest() {
       </TestCase>
       <TestCase
         tags={['C_API']}
+        modal
         itShould="render  scroll view with different border radii (start, end)">
         <View style={styles.wrapperView}>
           <ScrollView
@@ -77,6 +81,7 @@ export function StylesTest() {
       </TestCase>
       <TestCase
         tags={['C_API']}
+        modal
         itShould="render scroll view with different border widths (start, end)">
         <View style={styles.wrapperView}>
           <ScrollView
@@ -94,6 +99,7 @@ export function StylesTest() {
       </TestCase>
       <TestCase
         tags={['C_API']}
+        modal
         itShould="render scroll view with different border colors (start, end)">
         <View style={styles.wrapperView}>
           <ScrollView

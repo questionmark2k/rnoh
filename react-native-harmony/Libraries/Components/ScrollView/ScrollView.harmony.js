@@ -1832,8 +1832,8 @@ class ScrollView extends React.Component<Props, State> {
         this.props.snapToOffsets == null,
       // RNOH patch - resolving flashScrollIndicators command on the JS side
       // as it is currently not feasible on the native side 
-      showsVerticalScrollIndicator: this.props.showsVerticalScrollIndicator || this.state.showScrollIndicator,
-      showsHorizontalScrollIndicator: this.props.showsHorizontalScrollIndicator || this.state.showScrollIndicator,
+      showsVerticalScrollIndicator: (this.props.showsVerticalScrollIndicator ?? true) || this.state.showScrollIndicator,
+      showsHorizontalScrollIndicator: (this.props.showsHorizontalScrollIndicator ?? true) || this.state.showScrollIndicator,
       persistentScrollbar: this.props.persistentScrollbar || this.state.showScrollIndicator,
     };
 
