@@ -1,6 +1,7 @@
 import {TestCase, TestSuite} from '@rnoh/testerino';
 import {Platform, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {getScrollViewContent} from './fixtures';
+import React from 'react';
 
 export function StickyHeadersTest() {
   return (
@@ -52,7 +53,7 @@ export function StickyHeadersTest() {
           <ScrollView
             stickyHeaderIndices={[0, 3]}
             nestedScrollEnabled
-            StickyHeaderComponent={() => <Text>custom sticky header</Text>}>
+            StickyHeaderComponent={CustomStickyHeader}>
             {getScrollViewContent({})}
           </ScrollView>
         </View>
@@ -60,6 +61,10 @@ export function StickyHeadersTest() {
     </TestSuite>
   );
 }
+
+const CustomStickyHeader = React.forwardRef(() => (
+  <Text>custom sticky header</Text>
+));
 
 const styles = StyleSheet.create({
   wrapperView: {
