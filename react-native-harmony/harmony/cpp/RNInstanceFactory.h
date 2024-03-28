@@ -32,40 +32,22 @@
 using namespace rnoh;
 
 std::shared_ptr<RNInstanceInternal>
-createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef,
-                 napi_ref frameNodeFactoryRef, MutationsListener &&mutationsListener,
-                 MountingManager::CommandDispatcher &&commandDispatcher, napi_ref measureTextFnRef,
-                 napi_ref napiEventDispatcherRef, FeatureFlagRegistry::Shared featureFlagRegistry,
-                 UITicker::Shared uiTicker, bool shouldEnableDebugger, bool shouldEnableBackgroundExecutor) {
+createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef, napi_ref frameNodeFactoryRef,
+                 MutationsListener &&mutationsListener, MountingManager::CommandDispatcher &&commandDispatcher,
+                 napi_ref measureTextFnRef, napi_ref napiEventDispatcherRef,
+                 FeatureFlagRegistry::Shared featureFlagRegistry, UITicker::Shared uiTicker, bool shouldEnableDebugger,
+                 bool shouldEnableBackgroundExecutor) {
     auto shouldUseCAPIArchitecture = featureFlagRegistry->getFeatureFlagStatus("C_API_ARCH");
     std::shared_ptr<TaskExecutor> taskExecutor = std::make_shared<TaskExecutor>(env, shouldEnableBackgroundExecutor);
     auto arkTSChannel = std::make_shared<ArkTSChannel>(taskExecutor, ArkJS(env), napiEventDispatcherRef);
 
-    taskExecutor->setExceptionHandler([weakExecutor = std::weak_ptr(taskExecutor),
-                                       weakChannel = std::weak_ptr(arkTSChannel)](std::exception const &e) {
+    taskExecutor->setExceptionHandler([weakExecutor = std::weak_ptr(taskExecutor)](std::exception_ptr e) {
         auto executor = weakExecutor.lock();
         if (executor == nullptr) {
             return;
         }
-
-        auto payload = folly::dynamic::object();
-        if (auto *jsError = dynamic_cast<const facebook::jsi::JSError *>(&e)) {
-            payload("message", jsError->getMessage())("stack", jsError->getStack());
-        } else {
-            payload("message", e.what());
-        }
-
-        try {
-            std::rethrow_if_nested(e);
-        } catch (std::exception const &nested) {
-            payload("nested", nested.what());
-        }
-
-        executor->runTask(TaskThread::MAIN, [payload = folly::dynamic(std::move(payload)), weakChannel]() {
-            auto channel = weakChannel.lock();
-            if (channel != nullptr) {
-                channel->postMessage("RNOH_ERROR", std::move(payload));
-            }
+        executor->runTask(TaskThread::MAIN, [e]() {
+            ArkTSBridge::getInstance()->handleError(e);
         });
     });
 
@@ -140,8 +122,9 @@ createRNInstance(int id, napi_env env, napi_ref arkTsTurboModuleProviderRef,
         auto componentInstanceFactory = std::make_shared<ComponentInstanceFactory>(
             componentInstanceFactoryDelegates, componentInstanceDependencies, customComponentArkUINodeFactory);
         auto componentInstanceRegistry = std::make_shared<ComponentInstanceRegistry>();
-        auto schedulerDelegateCAPI = std::make_unique<SchedulerDelegateCAPI>(
-            taskExecutor, componentInstanceRegistry, componentInstanceFactory, std::move(schedulerDelegateArkTS), mountingManager);
+        auto schedulerDelegateCAPI =
+            std::make_unique<SchedulerDelegateCAPI>(taskExecutor, componentInstanceRegistry, componentInstanceFactory,
+                                                    std::move(schedulerDelegateArkTS), mountingManager);
         auto rnInstance = std::make_shared<RNInstanceCAPI>(
             id, contextContainer, std::move(turboModuleFactory), taskExecutor, componentDescriptorProviderRegistry,
             mutationsToNapiConverter, eventEmitRequestHandlers, globalJSIBinders, uiTicker, shadowViewRegistry,

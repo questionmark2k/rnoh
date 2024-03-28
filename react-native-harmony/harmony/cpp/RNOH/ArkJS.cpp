@@ -129,6 +129,50 @@ napi_value ArkJS::createFromDynamic(folly::dynamic dyn) {
     }
 }
 
+napi_value ArkJS::createFromException(std::exception e) {
+    folly::dynamic errData = folly::dynamic::object;
+    errData["message"] = e.what();
+    return this->createFromDynamic(errData);
+}
+
+napi_value ArkJS::createFromJSError(facebook::jsi::JSError e) {
+    folly::dynamic errData = folly::dynamic::object;
+    errData["message"] = e.getMessage();
+    try {
+        std::rethrow_if_nested(e);
+    } catch (std::exception const &nested) {
+        errData["details"] = nested.what();
+    }
+    folly::dynamic dynStacktrace = folly::dynamic::array;
+    dynStacktrace.push_back(e.getStack());
+    return this->createFromDynamic(errData);
+}
+
+napi_value ArkJS::createFromRNOHError(rnoh::RNOHError e) {
+    folly::dynamic errData = folly::dynamic::object;
+    errData["message"] = e.getMessage();
+
+    folly::dynamic dynStacktrace = folly::dynamic::array;
+    for (const auto &trace : e.getStacktrace()) {
+        dynStacktrace.push_back(trace);
+    }
+    errData["stacktrace"] = dynStacktrace;
+
+    folly::dynamic dynSuggestions = folly::dynamic::array;
+    for (const auto &trace : e.getSuggestions()) {
+        dynSuggestions.push_back(trace);
+    }
+    errData["suggestions"] = dynSuggestions;
+
+    try {
+        std::rethrow_if_nested(e);
+    } catch (std::exception const &nested) {
+        errData["details"] = nested.what();
+    }
+    return this->createFromDynamic(errData);
+}
+
+
 napi_value ArkJS::getReferenceValue(napi_ref ref) {
     napi_value result;
     auto status = napi_get_reference_value(m_env, ref, &result);

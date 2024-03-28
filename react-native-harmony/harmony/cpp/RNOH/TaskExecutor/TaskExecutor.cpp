@@ -30,7 +30,17 @@ void TaskExecutor::runSyncTask(TaskThread thread, Task &&task) {
     if (currentThread.has_value()) {
         m_waitsOnThread[currentThread.value()] = thread;
     }
-    m_taskRunners[thread]->runSyncTask(std::move(task));
+    std::exception_ptr thrownError;
+    m_taskRunners[thread]->runSyncTask([task = std::move(task), &thrownError]() {
+        try {
+            task();
+        } catch (const std::exception &e) {
+            thrownError = std::current_exception();
+        }
+    });
+    if (thrownError) {
+        std::rethrow_exception(thrownError);
+    }
     if (currentThread.has_value()) {
         m_waitsOnThread[currentThread.value()] = std::nullopt;
     }

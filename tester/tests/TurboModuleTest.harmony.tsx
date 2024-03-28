@@ -15,12 +15,14 @@ export function TurboModuleTest() {
     <TestSuite name="TurboModule">
       <TestSuite name="manual implementation">
         <TestCase.Logical
+          tags={['C_API']}
           itShould="return null when calling getNull()"
           fn={({expect}) => {
             expect(SampleTurboModule.getNull(null)).to.be.null;
           }}
         />
         <TestCase.Logical
+          tags={['C_API']}
           itShould="return [1, 2, 3] when calling getArray"
           fn={({expect}) => {
             expect(SampleTurboModule.getArray([1, 2, 3])).to.eql([1, 2, 3]);
@@ -33,6 +35,7 @@ export function TurboModuleTest() {
           sampleTurboModule={GeneratedSampleTurboModule}
         />
         <TestCase.Logical
+          tags={['C_API']}
           itShould="get union value"
           fn={async ({expect}) => {
             expect(GeneratedSampleTurboModule.getUnionValue('foo')).to.be.eq(
@@ -41,6 +44,7 @@ export function TurboModuleTest() {
           }}
         />
         <TestCase.Logical
+          tags={['C_API']}
           itShould="support enums"
           fn={async ({expect}) => {
             const result = GeneratedSampleTurboModule.getEnum(
@@ -54,6 +58,7 @@ export function TurboModuleTest() {
           }}
         />
         <TestCase.Logical
+          tags={['C_API']}
           itShould="handle enums without specified values correctly"
           skip="RN codegen doesn't parse enums without explicit values correctly"
           fn={async ({expect}) => {
@@ -78,12 +83,14 @@ function CommonTurboModuleTestCases({
   return (
     <>
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return null when calling voidFunc()"
         fn={({expect}) => {
           expect(sampleTurboModule.voidFunc()).to.be.null;
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return true when calling getBool(true)"
         fn={({expect}) => {
           expect(sampleTurboModule.getBool(true)).to.be.true;
@@ -91,6 +98,7 @@ function CommonTurboModuleTestCases({
       />
 
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return { x: { y: 1 } } when calling getObject"
         fn={({expect}) => {
           expect(sampleTurboModule.getObject({x: {y: 1}})).to.eql({
@@ -99,6 +107,7 @@ function CommonTurboModuleTestCases({
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="call the callback and providing string argument"
         fn={async ({expect}) => {
           const promise = new Promise<string>(resolve => {
@@ -108,6 +117,7 @@ function CommonTurboModuleTestCases({
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="handle async jobs"
         fn={async ({expect}) => {
           const result = await sampleTurboModule?.doAsyncJob(true);
@@ -115,6 +125,7 @@ function CommonTurboModuleTestCases({
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="handle errors in async jobs"
         fn={async ({expect}) => {
           let errMsg: string | undefined;
@@ -128,6 +139,7 @@ function CommonTurboModuleTestCases({
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="get an array asynchronously"
         fn={async ({expect}) => {
           expect(await sampleTurboModule.getPromisedArray()).to.be.eql([

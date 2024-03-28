@@ -221,6 +221,8 @@ struct RNOHErrorCustomDialog {
         .borderWidth({ top: 1 })
         .borderColor("#666")
       }.backgroundColor("#1A1A1A")
+      .padding({ bottom: 64 })
+
     }
     .width("100%")
     .height("100%")

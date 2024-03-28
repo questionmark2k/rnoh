@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <functional>
 #include <arkui/native_node.h>
+#include "RNOH/ArkTSBridge.h"
 
 namespace rnoh {
 
@@ -15,22 +16,26 @@ class TouchEventHandler {
 };
 
 class ArkUINodeRegistry {
+    static std::unique_ptr<ArkUINodeRegistry> instance;
+    
   public:
-    static ArkUINodeRegistry &getInstance();
+      static void initialize(ArkTSBridge::Shared arkTSBridge);
+      static ArkUINodeRegistry &getInstance();
 
-    void registerNode(ArkUINode *node);
-    void unregisterNode(ArkUINode *node);
+      void registerNode(ArkUINode *node);
+      void unregisterNode(ArkUINode *node);
 
-    void registerTouchHandler(ArkUINode *node, TouchEventHandler *touchEventHandler);
-    void unregisterTouchHandler(ArkUINode *node);
+      void registerTouchHandler(ArkUINode *node, TouchEventHandler *touchEventHandler);
+      void unregisterTouchHandler(ArkUINode *node);
 
   private:
-    ArkUINodeRegistry();
+    ArkUINodeRegistry(ArkTSBridge::Shared arkTSBridge);
 
     void receiveEvent(ArkUI_NodeEvent *event);
 
     std::unordered_map<ArkUI_NodeHandle, ArkUINode *> m_nodeByHandle;
     std::unordered_map<ArkUI_NodeHandle, TouchEventHandler *> m_touchHandlerByNodeHandle;
+    ArkTSBridge::Shared m_arkTSBridge;
 };
 
 } // namespace rnoh

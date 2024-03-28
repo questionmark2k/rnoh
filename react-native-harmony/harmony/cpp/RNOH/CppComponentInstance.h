@@ -12,7 +12,6 @@
 #include <react/renderer/components/view/TouchEventEmitter.h>
 #include "RNOH/ComponentInstance.h"
 
-
 namespace rnoh {
     template <typename ShadowNodeT> class CppComponentInstance : public ComponentInstance {
         static_assert(std::is_base_of_v<facebook::react::ShadowNode, ShadowNodeT>,
@@ -40,7 +39,6 @@ namespace rnoh {
             if (!newProps) {
                 return;
             }
-
             this->onPropsChanged(newProps);
             m_props = newProps;
         }

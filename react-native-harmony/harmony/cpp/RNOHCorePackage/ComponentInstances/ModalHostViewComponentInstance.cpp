@@ -55,7 +55,7 @@ void ModalHostViewComponentInstance::onStateChanged(SharedConcreteState const &s
     CppComponentInstance::onStateChanged(state);
     if (!m_state) {
         // set screen size the first time the component is initialized
-        auto displayMetrics = ArkTSBridge::getInstance().getDisplayMetrics();
+        auto displayMetrics = ArkTSBridge::getInstance()->getDisplayMetrics();
         auto screenMetrics = displayMetrics.screenPhysicalPixels;
         facebook::react::Size screenSize = {.width = screenMetrics.width / screenMetrics.scale, .height = screenMetrics.height / screenMetrics.scale};
         state->updateState({screenSize});

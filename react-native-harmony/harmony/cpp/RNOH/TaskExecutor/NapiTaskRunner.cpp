@@ -37,7 +37,7 @@ NapiTaskRunner::NapiTaskRunner(napi_env env, ExceptionHandler exceptionHandler) 
             try {
             task();
             } catch (std::exception const &e) {
-                runner->exceptionHandler(e);
+                runner->exceptionHandler(std::current_exception());
             }
         }
 

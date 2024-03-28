@@ -22,23 +22,26 @@ struct DisplayMetrics {
 };
 
 class ArkTSBridge final {
-    static std::unique_ptr<ArkTSBridge> instance;
+    static std::shared_ptr<ArkTSBridge> instance;
     ArkTSBridge(napi_env env, napi_ref napiBridgeRef);
 
   public:
-    static void initializeInstance(napi_env env, napi_ref napiBridgeRef);
+    using Shared = std::shared_ptr<ArkTSBridge>;
+    
+    static void initializeInstance(napi_env env, napi_ref arkTSBridgeHandlerRef);
 
-    static ArkTSBridge &getInstance();
+    static ArkTSBridge::Shared getInstance();
 
     ArkTSBridge(ArkTSBridge const &) = delete;
     ArkTSBridge &operator=(ArkTSBridge const &) = delete;
 
     ~ArkTSBridge();
 
+    void handleError(std::exception_ptr ex);
     DisplayMetrics getDisplayMetrics();
 
   protected:
     ArkJS m_arkJs;
-    napi_ref m_napiBridgeRef;
+    napi_ref m_arkTSBridgeRef;
 };
 } // namespace rnoh

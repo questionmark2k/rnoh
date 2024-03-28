@@ -11,6 +11,8 @@
 #include <react/renderer/graphics/Float.h>
 #include <react/renderer/graphics/Color.h>
 #include <react/renderer/graphics/RectangleCorners.h>
+#include <jsi/jsi.h>
+#include "RNOH/RNOHError.h"
 
 class RNOHNapiObjectBuilder;
 class RNOHNapiObject;
@@ -54,6 +56,12 @@ class ArkJS {
     std::vector<napi_value> createFromDynamics(std::vector<folly::dynamic>);
 
     napi_value createFromDynamic(folly::dynamic);
+
+    napi_value createFromException(std::exception);
+    
+    napi_value createFromJSError(facebook::jsi::JSError);
+    
+    napi_value createFromRNOHError(rnoh::RNOHError);
 
     RNOHNapiObjectBuilder createObjectBuilder();
 

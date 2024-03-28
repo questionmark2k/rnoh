@@ -70,7 +70,7 @@ void ThreadTaskRunner::runLoop() {
             try {
                 task();
             } catch (std::exception const &e) {
-                exceptionHandler(e);
+                exceptionHandler(std::current_exception());
             }
             // notify the threads that called runSyncTask.
             // it's not enough to notify one thread,
@@ -86,7 +86,7 @@ void ThreadTaskRunner::runLoop() {
             try {
                 task();
             } catch (std::exception const &e) {
-                exceptionHandler(e);
+                exceptionHandler(std::current_exception());
             }
         }
     }

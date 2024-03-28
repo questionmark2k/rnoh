@@ -6,7 +6,7 @@
 class AbstractTaskRunner {
 public:
     using Task = std::function<void()>;
-    using ExceptionHandler = std::function<void(std::exception const &)>;
+    using ExceptionHandler = std::function<void(std::exception_ptr const)>;
 
     virtual void runAsyncTask(Task &&task) = 0;
     virtual void runSyncTask(Task &&task) = 0;

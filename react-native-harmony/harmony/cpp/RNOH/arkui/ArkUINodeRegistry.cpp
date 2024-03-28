@@ -3,12 +3,19 @@
 #include <glog/logging.h>
 #include "ArkUINode.h"
 #include "NativeNodeApi.h"
+#include "RNOH/Assert.h"
 
 namespace rnoh {
 
+std::unique_ptr<ArkUINodeRegistry> ArkUINodeRegistry::instance = nullptr;
+
+void ArkUINodeRegistry::initialize(ArkTSBridge::Shared arkTSBridge) {
+    instance = std::unique_ptr<ArkUINodeRegistry>(new ArkUINodeRegistry(std::move(arkTSBridge)));
+}
+
 ArkUINodeRegistry &ArkUINodeRegistry::getInstance() {
-    static ArkUINodeRegistry instance;
-    return instance;
+    RNOH_ASSERT(instance != nullptr);
+    return *instance;
 }
 
 void ArkUINodeRegistry::registerNode(ArkUINode *node) {
@@ -46,31 +53,35 @@ void ArkUINodeRegistry::unregisterTouchHandler(ArkUINode *node) {
     m_touchHandlerByNodeHandle.erase(it);
 }
 
-ArkUINodeRegistry::ArkUINodeRegistry() {
+ArkUINodeRegistry::ArkUINodeRegistry(ArkTSBridge::Shared arkTSBridge) : m_arkTSBridge(std::move(arkTSBridge)) {
     NativeNodeApi::getInstance()->registerNodeEventReceiver([](ArkUI_NodeEvent *event) {
         ArkUINodeRegistry::getInstance().receiveEvent(event);
     });
 }
 
 void ArkUINodeRegistry::receiveEvent(ArkUI_NodeEvent *event) {
-    if (event->kind == ArkUI_NodeEventType::NODE_TOUCH_EVENT) {
-        auto it = m_touchHandlerByNodeHandle.find(event->node);
-        if (it == m_touchHandlerByNodeHandle.end()) {
-            LOG(WARNING) << "Touch event for node with handle: " << event->node << " not found";
+    try {
+        if (event->kind == ArkUI_NodeEventType::NODE_TOUCH_EVENT) {
+            auto it = m_touchHandlerByNodeHandle.find(event->node);
+            if (it == m_touchHandlerByNodeHandle.end()) {
+                LOG(WARNING) << "Touch event for node with handle: " << event->node << " not found";
+                return;
+            }
+
+            it->second->onTouchEvent(event->touchEvent);
             return;
         }
 
-        it->second->onTouchEvent(event->touchEvent);
-        return;
-    }
+        auto it = m_nodeByHandle.find(event->node);
+        if (it == m_nodeByHandle.end()) {
+            LOG(WARNING) << "Node with handle: " << event->node << " not found";
+            return;
+        }
 
-    auto it = m_nodeByHandle.find(event->node);
-    if (it == m_nodeByHandle.end()) {
-        LOG(WARNING) << "Node with handle: " << event->node << " not found";
-        return;
+        it->second->onNodeEvent(event);
+    } catch (std::exception &e) {
+        m_arkTSBridge->handleError(std::current_exception());
     }
-
-    it->second->onNodeEvent(event);
 }
 
 } // namespace rnoh

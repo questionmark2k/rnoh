@@ -3,5 +3,5 @@
 #include "AbstractTaskRunner.h"
 
 namespace rnoh {
-     void defaultExceptionHandler(std::exception const &e);
+     void defaultExceptionHandler(std::exception_ptr e);
 }

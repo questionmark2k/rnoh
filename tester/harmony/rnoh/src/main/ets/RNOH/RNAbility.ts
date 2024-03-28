@@ -76,7 +76,18 @@ export abstract class RNAbility extends UIAbility {
       this.context
     );
     this.napiBridge.initializeArkTSBridge({
-      getDisplayMetrics: this.getDisplayMetrics.bind(this)
+      getDisplayMetrics: this.getDisplayMetrics.bind(this),
+      handleError: (errData: {
+        message: string,
+        suggestions?: string[],
+        stacktrace?: string[]
+      }) => {
+        this.reportError(new RNOHError({
+          whatHappened: errData.message,
+          howCanItBeFixed: (errData.suggestions ?? []),
+          customStack: (errData.stacktrace ?? []).join("\n"),
+        }));
+      }
     });
     this.jsPackagerClient = new JSPackagerClient(
       this.providedLogger,
