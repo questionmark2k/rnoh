@@ -63,7 +63,6 @@ export abstract class RNAbility extends UIAbility {
     this.rnInstanceRegistry = new RNInstanceRegistry(
       this.providedLogger,
       this.napiBridge,
-      this.context,
       (rnInstance) => this.createRNOHContext({
         rnInstance
       }))

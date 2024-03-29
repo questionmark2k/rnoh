@@ -1,4 +1,4 @@
-import { RNViewManager } from '..';
+import { RNViewManager } from '../componentManagers';
 import { ColorSegments, convertColorSegmentsToString, Descriptor, RNOHContext } from '../../RNOH';
 import { RNViewBase, ViewBaseProps, ViewRawProps } from './RNViewBase';
 
@@ -35,7 +35,7 @@ export struct RNSwitch {
   }
 
   onChange(isOn: boolean) {
-    this.ctx.rnInstanceManager.emitComponentEvent(
+    this.ctx.rnInstance.emitComponentEvent(
       this.descriptor.tag,
       "onChange",
       {

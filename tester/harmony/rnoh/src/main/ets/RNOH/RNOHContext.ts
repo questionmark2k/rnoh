@@ -1,6 +1,5 @@
-import type common from '@ohos.app.ability.common';
 import type { DescriptorRegistry } from './DescriptorRegistry';
-import type { RNComponentCommandHub, RNComponentCommandReceiver } from './RNComponentCommandHub';
+import type { RNComponentCommandReceiver } from './RNComponentCommandHub';
 import type { RNInstance, RNInstanceImpl } from './RNInstance';
 import type { ComponentManagerRegistry } from './ComponentManagerRegistry';
 import { RNOHCoreContext } from './RNOHCoreContext';
@@ -10,30 +9,12 @@ export class RNOHContext extends RNOHCoreContext {
     return this.rnInstance.descriptorRegistry;
   }
 
-  /**
-   * @deprecated: Use componentCommandReceiver instead.
-   */
-  public get commandDispatcher(): RNComponentCommandHub {
-    return this.rnInstanceImpl.componentCommandHub;
-  }
-
   public get componentCommandReceiver(): RNComponentCommandReceiver {
     return this.rnInstanceImpl.componentCommandHub;
   }
 
-  public get uiAbilityContext(): common.UIAbilityContext {
-    return this.rnInstance.abilityContext;
-  }
-
   public get componentManagerRegistry(): ComponentManagerRegistry {
     return this.rnInstance.componentManagerRegistry;
-  }
-
-  /**
-   * @deprecated Use `rnInstance` instead.
-   */
-  public get rnInstanceManager(): RNInstance {
-    return this.rnInstance;
   }
 
   public get rnInstance(): RNInstance {
@@ -43,13 +24,14 @@ export class RNOHContext extends RNOHCoreContext {
   constructor(
     public reactNativeVersion: string,
     private rnInstanceImpl: RNInstanceImpl,
-    public coreContext: RNOHCoreContext
+    coreContext: RNOHCoreContext
   ) {
     super(
       coreContext.logger,
       coreContext.getDisplayMetrics,
       coreContext.getUIAbilityState,
       coreContext.markReadiness,
+      coreContext.uiAbilityContext,
       coreContext.devToolsController,
       coreContext.devMenu,
       coreContext.safeAreaInsetsProvider,

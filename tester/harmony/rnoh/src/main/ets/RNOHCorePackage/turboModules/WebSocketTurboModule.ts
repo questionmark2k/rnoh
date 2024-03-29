@@ -52,7 +52,7 @@ export class WebSocketTurboModule extends TurboModule {
         params = contentHandler.processMessage(params);
       }
 
-      this.ctx.rnInstanceManager.emitDeviceEvent("websocketMessage", params);
+      this.ctx.rnInstance.emitDeviceEvent("websocketMessage", params);
     } else if (data instanceof ArrayBuffer) {
       const base64Data = this.base64.encodeToStringSync(new Uint8Array(data));
       let params: MessageParams = { id: socketID, type: 'text', data: base64Data };
@@ -60,7 +60,7 @@ export class WebSocketTurboModule extends TurboModule {
         params = contentHandler.processByteMessage(data, params);
       }
 
-      this.ctx.rnInstanceManager.emitDeviceEvent("websocketMessage", params);
+      this.ctx.rnInstance.emitDeviceEvent("websocketMessage", params);
     }
   }
 
@@ -75,7 +75,7 @@ export class WebSocketTurboModule extends TurboModule {
     }
 
     ws.on('open', (data) => {
-      this.ctx.rnInstanceManager.emitDeviceEvent("websocketOpen", {
+      this.ctx.rnInstance.emitDeviceEvent("websocketOpen", {
         id: socketID,
         protocol: "",
       });
@@ -84,7 +84,7 @@ export class WebSocketTurboModule extends TurboModule {
     ws.on('error', (err) => this.handleError(socketID, err));
     ws.on('message', (err, data) => this.onMessage(err, data, socketID));
     ws.on('close', (err, data) => {
-      this.ctx.rnInstanceManager.emitDeviceEvent("websocketClosed", {
+      this.ctx.rnInstance.emitDeviceEvent("websocketClosed", {
         id: socketID,
         ...data,
       })
@@ -146,7 +146,7 @@ export class WebSocketTurboModule extends TurboModule {
   private handleError(socketID: number, err) {
     if (err) {
       this.ctx.logger.info(`WebSocketTurboModule::handleError ${JSON.stringify(err)}`);
-      this.ctx.rnInstanceManager.emitDeviceEvent("websocketFailed", { id: socketID, message: JSON.stringify(err) });
+      this.ctx.rnInstance.emitDeviceEvent("websocketFailed", { id: socketID, message: JSON.stringify(err) });
       this.socketsById.delete(socketID);
       this.contentHandlersBySocketID.delete(socketID);
     }

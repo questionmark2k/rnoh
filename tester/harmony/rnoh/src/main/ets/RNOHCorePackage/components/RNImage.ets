@@ -166,7 +166,7 @@ export struct RNImage {
   }
 
   onLoadStart() {
-    this.ctx.rnInstanceManager.emitComponentEvent(
+    this.ctx.rnInstance.emitComponentEvent(
       this.descriptor.tag,
       "loadStart",
       null
@@ -174,7 +174,7 @@ export struct RNImage {
   }
 
   onLoadEnd() {
-    this.ctx.rnInstanceManager.emitComponentEvent(
+    this.ctx.rnInstance.emitComponentEvent(
       this.descriptor.tag,
       "loadEnd",
       null

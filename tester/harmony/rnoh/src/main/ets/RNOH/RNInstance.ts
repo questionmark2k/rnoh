@@ -1,5 +1,4 @@
 import type UIAbility from '@ohos.app.ability.UIAbility'
-import type common from '@ohos.app.ability.common'
 import { CommandDispatcher, RNComponentCommandHub } from './RNComponentCommandHub'
 import { DescriptorRegistry, DescriptorWrapperFactory } from './DescriptorRegistry'
 import { ComponentManagerRegistry } from './ComponentManagerRegistry'
@@ -85,7 +84,6 @@ export interface RNInstance {
    */
   commandDispatcher: CommandDispatcher;
   componentManagerRegistry: ComponentManagerRegistry;
-  abilityContext: common.UIAbilityContext;
 
   getLifecycleState(): LifecycleState;
 
@@ -184,7 +182,6 @@ export class RNInstanceImpl implements RNInstance {
   constructor(
     private id: number,
     private injectedLogger: RNOHLogger,
-    public abilityContext: common.UIAbilityContext,
     private frameNodeFactory: FrameNodeFactory | null,
     private napiBridge: NapiBridge,
     private defaultProps: Record<string, any>,
