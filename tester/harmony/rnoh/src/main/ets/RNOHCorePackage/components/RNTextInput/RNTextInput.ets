@@ -351,13 +351,13 @@ export struct RNTextInput {
             width: this.descriptorWrapper?.width,
             height: this.descriptorWrapper?.height
           })
-          .key(`TextInput@${this.tag}`)
+          .id(`TextInput@${this.tag}`)
           .onAppear(() => this.maybeFocusOnAppear())
           .focusable(this.descriptorWrapper?.focusable ?? true)
           .onPaste(() => this.onPaste())
-          .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
+          .onTextSelectionChange((start: number, end: number) => this.textSelectionChange(start, end))
           .type(getTextAreaType(this.descriptor.props.keyboardType))
-          .onEditChange((isEditing) => {
+          .onEditChange((isEditing: boolean) => {
             this.isEditing = isEditing;
           })
           .selectionMenuHidden(this.descriptorWrapper?.contextMenuHidden)
@@ -410,13 +410,13 @@ export struct RNTextInput {
             width: this.descriptorWrapper?.width,
             height: this.descriptorWrapper?.height
           })
-          .key(`TextInput@${this.tag}`)
+          .id(`TextInput@${this.tag}`)
           .onAppear(() => this.maybeFocusOnAppear())
           .focusable(this.descriptorWrapper?.focusable ?? true)
           .cancelButton(this.getCancelButton())
           .onPaste(() => this.onPaste())
-          .onTextSelectionChange((start, end) => this.textSelectionChange(start, end))
-          .onEditChange((isEditing) => {
+          .onTextSelectionChange((start: number, end: number) => this.textSelectionChange(start, end))
+          .onEditChange((isEditing: boolean) => {
             this.isEditing = isEditing;
           })
           .selectionMenuHidden(this.descriptorWrapper?.contextMenuHidden)
