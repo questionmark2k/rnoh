@@ -87,7 +87,17 @@ namespace rnoh {
         }
 
         bool containsPointInBoundingBox(facebook::react::Point const &point) const override {
-            return containsPoint(point);
+            if (containsPoint(point)) {
+                return true;
+            } else if (m_props != nullptr && !m_props->getClipsContentToBounds()) {
+                for (auto child : m_children) {
+                    auto childPoint = this->computeChildPoint(point, child);
+                    if (child->containsPointInBoundingBox(childPoint)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         bool canHandleTouch() const override {

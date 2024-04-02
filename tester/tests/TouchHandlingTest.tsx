@@ -34,7 +34,23 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
-
+      <TestCase.Manual
+        tags={['C_API']}
+        itShould="pass when pressed red rectangle which is outside its green parent view"
+        initialState={false}
+        arrange={({setState}) => {
+          return (
+            <TouchIssue2
+              onPress={() => {
+                setState(true);
+              }}
+            />
+          );
+        }}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
       <TestCase.Manual
         tags={['C_API']}
         itShould="register a touch after native transform animation"
@@ -306,6 +322,24 @@ const TouchIssue1 = ({onPress}: {onPress: () => void}) => {
       </View>
     );
   }
+};
+
+const TouchIssue2 = ({onPress}: {onPress: () => void}) => {
+    return (
+      <View style={{height:150}}>
+        <View  style={{opacity: 1, width:100, height:50, backgroundColor:'green'}} collapsable={false}>
+          <TouchableOpacity
+            style={{marginTop:50}}
+            onPress={() => {
+              onPress();
+            }}>
+            <View
+              style={{height: 100, width: 100, backgroundColor: 'red'}}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
 };
 
 class ScrollViewLockedIssue extends React.Component {
