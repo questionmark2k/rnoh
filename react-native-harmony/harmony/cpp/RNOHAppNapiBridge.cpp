@@ -62,7 +62,9 @@ napi_value initializeArkTSBridge(napi_env env, napi_callback_info info) {
     auto args = arkJs.getCallbackArgs(info, 1);
     auto bridgeHandlerRef = arkJs.createReference(args[0]);
     ArkTSBridge::initializeInstance(env, bridgeHandlerRef);
+#ifdef C_API_ARCH
     ArkUINodeRegistry::initialize(ArkTSBridge::getInstance());
+#endif
     return arkJs.getUndefined();
 }
 
