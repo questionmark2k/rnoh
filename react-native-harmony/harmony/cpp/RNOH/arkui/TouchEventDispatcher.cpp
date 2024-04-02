@@ -93,7 +93,7 @@ void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchT
 
     auto it = m_touchTargetTagById.find(event.actionTouch.id);
     if (it == m_touchTargetTagById.end()) {
-        DLOG(INFO) << "No target for current touch event";
+        VLOG(2) << "No target for current touch event with id: " << event.actionTouch.id;
         return;
     }
     auto eventTarget = it->second.lock();
@@ -187,7 +187,7 @@ void TouchEventDispatcher::registerTargetForTouch(ArkUI_NodeTouchPoint activeTou
     auto touchTarget = findTargetForTouchPoint(touchPoint, rootTarget).first;
     if (touchTarget) {
         m_touchTargetTagById.emplace(activeTouch.id, touchTarget);
-        DLOG(INFO) << "Touch with id " << id << " started on target with tag " << touchTarget->getTouchTargetTag();
+        VLOG(2) << "Touch with id " << id << " started on target with tag " << touchTarget->getTouchTargetTag();
     }
 }
 

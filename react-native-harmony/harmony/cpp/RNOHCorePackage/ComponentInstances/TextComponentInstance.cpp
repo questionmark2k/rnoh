@@ -6,23 +6,22 @@
 #include <react/renderer/components/text/ParagraphProps.h>
 #include <react/renderer/components/text/ParagraphState.h>
 #include <glog/logging.h>
+#include "RNOH/TextMeasurer.h"
+#include "TextConversions.h"
 
-using namespace rnoh;
-
-const static std::string IMAGE_SPAN_FLAG = "￼";
+namespace rnoh {
 const static float DEFAULT_LINE_SPACING = 0.15f;
-float DEFAULT_FONT_SIZE = 16.0f;
 
 TextComponentInstance::TextComponentInstance(Context context) : CppComponentInstance(std::move(context)) {
     m_stackNode.insertChild(m_textNode, 0);
-    m_children.clear();
+    m_childNodes.clear();
 }
 
 TextComponentInstance::~TextComponentInstance() {
-    for (auto item : m_children) {
+    for (auto const &item : m_childNodes) {
         m_textNode.removeChild(*item);
     }
-    m_children.clear();
+    m_childNodes.clear();
 }
 
 void TextComponentInstance::onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) {
@@ -33,7 +32,7 @@ void TextComponentInstance::onChildRemoved(ComponentInstance::Shared const &chil
     m_stackNode.removeChild(childComponentInstance->getLocalRootArkUINode());
 }
 
-void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react::ParagraphProps> const &textProps) {
+void TextComponentInstance::onPropsChanged(SharedConcreteProps const &textProps) {
     CppComponentInstance::onPropsChanged(textProps);
     if (textProps == nullptr) {
         return;
@@ -41,9 +40,9 @@ void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react
     // padding
     TextPaddingInfo info = TextConversions::getArkUIPadding(textProps);
     VLOG(3) << "[text-debug] textProps->setPadding top=" << info.top << ", right=" << info.right
-              << ", bottom=" << info.bottom << ", left=" << info.left;
+            << ", bottom=" << info.bottom << ", left=" << info.left;
     m_textNode.setPadding(info.top, info.right, info.bottom, info.left);
-    
+
     // Copy Option
     VLOG(3) << "[text-debug] textProps->isSelectable=" << textProps->isSelectable;
     int32_t testCopyOption = ArkUI_CopyOptions::ARKUI_COPY_OPTIONS_NONE;
@@ -51,14 +50,14 @@ void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react
         testCopyOption = ArkUI_CopyOptions::ARKUI_COPY_OPTIONS_LOCAL_DEVICE;
     }
     m_textNode.setTextCopyOption(testCopyOption);
-    
+
     // MaxFontSize
     std::optional<float> maxFontSize = TextConversions::getMaxFontSize(textProps);
     if (maxFontSize.has_value()) {
         m_textNode.setMaxFontSize(maxFontSize.value());
         VLOG(3) << "[text-debug] maxFontSize=" << maxFontSize.value();
     }
-    
+
     if (textProps->rawProps != nullptr) {
         // stack align
         facebook::react::TextAlignment alignHorizon = facebook::react::TextAlignment::Left;
@@ -104,36 +103,36 @@ void TextComponentInstance::onPropsChanged(std::shared_ptr<const facebook::react
     VLOG(3) << "[text-debug] setProps end";
 }
 
-void TextComponentInstance::onStateChanged(
-    std::shared_ptr<const facebook::react::ConcreteState<facebook::react::ParagraphState>> const &textState) {
+void TextComponentInstance::onStateChanged(SharedConcreteState const &textState) {
     CppComponentInstance::onStateChanged(textState);
+    m_touchTargetChildrenNeedUpdate = true;
     if (textState == nullptr) {
         return;
     }
-    if (textState->getData().attributedString.getFragments().size() <= 0) {
+    if (textState->getData().attributedString.getFragments().empty()) {
         return;
     }
-    for (auto item : m_children) {
+    for (const auto &item : m_childNodes) {
         m_textNode.removeChild(*item);
     }
-    m_children.clear();
-    m_childIndex = 0;
+    m_childNodes.clear();
+    uint32_t childIndex = 0;
     VLOG(3) << "[text-debug] getFragments size:" << textState->getData().attributedString.getFragments().size();
-    for (auto fragment : textState->getData().attributedString.getFragments()) {
-        if (fragment.string != IMAGE_SPAN_FLAG) {
+    for (const auto &fragment : textState->getData().attributedString.getFragments()) {
+        if (!fragment.isAttachment()) {
             std::shared_ptr<SpanNode> spanNode = std::make_shared<SpanNode>();
-            VLOG(3) << "[text-debug] create span text=" << fragment.string.c_str() << ", index=" << m_childIndex;
-            m_textNode.insertChild(*spanNode, m_childIndex);
-            m_children.push_back(spanNode);
-            setFragment(fragment, spanNode, m_childIndex);
-            m_childIndex++;
+            VLOG(3) << "[text-debug] create span text=" << fragment.string.c_str() << ", index=" << childIndex;
+            m_textNode.insertChild(*spanNode, childIndex);
+            m_childNodes.push_back(spanNode);
+            setFragment(fragment, spanNode, childIndex);
+            childIndex++;
         } else {
-            VLOG(3) << "[text-debug] create image span, index=" << m_childIndex;
+            VLOG(3) << "[text-debug] create image span, index=" << childIndex;
             std::shared_ptr<ImageSpanNode> imageSpanNode = std::make_shared<ImageSpanNode>();
-            m_textNode.insertChild(*imageSpanNode, m_childIndex);
-            m_children.push_back(imageSpanNode);
+            m_textNode.insertChild(*imageSpanNode, childIndex);
+            m_childNodes.push_back(imageSpanNode);
             setImageSpanSize(fragment.parentShadowView.layoutMetrics.frame.size, imageSpanNode);
-            m_childIndex++;
+            childIndex++;
         }
     }
     this->setTextAttributes(textState->getData().attributedString.getFragments()[0].textAttributes);
@@ -178,25 +177,24 @@ void TextComponentInstance::setFragment(const facebook::react::AttributedString:
     // FontStyle
     if (textAttributes.fontStyle.has_value()) {
         VLOG(3) << "[text-debug] textAttributes.fontStyle=" << (int32_t)textAttributes.fontStyle.value()
-                  << ", index=" << index;
+                << ", index=" << index;
         spanNode->setFontStyle((int32_t)textAttributes.fontStyle.value());
     }
 
     // TextDecoration
     if (textAttributes.textDecorationLineType.has_value()) {
-        int32_t type = (int32_t)textAttributes.textDecorationLineType.value(); 
+        auto type = (int32_t)textAttributes.textDecorationLineType.value();
         VLOG(3) << "[text-debug] textAttributes.textDecorationLineType="
-                          << type
-                          << ", textAttributes.textDecorationColor=" << (uint32_t)(*textAttributes.textDecorationColor)
-                          << ", index=" << index;
+                << type
+                << ", textAttributes.textDecorationColor=" << (uint32_t)(*textAttributes.textDecorationColor)
+                << ", index=" << index;
         uint32_t color = 0xFF000000;
         if (textAttributes.textDecorationColor) {
             color = (uint32_t)(*textAttributes.textDecorationColor);
         } else if (textAttributes.foregroundColor) {
             color = (uint32_t)(*textAttributes.foregroundColor);
         }
-        if (type == (int32_t)facebook::react::TextDecorationLineType::Strikethrough
-            || type == (int32_t)facebook::react::TextDecorationLineType::UnderlineStrikethrough) {
+        if (type == (int32_t)facebook::react::TextDecorationLineType::Strikethrough || type == (int32_t)facebook::react::TextDecorationLineType::UnderlineStrikethrough) {
             type = ARKUI_TEXT_DECORATION_TYPE_LINE_THROUGH;
         }
         spanNode->setTextDecoration(type, color);
@@ -211,7 +209,7 @@ void TextComponentInstance::setFragment(const facebook::react::AttributedString:
 
     // BackgroundColor
     VLOG(3) << "[text-debug] textAttributes.backgroundColor=" << (uint32_t)(*textAttributes.backgroundColor)
-              << ", index=" << index;
+            << ", index=" << index;
     if (textAttributes.backgroundColor) {
         spanNode->setBackgroundStyle((uint32_t)(*textAttributes.backgroundColor));
     }
@@ -219,7 +217,7 @@ void TextComponentInstance::setFragment(const facebook::react::AttributedString:
     // letterSpacing
     if (!std::isnan(textAttributes.letterSpacing)) {
         VLOG(3) << "[text-debug] textAttributes.letterSpacing=" << textAttributes.letterSpacing
-                  << ", index=" << index;
+                << ", index=" << index;
         spanNode->setTextLetterSpacing(textAttributes.letterSpacing);
     }
 
@@ -232,14 +230,14 @@ void TextComponentInstance::setFragment(const facebook::react::AttributedString:
     float textShadowOffsetY =
         textAttributes.textShadowOffset.has_value() ? textAttributes.textShadowOffset.value().height : 0.0f;
     VLOG(3) << "[text-debug] setTextShadow:" << textShadowRadius << ", textShadowType:" << textShadowType
-              << ", textShadowColor:" << textShadowColor << ", textShadowOffsetX:" << textShadowOffsetX
-              << ", textShadowOffsetY:" << textShadowOffsetY << ", index=" << index;
+            << ", textShadowColor:" << textShadowColor << ", textShadowOffsetX:" << textShadowOffsetX
+            << ", textShadowOffsetY:" << textShadowOffsetY << ", index=" << index;
     spanNode->setTextShadow(textShadowRadius, textShadowType, textShadowColor, textShadowOffsetX, textShadowOffsetY);
 
     // text Case
     if (textAttributes.textTransform.has_value()) {
         VLOG(3) << "[text-debug] textAttributes.textTransform=" << (int)textAttributes.textTransform.value()
-                  << ", index=" << index;
+                << ", index=" << index;
         switch (textAttributes.textTransform.value()) {
         case facebook::react::TextTransform::None:
         case facebook::react::TextTransform::Uppercase:
@@ -276,7 +274,7 @@ void TextComponentInstance::setParagraphAttributes(const facebook::react::Paragr
 
     // height Adaptive Policy
     VLOG(3) << "[text-debug] paragraphAttributes.heightAdaptivePolicy="
-              << (int)paragraphAttributes.adjustsFontSizeToFit;
+            << (int)paragraphAttributes.adjustsFontSizeToFit;
     int32_t heightAdaptivePolicy = paragraphAttributes.adjustsFontSizeToFit
                                        ? ARKUI_TEXT_HEIGHT_ADAPTIVE_POLICY_MIN_FONT_SIZE_FIRST
                                        : ARKUI_TEXT_HEIGHT_ADAPTIVE_POLICY_MAX_LINES_FIRST;
@@ -291,24 +289,23 @@ void TextComponentInstance::setParagraphAttributes(const facebook::react::Paragr
         m_textNode.setTextOverflow(ARKUI_TEXT_OVERFLOW_ELLIPSIS);
         m_textNode.setTextEllipsisMode(ellipsizeMode);
     }
-    return;
 }
 
 std::string TextComponentInstance::stringCapitalize(const std::string &strInput) {
-    if (strInput == "") {
+    if (strInput.empty()) {
         return strInput;
     }
 
-    std::string strRes = "";
+    std::string strRes;
     std::string split = " ";
     std::vector<std::string> subStringVector;
     subStringVector.clear();
 
     std::string strSrc = strInput + split;
-    size_t pos = strSrc.find(split);
-    int32_t step = split.size();
+    auto pos = strSrc.find(split);
+    auto step = split.size();
 
-    while (pos != strSrc.npos) {
+    while (pos != std::string::npos) {
         std::string strTemp = strSrc.substr(0, pos);
         subStringVector.push_back(strTemp);
 
@@ -317,7 +314,7 @@ std::string TextComponentInstance::stringCapitalize(const std::string &strInput)
     }
 
     for (auto subString : subStringVector) {
-        if (std::isalpha(subString[0])) {
+        if (std::isalpha(subString[0]) != 0) {
             std::transform(subString.begin(), subString.end(), subString.begin(),
                            [](unsigned char c) { return std::tolower(c); });
             subString[0] = std::toupper(static_cast<unsigned char>(subString[0]));
@@ -332,3 +329,131 @@ std::string TextComponentInstance::stringCapitalize(const std::string &strInput)
 }
 
 StackNode &TextComponentInstance::getLocalRootArkUINode() { return m_stackNode; }
+
+class TextFragmentTouchTarget : public TouchTarget {
+  public:
+    TextFragmentTouchTarget(
+        facebook::react::Tag tag,
+        std::vector<facebook::react::Rect> rects,
+        facebook::react::SharedTouchEventEmitter touchEventEmitter)
+        : m_tag(tag), m_touchEventEmitter(std::move(touchEventEmitter)), m_rects(std::move(rects)) {}
+
+    void setRects(std::vector<facebook::react::Rect> rects) {
+        m_rects = std::move(rects);
+    }
+
+    facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override {
+        return m_touchEventEmitter;
+    }
+
+    facebook::react::Point computeChildPoint(facebook::react::Point const &point, TouchTarget::Shared const & /*child*/) const override {
+        return point;
+    }
+
+    bool containsPoint(facebook::react::Point const &point) const override {
+        for (auto rect : m_rects) {
+            if (rect.containsPoint(point)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool containsPointInBoundingBox(facebook::react::Point const &point) const override {
+        return containsPoint(point);
+    }
+
+    bool canHandleTouch() const override {
+        return m_touchEventEmitter != nullptr;
+    }
+
+    bool canChildrenHandleTouch() const override {
+        return false;
+    }
+
+    facebook::react::Tag getTouchTargetTag() const override {
+        return m_tag;
+    }
+
+    std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
+        return {};
+    }
+
+    facebook::react::LayoutMetrics getLayoutMetrics() const override {
+        return {};
+    }
+
+    facebook::react::Transform getTransform() const override {
+        return {};
+    }
+
+  private:
+    facebook::react::Tag m_tag;
+    facebook::react::SharedTouchEventEmitter m_touchEventEmitter;
+    std::vector<facebook::react::Rect> m_rects;
+};
+
+std::vector<TouchTarget::Shared> TextComponentInstance::getTouchTargetChildren() const {
+    if (m_state == nullptr) {
+        m_fragmentTouchTargetByTag.clear();
+        return {};
+    }
+
+    if (m_touchTargetChildrenNeedUpdate) {
+        m_touchTargetChildrenNeedUpdate = false;
+        updateFragmentTouchTargets(m_state->getData());
+    }
+
+    auto const &fragments = m_state->getData().attributedString.getFragments();
+
+    std::vector<TouchTarget::Shared> result;
+    auto attachmentCount = 0;
+    for (auto const &fragment : fragments) {
+        if (fragment.isAttachment()) {
+            result.push_back(m_children.at(attachmentCount));
+            attachmentCount++;
+        } else {
+            result.push_back(m_fragmentTouchTargetByTag.at(fragment.parentShadowView.tag));
+        }
+    }
+    return result;
+}
+
+void TextComponentInstance::updateFragmentTouchTargets(facebook::react::ParagraphState const &newState) const {
+    auto const &fragments = newState.attributedString.getFragments();
+    auto textLayoutManager = newState.paragraphLayoutManager.getTextLayoutManager();
+    if (textLayoutManager == nullptr || fragments.empty()) {
+        m_fragmentTouchTargetByTag.clear();
+        return;
+    }
+
+    auto nativeTextLayoutManager = textLayoutManager->getNativeTextLayoutManager();
+    auto textMeasurer = static_cast<TextMeasurer *>(nativeTextLayoutManager);
+    auto typography = textMeasurer->measureTypography(newState.attributedString,
+                                                      newState.paragraphAttributes,
+                                                      {m_layoutMetrics.frame.size, m_layoutMetrics.frame.size});
+    auto rects = typography.getRectsForFragments();
+
+    FragmentTouchTargetByTag touchTargetByTag;
+    size_t textFragmentCount = 0;
+    for (auto const &fragment : fragments) {
+        if (fragment.isAttachment()) {
+            continue;
+        }
+        auto index = textFragmentCount;
+        auto eventEmitter = std::dynamic_pointer_cast<const facebook::react::TouchEventEmitter>(fragment.parentShadowView.eventEmitter);
+        auto tag = fragment.parentShadowView.tag;
+        if (m_fragmentTouchTargetByTag.count(tag) > 0) {
+            // update the existing touch target
+            auto fragmentTouchTarget = std::static_pointer_cast<TextFragmentTouchTarget>(m_fragmentTouchTargetByTag.at(tag));
+            fragmentTouchTarget->setRects(rects.at(index));
+            touchTargetByTag.try_emplace(tag, std::move(fragmentTouchTarget));
+        } else {
+            // create a new touch target
+            touchTargetByTag.try_emplace(tag, std::make_shared<TextFragmentTouchTarget>(tag, rects.at(index), std::move(eventEmitter)));
+        }
+        textFragmentCount++;
+    }
+    m_fragmentTouchTargetByTag = std::move(touchTargetByTag);
+}
+} // namespace rnoh

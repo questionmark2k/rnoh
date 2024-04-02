@@ -12,6 +12,8 @@
 #include <arkui/native_type.h>
 
 namespace rnoh {
+    constexpr static float DEFAULT_FONT_SIZE = 14.0f;
+    constexpr static float EPSILON_THRESHOLD = 1e-6;
 
     struct TextPaddingInfo {
         float top = 0.0;

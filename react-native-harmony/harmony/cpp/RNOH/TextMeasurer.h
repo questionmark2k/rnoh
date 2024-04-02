@@ -5,6 +5,7 @@
 #include "napi/native_api.h"
 #include "RNOH/TaskExecutor/TaskExecutor.h"
 #include "RNOH/FeatureFlagRegistry.h"
+#include "ArkUITypography.h"
 
 namespace rnoh {
 class TextMeasurer : public facebook::react::TextLayoutManagerDelegate {
@@ -19,6 +20,10 @@ class TextMeasurer : public facebook::react::TextLayoutManagerDelegate {
     facebook::react::TextMeasurement measure(facebook::react::AttributedString attributedString,
                                              facebook::react::ParagraphAttributes paragraphAttributes,
                                              facebook::react::LayoutConstraints layoutConstraints) override;
+
+    ArkUITypography measureTypography(facebook::react::AttributedString const &attributedString,
+                                      facebook::react::ParagraphAttributes const &paragraphAttributes,
+                                      facebook::react::LayoutConstraints const &layoutConstraints);
 
   private:
     napi_env m_env;

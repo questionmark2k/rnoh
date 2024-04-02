@@ -8,7 +8,6 @@ namespace rnoh {
         public StackNodeDelegate {
     private:
         StackNode m_stackNode;
-        facebook::react::SharedViewEventEmitter m_eventEmitter;
 
     public:
         ViewComponentInstance(Context context);

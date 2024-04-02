@@ -10,22 +10,25 @@
 namespace rnoh {
     class TextComponentInstance : public CppComponentInstance<facebook::react::ParagraphShadowNode> {
     private:
-        TextNode m_textNode;
-        StackNode m_stackNode;
-        uint32_t m_childIndex = 0;
-        std::vector<std::shared_ptr<ArkUINode>> m_children;
+        using FragmentTouchTargetByTag = std::unordered_map<facebook::react::Tag, std::shared_ptr<TouchTarget>>;
+
+        TextNode m_textNode{};
+        StackNode m_stackNode{};
+        std::vector<std::shared_ptr<ArkUINode>> m_childNodes{};
+        mutable FragmentTouchTargetByTag m_fragmentTouchTargetByTag{};
+        mutable bool m_touchTargetChildrenNeedUpdate = false;
 
     public:
         TextComponentInstance(Context context);
         ~TextComponentInstance();
         StackNode &getLocalRootArkUINode() override;
+        std::vector<TouchTarget::Shared> getTouchTargetChildren() const override;
 
     protected:
         void onChildInserted(ComponentInstance::Shared const &childComponentInstance, std::size_t index) override;
         void onChildRemoved(ComponentInstance::Shared const &childComponentInstance) override;
-        void onPropsChanged(std::shared_ptr<const facebook::react::ParagraphProps> const &props) override;
-        void onStateChanged(std::shared_ptr<const facebook::react::ConcreteState<facebook::react::ParagraphState>> const
-                                &state) override;
+        void onPropsChanged(SharedConcreteProps const &props) override;
+        void onStateChanged(SharedConcreteState const &textState) override;
 
     private:
         void setTextAttributes(const facebook::react::TextAttributes &textAttributes);
@@ -34,5 +37,6 @@ namespace rnoh {
         void setImageSpanSize(const facebook::react::Size &imageSize, std::shared_ptr<ImageSpanNode> imageSpanNode);
         void setParagraphAttributes(const facebook::react::ParagraphAttributes &paragraphAttributes);
         std::string stringCapitalize(const std::string &strInput);
+        void updateFragmentTouchTargets(facebook::react::ParagraphState const &newState) const;
     };
 } // namespace rnoh

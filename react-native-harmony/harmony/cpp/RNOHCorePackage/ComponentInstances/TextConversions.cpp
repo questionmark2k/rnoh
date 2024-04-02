@@ -9,9 +9,6 @@
 
 using namespace rnoh;
 
-extern float DEFAULT_FONT_SIZE;
-const static float EPSILON_THRESHOLD = 1e-6;
-
 int32_t TextConversions::getArkUIFontWeight(int32_t fontWeight) {
     int32_t data = ArkUI_FontWeight::ARKUI_FONT_WEIGHT_NORMAL;
     switch (fontWeight) {

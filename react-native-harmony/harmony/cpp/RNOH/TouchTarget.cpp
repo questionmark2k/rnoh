@@ -57,7 +57,8 @@ auto rnoh::TouchTarget::computeChildPoint(Point const &point, TouchTarget::Share
  * Silicon Graphics, Inc.
  */
 static bool gluInvertMatrix(const facebook::react::Float m[16], facebook::react::Float invOut[16]) {
-    facebook::react::Float inv[16], det;
+    facebook::react::Float inv[16];
+    facebook::react::Float det;
     int i;
 
     inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
@@ -78,13 +79,15 @@ static bool gluInvertMatrix(const facebook::react::Float m[16], facebook::react:
     inv[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] + m[4] * m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
 
     det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
-    if (det == 0)
+    if (det == 0) {
         return false;
+    }
 
     det = 1.0 / det;
 
-    for (i = 0; i < 16; i++)
+    for (i = 0; i < 16; i++) {
         invOut[i] = inv[i] * det;
+    }
 
     return true;
 }

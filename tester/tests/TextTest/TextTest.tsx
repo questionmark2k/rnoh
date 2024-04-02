@@ -6,6 +6,7 @@ import {TextStyleTest} from './TextStyleTest';
 import {TextMeasuringTest} from './TextMeasuringTest';
 import {TextPaddingTest} from './TextPaddingTest';
 import {TextAccessibilityTest} from './TextAccessibilityTest';
+import {TextNestedTest} from './TextNestedTest';
 
 export function TextTest() {
   return (
@@ -14,6 +15,7 @@ export function TextTest() {
       <TextStyleTest />
       <TextPaddingTest />
       <TextAccessibilityTest />
+      <TextNestedTest />
       <TestCase tags={['C_API']} itShould="show selectable text">
         <View style={styles.smallContainer}>
           <Text style={styles.smallText} selectable={true}>
