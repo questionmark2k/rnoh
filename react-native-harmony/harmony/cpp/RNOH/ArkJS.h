@@ -57,11 +57,11 @@ class ArkJS {
 
     napi_value createFromDynamic(folly::dynamic);
 
-    napi_value createFromException(std::exception);
+    napi_value createFromException(std::exception const &);
     
-    napi_value createFromJSError(facebook::jsi::JSError);
+    napi_value createFromJSError(facebook::jsi::JSError const &);
     
-    napi_value createFromRNOHError(rnoh::RNOHError);
+    napi_value createFromRNOHError(rnoh::RNOHError const &);
 
     RNOHNapiObjectBuilder createObjectBuilder();
 

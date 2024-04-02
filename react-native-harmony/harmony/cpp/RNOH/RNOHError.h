@@ -14,7 +14,7 @@ namespace rnoh {
         boost::stacktrace::stacktrace m_stacktrace;
 
     public:
-        RNOHError(std::string whatHappened, std::vector<std::string> howCanItBeFixed)
+        RNOHError(std::string whatHappened, std::vector<std::string> howCanItBeFixed = {})
             : m_message(std::move(whatHappened)), m_suggestions(std::move(howCanItBeFixed)) {
             m_stacktrace = boost::stacktrace::stacktrace();
         

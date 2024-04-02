@@ -129,13 +129,13 @@ napi_value ArkJS::createFromDynamic(folly::dynamic dyn) {
     }
 }
 
-napi_value ArkJS::createFromException(std::exception e) {
+napi_value ArkJS::createFromException(std::exception const &e) {
     folly::dynamic errData = folly::dynamic::object;
     errData["message"] = e.what();
     return this->createFromDynamic(errData);
 }
 
-napi_value ArkJS::createFromJSError(facebook::jsi::JSError e) {
+napi_value ArkJS::createFromJSError(facebook::jsi::JSError const &e) {
     folly::dynamic errData = folly::dynamic::object;
     errData["message"] = e.getMessage();
     try {
@@ -148,7 +148,7 @@ napi_value ArkJS::createFromJSError(facebook::jsi::JSError e) {
     return this->createFromDynamic(errData);
 }
 
-napi_value ArkJS::createFromRNOHError(rnoh::RNOHError e) {
+napi_value ArkJS::createFromRNOHError(rnoh::RNOHError const &e) {
     folly::dynamic errData = folly::dynamic::object;
     errData["message"] = e.getMessage();
 
