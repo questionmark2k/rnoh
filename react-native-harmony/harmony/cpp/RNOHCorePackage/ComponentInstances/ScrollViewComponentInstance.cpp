@@ -112,6 +112,10 @@ facebook::react::ScrollViewMetrics ScrollViewComponentInstance::getScrollViewMet
     return scrollViewMetrics;
 }
 
+bool ScrollViewComponentInstance::isHandlingTouches() const {
+    return m_scrollState != IDLE;
+}
+
 void ScrollViewComponentInstance::onScroll() {
     auto scrollViewMetrics = getScrollViewMetrics();
     auto now =

@@ -71,6 +71,8 @@ namespace rnoh {
                                                  TouchTarget::Shared const &child) const override;
 
         facebook::react::ScrollViewMetrics getScrollViewMetrics();
+    
+        bool isHandlingTouches() const override;
 
       private:
         void updateStateWithContentOffset(facebook::react::Point contentOffset);

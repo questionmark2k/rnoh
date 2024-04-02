@@ -1,4 +1,5 @@
 #include "TouchEventDispatcher.h"
+#include <set>
 #include <glog/logging.h>
 
 namespace rnoh {
@@ -86,26 +87,34 @@ bool TouchEventDispatcher::canIgnoreMoveEvent(facebook::react::TouchEvent curren
 
 void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchTarget::Shared const &rootTarget) {
     VLOG(2) << "Touch event received: id=" << event.actionTouch.id << ", action type:" << event.action;
+    double timestampMillis = static_cast<double>(event.timeStamp) / 1000;
 
     if (event.action == NODE_ACTION_DOWN) {
         registerTargetForTouch(event.actionTouch, rootTarget);
+    } else if (m_touchTargetByTouchId.find(event.actionTouch.id) != m_touchTargetByTouchId.end()) {
+        Point touchPoint{.x = static_cast<facebook::react::Float>(event.actionTouch.nodeX),
+                         .y = static_cast<facebook::react::Float>(event.actionTouch.nodeY)};
+        auto touchTarget = findTargetForTouchPoint(touchPoint, rootTarget).first;
+        auto hasCancelled = maybeCancelPreviousTouchEvent(timestampMillis, touchTarget);
+        if (hasCancelled) {
+            m_touchTargetByTouchId.erase(event.actionTouch.id);
+            return;
+        }
     }
 
-    auto it = m_touchTargetTagById.find(event.actionTouch.id);
-    if (it == m_touchTargetTagById.end()) {
+    auto it = m_touchTargetByTouchId.find(event.actionTouch.id);
+    if (it == m_touchTargetByTouchId.end()) {
         VLOG(2) << "No target for current touch event with id: " << event.actionTouch.id;
         return;
     }
     auto eventTarget = it->second.lock();
     if (eventTarget == nullptr) {
         LOG(WARNING) << "Target for current touch event has been deleted";
-        m_touchTargetTagById.erase(it);
+        m_touchTargetByTouchId.erase(it);
         return;
     }
 
     auto [touchPoints, touchPointsCount] = getTouchesFromEvent(event);
-
-    double timestampMillis = static_cast<double>(event.timeStamp) / 1000;
 
     facebook::react::Touches touches;
     std::optional<facebook::react::Touch> changedTouch;
@@ -114,12 +123,12 @@ void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchT
     for (int i = 0; i < touchPointsCount; i++) {
         auto touchPoint = touchPoints[i];
         auto id = touchPoint.id;
-        if (m_touchTargetTagById.find(id) == m_touchTargetTagById.end()) {
+        if (m_touchTargetByTouchId.find(id) == m_touchTargetByTouchId.end()) {
             DLOG(INFO) << "Touch with id " << id << " does not exist";
             continue;
         }
 
-        auto touchTarget = m_touchTargetTagById[id].lock();
+        auto touchTarget = m_touchTargetByTouchId[id].lock();
         if (!touchTarget) {
             continue;
         }
@@ -141,7 +150,7 @@ void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchT
     if (event.action == NODE_ACTION_UP) {
         touches.erase(changedTouch.value());
         targetTouches.erase(changedTouch.value());
-        m_touchTargetTagById.erase(changedTouch.value().identifier);
+        m_touchTargetByTouchId.erase(changedTouch.value().identifier);
     }
 
     facebook::react::TouchEvent touchEvent{
@@ -173,11 +182,11 @@ void TouchEventDispatcher::dispatchTouchEvent(ArkUI_NodeTouchEvent event, TouchT
     }
 }
 
-void TouchEventDispatcher::registerTargetForTouch(ArkUI_NodeTouchPoint activeTouch, TouchTarget::Shared const &rootTarget) {
+TouchTarget::Shared TouchEventDispatcher::registerTargetForTouch(ArkUI_NodeTouchPoint activeTouch, TouchTarget::Shared const &rootTarget) {
     auto id = activeTouch.id;
-    if (m_touchTargetTagById.find(id) != m_touchTargetTagById.end()) {
+    if (m_touchTargetByTouchId.find(id) != m_touchTargetByTouchId.end()) {
         LOG(ERROR) << "Touch with id " << id << " already exists";
-        return;
+        return nullptr;
     }
 
     Point touchPoint{
@@ -186,9 +195,43 @@ void TouchEventDispatcher::registerTargetForTouch(ArkUI_NodeTouchPoint activeTou
     };
     auto touchTarget = findTargetForTouchPoint(touchPoint, rootTarget).first;
     if (touchTarget) {
-        m_touchTargetTagById.emplace(activeTouch.id, touchTarget);
+        m_touchTargetByTouchId.emplace(activeTouch.id, touchTarget);
         VLOG(2) << "Touch with id " << id << " started on target with tag " << touchTarget->getTouchTargetTag();
+        return touchTarget;
     }
+    return nullptr;
 }
+
+bool TouchEventDispatcher::maybeCancelPreviousTouchEvent(double timestampInMs, TouchTarget::Shared touchTarget) {
+    // check if ancestor is handling touches
+    auto shouldEmitTouchCancelEvent = false;
+    auto tmpTouchTarget = touchTarget;
+    while(tmpTouchTarget) {
+        if (tmpTouchTarget->isHandlingTouches()) {
+            shouldEmitTouchCancelEvent = true;
+            break;
+        }
+        tmpTouchTarget = tmpTouchTarget->getTouchTargetParent();
+    }
+    if (!shouldEmitTouchCancelEvent) {
+        return false;
+    }
+    
+    // create new touch event based on the previously emitted event
+    auto touchCancelEvent = m_previousEvent;
+    touchCancelEvent.targetTouches = {};
+    touchCancelEvent.changedTouches = {};
+    touchCancelEvent.touches = {};
+    for (auto touch : m_previousEvent.touches) { 
+        touch.timestamp = timestampInMs;
+        touchCancelEvent.changedTouches.insert(touch);
+    }    
+
+    // emit cancel event
+    DLOG(INFO) << "Cancelling previous touch event";
+    touchTarget->getTouchEventEmitter()->onTouchCancel(touchCancelEvent);
+    return true;
+}
+
 
 } // namespace rnoh

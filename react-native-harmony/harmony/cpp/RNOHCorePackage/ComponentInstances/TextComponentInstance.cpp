@@ -334,9 +334,10 @@ class TextFragmentTouchTarget : public TouchTarget {
   public:
     TextFragmentTouchTarget(
         facebook::react::Tag tag,
+        TouchTarget::Weak parentTouchTarget,
         std::vector<facebook::react::Rect> rects,
         facebook::react::SharedTouchEventEmitter touchEventEmitter)
-        : m_tag(tag), m_touchEventEmitter(std::move(touchEventEmitter)), m_rects(std::move(rects)) {}
+        : m_tag(tag), m_touchEventEmitter(std::move(touchEventEmitter)), m_rects(std::move(rects)), m_parentTouchTarget(parentTouchTarget) {}
 
     void setRects(std::vector<facebook::react::Rect> rects) {
         m_rects = std::move(rects);
@@ -375,6 +376,10 @@ class TextFragmentTouchTarget : public TouchTarget {
         return m_tag;
     }
 
+    TouchTarget::Shared getTouchTargetParent() const override { 
+        return m_parentTouchTarget.lock();
+    };
+
     std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
         return {};
     }
@@ -391,6 +396,7 @@ class TextFragmentTouchTarget : public TouchTarget {
     facebook::react::Tag m_tag;
     facebook::react::SharedTouchEventEmitter m_touchEventEmitter;
     std::vector<facebook::react::Rect> m_rects;
+    TouchTarget::Weak m_parentTouchTarget;
 };
 
 std::vector<TouchTarget::Shared> TextComponentInstance::getTouchTargetChildren() const {
@@ -450,7 +456,12 @@ void TextComponentInstance::updateFragmentTouchTargets(facebook::react::Paragrap
             touchTargetByTag.try_emplace(tag, std::move(fragmentTouchTarget));
         } else {
             // create a new touch target
-            touchTargetByTag.try_emplace(tag, std::make_shared<TextFragmentTouchTarget>(tag, rects.at(index), std::move(eventEmitter)));
+            touchTargetByTag.try_emplace(tag, std::make_shared<TextFragmentTouchTarget>(
+                tag,
+                this->shared_from_this(),
+                rects.at(index),
+                std::move(eventEmitter))
+            );
         }
         textFragmentCount++;
     }

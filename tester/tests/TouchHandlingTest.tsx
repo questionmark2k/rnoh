@@ -10,7 +10,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import {Button, TestCase} from '../components';
+import {Button, StateKeeper, TestCase} from '../components';
 import React from 'react';
 import {PALETTE} from '../components/palette';
 
@@ -114,6 +114,47 @@ export function TouchHandlingTest() {
             {scaleX: -1},
             {scaleY: 1.25},
           ]}
+        />
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        tags={['C_API']}
+        itShould="toggle color on press but not on scroll start">
+        <StateKeeper
+          initialValue={'red'}
+          renderContent={(backgroundColor, setBackgroundColor) => {
+            return (
+              <ScrollView style={{height: 256}}>
+                <TouchableOpacity
+                  onPress={() =>
+                    setBackgroundColor(prev =>
+                      prev === 'red' ? 'green' : 'red',
+                    )
+                  }>
+                  <View style={{width: 256, height: 512, backgroundColor}}>
+                    <View
+                      style={{
+                        width: 256,
+                        height: 128,
+                        backgroundColor: 'white',
+                        opacity: 0.75,
+                        marginTop: 128,
+                      }}
+                    />
+                    <View
+                      style={{
+                        width: 256,
+                        height: 128,
+                        backgroundColor: 'white',
+                        opacity: 0.75,
+                        marginTop: 128,
+                      }}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </ScrollView>
+            );
+          }}
         />
       </TestCase.Example>
       <TestCase.Manual
@@ -325,21 +366,21 @@ const TouchIssue1 = ({onPress}: {onPress: () => void}) => {
 };
 
 const TouchIssue2 = ({onPress}: {onPress: () => void}) => {
-    return (
-      <View style={{height:150}}>
-        <View  style={{opacity: 1, width:100, height:50, backgroundColor:'green'}} collapsable={false}>
-          <TouchableOpacity
-            style={{marginTop:50}}
-            onPress={() => {
-              onPress();
-            }}>
-            <View
-              style={{height: 100, width: 100, backgroundColor: 'red'}}
-            />
-          </TouchableOpacity>
-        </View>
+  return (
+    <View style={{height: 150}}>
+      <View
+        style={{opacity: 1, width: 100, height: 50, backgroundColor: 'green'}}
+        collapsable={false}>
+        <TouchableOpacity
+          style={{marginTop: 50}}
+          onPress={() => {
+            onPress();
+          }}>
+          <View style={{height: 100, width: 100, backgroundColor: 'red'}} />
+        </TouchableOpacity>
       </View>
-    );
+    </View>
+  );
 };
 
 class ScrollViewLockedIssue extends React.Component {

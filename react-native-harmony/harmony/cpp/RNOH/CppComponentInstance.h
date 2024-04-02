@@ -119,6 +119,10 @@ namespace rnoh {
         };
 
         facebook::react::Tag getTouchTargetTag() const override { return getTag(); }
+    
+        TouchTarget::Shared getTouchTargetParent() const override { 
+            return getParent().lock();
+        }
 
         facebook::react::SharedTouchEventEmitter getTouchEventEmitter() const override { return m_eventEmitter; }
 
