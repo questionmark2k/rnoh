@@ -14,7 +14,8 @@ export const RefreshControlTest = () => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    setInterval(() => setRefreshKey(prev => prev + 1), 1000);
+    const intervalId = setInterval(() => setRefreshKey(prev => prev + 1), 1000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -34,7 +35,11 @@ export const RefreshControlTest = () => {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
-        itShould="display refresh control with tintColor">
+        itShould="display refresh control with tintColor"
+        skip={{
+          harmony: false,
+          android: 'iOS specific prop',
+        }}>
         <ScrollView
           style={{height: 128, backgroundColor: 'white'}}
           refreshControl={
@@ -127,6 +132,36 @@ export const RefreshControlTest = () => {
         itShould="display FlatList with with green border, pink background and yellow items when RefreshControl component is set"
         modal>
         <RefreshControlInsideFlatListWithStylesExample />
+      </TestCase.Example>
+      <TestCase.Example itShould="display background color for refresh control indicator">
+        <ScrollView
+          style={{height: 128, backgroundColor: 'white'}}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshKey % 2 === 0}
+              progressBackgroundColor={'#FFC0CB'}
+              onRefresh={() => {}}
+            />
+          }
+        />
+      </TestCase.Example>
+      <TestCase.Example
+        itShould="display pink 'I am refreshing!' text below refresh control indicator"
+        skip={{
+          harmony: false,
+          android: 'iOS specific prop',
+        }}>
+        <ScrollView
+          style={{height: 128, backgroundColor: 'white'}}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshKey % 2 === 0}
+              title="I am refreshing!"
+              titleColor={'#FFC0CB'}
+              onRefresh={() => {}}
+            />
+          }
+        />
       </TestCase.Example>
     </TestSuite>
   );
@@ -449,7 +484,11 @@ function RefreshControlInsideScrollViewWithStylesExample() {
           paddingTop: 100,
         }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            title="I am refreshing!"
+          />
         }>
         {Array(50)
           .fill('Item')

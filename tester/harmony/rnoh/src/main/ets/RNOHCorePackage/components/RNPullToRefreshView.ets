@@ -7,14 +7,20 @@ export interface PullToRefreshProps {}
 export interface PullToRefreshRawProps extends RawPropsBase {
   refreshing?: boolean
   progressViewOffset?: number
+  progressBackgroundColor?: string
   tintColor?: string
+  title?: string
+  titleColor?: string
 }
 
 export interface PullToRefreshState {}
 
 export interface RefreshLoadingProgressBuilderParams {
   progressOffsetView?: number
+  progressBackgroundColor?: ResourceColor
   tintColor?: ResourceColor
+  title?: string
+  titleColor?: ResourceColor
 }
 
 export const RN_PULL_TO_REFRESH_VIEW_NAME: string = "PullToRefreshView"
@@ -78,10 +84,19 @@ export struct RNPullToRefreshView {
 
   @Builder
   RefreshLoadingProgress(params: RefreshLoadingProgressBuilderParams) {
-    LoadingProgress()
-      .width('112px')
-      .height('112px')
-      .color(params.tintColor)
+    Stack() {
+      Stack() {
+        LoadingProgress()
+          .width('112px')
+          .height('112px')
+          .color(params.tintColor)
+      }
+      .backgroundColor(params.progressBackgroundColor ?? Color.Transparent)
+      .borderRadius(1000)
+    }
+    Text(params.title)
+      .fontColor(params.titleColor)
+      .margin({ top: '224px' })
   }
 
   build() {
@@ -89,7 +104,10 @@ export struct RNPullToRefreshView {
       refreshing: this.isRefreshing,
       builder: this.RefreshLoadingProgress({
         progressOffsetView: this.descriptor.rawProps.progressViewOffset,
+        progressBackgroundColor: this.descriptor.rawProps.progressBackgroundColor,
         tintColor: this.descriptor.rawProps.tintColor,
+        title: this.descriptor.rawProps.title,
+        titleColor: this.descriptor.rawProps.titleColor
       }),
     }) {
       this.renderDescriptors();
