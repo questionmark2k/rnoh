@@ -8,40 +8,48 @@
 
 namespace rnoh {
 
-class TextAreaNodeDelegate {
+    class TextAreaNodeDelegate {
     public:
         virtual ~TextAreaNodeDelegate() = default;
-        virtual void onChange() {};
-        virtual void onBlur() {};
-        virtual void onFocus() {};
-        virtual void onPaste() {};
-        virtual void onTextSelectionChange() {};
-};
+        virtual void onChange(ArkUI_NodeEvent *event){};
+        virtual void onBlur(ArkUI_NodeEvent *event){};
+        virtual void onFocus(ArkUI_NodeEvent *event){};
+        virtual void onPaste(){};
+        virtual void onTextSelectionChange(){};
+    };
 
-class TextAreaNode : public TextInputNodeBase {
-protected:
-    ArkUI_NodeHandle m_childArkUINodeHandle;
-    TextAreaNodeDelegate *m_textAreaNodeDelegate;
+    class TextAreaNode : public TextInputNodeBase {
+    protected:
+        ArkUI_NodeHandle m_childArkUINodeHandle;
+        TextAreaNodeDelegate *m_textAreaNodeDelegate;
 
-public:
-    TextAreaNode();
-    ~TextAreaNode();
+    public:
+        TextAreaNode();
+        ~TextAreaNode() override;
 
-    facebook::react::Point getTextAreaOffset() const;
+        facebook::react::Point getTextAreaOffset() const;
 
-    void onNodeEvent(ArkUI_NodeEvent *event) override;
+        void onNodeEvent(ArkUI_NodeEvent *event) override;
 
-    void setTextAreaNodeDelegate(TextAreaNodeDelegate *textAreaNodeDelegate);
+        void setTextAreaNodeDelegate(TextAreaNodeDelegate *textAreaNodeDelegate);
 
-    void setTextContent(std::string const &textContent);
+        void setTextContent(std::string const &textContent);
 
-    void setTextSelection(int const &start, int const &end);
+        void setInputType(facebook::react::KeyboardType keyboardType);
 
-    void setInputType(facebook::react::KeyboardType keyboardType);
+        void setFont(facebook::react::TextAttributes const &textAttributes) override;
 
-    ArkUI_TextAreaType convertTextAreaInputType(facebook::react::KeyboardType keyboardType);
-private:
-    facebook::react::KeyboardType keyboardType_{facebook::react::KeyboardType::Default};
-};
+        void setCaretColor(facebook::react::SharedColor const &color) override;
+
+        void setMaxLength(int32_t maxLength) override;
+
+        void setPlaceholder(std::string const &placeholder) override;
+
+        void setPlaceholderColor(facebook::react::SharedColor const &color) override;
+
+        void defaultSetPadding();
+
+        std::string getTextContent() override;
+    };
 
 } // namespace rnoh

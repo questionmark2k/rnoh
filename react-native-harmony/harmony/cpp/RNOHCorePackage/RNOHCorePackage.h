@@ -10,6 +10,7 @@
 #include <react/renderer/components/modal/ModalHostViewComponentDescriptor.h>
 #include "RNOH/Package.h"
 #include "RNOH/ArkTSTurboModule.h"
+#include "RNOHCorePackage/ComponentInstances/TextInputComponentInstance.h"
 #include "RNOHCorePackage/TurboModules/AccessibilityInfoTurboModule.h"
 #include "RNOHCorePackage/TurboModules/AlertManagerTurboModule.h"
 #include "RNOHCorePackage/TurboModules/AppearanceTurboModule.h"
@@ -143,7 +144,7 @@ namespace rnoh {
     };
 
     class RNOHCorePackageComponentInstanceFactoryDelegate : public ComponentInstanceFactoryDelegate {
-      public:
+    public:
         using ComponentInstanceFactoryDelegate::ComponentInstanceFactoryDelegate;
 
         ComponentInstance::Shared create(ComponentInstance::Context ctx) override {

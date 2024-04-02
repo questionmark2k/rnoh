@@ -80,10 +80,8 @@ namespace rnoh {
         if (borderColors.left) {
             borderLeftColor = (uint32_t)*borderColors.left;
         }
-        ArkUI_NumberValue borderColorValue[] = {{.u32 = borderTopColor},
-                                                {.u32 = bordeRightColor},
-                                                {.u32 = borderBottomColor},
-                                                {.u32 = borderLeftColor}};
+        ArkUI_NumberValue borderColorValue[] = {
+            {.u32 = borderTopColor}, {.u32 = bordeRightColor}, {.u32 = borderBottomColor}, {.u32 = borderLeftColor}};
 
         ArkUI_AttributeItem borderColorItem = {borderColorValue, sizeof(borderColorValue) / sizeof(ArkUI_NumberValue)};
 
@@ -117,7 +115,8 @@ namespace rnoh {
     }
 
     ArkUINode &ArkUINode::setShadow(facebook::react::SharedColor const &shadowColor,
-        facebook::react::Size const &shadowOffset, float const shadowOpacity, float const shadowRadius) {
+                                    facebook::react::Size const &shadowOffset, float const shadowOpacity,
+                                    float const shadowRadius) {
         if (shadowOpacity <= 0.0 || shadowOpacity > 1.0) {
             return *this;
         }
@@ -127,30 +126,35 @@ namespace rnoh {
         }
         uint32_t alpha = static_cast<uint32_t>((float)((shadowColorValue >> 24) & (0xff)) * shadowOpacity);
         shadowColorValue = (alpha << 24) + (shadowColorValue & 0xffffff);
-        ArkUI_NumberValue shadowValue[] = {{.f32 = shadowRadius}, {.i32 = 0},
-            {.f32 = static_cast<float>(shadowOffset.width)}, {.f32 = static_cast<float>(shadowOffset.height)},
-            {.i32 = 0},  {.u32 = shadowColorValue}, {.u32 = 0}};
-        ArkUI_AttributeItem shadowItem = {
-            .value = shadowValue, .size = sizeof(shadowValue) / sizeof(ArkUI_NumberValue)};
+        ArkUI_NumberValue shadowValue[] = {{.f32 = shadowRadius},
+                                           {.i32 = 0},
+                                           {.f32 = static_cast<float>(shadowOffset.width)},
+                                           {.f32 = static_cast<float>(shadowOffset.height)},
+                                           {.i32 = 0},
+                                           {.u32 = shadowColorValue},
+                                           {.u32 = 0}};
+        ArkUI_AttributeItem shadowItem = {.value = shadowValue,
+                                          .size = sizeof(shadowValue) / sizeof(ArkUI_NumberValue)};
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_CUSTOM_SHADOW, &shadowItem));
         return *this;
     }
 
     ArkUINode &ArkUINode::setHitTestMode(facebook::react::PointerEventsMode const &pointerEvents) {
         ArkuiHitTestMode hitTestMode = (pointerEvents == facebook::react::PointerEventsMode::None ||
-            pointerEvents == facebook::react::PointerEventsMode::BoxNone) ?
-            ArkuiHitTestMode::NONE : ArkuiHitTestMode::DEFAULT;
+                                        pointerEvents == facebook::react::PointerEventsMode::BoxNone)
+                                           ? ArkuiHitTestMode::NONE
+                                           : ArkuiHitTestMode::DEFAULT;
         ArkUI_NumberValue hitTestModeValue[] = {{.i32 = static_cast<int32_t>(hitTestMode)}};
-        ArkUI_AttributeItem hitTestModeItem =
-            {.value = hitTestModeValue, .size = sizeof(hitTestModeValue) / sizeof(ArkUI_NumberValue)};
+        ArkUI_AttributeItem hitTestModeItem = {.value = hitTestModeValue,
+                                               .size = sizeof(hitTestModeValue) / sizeof(ArkUI_NumberValue)};
         maybeThrow(NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_HIT_TEST_BEHAVIOR, &hitTestModeItem));
         return *this;
     }
 
     ArkUINode &ArkUINode::setAccessibilityDescription(std::string const &accessibilityDescription) {
         ArkUI_AttributeItem descriptionItem = {.string = accessibilityDescription.c_str()};
-        maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-            m_nodeHandle, NODE_ACCESSIBILITY_DESCRIPTION, &descriptionItem));
+        maybeThrow(
+            NativeNodeApi::getInstance()->setAttribute(m_nodeHandle, NODE_ACCESSIBILITY_DESCRIPTION, &descriptionItem));
         return *this;
     }
 
@@ -190,7 +194,8 @@ namespace rnoh {
         return *this;
     }
 
-    ArkUINode &ArkUINode::setTransform(facebook::react::Transform const &transform, facebook::react::Float pointScaleFactor) {
+    ArkUINode &ArkUINode::setTransform(facebook::react::Transform const &transform,
+                                       facebook::react::Float pointScaleFactor) {
         ArkUI_NumberValue transformCenterValue[] = {0, 0, 0, 0.5f, 0.5f};
 
         ArkUI_AttributeItem transformCenterItem = {transformCenterValue,

@@ -6,58 +6,60 @@
 
 namespace rnoh {
 
-class TextInputNodeDelegate {
+    class TextInputNodeDelegate {
     public:
         virtual ~TextInputNodeDelegate() = default;
-        virtual void onChange() {};
-        virtual void onBlur() {};
-        virtual void onFocus() {};
-        virtual void onSubmit() {};
-        virtual void onPaste() {};
-        virtual void onTextSelectionChange() {};
-};
+        virtual void onChange(ArkUI_NodeEvent *event){};
+        virtual void onBlur(ArkUI_NodeEvent *event){};
+        virtual void onFocus(ArkUI_NodeEvent *event){};
+        virtual void onSubmit(ArkUI_NodeEvent *event){};
+        virtual void onPaste(){};
+        virtual void onTextSelectionChange(){};
+    };
 
-class TextInputNode : public TextInputNodeBase {
+    class TextInputNode : public TextInputNodeBase {
 
-protected:
-    ArkUI_NodeHandle m_childArkUINodeHandle;
-    TextInputNodeDelegate *m_textInputNodeDelegate;
+    protected:
+        ArkUI_NodeHandle m_childArkUINodeHandle;
+        TextInputNodeDelegate *m_textInputNodeDelegate;
 
-public:
-    TextInputNode();
-    ~TextInputNode();
+    public:
+        TextInputNode();
+        ~TextInputNode();
 
-    facebook::react::Point getTextInputOffset() const;
+        facebook::react::Point getTextInputOffset() const;
 
-    void onNodeEvent(ArkUI_NodeEvent *event) override;
+        void onNodeEvent(ArkUI_NodeEvent *event) override;
 
-    void setTextInputNodeDelegate(TextInputNodeDelegate *textInputNodeDelegate);
+        void setTextInputNodeDelegate(TextInputNodeDelegate *textInputNodeDelegate);
 
-    void setTextContent(std::string const &textContent);
+        void setTextContent(std::string const &textContent);
 
-    void setTextSelection(int const &start, int const &end);
+        void setTextSelection(int32_t start, int32_t end);
 
-    void setCaretHidden(bool hidden);
+        void setCaretHidden(bool hidden);
 
-    void setInputType(bool secure, facebook::react::KeyboardType keyboardType);
+        void setInputType(ArkUI_TextInputType keyboardType);
 
-    void setSelectedBackgroundColor(facebook::react::SharedColor const &color);
+        void setSelectedBackgroundColor(facebook::react::SharedColor const &color);
 
-    void setPasswordIconVisibility(bool isVisible);
+        void setPasswordIconVisibility(bool isVisible);
 
-    void setEnterKeyType(facebook::react::ReturnKeyType returnKeyType);
+        void setEnterKeyType(facebook::react::ReturnKeyType returnKeyType);
 
-    void setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode mode);
-private:
-    bool m_secureInput{false};
-    facebook::react::KeyboardType m_keyboardType{facebook::react::KeyboardType::Default};
+        void setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode mode);
 
-    // util methods
-    uint32_t convertColorToTranslucent(facebook::react::SharedColor const &color);
+        void setFont(facebook::react::TextAttributes const &textAttributes) override;
 
-    ArkUI_TextInputType convertInputType(facebook::react::KeyboardType keyboardType);
+        void setCaretColor(facebook::react::SharedColor const &color) override;
 
-    ArkUI_EnterKeyType convertEnterKeyType(facebook::react::ReturnKeyType returnKeyType);
-};
+        void setMaxLength(int32_t maxLength) override;
+
+        void setPlaceholder(std::string const &placeholder) override;
+
+        void setPlaceholderColor(facebook::react::SharedColor const &color) override;
+
+        std::string getTextContent() override;
+    };
 
 } // namespace rnoh

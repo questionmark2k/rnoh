@@ -27,17 +27,21 @@ export function TextInputTest() {
   return (
     <TestSuite name="TextInput">
       <TestCase.Example
-        modal
+        tags={['C_API']}
         itShould="render textinput and change the text component based on the values inputted">
         <TextInputWithText style={styles.textInput} />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
         itShould="render non-editable textInput">
-        <TextInputWithText style={styles.textInput} editable={false} />
+        <TextInputWithText
+          defaultValue="test"
+          style={styles.textInput}
+          editable={false}
+        />
       </TestCase.Example>
       <TestCase.Example
-        modal
+        tags={['C_API']}
         itShould="render textInput with Pacifico Regular font">
         <TextInputWithText
           style={[styles.textInput, {fontFamily: 'Pacifico-Regular'}]}
@@ -74,7 +78,7 @@ export function TextInputTest() {
           }}
         />
         <TestCase.Manual
-          modal
+          tags={['C_API']}
           itShould="blur text after switching to another textinput"
           initialState={false}
           arrange={({setState}) => {
@@ -109,6 +113,7 @@ export function TextInputTest() {
           />
         </TestCase.Example>
         <TestCase.Manual
+          tags={['C_API']}
           modal
           itShould="automatically focus textInput when displayed"
           initialState={false}
@@ -124,7 +129,7 @@ export function TextInputTest() {
           }}
         />
         <TestCase.Manual
-          modal
+          tags={['C_API']}
           itShould="focus textInput on click"
           initialState={false}
           arrange={({setState}) => (
@@ -138,8 +143,8 @@ export function TextInputTest() {
           }}
         />
         <TestCase.Manual
-          modal
           itShould="focus textInput when pressing the button"
+          modal
           initialState={false}
           arrange={({setState}) => <FocusTextInputTest setState={setState} />}
           assert={({state, expect}) => {
@@ -167,16 +172,14 @@ export function TextInputTest() {
           placeholderTextColor={'red'}
         />
       </TestCase.Example>
-      <TestCase.Example
-        tags={['C_API']}
-        itShould="render textinput with green selection color">
+      <TestCase.Example itShould="render textinput with green selection color">
         <TextInputWithText style={styles.textInput} selectionColor="green" />
       </TestCase.Example>
       <TestCase.Example tags={['C_API']} itShould="render multiline text input">
         <TextInputWithText style={styles.textInputBigger} multiline={true} />
       </TestCase.Example>
       <TestCase.Example
-        modal
+        tags={['C_API']}
         itShould="render multiline text input with Pacifico Regular font">
         <TextInputWithText
           style={[styles.textInputBigger, {fontFamily: 'Pacifico-Regular'}]}
@@ -189,6 +192,7 @@ export function TextInputTest() {
         <TextInputWithText style={styles.textInput} maxLength={10} />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="toggle between rendering 10 and 5 characters">
         <StateKeeper
@@ -236,11 +240,14 @@ export function TextInputTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase.Example modal itShould="toggle between different return keys">
+      <TestCase.Example
+        modal
+        tags={['C_API']}
+        itShould="toggle between different return keys">
         <ReturnKeyTypeView />
       </TestCase.Example>
       <TestCase.Example
-        modal
+        tags={['C_API']}
         itShould="render secure text input (text obscured)">
         <TextInputWithText style={styles.textInput} secureTextEntry />
       </TestCase.Example>
@@ -277,12 +284,12 @@ export function TextInputTest() {
         }}
       />
       <TestCase.Example
-        modal
+        tags={['C_API']}
         itShould="show text input with default value (defaultProps)">
         <DefaultProps />
       </TestCase.Example>
       <TestCase.Example
-        modal
+        tags={['C_API']}
         itShould="show text input with default value (defaultValue)">
         <TextInput style={styles.textInput} defaultValue="defaultText" />
       </TestCase.Example>

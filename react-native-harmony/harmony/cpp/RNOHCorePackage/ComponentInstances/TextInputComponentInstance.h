@@ -8,29 +8,35 @@
 
 namespace rnoh {
     class TextInputComponentInstance : public CppComponentInstance<facebook::react::TextInputShadowNode>,
-        public TextInputNodeDelegate, public TextAreaNodeDelegate {
+                                       public TextInputNodeDelegate,
+                                       public TextAreaNodeDelegate {
     private:
         TextInputNode m_textInputNode;
         TextAreaNode m_textAreaNode;
-        bool multiline_ = false;
-        
-        facebook::react::TextInputMetrics getTextInputMetrics();
+        bool m_multiline{false};
+
+        facebook::react::TextInputMetrics getTextInputMetrics(ArkUI_NodeEvent *event);
+
+        bool m_secureInput{false};
+
     public:
         TextInputComponentInstance(Context context);
 
-        void onPropsChanged(std::shared_ptr<const facebook::react::TextInputProps> const &props) override;
+        void onPropsChanged(SharedConcreteProps const &props) override;
+
+        void onStateChanged(SharedConcreteState const &state) override;
 
         void setLayout(facebook::react::LayoutMetrics layoutMetrics) override;
 
         void handleCommand(std::string const &commandName, folly::dynamic const &args) override;
-        
-        void onChange() override;
 
-        void onBlur() override;
+        void onChange(ArkUI_NodeEvent *event) override;
 
-        void onSubmit() override;
+        void onBlur(ArkUI_NodeEvent *event) override;
 
-        void onFocus() override;
+        void onSubmit(ArkUI_NodeEvent *event) override;
+
+        void onFocus(ArkUI_NodeEvent *event) override;
 
         ArkUINode &getLocalRootArkUINode() override;
     };
