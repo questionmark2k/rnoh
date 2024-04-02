@@ -401,7 +401,7 @@ export struct RNScrollView {
     this.contentOffset = this.getContentOffset();
 
     const now = Date.now();
-    if (this.isScrolling && (this.allowNextScrollEvent || descriptor.props.scrollEventThrottle < now - this.lastScrollDispatchTime)) {
+    if (this.allowNextScrollEvent || this.isScrolling && descriptor.props.scrollEventThrottle < now - this.lastScrollDispatchTime) {
       this.lastScrollDispatchTime = now
       this.ctx.rnInstance.emitComponentEvent(
         this.tag,
