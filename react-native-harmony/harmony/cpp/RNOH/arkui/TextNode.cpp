@@ -85,6 +85,11 @@ TextNode &TextNode::setTextMaxLines(int32_t textMaxLines) {
     return *this;
 }
 
+TextNode &TextNode::resetTextMaxLines() {
+    maybeThrow(NativeNodeApi::getInstance()->resetAttribute(m_nodeHandle, NODE_TEXT_MAX_LINES));
+    return *this;
+}
+
 TextNode &TextNode::setTextAlign(int32_t align) {
     ArkUI_NumberValue value[] = {{.i32 = align}};
     ArkUI_AttributeItem item = {.value = value, .size = 1};

@@ -42,6 +42,7 @@ class TextNode : public ArkUINode {
     TextNode &setTextCase(int32_t textCase);
     TextNode &setTextLetterSpacing(float textLetterSpacing);
     TextNode &setTextMaxLines(int32_t textMaxLines);
+    TextNode &resetTextMaxLines();
     TextNode &setTextAlign(int32_t align);
     TextNode &setTextEllipsisMode(int32_t ellipsisMode);
     TextNode &setTextOverflow(int32_t textOverflow);

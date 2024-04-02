@@ -270,6 +270,8 @@ void TextComponentInstance::setParagraphAttributes(const facebook::react::Paragr
     VLOG(3) << "[text-debug] paragraphAttributes.maximumNumberOfLines=" << paragraphAttributes.maximumNumberOfLines;
     if (paragraphAttributes.maximumNumberOfLines > 0) {
         m_textNode.setTextMaxLines(paragraphAttributes.maximumNumberOfLines);
+    } else {
+        m_textNode.resetTextMaxLines();
     }
 
     // height Adaptive Policy

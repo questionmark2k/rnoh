@@ -408,16 +408,17 @@ export function TextMeasuringTest() {
 }
 
 const TextUpdateNumberOfLinesTest = () => {
-  const [maxLines, setMaxLines] = useState(1);
+  const [caseIndex, setCaseIndex] = useState(0);
+  const testCases = [...Array.from({ length: 7 }, (_, i) => i + 1), undefined];
   return (
     <View>
       <Button
-        title="Click"
+        title={`Click, numberOfLines=${testCases[caseIndex]}`}
         onPress={() => {
-          setMaxLines(prev => (prev % 8) + 1);
+          setCaseIndex(prev => (prev + 1) % testCases.length);
         }}
       />
-      <Text numberOfLines={maxLines}>{SAMPLE_PARAGRAPH_TEXT}</Text>
+      <Text numberOfLines={testCases[caseIndex]}>{SAMPLE_PARAGRAPH_TEXT}</Text>
     </View>
   );
 };
