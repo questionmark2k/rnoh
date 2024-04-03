@@ -1,48 +1,54 @@
 #pragma once
 
 #include "ArkUINode.h"
-#include "react/renderer/graphics/Color.h"
 #include "react/renderer/components/textinput/TextInputProps.h"
+#include "react/renderer/graphics/Color.h"
 
 namespace rnoh {
 
-    class TextInputNodeBase : public ArkUINode {
-    protected:
-        TextInputNodeBase(ArkUI_NodeType nodeType);
-        void setCommonFontAttributes(facebook::react::TextAttributes const &textAttributes);
+class TextInputNodeBase : public ArkUINode {
+ protected:
+  TextInputNodeBase(ArkUI_NodeType nodeType);
+  void setCommonFontAttributes(
+      facebook::react::TextAttributes const& textAttributes);
 
-    public:
-        void setPadding(int32_t padding);
+ public:
+  void setPadding(int32_t padding);
 
-        void setFocusable(bool const &focusable);
+  void setFocusable(bool const& focusable);
 
-        void setAutoFocus(bool autoFocus);
+  void setAutoFocus(bool autoFocus);
 
-        void setResponseRegion(facebook::react::Point const &position, facebook::react::Size const &size);
+  void setResponseRegion(
+      facebook::react::Point const& position,
+      facebook::react::Size const& size);
 
-        void setFocusStatus(int32_t focus);
+  void setFocusStatus(int32_t focus);
 
-        void setTextContent(std::string const &textContent);
+  void setTextContent(std::string const& textContent);
 
-        void setTextSelection(int32_t start, int32_t end);
+  void setTextSelection(int32_t start, int32_t end);
 
-        void setFontColor(facebook::react::SharedColor const &color);
+  void setFontColor(facebook::react::SharedColor const& color);
 
-        virtual void setFont(facebook::react::TextAttributes const &textAttributes) = 0;
+  virtual void setFont(
+      facebook::react::TextAttributes const& textAttributes) = 0;
 
-        virtual void setCaretColor(facebook::react::SharedColor const &color) = 0;
+  virtual void setCaretColor(facebook::react::SharedColor const& color) = 0;
 
-        void setEnabled(bool enabled);
+  void setEnabled(bool enabled);
 
-        virtual void setMaxLength(int32_t maxLength) = 0;
+  virtual void setMaxLength(int32_t maxLength) = 0;
 
-        virtual void setPlaceholder(std::string const &placeholder) = 0;
+  virtual void setPlaceholder(std::string const& placeholder) = 0;
 
-        virtual void setPlaceholderColor(facebook::react::SharedColor const &color) = 0;
+  virtual void setPlaceholderColor(
+      facebook::react::SharedColor const& color) = 0;
 
-        void setTextAlign(std::optional<facebook::react::TextAlignment> const &textAlign);
+  void setTextAlign(
+      std::optional<facebook::react::TextAlignment> const& textAlign);
 
-        std::string virtual getTextContent() = 0;
-    };
+  std::string virtual getTextContent() = 0;
+};
 
 } // namespace rnoh

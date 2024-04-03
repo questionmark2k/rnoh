@@ -7,37 +7,39 @@
 #include "react/renderer/components/textinput/TextInputShadowNode.h"
 
 namespace rnoh {
-    class TextInputComponentInstance : public CppComponentInstance<facebook::react::TextInputShadowNode>,
-                                       public TextInputNodeDelegate,
-                                       public TextAreaNodeDelegate {
-    private:
-        TextInputNode m_textInputNode;
-        TextAreaNode m_textAreaNode;
-        bool m_multiline{false};
+class TextInputComponentInstance
+    : public CppComponentInstance<facebook::react::TextInputShadowNode>,
+      public TextInputNodeDelegate,
+      public TextAreaNodeDelegate {
+ private:
+  TextInputNode m_textInputNode;
+  TextAreaNode m_textAreaNode;
+  bool m_multiline{false};
 
-        facebook::react::TextInputMetrics getTextInputMetrics(ArkUI_NodeEvent *event);
+  facebook::react::TextInputMetrics getTextInputMetrics(ArkUI_NodeEvent* event);
 
-        bool m_secureInput{false};
+  bool m_secureInput{false};
 
-    public:
-        TextInputComponentInstance(Context context);
+ public:
+  TextInputComponentInstance(Context context);
 
-        void onPropsChanged(SharedConcreteProps const &props) override;
+  void onPropsChanged(SharedConcreteProps const& props) override;
 
-        void onStateChanged(SharedConcreteState const &state) override;
+  void onStateChanged(SharedConcreteState const& state) override;
 
-        void setLayout(facebook::react::LayoutMetrics layoutMetrics) override;
+  void setLayout(facebook::react::LayoutMetrics layoutMetrics) override;
 
-        void handleCommand(std::string const &commandName, folly::dynamic const &args) override;
+  void handleCommand(std::string const& commandName, folly::dynamic const& args)
+      override;
 
-        void onChange(ArkUI_NodeEvent *event) override;
+  void onChange(ArkUI_NodeEvent* event) override;
 
-        void onBlur(ArkUI_NodeEvent *event) override;
+  void onBlur(ArkUI_NodeEvent* event) override;
 
-        void onSubmit(ArkUI_NodeEvent *event) override;
+  void onSubmit(ArkUI_NodeEvent* event) override;
 
-        void onFocus(ArkUI_NodeEvent *event) override;
+  void onFocus(ArkUI_NodeEvent* event) override;
 
-        ArkUINode &getLocalRootArkUINode() override;
-    };
+  ArkUINode& getLocalRootArkUINode() override;
+};
 } // namespace rnoh

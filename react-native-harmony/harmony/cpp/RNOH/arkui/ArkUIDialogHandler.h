@@ -5,49 +5,48 @@
 namespace rnoh {
 
 class ArkUIDialogDelegate {
-  public:
-    virtual ~ArkUIDialogDelegate() = default;
-    virtual void onShow(){};
-    virtual void onRequestClose(){};
+ public:
+  virtual ~ArkUIDialogDelegate() = default;
+  virtual void onShow(){};
+  virtual void onRequestClose(){};
 };
 
 class ArkUIDialogHandler {
+ public:
+  ArkUIDialogHandler();
 
-  public:
-    ArkUIDialogHandler();
+  ArkUIDialogHandler(ArkUIDialogHandler const& other) = delete;
 
-    ArkUIDialogHandler(ArkUIDialogHandler const &other) = delete;
+  ArkUIDialogHandler& operator=(const ArkUIDialogHandler& other) = delete;
 
-    ArkUIDialogHandler &operator=(const ArkUIDialogHandler &other) = delete;
+  ~ArkUIDialogHandler();
 
-    ~ArkUIDialogHandler();
+  void setContent(ArkUINode& node);
 
-    void setContent(ArkUINode &node);
+  void show();
 
-    void show();
+  void close();
 
-    void close();
+  void onShow();
 
-    void onShow();
+  void onRequestClose();
 
-    void onRequestClose();
+  void setDialogDelegate(ArkUIDialogDelegate* dialogDelegate) {
+    m_dialogDelegate = dialogDelegate;
+  }
 
-    void setDialogDelegate(ArkUIDialogDelegate *dialogDelegate) {
-        m_dialogDelegate = dialogDelegate;
-    }
+  bool isShow() {
+    return isShow_;
+  }
 
-    bool isShow() {
-        return isShow_;
-    }
+ private:
+  void destroy();
 
-  private:
-    void destroy();
+  void initDialogProperties();
 
-    void initDialogProperties();
-
-    bool isShow_ = false;
-    ArkUI_NativeDialogHandle handler_;
-    ArkUIDialogDelegate *m_dialogDelegate;
+  bool isShow_ = false;
+  ArkUI_NativeDialogHandle handler_;
+  ArkUIDialogDelegate* m_dialogDelegate;
 };
 
 } // namespace rnoh

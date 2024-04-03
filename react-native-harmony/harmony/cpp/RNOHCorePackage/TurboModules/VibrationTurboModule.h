@@ -6,8 +6,10 @@
 namespace rnoh {
 
 class JSI_EXPORT VibrationTurboModule : public ArkTSTurboModule {
-  public:
-    VibrationTurboModule(const ArkTSTurboModule::Context ctx, const std::string name);
+ public:
+  VibrationTurboModule(
+      const ArkTSTurboModule::Context ctx,
+      const std::string name);
 };
 
 } // namespace rnoh

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <unordered_map>
-#include <functional>
 #include <arkui/native_node.h>
+#include <functional>
+#include <unordered_map>
 #include "RNOH/ArkTSBridge.h"
 
 namespace rnoh {
@@ -10,32 +10,35 @@ namespace rnoh {
 class ArkUINode;
 
 class TouchEventHandler {
-  public:
-    virtual void onTouchEvent(ArkUI_NodeTouchEvent event) = 0;
-    virtual ~TouchEventHandler() = default;
+ public:
+  virtual void onTouchEvent(ArkUI_NodeTouchEvent event) = 0;
+  virtual ~TouchEventHandler() = default;
 };
 
 class ArkUINodeRegistry {
-    static std::unique_ptr<ArkUINodeRegistry> instance;
-    
-  public:
-      static void initialize(ArkTSBridge::Shared arkTSBridge);
-      static ArkUINodeRegistry &getInstance();
+  static std::unique_ptr<ArkUINodeRegistry> instance;
 
-      void registerNode(ArkUINode *node);
-      void unregisterNode(ArkUINode *node);
+ public:
+  static void initialize(ArkTSBridge::Shared arkTSBridge);
+  static ArkUINodeRegistry& getInstance();
 
-      void registerTouchHandler(ArkUINode *node, TouchEventHandler *touchEventHandler);
-      void unregisterTouchHandler(ArkUINode *node);
+  void registerNode(ArkUINode* node);
+  void unregisterNode(ArkUINode* node);
 
-  private:
-    ArkUINodeRegistry(ArkTSBridge::Shared arkTSBridge);
+  void registerTouchHandler(
+      ArkUINode* node,
+      TouchEventHandler* touchEventHandler);
+  void unregisterTouchHandler(ArkUINode* node);
 
-    void receiveEvent(ArkUI_NodeEvent *event);
+ private:
+  ArkUINodeRegistry(ArkTSBridge::Shared arkTSBridge);
 
-    std::unordered_map<ArkUI_NodeHandle, ArkUINode *> m_nodeByHandle;
-    std::unordered_map<ArkUI_NodeHandle, TouchEventHandler *> m_touchHandlerByNodeHandle;
-    ArkTSBridge::Shared m_arkTSBridge;
+  void receiveEvent(ArkUI_NodeEvent* event);
+
+  std::unordered_map<ArkUI_NodeHandle, ArkUINode*> m_nodeByHandle;
+  std::unordered_map<ArkUI_NodeHandle, TouchEventHandler*>
+      m_touchHandlerByNodeHandle;
+  ArkTSBridge::Shared m_arkTSBridge;
 };
 
 } // namespace rnoh

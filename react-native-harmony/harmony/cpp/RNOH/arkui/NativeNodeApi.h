@@ -4,14 +4,14 @@
 
 namespace rnoh {
 
-    class NativeNodeApi {
-    public:
-        static ArkUI_NativeNodeAPI_1 *getInstance();
+class NativeNodeApi {
+ public:
+  static ArkUI_NativeNodeAPI_1* getInstance();
 
-    private:
-        NativeNodeApi() {}
+ private:
+  NativeNodeApi() {}
 
-        static ArkUI_NativeNodeAPI_1 *api;
-    };
+  static ArkUI_NativeNodeAPI_1* api;
+};
 
 } // namespace rnoh

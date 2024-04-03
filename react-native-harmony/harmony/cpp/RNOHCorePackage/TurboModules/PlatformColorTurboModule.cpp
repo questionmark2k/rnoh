@@ -3,10 +3,11 @@
 namespace rnoh {
 using namespace facebook;
 
-PlatformColorTurboModule::PlatformColorTurboModule(const ArkTSTurboModule::Context ctx, const std::string name) : ArkTSTurboModule(ctx, name) {
-    methodMap_ = {
-      ARK_METHOD_METADATA(getSystemColor, 1)
-    };
-} 
+PlatformColorTurboModule::PlatformColorTurboModule(
+    const ArkTSTurboModule::Context ctx,
+    const std::string name)
+    : ArkTSTurboModule(ctx, name) {
+  methodMap_ = {ARK_METHOD_METADATA(getSystemColor, 1)};
+}
 
 } // namespace rnoh

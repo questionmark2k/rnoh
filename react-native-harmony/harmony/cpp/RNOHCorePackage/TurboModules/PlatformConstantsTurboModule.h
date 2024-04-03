@@ -6,8 +6,10 @@
 namespace rnoh {
 
 class JSI_EXPORT PlatformConstantsTurboModule : public ArkTSTurboModule {
-  public:
-    PlatformConstantsTurboModule(const ArkTSTurboModule::Context ctx, const std::string name);
+ public:
+  PlatformConstantsTurboModule(
+      const ArkTSTurboModule::Context ctx,
+      const std::string name);
 };
 
 } // namespace rnoh

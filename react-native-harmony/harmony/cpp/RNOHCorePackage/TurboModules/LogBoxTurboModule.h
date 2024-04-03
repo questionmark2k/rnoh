@@ -6,8 +6,10 @@
 namespace rnoh {
 
 class JSI_EXPORT LogBoxTurboModule : public ArkTSTurboModule {
-  public:
-    LogBoxTurboModule(const ArkTSTurboModule::Context ctx, const std::string name);
+ public:
+  LogBoxTurboModule(
+      const ArkTSTurboModule::Context ctx,
+      const std::string name);
 };
 
 } // namespace rnoh
