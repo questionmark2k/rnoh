@@ -1,8 +1,8 @@
 #pragma once
 
-#include <react/renderer/core/ConcreteComponentDescriptor.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/components/view/ViewShadowNode.h>
+#include <react/renderer/core/ConcreteComponentDescriptor.h>
 
 namespace facebook {
 namespace react {
@@ -10,11 +10,14 @@ namespace react {
 extern const char PropsDisplayerComponentName[] = "PropsDisplayer";
 
 class PropsDisplayerProps : public ViewProps {
-  public:
-    PropsDisplayerProps() = default;
+ public:
+  PropsDisplayerProps() = default;
 
-    PropsDisplayerProps(const PropsParserContext &context, const PropsDisplayerProps &sourceProps, const RawProps &rawProps)
-        : ViewProps(context, sourceProps, rawProps) {}
+  PropsDisplayerProps(
+      const PropsParserContext& context,
+      const PropsDisplayerProps& sourceProps,
+      const RawProps& rawProps)
+      : ViewProps(context, sourceProps, rawProps) {}
 };
 
 using PropsDisplayerShadowNode = ConcreteViewShadowNode<
@@ -24,9 +27,10 @@ using PropsDisplayerShadowNode = ConcreteViewShadowNode<
 
 class PropsDisplayerComponentDescriptor final
     : public ConcreteComponentDescriptor<PropsDisplayerShadowNode> {
-  public:
-    PropsDisplayerComponentDescriptor(ComponentDescriptorParameters const &parameters)
-        : ConcreteComponentDescriptor(parameters) {}
+ public:
+  PropsDisplayerComponentDescriptor(
+      ComponentDescriptorParameters const& parameters)
+      : ConcreteComponentDescriptor(parameters) {}
 };
 
 } // namespace react

@@ -5,48 +5,48 @@
 #include "AnimatedNode.h"
 #include "RNOHCorePackage/TurboModules/Animated/AnimatedNodesManager.h"
 
-namespace rnoh
-{
-    
-class InterpolationAnimatedNode : public ValueAnimatedNode
-{
-public:
-    InterpolationAnimatedNode(folly::dynamic const &config, AnimatedNodesManager &nodesManager);
-    virtual ~InterpolationAnimatedNode() = default;
+namespace rnoh {
 
-    void update() override;
-    void onAttachedToNode(facebook::react::Tag tag) override;
-    void onDetachedFromNode(facebook::react::Tag tag) override;
+class InterpolationAnimatedNode : public ValueAnimatedNode {
+ public:
+  InterpolationAnimatedNode(
+      folly::dynamic const& config,
+      AnimatedNodesManager& nodesManager);
+  virtual ~InterpolationAnimatedNode() = default;
 
-private:
-    enum ExtrapolateType {
-        EXTRAPOLATE_TYPE_IDENTITY,
-        EXTRAPOLATE_TYPE_CLAMP,
-        EXTRAPOLATE_TYPE_EXTEND
-    };
+  void update() override;
+  void onAttachedToNode(facebook::react::Tag tag) override;
+  void onDetachedFromNode(facebook::react::Tag tag) override;
 
-    static ExtrapolateType extrapolateTypeFromString(std::string const &extrapolateType);
+ private:
+  enum ExtrapolateType {
+    EXTRAPOLATE_TYPE_IDENTITY,
+    EXTRAPOLATE_TYPE_CLAMP,
+    EXTRAPOLATE_TYPE_EXTEND
+  };
 
-    ExtrapolateType m_extrapolateLeft;
-    ExtrapolateType m_extrapolateRight;
-    
-    double interpolate(
-        double value,
-        double inputMin,
-        double inputMax,
-        double outputMin,
-        double outputMax,
-        ExtrapolateType extrapolateLeft,
-        ExtrapolateType extrapolateRight
-    ) const;
+  static ExtrapolateType extrapolateTypeFromString(
+      std::string const& extrapolateType);
 
-    ValueAnimatedNode &getParentNode() const;
+  ExtrapolateType m_extrapolateLeft;
+  ExtrapolateType m_extrapolateRight;
 
-    folly::dynamic m_inputRange;
-    folly::dynamic m_outputRange;
+  double interpolate(
+      double value,
+      double inputMin,
+      double inputMax,
+      double outputMin,
+      double outputMax,
+      ExtrapolateType extrapolateLeft,
+      ExtrapolateType extrapolateRight) const;
 
-    std::optional<facebook::react::Tag> m_parent;
-    AnimatedNodesManager &m_nodesManager;
+  ValueAnimatedNode& getParentNode() const;
+
+  folly::dynamic m_inputRange;
+  folly::dynamic m_outputRange;
+
+  std::optional<facebook::react::Tag> m_parent;
+  AnimatedNodesManager& m_nodesManager;
 };
 
 } // namespace rnoh

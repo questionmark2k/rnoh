@@ -1,26 +1,31 @@
 #include "TouchTarget.h"
 
-facebook::react::Transform invertTransform(const facebook::react::Transform &transform);
+facebook::react::Transform invertTransform(
+    const facebook::react::Transform& transform);
 
-auto rnoh::TouchTarget::computeChildPoint(Point const &point, TouchTarget::Shared const &child) const -> Point {
-    auto childLayout = child->getLayoutMetrics();
-    auto childTransform = child->getTransform();
+auto rnoh::TouchTarget::computeChildPoint(
+    Point const& point,
+    TouchTarget::Shared const& child) const -> Point {
+  auto childLayout = child->getLayoutMetrics();
+  auto childTransform = child->getTransform();
 
-    // the center of the view (relative to its origin)
-    Point center{childLayout.frame.size.width / 2, childLayout.frame.size.height / 2};
-    // the center of the view (before applying its transformation),
-    // which is the origin of the transformation (relative to parent)
-    Point transformationOrigin = childLayout.frame.origin + center;
+  // the center of the view (relative to its origin)
+  Point center{
+      childLayout.frame.size.width / 2, childLayout.frame.size.height / 2};
+  // the center of the view (before applying its transformation),
+  // which is the origin of the transformation (relative to parent)
+  Point transformationOrigin = childLayout.frame.origin + center;
 
-    auto inverseTransform = invertTransform(childTransform);
+  auto inverseTransform = invertTransform(childTransform);
 
-    // transform the vector from the origin of the transformation
-    auto transformedOffsetFromCenter = (point - transformationOrigin) * inverseTransform;
+  // transform the vector from the origin of the transformation
+  auto transformedOffsetFromCenter =
+      (point - transformationOrigin) * inverseTransform;
 
-    // add back the offset of the center relative to the origin of the view
-    auto localPoint = transformedOffsetFromCenter + center;
+  // add back the offset of the center relative to the origin of the view
+  auto localPoint = transformedOffsetFromCenter + center;
 
-    return localPoint;
+  return localPoint;
 }
 
 /*
@@ -56,47 +61,67 @@ auto rnoh::TouchTarget::computeChildPoint(Point const &point, TouchTarget::Share
  * other dealings in this Software without prior written authorization from
  * Silicon Graphics, Inc.
  */
-static bool gluInvertMatrix(const facebook::react::Float m[16], facebook::react::Float invOut[16]) {
-    facebook::react::Float inv[16];
-    facebook::react::Float det;
-    int i;
+static bool gluInvertMatrix(
+    const facebook::react::Float m[16],
+    facebook::react::Float invOut[16]) {
+  facebook::react::Float inv[16];
+  facebook::react::Float det;
+  int i;
 
-    inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
-    inv[4] = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] - m[8] * m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
-    inv[8] = m[4] * m[9] * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] + m[8] * m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
-    inv[12] = -m[4] * m[9] * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] - m[8] * m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
-    inv[1] = -m[1] * m[10] * m[15] + m[1] * m[11] * m[14] + m[9] * m[2] * m[15] - m[9] * m[3] * m[14] - m[13] * m[2] * m[11] + m[13] * m[3] * m[10];
-    inv[5] = m[0] * m[10] * m[15] - m[0] * m[11] * m[14] - m[8] * m[2] * m[15] + m[8] * m[3] * m[14] + m[12] * m[2] * m[11] - m[12] * m[3] * m[10];
-    inv[9] = -m[0] * m[9] * m[15] + m[0] * m[11] * m[13] + m[8] * m[1] * m[15] - m[8] * m[3] * m[13] - m[12] * m[1] * m[11] + m[12] * m[3] * m[9];
-    inv[13] = m[0] * m[9] * m[14] - m[0] * m[10] * m[13] - m[8] * m[1] * m[14] + m[8] * m[2] * m[13] + m[12] * m[1] * m[10] - m[12] * m[2] * m[9];
-    inv[2] = m[1] * m[6] * m[15] - m[1] * m[7] * m[14] - m[5] * m[2] * m[15] + m[5] * m[3] * m[14] + m[13] * m[2] * m[7] - m[13] * m[3] * m[6];
-    inv[6] = -m[0] * m[6] * m[15] + m[0] * m[7] * m[14] + m[4] * m[2] * m[15] - m[4] * m[3] * m[14] - m[12] * m[2] * m[7] + m[12] * m[3] * m[6];
-    inv[10] = m[0] * m[5] * m[15] - m[0] * m[7] * m[13] - m[4] * m[1] * m[15] + m[4] * m[3] * m[13] + m[12] * m[1] * m[7] - m[12] * m[3] * m[5];
-    inv[14] = -m[0] * m[5] * m[14] + m[0] * m[6] * m[13] + m[4] * m[1] * m[14] - m[4] * m[2] * m[13] - m[12] * m[1] * m[6] + m[12] * m[2] * m[5];
-    inv[3] = -m[1] * m[6] * m[11] + m[1] * m[7] * m[10] + m[5] * m[2] * m[11] - m[5] * m[3] * m[10] - m[9] * m[2] * m[7] + m[9] * m[3] * m[6];
-    inv[7] = m[0] * m[6] * m[11] - m[0] * m[7] * m[10] - m[4] * m[2] * m[11] + m[4] * m[3] * m[10] + m[8] * m[2] * m[7] - m[8] * m[3] * m[6];
-    inv[11] = -m[0] * m[5] * m[11] + m[0] * m[7] * m[9] + m[4] * m[1] * m[11] - m[4] * m[3] * m[9] - m[8] * m[1] * m[7] + m[8] * m[3] * m[5];
-    inv[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] + m[4] * m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
+  inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] +
+      m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
+  inv[4] = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] -
+      m[8] * m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
+  inv[8] = m[4] * m[9] * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] +
+      m[8] * m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
+  inv[12] = -m[4] * m[9] * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] -
+      m[8] * m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
+  inv[1] = -m[1] * m[10] * m[15] + m[1] * m[11] * m[14] + m[9] * m[2] * m[15] -
+      m[9] * m[3] * m[14] - m[13] * m[2] * m[11] + m[13] * m[3] * m[10];
+  inv[5] = m[0] * m[10] * m[15] - m[0] * m[11] * m[14] - m[8] * m[2] * m[15] +
+      m[8] * m[3] * m[14] + m[12] * m[2] * m[11] - m[12] * m[3] * m[10];
+  inv[9] = -m[0] * m[9] * m[15] + m[0] * m[11] * m[13] + m[8] * m[1] * m[15] -
+      m[8] * m[3] * m[13] - m[12] * m[1] * m[11] + m[12] * m[3] * m[9];
+  inv[13] = m[0] * m[9] * m[14] - m[0] * m[10] * m[13] - m[8] * m[1] * m[14] +
+      m[8] * m[2] * m[13] + m[12] * m[1] * m[10] - m[12] * m[2] * m[9];
+  inv[2] = m[1] * m[6] * m[15] - m[1] * m[7] * m[14] - m[5] * m[2] * m[15] +
+      m[5] * m[3] * m[14] + m[13] * m[2] * m[7] - m[13] * m[3] * m[6];
+  inv[6] = -m[0] * m[6] * m[15] + m[0] * m[7] * m[14] + m[4] * m[2] * m[15] -
+      m[4] * m[3] * m[14] - m[12] * m[2] * m[7] + m[12] * m[3] * m[6];
+  inv[10] = m[0] * m[5] * m[15] - m[0] * m[7] * m[13] - m[4] * m[1] * m[15] +
+      m[4] * m[3] * m[13] + m[12] * m[1] * m[7] - m[12] * m[3] * m[5];
+  inv[14] = -m[0] * m[5] * m[14] + m[0] * m[6] * m[13] + m[4] * m[1] * m[14] -
+      m[4] * m[2] * m[13] - m[12] * m[1] * m[6] + m[12] * m[2] * m[5];
+  inv[3] = -m[1] * m[6] * m[11] + m[1] * m[7] * m[10] + m[5] * m[2] * m[11] -
+      m[5] * m[3] * m[10] - m[9] * m[2] * m[7] + m[9] * m[3] * m[6];
+  inv[7] = m[0] * m[6] * m[11] - m[0] * m[7] * m[10] - m[4] * m[2] * m[11] +
+      m[4] * m[3] * m[10] + m[8] * m[2] * m[7] - m[8] * m[3] * m[6];
+  inv[11] = -m[0] * m[5] * m[11] + m[0] * m[7] * m[9] + m[4] * m[1] * m[11] -
+      m[4] * m[3] * m[9] - m[8] * m[1] * m[7] + m[8] * m[3] * m[5];
+  inv[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] +
+      m[4] * m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
 
-    det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
-    if (det == 0) {
-        return false;
-    }
+  det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+  if (det == 0) {
+    return false;
+  }
 
-    det = 1.0 / det;
+  det = 1.0 / det;
 
-    for (i = 0; i < 16; i++) {
-        invOut[i] = inv[i] * det;
-    }
+  for (i = 0; i < 16; i++) {
+    invOut[i] = inv[i] * det;
+  }
 
-    return true;
+  return true;
 }
 
-facebook::react::Transform invertTransform(const facebook::react::Transform &transform) {
-    facebook::react::Transform result;
-    auto succeeded = gluInvertMatrix(transform.matrix.data(), result.matrix.data());
-    if (!succeeded) {
-        throw std::runtime_error("Matrix is not invertible.");
-    }
-    return result;
+facebook::react::Transform invertTransform(
+    const facebook::react::Transform& transform) {
+  facebook::react::Transform result;
+  auto succeeded =
+      gluInvertMatrix(transform.matrix.data(), result.matrix.data());
+  if (!succeeded) {
+    throw std::runtime_error("Matrix is not invertible.");
+  }
+  return result;
 }

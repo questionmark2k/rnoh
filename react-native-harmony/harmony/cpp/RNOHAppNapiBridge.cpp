@@ -444,6 +444,28 @@ static napi_value updateState(napi_env env, napi_callback_info info) {
   return arkJs.getUndefined();
 }
 
+static napi_value onArkTSMessage(napi_env env, napi_callback_info info) {
+  ArkJS arkJs(env);
+  try {
+    auto args = arkJs.getCallbackArgs(info, 2);
+    auto messageName = arkJs.getString(args[0]);
+    auto wrappedPayload = arkJs.getDynamic(args[1]);
+    auto rnInstanceId = wrappedPayload["rnInstanceId"].getDouble();
+    auto messagePayload = wrappedPayload["payload"];
+    auto lock = std::lock_guard<std::mutex>(rnInstanceByIdMutex);
+    auto it = rnInstanceById.find(rnInstanceId);
+    if (it == rnInstanceById.end()) {
+      return arkJs.getUndefined();
+    }
+    auto& rnInstance = it->second;
+    rnInstance->handleArkTSMessage(messageName, messagePayload);
+  } catch (...) {
+    ArkTSBridge::getInstance()->handleError(std::current_exception());
+  }
+
+  return arkJs.getUndefined();
+}
+
 static void registerNativeXComponent(napi_env env, napi_value exports) {
   if ((env == nullptr) || (exports == nullptr)) {
     LOG(ERROR) << "registerNativeXComponent: env or exports is null"
@@ -586,6 +608,14 @@ static napi_value Init(napi_env env, napi_value exports) {
       {"setSurfaceDisplayMode",
        nullptr,
        setSurfaceDisplayMode,
+       nullptr,
+       nullptr,
+       nullptr,
+       napi_default,
+       nullptr},
+      {"onArkTSMessage",
+       nullptr,
+       onArkTSMessage,
        nullptr,
        nullptr,
        nullptr,

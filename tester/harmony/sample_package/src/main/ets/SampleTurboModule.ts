@@ -88,4 +88,14 @@ export class SampleTurboModule extends TurboModule implements TM.GeneratedSample
   getUnknown(arg: Object) {
     return arg
   }
+
+  async emitEventFromArkTS2Cpp(payload: { foo: string }): Promise<{ foo: string }> {
+    return await new Promise((resolve) => {
+      const unsubscribe = this.ctx.rnInstance.cppEventEmitter.subscribe("SAMPLE_MESSAGE", (value: {foo: string}) => {
+        resolve(value)
+        unsubscribe();
+      })
+      this.ctx.rnInstance.postMessageToCpp("SAMPLE_MESSAGE", payload);
+    })
+  }
 }

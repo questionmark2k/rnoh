@@ -3,15 +3,20 @@
 namespace rnoh {
 
 class SamplePackage : public Package {
-  public:
-    SamplePackage(Package::Context ctx) : Package(ctx) {}
+ public:
+  SamplePackage(Package::Context ctx) : Package(ctx) {}
 
-    std::vector<facebook::react::ComponentDescriptorProvider> createComponentDescriptorProviders() override;
+  std::vector<facebook::react::ComponentDescriptorProvider>
+  createComponentDescriptorProviders() override;
 
-    std::unique_ptr<TurboModuleFactoryDelegate> createTurboModuleFactoryDelegate() override;
+  std::unique_ptr<TurboModuleFactoryDelegate> createTurboModuleFactoryDelegate()
+      override;
 
-    ComponentNapiBinderByString createComponentNapiBinderByName() override;
+  ComponentNapiBinderByString createComponentNapiBinderByName() override;
 
-    ComponentJSIBinderByString createComponentJSIBinderByName() override;
+  ComponentJSIBinderByString createComponentJSIBinderByName() override;
+
+  std::vector<ArkTSMessageHandler::Shared> createArkTSMessageHandlers()
+      override;
 };
 } // namespace rnoh

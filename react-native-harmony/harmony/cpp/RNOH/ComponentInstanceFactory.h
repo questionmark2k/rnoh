@@ -2,9 +2,9 @@
  * Used only in C-API based Architecture.
  */
 #pragma once
+#include <react/renderer/core/ReactPrimitives.h>
 #include <memory>
 #include <vector>
-#include <react/renderer/core/ReactPrimitives.h>
 #include "RNOH/ComponentInstance.h"
 #include "RNOH/CustomComponentArkUINodeHandleFactory.h"
 #include "RNOH/FallbackComponentInstance.h"
@@ -12,56 +12,71 @@
 #include "glog/logging.h"
 
 namespace rnoh {
-    class ComponentInstanceFactoryDelegate {
-    public:
-        ComponentInstanceFactoryDelegate() = default;
+class ComponentInstanceFactoryDelegate {
+ public:
+  ComponentInstanceFactoryDelegate() = default;
 
-        using Shared = std::shared_ptr<ComponentInstanceFactoryDelegate>;
+  using Shared = std::shared_ptr<ComponentInstanceFactoryDelegate>;
 
-        virtual ComponentInstance::Shared create(ComponentInstance::Context ctx) = 0;
-    };
+  virtual ComponentInstance::Shared create(ComponentInstance::Context ctx) = 0;
+};
 
+class ComponentInstanceFactory {
+ private:
+  std::vector<ComponentInstanceFactoryDelegate::Shared> m_delegates;
+  ComponentInstance::Dependencies::Shared m_dependencies;
+  CustomComponentArkUINodeHandleFactory::Shared
+      m_customComponentArkUINodeHandleFactory;
 
-    class ComponentInstanceFactory {
-    private:
-        std::vector<ComponentInstanceFactoryDelegate::Shared> m_delegates;
-        ComponentInstance::Dependencies::Shared m_dependencies;
-        CustomComponentArkUINodeHandleFactory::Shared m_customComponentArkUINodeHandleFactory;
+ public:
+  using Shared = std::shared_ptr<ComponentInstanceFactory>;
 
-    public:
-        using Shared = std::shared_ptr<ComponentInstanceFactory>;
+  ComponentInstanceFactory(
+      std::vector<ComponentInstanceFactoryDelegate::Shared> delegates,
+      ComponentInstance::Dependencies::Shared dependencies,
+      CustomComponentArkUINodeHandleFactory::Shared
+          customComponentArkUINodeHandleFactory)
+      : m_delegates(std::move(delegates)),
+        m_dependencies(dependencies),
+        m_customComponentArkUINodeHandleFactory(
+            customComponentArkUINodeHandleFactory) {}
 
-        ComponentInstanceFactory(std::vector<ComponentInstanceFactoryDelegate::Shared> delegates,
-                                 ComponentInstance::Dependencies::Shared dependencies,
-                                 CustomComponentArkUINodeHandleFactory::Shared customComponentArkUINodeHandleFactory)
-            : m_delegates(std::move(delegates)), m_dependencies(dependencies),
-              m_customComponentArkUINodeHandleFactory(customComponentArkUINodeHandleFactory) {}
+  ComponentInstance::Shared createArkTSComponent(
+      facebook::react::Tag tag,
+      facebook::react::ComponentHandle componentHandle,
+      std::string componentName) {
+    ComponentInstance::Context ctx = {
+        .tag = tag,
+        .componentHandle = componentHandle,
+        .componentName = componentName,
+        .dependencies = m_dependencies};
 
-        ComponentInstance::Shared createArkTSComponent(facebook::react::Tag tag, facebook::react::ComponentHandle componentHandle,
-                                         std::string componentName) {
-            ComponentInstance::Context ctx = {.tag = tag,
-                                              .componentHandle = componentHandle,
-                                              .componentName = componentName,
-                                              .dependencies = m_dependencies};
+    LOG(WARNING) << "Creating FallbackComponentInstance for: " << componentName
+                 << ""
+                    ""
+                 << tag;
+    auto arkUINode = std::make_unique<ArkUINode>(
+        m_customComponentArkUINodeHandleFactory->create(tag, componentName));
+    return std::make_shared<FallbackComponentInstance>(
+        ctx, std::move(arkUINode));
+  }
 
-            LOG(WARNING) << "Creating FallbackComponentInstance for: " << componentName << ""  "" << tag;
-            auto arkUINode = std::make_unique<ArkUINode>(m_customComponentArkUINodeHandleFactory->create(tag, componentName));
-            return std::make_shared<FallbackComponentInstance>(ctx, std::move(arkUINode));
-        }
-
-        ComponentInstance::Shared create(facebook::react::Tag tag, facebook::react::ComponentHandle componentHandle,
-                                         std::string componentName) {
-            ComponentInstance::Context ctx = {.tag = tag,
-                                              .componentHandle = componentHandle,
-                                              .componentName = componentName,
-                                              .dependencies = m_dependencies};
-            for (auto &delegate : m_delegates) {
-                auto componentInstance = delegate->create(ctx);
-                if (componentInstance != nullptr) {
-                    return componentInstance;
-                }
-            }
-            return nullptr;
-        }
-    };
+  ComponentInstance::Shared create(
+      facebook::react::Tag tag,
+      facebook::react::ComponentHandle componentHandle,
+      std::string componentName) {
+    ComponentInstance::Context ctx = {
+        .tag = tag,
+        .componentHandle = componentHandle,
+        .componentName = componentName,
+        .dependencies = m_dependencies};
+    for (auto& delegate : m_delegates) {
+      auto componentInstance = delegate->create(ctx);
+      if (componentInstance != nullptr) {
+        return componentInstance;
+      }
+    }
+    return nullptr;
+  }
+};
 } // namespace rnoh

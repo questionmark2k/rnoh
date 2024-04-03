@@ -5,39 +5,43 @@
 
 class AnimatedNodesManager;
 
-namespace rnoh
-{
+namespace rnoh {
 
 class EventAnimationDriver {
-public:
-    // a list of property names of the event payload (sub)objects 
-    // to traverse to get to the value
-    using EventPath = std::vector<std::string>;
+ public:
+  // a list of property names of the event payload (sub)objects
+  // to traverse to get to the value
+  using EventPath = std::vector<std::string>;
 
-    EventAnimationDriver(std::string const &eventName, facebook::react::Tag viewTag, EventPath &&eventPath, facebook::react::Tag nodeTag, AnimatedNodesManager &nodesManager);
+  EventAnimationDriver(
+      std::string const& eventName,
+      facebook::react::Tag viewTag,
+      EventPath&& eventPath,
+      facebook::react::Tag nodeTag,
+      AnimatedNodesManager& nodesManager);
 
-    void updateWithEvent(folly::dynamic const &event);
+  void updateWithEvent(folly::dynamic const& event);
 
-    ValueAnimatedNode &getValueNode() const;
+  ValueAnimatedNode& getValueNode() const;
 
-    std::string const &getEventName() const {
-        return m_eventName;
-    }
+  std::string const& getEventName() const {
+    return m_eventName;
+  }
 
-    facebook::react::Tag getViewTag() const {
-        return m_viewTag;
-    }
+  facebook::react::Tag getViewTag() const {
+    return m_viewTag;
+  }
 
-    facebook::react::Tag getNodeTag() const {
-        return m_nodeTag;
-    }
+  facebook::react::Tag getNodeTag() const {
+    return m_nodeTag;
+  }
 
-private:
-    std::string m_eventName;
-    facebook::react::Tag m_viewTag;
-    EventPath m_eventPath;
-    facebook::react::Tag m_nodeTag;
-    AnimatedNodesManager &m_nodesManager;
+ private:
+  std::string m_eventName;
+  facebook::react::Tag m_viewTag;
+  EventPath m_eventPath;
+  facebook::react::Tag m_nodeTag;
+  AnimatedNodesManager& m_nodesManager;
 };
 
 } // namespace rnoh

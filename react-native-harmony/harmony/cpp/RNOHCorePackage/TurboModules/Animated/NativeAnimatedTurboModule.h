@@ -1,101 +1,131 @@
 #pragma once
 
-#include <mutex>
-#include <react/renderer/core/ReactPrimitives.h>
-#include <react/renderer/core/EventListener.h>
 #include <RNOH/ArkTSTurboModule.h>
 #include <folly/dynamic.h>
 #include <native_vsync/native_vsync.h>
+#include <react/renderer/core/EventListener.h>
+#include <react/renderer/core/ReactPrimitives.h>
+#include <mutex>
 
 #include "AnimatedNodesManager.h"
-#include "RNOH/NativeVsyncHandle.h"
 #include "RNOH/EventEmitRequestHandler.h"
+#include "RNOH/NativeVsyncHandle.h"
 
 namespace rnoh {
 
-class NativeAnimatedTurboModule : public rnoh::ArkTSTurboModule, public rnoh::EventEmitRequestHandler, public std::enable_shared_from_this<NativeAnimatedTurboModule> {
+class NativeAnimatedTurboModule
+    : public rnoh::ArkTSTurboModule,
+      public rnoh::EventEmitRequestHandler,
+      public std::enable_shared_from_this<NativeAnimatedTurboModule> {
+ public:
+  using Context = rnoh::ArkTSTurboModule::Context;
 
-  public:
-    using Context = rnoh::ArkTSTurboModule::Context;
+  NativeAnimatedTurboModule(
+      const ArkTSTurboModule::Context ctx,
+      const std::string name);
+  ~NativeAnimatedTurboModule() override;
 
-    NativeAnimatedTurboModule(const ArkTSTurboModule::Context ctx, const std::string name);
-    ~NativeAnimatedTurboModule() override;
+  void startOperationBatch();
 
-    void startOperationBatch();
+  void finishOperationBatch();
 
-    void finishOperationBatch();
+  void createAnimatedNode(
+      facebook::react::Tag tag,
+      folly::dynamic const& config);
 
-    void createAnimatedNode(facebook::react::Tag tag, folly::dynamic const &config);
+  void updateAnimatedNodeConfig(
+      facebook::react::Tag tag,
+      facebook::jsi::Value const& config);
 
-    void updateAnimatedNodeConfig(facebook::react::Tag tag, facebook::jsi::Value const &config);
+  double getValue(facebook::react::Tag tag);
 
-    double getValue(facebook::react::Tag tag);
+  void startListeningToAnimatedNodeValue(
+      facebook::jsi::Runtime& rt,
+      facebook::react::Tag tag);
 
-    void startListeningToAnimatedNodeValue(facebook::jsi::Runtime &rt, facebook::react::Tag tag);
+  void stopListeningToAnimatedNodeValue(facebook::react::Tag tag);
 
-    void stopListeningToAnimatedNodeValue(facebook::react::Tag tag);
+  void connectAnimatedNodes(
+      facebook::react::Tag parentTag,
+      facebook::react::Tag childTag);
 
-    void connectAnimatedNodes(facebook::react::Tag parentTag, facebook::react::Tag childTag);
+  void disconnectAnimatedNodes(
+      facebook::react::Tag parentTag,
+      facebook::react::Tag childTag);
 
-    void disconnectAnimatedNodes(facebook::react::Tag parentTag, facebook::react::Tag childTag);
+  void startAnimatingNode(
+      facebook::react::Tag animationId,
+      facebook::react::Tag nodeTag,
+      folly::dynamic const& config,
+      std::function<void(bool)>&& endCallback);
 
-    void startAnimatingNode(
-        facebook::react::Tag animationId,
-        facebook::react::Tag nodeTag,
-        folly::dynamic const &config,
-        std::function<void(bool)> &&endCallback);
+  void stopAnimation(facebook::react::Tag animationId);
 
-    void stopAnimation(facebook::react::Tag animationId);
+  void setAnimatedNodeValue(facebook::react::Tag nodeTag, double value);
 
-    void setAnimatedNodeValue(facebook::react::Tag nodeTag, double value);
+  void setAnimatedNodeOffset(facebook::react::Tag nodeTag, double offset);
 
-    void setAnimatedNodeOffset(facebook::react::Tag nodeTag, double offset);
+  void flattenAnimatedNodeOffset(facebook::react::Tag nodeTag);
 
-    void flattenAnimatedNodeOffset(facebook::react::Tag nodeTag);
+  void extractAnimatedNodeOffset(facebook::react::Tag nodeTag);
 
-    void extractAnimatedNodeOffset(facebook::react::Tag nodeTag);
+  void connectAnimatedNodeToView(
+      facebook::react::Tag nodeTag,
+      facebook::react::Tag viewTag);
 
-    void connectAnimatedNodeToView(facebook::react::Tag nodeTag, facebook::react::Tag viewTag);
+  void disconnectAnimatedNodeFromView(
+      facebook::react::Tag nodeTag,
+      facebook::react::Tag viewTag);
 
-    void disconnectAnimatedNodeFromView(facebook::react::Tag nodeTag, facebook::react::Tag viewTag);
+  void restoreDefaultValues(facebook::react::Tag nodeTag);
 
-    void restoreDefaultValues(facebook::react::Tag nodeTag);
+  void dropAnimatedNode(facebook::react::Tag tag);
 
-    void dropAnimatedNode(facebook::react::Tag tag);
+  void addAnimatedEventToView(
+      facebook::react::Tag viewTag,
+      std::string const& eventName,
+      folly::dynamic const& eventMapping);
 
-    void addAnimatedEventToView(facebook::react::Tag viewTag, std::string const &eventName, folly::dynamic const &eventMapping);
+  void removeAnimatedEventFromView(
+      facebook::react::Tag viewTag,
+      std::string const& eventName,
+      facebook::react::Tag animatedValueTag);
 
-    void removeAnimatedEventFromView(facebook::react::Tag viewTag, std::string const &eventName, facebook::react::Tag animatedValueTag);
+  void addListener(std::string const& eventName);
 
-    void addListener(std::string const &eventName);
+  void removeListeners(double count);
 
-    void removeListeners(double count);
+  void runUpdates();
 
-    void runUpdates();
+  void setNativeProps(facebook::react::Tag tag, folly::dynamic const& props);
 
-    void setNativeProps(facebook::react::Tag tag, folly::dynamic const &props);
+  void emitAnimationEndedEvent(
+      facebook::jsi::Runtime& rt,
+      facebook::react::Tag animationId,
+      bool completed);
 
-    void emitAnimationEndedEvent(facebook::jsi::Runtime &rt, facebook::react::Tag animationId, bool completed);
+  // EventEmitRequestHandler
+  void handleEvent(EventEmitRequestHandler::Context const& ctx) override;
 
-    // EventEmitRequestHandler
-    void handleEvent(EventEmitRequestHandler::Context const &ctx) override;
+  void handleComponentEvent(
+      facebook::react::Tag tag,
+      std::string const& eventName,
+      folly::dynamic payload);
 
-    void handleComponentEvent(facebook::react::Tag tag, std::string const &eventName, folly::dynamic payload);
+ private:
+  std::unique_lock<std::mutex> acquireLock() {
+    return std::unique_lock(m_nodesManagerLock);
+  }
 
-  private:
-    std::unique_lock<std::mutex> acquireLock() {
-        return std::unique_lock(m_nodesManagerLock);
-    }
+  // `shared_from_this` cannot be used in constructor,
+  // so we defer the initialization of the event listener
+  // until the first animated event is registered.
+  void initializeEventListener();
 
-    // `shared_from_this` cannot be used in constructor,
-    // so we defer the initialization of the event listener
-    // until the first animated event is registered.
-    void initializeEventListener();
-
-    NativeVsyncHandle m_vsyncHandle;
-    AnimatedNodesManager m_animatedNodesManager;
-    std::mutex m_nodesManagerLock;
-    bool m_initializedEventListener = false;
+  NativeVsyncHandle m_vsyncHandle;
+  AnimatedNodesManager m_animatedNodesManager;
+  std::mutex m_nodesManagerLock;
+  bool m_initializedEventListener = false;
 };
 
 } // namespace rnoh

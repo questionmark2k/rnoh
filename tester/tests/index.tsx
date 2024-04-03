@@ -21,6 +21,7 @@ export * from './I18nManagerTest';
 export * from './ImageBackgroundTest';
 export * from './ImageTest';
 export * from './InteractionManagerTest';
+export * from './InternalTest';
 export * from './KeyboardAvoidingViewTest';
 export * from './KeyboardTest';
 export * from './LayoutAnimationsTest';

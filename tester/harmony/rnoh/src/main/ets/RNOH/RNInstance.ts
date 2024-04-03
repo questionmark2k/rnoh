@@ -130,6 +130,8 @@ export interface RNInstance {
   getArchitecture(): "ARK_TS" | "C_API"
 
   getAssetsDest(): string
+
+  postMessageToCpp(name: string, payload: any): void
 }
 
 /**
@@ -529,6 +531,10 @@ export class RNInstanceImpl implements RNInstance {
     emitter.subscribe("OPEN_URL", (url, onError) => {
       DevServerHelper.openUrl(url, this.getInitialBundleUrl(), onError);
     })
+  }
+
+  public postMessageToCpp(name: string, payload: any): void {
+    this.napiBridge.postMessageToCpp(name, {rnInstanceId: this.id, payload});
   }
 }
 

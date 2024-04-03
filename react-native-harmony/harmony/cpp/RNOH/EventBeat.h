@@ -5,31 +5,34 @@
 namespace rnoh {
 
 class EventBeat : public facebook::react::EventBeat {
-  public:
-    EventBeat(std::weak_ptr<TaskExecutor> const &taskExecutor, facebook::react::RuntimeExecutor runtimeExecutor, SharedOwnerBox ownerBox)
-        : m_taskExecutor(taskExecutor), m_runtimeExecutor(runtimeExecutor), facebook::react::EventBeat(ownerBox) {
+ public:
+  EventBeat(
+      std::weak_ptr<TaskExecutor> const& taskExecutor,
+      facebook::react::RuntimeExecutor runtimeExecutor,
+      SharedOwnerBox ownerBox)
+      : m_taskExecutor(taskExecutor),
+        m_runtimeExecutor(runtimeExecutor),
+        facebook::react::EventBeat(ownerBox) {}
+
+  void induce() const override {
+    if (!this->isRequested_) {
+      return;
     }
 
-    void induce() const override {
-        if (!this->isRequested_) {
-            return;
-        }
+    this->m_runtimeExecutor(
+        [this](facebook::jsi::Runtime& runtime) { beat(runtime); });
+  }
 
-        this->m_runtimeExecutor([this](facebook::jsi::Runtime &runtime) {
-            beat(runtime);
-        });
-    }
+  void request() const override {
+    facebook::react::EventBeat::request();
+    induce();
+  }
 
-    void request() const override {
-        facebook::react::EventBeat::request();
-        induce();
-    }
+  ~EventBeat() override = default;
 
-    ~EventBeat() override = default;
-
-  private:
-    std::weak_ptr<TaskExecutor> m_taskExecutor;
-    facebook::react::RuntimeExecutor m_runtimeExecutor;
+ private:
+  std::weak_ptr<TaskExecutor> m_taskExecutor;
+  facebook::react::RuntimeExecutor m_runtimeExecutor;
 };
 
 } // namespace rnoh

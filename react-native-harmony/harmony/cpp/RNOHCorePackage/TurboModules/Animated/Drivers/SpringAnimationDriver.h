@@ -7,53 +7,54 @@
 namespace rnoh {
 
 class SpringAnimationDriver : public AnimationDriver {
-public:
-    SpringAnimationDriver(
-        facebook::react::Tag animationId, 
-        facebook::react::Tag animatedNode,
-        AnimatedNodesManager &nodesManager,
-        folly::dynamic const &config,
-        AnimationEndCallback &&endCallback);
+ public:
+  SpringAnimationDriver(
+      facebook::react::Tag animationId,
+      facebook::react::Tag animatedNode,
+      AnimatedNodesManager& nodesManager,
+      folly::dynamic const& config,
+      AnimationEndCallback&& endCallback);
 
-    void resetConfig(folly::dynamic const &config) override;
+  void resetConfig(folly::dynamic const& config) override;
 
-    void runAnimationStep(uint64_t frameTimeNanos) override;
-private:
-    static constexpr double MAX_DELTA_TIME_SEC = 0.064;
-    static constexpr double SOLVER_TIMESTEP_SEC = 0.001;
+  void runAnimationStep(uint64_t frameTimeNanos) override;
 
-    bool isAtRest() const;
-    bool isOvershooting() const;
-    void advance(double deltaTime);
+ private:
+  static constexpr double MAX_DELTA_TIME_SEC = 0.064;
+  static constexpr double SOLVER_TIMESTEP_SEC = 0.001;
 
-    int64_t m_startTimeNanos;
-    bool m_springStarted;
+  bool isAtRest() const;
+  bool isOvershooting() const;
+  void advance(double deltaTime);
 
-    double m_lastTime;
+  int64_t m_startTimeNanos;
+  bool m_springStarted;
 
-    // spring configuration
-    double m_stiffness;
-    double m_damping;
-    double m_mass;
-    double m_initialVelocity;
-    bool m_overshootClamping;
+  double m_lastTime;
 
-    // spring state
-    double m_position;
-    double m_velocity;
+  // spring configuration
+  double m_stiffness;
+  double m_damping;
+  double m_mass;
+  double m_initialVelocity;
+  bool m_overshootClamping;
 
-    // threshold to determine if the spring is at rest
-    double m_restSpeedThreshold;
-    double m_restDisplacementThreshold;
-    double m_timeAccumulator;
+  // spring state
+  double m_position;
+  double m_velocity;
 
-    double m_toValue;
-    double m_fromValue;
+  // threshold to determine if the spring is at rest
+  double m_restSpeedThreshold;
+  double m_restDisplacementThreshold;
+  double m_timeAccumulator;
 
-    // looping control
-    int64_t m_iterations;
-    uint64_t m_currentLoop;
-    double m_originalValue;
+  double m_toValue;
+  double m_fromValue;
+
+  // looping control
+  int64_t m_iterations;
+  uint64_t m_currentLoop;
+  double m_originalValue;
 };
 
 } // namespace rnoh

@@ -409,7 +409,7 @@ export function TextMeasuringTest() {
 
 const TextUpdateNumberOfLinesTest = () => {
   const [caseIndex, setCaseIndex] = useState(0);
-  const testCases = [...Array.from({ length: 7 }, (_, i) => i + 1), undefined];
+  const testCases = [...Array.from({length: 7}, (_, i) => i + 1), undefined];
   return (
     <View>
       <Button

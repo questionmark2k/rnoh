@@ -12,18 +12,18 @@
 namespace rnoh {
 
 class MessageQueueThread : public facebook::react::MessageQueueThread {
-  public:
-    MessageQueueThread(std::shared_ptr<TaskExecutor> const &taskExecutor);
-    virtual ~MessageQueueThread();
+ public:
+  MessageQueueThread(std::shared_ptr<TaskExecutor> const& taskExecutor);
+  virtual ~MessageQueueThread();
 
-    void runOnQueue(std::function<void()> &&func) override;
+  void runOnQueue(std::function<void()>&& func) override;
 
-    void runOnQueueSync(std::function<void()> &&func) override;
+  void runOnQueueSync(std::function<void()>&& func) override;
 
-    void quitSynchronous() override;
+  void quitSynchronous() override;
 
-  private:
-    std::shared_ptr<TaskExecutor> taskExecutor;
+ private:
+  std::shared_ptr<TaskExecutor> taskExecutor;
 };
 
 } // namespace rnoh

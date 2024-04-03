@@ -8,6 +8,7 @@
 #include <vector>
 #include "RNOH/ArkJS.h"
 #include "RNOH/ArkTSChannel.h"
+#include "RNOH/ArkTSMessageHandler.h"
 #include "RNOH/ArkTSTurboModule.h"
 #include "RNOH/EventEmitRequestHandler.h"
 #include "RNOH/FeatureFlagRegistry.h"
@@ -84,6 +85,7 @@ std::shared_ptr<RNInstanceInternal> createRNInstance(
   EventEmitRequestHandlers eventEmitRequestHandlers = {};
   std::vector<ComponentInstanceFactoryDelegate::Shared>
       componentInstanceFactoryDelegates = {};
+  std::vector<ArkTSMessageHandler::Shared> arkTSMessageHandlers = {};
 
   for (auto& package : packages) {
     auto turboModuleFactoryDelegate =
@@ -120,6 +122,10 @@ std::shared_ptr<RNInstanceInternal> createRNInstance(
     if (componentInstanceFactoryDelegate != nullptr) {
       componentInstanceFactoryDelegates.push_back(
           std::move(componentInstanceFactoryDelegate));
+    }
+    for (auto const& arkTSMessageHandler :
+         package->createArkTSMessageHandlers()) {
+      arkTSMessageHandlers.push_back(arkTSMessageHandler);
     }
   }
 
@@ -187,6 +193,8 @@ std::shared_ptr<RNInstanceInternal> createRNInstance(
         uiTicker,
         shadowViewRegistry,
         std::move(schedulerDelegateCAPI),
+        std::move(arkTSMessageHandlers),
+        arkTSChannel,
         componentInstanceRegistry,
         componentInstanceFactory,
         shouldEnableDebugger,
@@ -211,7 +219,9 @@ std::shared_ptr<RNInstanceInternal> createRNInstance(
       globalJSIBinders,
       uiTicker,
       shadowViewRegistry,
+      arkTSChannel,
       std::move(schedulerDelegateArkTS),
+      std::move(arkTSMessageHandlers),
       shouldEnableDebugger,
       shouldEnableBackgroundExecutor);
 }

@@ -199,4 +199,8 @@ export class NapiBridge {
   initializeArkTSBridge(bridge: ArkTSBridgeHandler) {
     this.libRNOHApp?.initializeArkTSBridge(bridge);
   }
+
+  postMessageToCpp(name: string, payload: any) {
+    this.libRNOHApp?.onArkTSMessage(name, payload)
+  }
 }

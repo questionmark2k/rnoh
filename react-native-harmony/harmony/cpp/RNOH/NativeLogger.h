@@ -2,6 +2,6 @@
 
 namespace rnoh {
 
-void nativeLogger(const std::string &message, unsigned int logLevel);
+void nativeLogger(const std::string& message, unsigned int logLevel);
 
-} // namepsace rnoh
+} // namespace rnoh

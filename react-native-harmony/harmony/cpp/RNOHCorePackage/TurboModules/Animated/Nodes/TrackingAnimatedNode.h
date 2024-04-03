@@ -5,25 +5,25 @@
 #include "AnimatedNode.h"
 #include "RNOHCorePackage/TurboModules/Animated/AnimatedNodesManager.h"
 
-namespace rnoh
-{
-    
-class TrackingAnimatedNode : public AnimatedNode
-{
-public:
-    TrackingAnimatedNode(folly::dynamic const &config, AnimatedNodesManager &nodesManager);
-    virtual ~TrackingAnimatedNode() = default;
+namespace rnoh {
 
-    void update() override;
-    void onDetachedFromNode(facebook::react::Tag tag) override;
+class TrackingAnimatedNode : public AnimatedNode {
+ public:
+  TrackingAnimatedNode(
+      folly::dynamic const& config,
+      AnimatedNodesManager& nodesManager);
+  virtual ~TrackingAnimatedNode() = default;
 
-private:
-    size_t m_animationId;
-    size_t m_valueNodeTag;
-    size_t m_toValueNodeTag;
-    folly::dynamic m_animationConfig;
+  void update() override;
+  void onDetachedFromNode(facebook::react::Tag tag) override;
 
-    AnimatedNodesManager &m_nodesManager;
+ private:
+  size_t m_animationId;
+  size_t m_valueNodeTag;
+  size_t m_toValueNodeTag;
+  folly::dynamic m_animationConfig;
+
+  AnimatedNodesManager& m_nodesManager;
 };
 
 } // namespace rnoh
