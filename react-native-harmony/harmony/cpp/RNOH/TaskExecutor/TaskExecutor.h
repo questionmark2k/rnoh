@@ -6,6 +6,7 @@
 #include <js_native_api.h>
 #include <js_native_api_types.h>
 #include <uv.h>
+#include "qos/qos.h"
 #include "AbstractTaskRunner.h"
 
 namespace rnoh {
@@ -35,6 +36,7 @@ class TaskExecutor {
     void setExceptionHandler(ExceptionHandler handler);
 
   private:
+    void setTaskThreadPriority(QoS_Level);
     std::array<std::shared_ptr<AbstractTaskRunner>, TaskThread::BACKGROUND + 1> m_taskRunners;
     std::array<std::optional<TaskThread>, TaskThread::BACKGROUND + 1> m_waitsOnThread;
 };

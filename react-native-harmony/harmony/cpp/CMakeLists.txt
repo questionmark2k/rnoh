@@ -491,6 +491,7 @@ if(DEFINED WITH_HITRACE_SYSTRACE)
     target_link_libraries(react_render_debug libhitrace_ndk.z.so)
 endif()
 target_link_libraries(rnoh PUBLIC
+    libqos.so
     libace_napi.z.so
     libace_ndk.z.so
     libhilog_ndk.z.so

@@ -15,6 +15,21 @@ TaskExecutor::TaskExecutor(napi_env mainEnv, bool shouldEnableBackground) {
         mainTaskRunner,
         jsTaskRunner,
         backgroundExecutor};
+    this->runTask(TaskThread::JS, [this](){
+        this->setTaskThreadPriority(QoS_Level::QOS_USER_INTERACTIVE);
+    });
+    if (shouldEnableBackground) {
+        this->runTask(TaskThread::BACKGROUND, [this](){
+            this->setTaskThreadPriority(QoS_Level::QOS_USER_INTERACTIVE);
+        });
+    }
+}
+
+void TaskExecutor::setTaskThreadPriority(QoS_Level level) {
+    int ret = OH_QoS_SetThreadQoS(level);
+    std::array<char, 16> buffer = {0};
+    pthread_getname_np(pthread_self(), buffer.data(), sizeof(buffer));
+    DLOG(INFO) << "TaskExecutor::setTaskThreadPriority " << buffer.data() << (ret == 0 ? " SUCCESSFUL" : " FAILED");
 }
 
 void TaskExecutor::runTask(TaskThread thread, Task &&task) {
