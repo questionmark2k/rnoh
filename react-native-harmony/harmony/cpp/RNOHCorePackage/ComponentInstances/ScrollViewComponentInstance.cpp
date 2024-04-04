@@ -41,7 +41,12 @@ void ScrollViewComponentInstance::setLayout(
   m_scrollContainerNode.setSize(layoutMetrics.frame.size);
   m_scrollNode.setSize(layoutMetrics.frame.size);
   m_layoutMetrics = layoutMetrics;
-  m_containerSize = layoutMetrics.frame.size;
+  if (m_containerSize != layoutMetrics.frame.size) {
+    m_containerSize = layoutMetrics.frame.size;
+    m_scrollNode.setNestedScroll(
+        isContentSmallerThanContainer() ? ARKUI_SCROLL_NESTED_MODE_SELF_FIRST
+                                        : ARKUI_SCROLL_NESTED_MODE_SELF_ONLY);
+  }
 }
 
 void rnoh::ScrollViewComponentInstance::onStateChanged(
@@ -49,28 +54,33 @@ void rnoh::ScrollViewComponentInstance::onStateChanged(
   CppComponentInstance::onStateChanged(state);
   auto stateData = state->getData();
   m_contentContainerNode.setSize(stateData.getContentSize());
-  m_contentSize = stateData.getContentSize();
+  if (m_contentSize != stateData.getContentSize()) {
+    m_contentSize = stateData.getContentSize();
+    m_scrollNode.setNestedScroll(
+        isContentSmallerThanContainer() ? ARKUI_SCROLL_NESTED_MODE_SELF_FIRST
+                                        : ARKUI_SCROLL_NESTED_MODE_SELF_ONLY);
+  }
 }
 
 void rnoh::ScrollViewComponentInstance::onPropsChanged(
     SharedConcreteProps const& props) {
   CppComponentInstance::onPropsChanged(props);
-  auto horizontal = props->alwaysBounceHorizontal ||
+  m_horizontal = props->alwaysBounceHorizontal ||
       m_contentSize.width > m_containerSize.width;
   if (props->rawProps.count("persistentScrollbar") > 0) {
     m_persistentScrollbar = props->rawProps["persistentScrollbar"].asBool();
   }
   m_scrollEventThrottle = props->scrollEventThrottle;
-  m_scrollNode.setHorizontal(horizontal)
+  m_scrollNode.setHorizontal(m_horizontal)
       .setEnableScrollInteraction(
           !m_isNativeResponderBlocked && props->scrollEnabled)
       .setFriction(getFrictionFromDecelerationRate(props->decelerationRate))
       .setEdgeEffect(
           props->bounces,
-          horizontal ? props->alwaysBounceHorizontal
-                     : props->alwaysBounceVertical)
+          m_horizontal ? props->alwaysBounceHorizontal
+                       : props->alwaysBounceVertical)
       .setScrollBarDisplayMode(getScrollBarDisplayMode(
-          horizontal,
+          m_horizontal,
           m_persistentScrollbar,
           props->showsVerticalScrollIndicator,
           props->showsHorizontalScrollIndicator))
@@ -155,6 +165,11 @@ bool ScrollViewComponentInstance::isHandlingTouches() const {
 
 void ScrollViewComponentInstance::onScroll() {
   auto scrollViewMetrics = getScrollViewMetrics();
+  if (!isContentSmallerThanContainer() && m_allowScrollPropagation &&
+      !isAtEnd(scrollViewMetrics.contentOffset)) {
+    m_scrollNode.setNestedScroll(ARKUI_SCROLL_NESTED_MODE_SELF_ONLY);
+    m_allowScrollPropagation = false;
+  }
   auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
                  std::chrono::steady_clock::now().time_since_epoch())
                  .count();
@@ -187,6 +202,11 @@ void ScrollViewComponentInstance::onScrollStop() {
     emitOnScrollEndDragEvent();
   }
   m_scrollState = ScrollState::IDLE;
+  if (!isContentSmallerThanContainer() && !m_allowScrollPropagation &&
+      isAtEnd(m_currentOffset)) {
+    m_scrollNode.setNestedScroll(ARKUI_SCROLL_NESTED_MODE_SELF_FIRST);
+    m_allowScrollPropagation = true;
+  }
 }
 
 float ScrollViewComponentInstance::onScrollFrameBegin(
@@ -343,6 +363,22 @@ void rnoh::ScrollViewComponentInstance::sendEventForNativeAnimations(
   if (nativeAnimatedTurboModule != nullptr) {
     nativeAnimatedTurboModule->handleComponentEvent(
         m_tag, "onScroll", getScrollEventPayload(scrollViewMetrics));
+  }
+}
+
+bool ScrollViewComponentInstance::isContentSmallerThanContainer() {
+  return m_horizontal ? m_contentSize.width < m_containerSize.width
+                      : m_contentSize.height < m_containerSize.height;
+}
+
+bool ScrollViewComponentInstance::isAtEnd(
+    facebook::react::Point currentOffset) {
+  if (m_horizontal) {
+    return currentOffset.x <= 0 ||
+        m_contentSize.width - m_containerSize.width - currentOffset.x < 0.001;
+  } else {
+    return currentOffset.y <= 0 ||
+        m_contentSize.height - m_containerSize.height - currentOffset.y < 0.001;
   }
 }
 

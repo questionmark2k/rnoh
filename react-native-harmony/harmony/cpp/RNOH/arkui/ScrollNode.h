@@ -21,7 +21,6 @@ class ScrollNode : public ArkUINode {
 
   ArkUI_NodeHandle m_childArkUINodeHandle;
   ScrollNodeDelegate* m_scrollNodeDelegate;
-  void setNestedScroll();
 
  public:
   ScrollNode();
@@ -47,6 +46,7 @@ class ScrollNode : public ArkUINode {
       const std::vector<facebook::react::Float>& snapPoints);
   ScrollNode& setEnablePaging(bool enablePaging);
   void scrollTo(float x, float y, bool animated);
+  void setNestedScroll(ArkUI_ScrollNestedMode scrollNestedMode);
 };
 
 } // namespace rnoh
