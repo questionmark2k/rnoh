@@ -52,9 +52,7 @@ class ComponentInstanceFactory {
         .dependencies = m_dependencies};
 
     LOG(WARNING) << "Creating FallbackComponentInstance for: " << componentName
-                 << ""
-                    ""
-                 << tag;
+                 << " with tag:" << tag;
     auto arkUINode = std::make_unique<ArkUINode>(
         m_customComponentArkUINodeHandleFactory->create(tag, componentName));
     return std::make_shared<FallbackComponentInstance>(

@@ -11,7 +11,7 @@
 #include <react/renderer/graphics/Float.h>
 #include <react/renderer/graphics/Rect.h>
 #include <react/renderer/graphics/Transform.h>
-#include <stdexcept>
+#include "RNOH/RNOHError.h"
 #include "glog/logging.h"
 #include "react/renderer/components/view/primitives.h"
 
@@ -90,8 +90,7 @@ class ArkUINode {
     if (status != 0) {
       auto message = std::string("ArkUINode operation failed with status: ") +
           std::to_string(status);
-      LOG(ERROR) << message;
-      throw std::runtime_error(std::move(message));
+      throw RNOHError(std::move(message));
     }
   }
 
