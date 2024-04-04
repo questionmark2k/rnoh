@@ -7,9 +7,9 @@ namespace rnoh {
 class ScrollNodeDelegate {
  public:
   virtual ~ScrollNodeDelegate() = default;
-  virtual void onScroll(){};
-  virtual void onScrollStart(){};
-  virtual void onScrollStop(){};
+  virtual void onScroll() {};
+  virtual void onScrollStart() {};
+  virtual void onScrollStop() {};
   virtual float onScrollFrameBegin(float offset, int32_t scrollState) {
     return offset;
   };

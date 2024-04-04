@@ -9,22 +9,21 @@ namespace rnoh {
 class TextInputNodeDelegate {
  public:
   virtual ~TextInputNodeDelegate() = default;
-  virtual void onChange(ArkUI_NodeEvent* event){};
-  virtual void onBlur(ArkUI_NodeEvent* event){};
-  virtual void onFocus(ArkUI_NodeEvent* event){};
-  virtual void onSubmit(ArkUI_NodeEvent* event){};
-  virtual void onPaste(){};
-  virtual void onTextSelectionChange(){};
+  virtual void onChange(std::string text) {};
+  virtual void onBlur() {};
+  virtual void onFocus() {};
+  virtual void onSubmit() {};
+  virtual void onPaste() {};
+  virtual void onTextSelectionChange() {};
 };
 
 class TextInputNode : public TextInputNodeBase {
  protected:
-  ArkUI_NodeHandle m_childArkUINodeHandle;
   TextInputNodeDelegate* m_textInputNodeDelegate;
 
  public:
   TextInputNode();
-  ~TextInputNode();
+  ~TextInputNode() override;
 
   facebook::react::Point getTextInputOffset() const;
 

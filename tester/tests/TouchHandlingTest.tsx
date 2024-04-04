@@ -224,7 +224,9 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase.Example tags={["C_API"]} itShould="emit touch events with resonable timestamps (event.timeStamp is the UNIX time, nativeEvent.timestamp is the device uptime, both are in ms)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="emit touch events with resonable timestamps (event.timeStamp is the UNIX time, nativeEvent.timestamp is the device uptime, both are in ms)">
         <TimestampExample />
       </TestCase.Example>
     </TestSuite>

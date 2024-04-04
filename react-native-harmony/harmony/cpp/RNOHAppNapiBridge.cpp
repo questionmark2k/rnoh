@@ -468,8 +468,7 @@ static napi_value onArkTSMessage(napi_env env, napi_callback_info info) {
 
 static void registerNativeXComponent(napi_env env, napi_value exports) {
   if ((env == nullptr) || (exports == nullptr)) {
-    LOG(ERROR) << "registerNativeXComponent: env or exports is null"
-               << "\n";
+    LOG(ERROR) << "registerNativeXComponent: env or exports is null" << "\n";
     return;
   }
 

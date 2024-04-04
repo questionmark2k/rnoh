@@ -261,10 +261,10 @@ class CppComponentInstance : public ComponentInstance {
     }
   };
 
-  virtual void onStateChanged(SharedConcreteState const& state){};
+  virtual void onStateChanged(SharedConcreteState const& state) {};
 
   virtual void onEventEmitterChanged(
-      SharedConcreteEventEmitter const& eventEmitter){};
+      SharedConcreteEventEmitter const& eventEmitter) {};
 
  private:
   void setOpacity(SharedConcreteProps const& props) {
