@@ -81,9 +81,10 @@ void ScrollNode::setScrollNodeDelegate(ScrollNodeDelegate* scrollNodeDelegate) {
   m_scrollNodeDelegate = scrollNodeDelegate;
 }
 
-void ScrollNode::setNestedScroll(ArkUI_ScrollNestedMode scrollNestedMode) {
+void ScrollNode::setNestedScroll() {
   ArkUI_NumberValue value[] = {
-      {.i32 = scrollNestedMode}, {.i32 = scrollNestedMode}};
+      {.i32 = ArkUI_ScrollNestedMode::ARKUI_SCROLL_NESTED_MODE_SELF_FIRST},
+      {.i32 = ArkUI_ScrollNestedMode::ARKUI_SCROLL_NESTED_MODE_SELF_FIRST}};
   ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_SCROLL_NESTED_SCROLL, &item));
