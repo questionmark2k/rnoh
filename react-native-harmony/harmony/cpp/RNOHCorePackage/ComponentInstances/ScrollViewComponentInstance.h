@@ -69,8 +69,6 @@ class ScrollViewComponentInstance
   void handleCommand(std::string const& commandName, folly::dynamic const& args)
       override;
 
-  void setNativeResponderBlocked(bool blocked) override;
-
   // ScrollNodeDelegate implementation
   void onScroll() override;
   void onScrollStart() override;
@@ -87,6 +85,9 @@ class ScrollViewComponentInstance
   facebook::react::ScrollViewMetrics getScrollViewMetrics();
 
   bool isHandlingTouches() const override;
+
+ protected:
+  void onNativeResponderBlockChange(bool isBlocked) override;
 
  private:
   void updateStateWithContentOffset(facebook::react::Point contentOffset);

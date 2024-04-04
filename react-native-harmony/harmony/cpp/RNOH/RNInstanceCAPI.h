@@ -186,6 +186,9 @@ class RNInstanceCAPI : public RNInstanceInternal,
   ComponentInstance::Shared findComponentInstanceByTag(
       facebook::react::Tag tag);
 
+  std::optional<facebook::react::Tag> findComponentInstanceTagById(
+      const std::string& id);
+
   void handleArkTSMessage(
       const std::string& name,
       folly::dynamic const& payload) override;

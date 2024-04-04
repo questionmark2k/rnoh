@@ -1,6 +1,7 @@
 #include "SamplePackage.h"
 #include "NativeCxxModuleExampleCxxSpec.h"
 #include "PropsDisplayerComponentDescriptor.h"
+#include "RNOH/RNInstanceCAPI.h"
 #include "RNOHCorePackage/ComponentBinders/ViewComponentJSIBinder.h"
 #include "RNOHCorePackage/ComponentBinders/ViewComponentNapiBinder.h"
 #include "SampleTurboModuleSpec.h"
@@ -63,7 +64,21 @@ class SampleArkTSMessageHandler : public ArkTSMessageHandler {
   void handleArkTSMessage(const Context& ctx) override {
     auto rnInstance = ctx.rnInstance.lock();
     if (rnInstance) {
-      rnInstance->postMessageToArkTS(ctx.messageName, ctx.messagePayload);
+      if (ctx.messageName == "SAMPLE_MESSAGE") {
+        rnInstance->postMessageToArkTS(ctx.messageName, ctx.messagePayload);
+      } else if (ctx.messageName == "BLOCK_NATIVE_RESPONDER") {
+        auto rnInstanceCAPI =
+            std::dynamic_pointer_cast<RNInstanceCAPI>(rnInstance);
+        auto maybeTag = rnInstanceCAPI->findComponentInstanceTagById(
+            ctx.messagePayload["componentInstanceId"].asString());
+        if (maybeTag.has_value()) {
+          auto componentInstance =
+              rnInstanceCAPI->findComponentInstanceByTag(maybeTag.value());
+          componentInstance->setNativeResponderBlocked(
+              ctx.messagePayload["isBlocked"].asBool(),
+              ctx.messagePayload["origin"].asString());
+        }
+      }
     }
   };
 };

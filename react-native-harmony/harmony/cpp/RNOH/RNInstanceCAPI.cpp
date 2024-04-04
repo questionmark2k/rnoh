@@ -411,6 +411,11 @@ ComponentInstance::Shared RNInstanceCAPI::findComponentInstanceByTag(
   return m_componentInstanceRegistry->findByTag(tag);
 }
 
+std::optional<facebook::react::Tag>
+RNInstanceCAPI::findComponentInstanceTagById(const std::string& id) {
+  return m_componentInstanceRegistry->findTagById(id);
+}
+
 void RNInstanceCAPI::handleArkTSMessage(
     const std::string& name,
     folly::dynamic const& payload) {

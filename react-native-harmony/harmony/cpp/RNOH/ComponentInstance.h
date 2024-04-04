@@ -21,6 +21,7 @@ class ComponentInstance
       public std::enable_shared_from_this<ComponentInstance> {
  private:
   std::string m_componentName;
+  std::unordered_set<std::string> m_nativeResponderBlockOrigins;
 
  protected:
   using Tag = facebook::react::Tag;
@@ -52,6 +53,14 @@ class ComponentInstance
 
   Tag getTag() const {
     return m_tag;
+  }
+
+  std::string getId() const {
+    auto props = getProps();
+    if (props == nullptr) {
+      return "";
+    }
+    return props->nativeId;
   }
 
   const std::string getComponentName() const {
@@ -99,7 +108,18 @@ class ComponentInstance
     m_parent = parent;
   }
 
-  virtual void setNativeResponderBlocked(bool blocked) {}
+  void setNativeResponderBlocked(
+      bool blocked,
+      const std::string& origin = "REACT_NATIVE") {
+    if (blocked) {
+      m_nativeResponderBlockOrigins.insert(origin);
+    } else if (
+        m_nativeResponderBlockOrigins.find(origin) !=
+        m_nativeResponderBlockOrigins.end()) {
+      m_nativeResponderBlockOrigins.erase(origin);
+    }
+    onNativeResponderBlockChange(m_nativeResponderBlockOrigins.size() > 0);
+  }
 
   // TouchTarget implementation
   Tag getTouchTargetTag() const override {
@@ -121,8 +141,19 @@ class ComponentInstance
   virtual void onChildInserted(
       ComponentInstance::Shared const& childComponentInstance,
       std::size_t index) {}
+
   virtual void onChildRemoved(
       ComponentInstance::Shared const& childComponentInstance) {}
+
+  /**
+   * Override this method if your component has scrollable functionality.
+   * Temporarily blocking the scrolling is required to support continuous
+   * gestures like panning within these scrollable components.
+   *
+   * @param isBlocked A boolean indicating whether scrolling should be blocked
+   * or not.
+   */
+  virtual void onNativeResponderBlockChange(bool isBlocked) {}
 
   Tag m_tag;
   bool m_isRadiusSetValid = 0;

@@ -107,10 +107,10 @@ void ScrollViewComponentInstance::handleCommand(
   }
 }
 
-void rnoh::ScrollViewComponentInstance::setNativeResponderBlocked(
-    bool blocked) {
-  m_isNativeResponderBlocked = blocked;
-  if (blocked) {
+void rnoh::ScrollViewComponentInstance::onNativeResponderBlockChange(
+    bool isBlocked) {
+  m_isNativeResponderBlocked = isBlocked;
+  if (isBlocked) {
     m_scrollNode.setEnableScrollInteraction(false);
   } else {
     m_scrollNode.setEnableScrollInteraction(m_props->scrollEnabled);

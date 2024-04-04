@@ -91,11 +91,15 @@ export class SampleTurboModule extends TurboModule implements TM.GeneratedSample
 
   async emitEventFromArkTS2Cpp(payload: { foo: string }): Promise<{ foo: string }> {
     return await new Promise((resolve) => {
-      const unsubscribe = this.ctx.rnInstance.cppEventEmitter.subscribe("SAMPLE_MESSAGE", (value: {foo: string}) => {
+      const unsubscribe = this.ctx.rnInstance.cppEventEmitter.subscribe("SAMPLE_MESSAGE", (value: { foo: string }) => {
         resolve(value)
         unsubscribe();
       })
       this.ctx.rnInstance.postMessageToCpp("SAMPLE_MESSAGE", payload);
     })
+  }
+
+  setNativeResponderBlocked(isBlocked: boolean, origin: string, componentInstanceId: string): void {
+    this.ctx.rnInstance.postMessageToCpp("BLOCK_NATIVE_RESPONDER", { isBlocked, origin, componentInstanceId })
   }
 }
