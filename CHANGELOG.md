@@ -1,4 +1,24 @@
 # Changelog
+## v0.72.20
+- added Systrace support
+- fixed nativeEvent timestamps unit
+
+### ArkTS architecture
+- added support for placing images in a custom assets directory
+- fixed ScrollView styles when using RefreshControl
+- fixed changing TextInput value
+
+### C-API architecture
+- various touch handling improvements
+- added ScrollView events support in Animated 
+- added support for touches in nested Text components
+- added TextInput support
+- fixed ScrollView alignment
+- fixed dynamically changing number of lines in a Text component
+- fixed TextInput default padding and caret color
+- fixed touches not being cancelled
+- improved error handling
+
 ## v0.72.19
 - added basic Share module support
 - fixed Linking::openSettings
