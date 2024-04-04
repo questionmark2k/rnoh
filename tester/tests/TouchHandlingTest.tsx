@@ -224,7 +224,33 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
+      <TestCase.Example tags={["C_API"]} itShould="emit touch events with resonable timestamps (event.timeStamp is the UNIX time, nativeEvent.timestamp is the device uptime, both are in ms)">
+        <TimestampExample />
+      </TestCase.Example>
     </TestSuite>
+  );
+}
+
+function TimestampExample() {
+  const [nativEventTimestamp, setNativeEventTimestamp] = useState<number>(0);
+  const [eventTimestamp, setEventTimestamp] = useState<number>(0);
+
+  return (
+    <>
+      <Text>event.timeStamp: {eventTimestamp}</Text>
+      <Text>event.nativeEvent.timestamp: {nativEventTimestamp}</Text>
+      <TouchableOpacity
+        onPress={event => {
+          setEventTimestamp(event.timeStamp);
+          setNativeEventTimestamp(event.nativeEvent.timestamp);
+          console.log('event.timeStamp: ' + event.timeStamp);
+          console.log(
+            'event.nativeEvent.timestamp: ' + event.nativeEvent.timestamp,
+          );
+        }}>
+        <Text>Press me to run the example</Text>
+      </TouchableOpacity>
+    </>
   );
 }
 

@@ -39,7 +39,7 @@ static std::pair<TouchTarget::Shared, Point> findTargetForTouchPoint(
 facebook::react::Touch convertTouchPointToReactTouch(
     ArkUI_NodeTouchPoint const& touchPoint,
     TouchTarget::Shared const& target,
-    double timestampMillis) {
+    double timestampSeconds) {
   Point rootPoint{
       .x = static_cast<facebook::react::Float>(touchPoint.nodeX),
       .y = static_cast<facebook::react::Float>(touchPoint.nodeY)};
@@ -55,7 +55,7 @@ facebook::react::Touch convertTouchPointToReactTouch(
       .screenPoint = screenPoint,
       .identifier = touchPoint.id,
       .target = target->getTouchTargetTag(),
-      .timestamp = timestampMillis};
+      .timestamp = timestampSeconds};
 
   return touch;
 }
@@ -103,7 +103,11 @@ void TouchEventDispatcher::dispatchTouchEvent(
     TouchTarget::Shared const& rootTarget) {
   VLOG(2) << "Touch event received: id=" << event.actionTouch.id
           << ", action type:" << event.action;
-  double timestampMillis = static_cast<double>(event.timeStamp) / 1000;
+  // react-native expects a timestamp in seconds (because rn multiplies the
+  // value by 1e3). The timestamp passed by ArkUI is in nanoseconds. We convert
+  // it first to miliseconds before casting to lose unnecessary precision. Then
+  // we cast it to a double and convert it to seconds.
+  double timestampSeconds = static_cast<double>(event.timeStamp / 1e6) / 1e3;
 
   if (event.action == NODE_ACTION_DOWN) {
     registerTargetForTouch(event.actionTouch, rootTarget);
@@ -115,7 +119,7 @@ void TouchEventDispatcher::dispatchTouchEvent(
         .y = static_cast<facebook::react::Float>(event.actionTouch.nodeY)};
     auto touchTarget = findTargetForTouchPoint(touchPoint, rootTarget).first;
     auto hasCancelled =
-        maybeCancelPreviousTouchEvent(timestampMillis, touchTarget);
+        maybeCancelPreviousTouchEvent(timestampSeconds, touchTarget);
     if (hasCancelled) {
       m_touchTargetByTouchId.erase(event.actionTouch.id);
       return;
@@ -153,8 +157,8 @@ void TouchEventDispatcher::dispatchTouchEvent(
     if (!touchTarget) {
       continue;
     }
-    auto touch =
-        convertTouchPointToReactTouch(touchPoint, touchTarget, timestampMillis);
+    auto touch = convertTouchPointToReactTouch(
+        touchPoint, touchTarget, timestampSeconds);
     touches.insert(touch);
     if (touchTarget->getTouchTargetTag() == eventTarget->getTouchTargetTag()) {
       targetTouches.insert(touch);
@@ -226,7 +230,7 @@ TouchTarget::Shared TouchEventDispatcher::registerTargetForTouch(
 }
 
 bool TouchEventDispatcher::maybeCancelPreviousTouchEvent(
-    double timestampInMs,
+    double timestampInSecs,
     TouchTarget::Shared touchTarget) {
   // check if ancestor is handling touches
   auto shouldEmitTouchCancelEvent = false;
@@ -248,7 +252,7 @@ bool TouchEventDispatcher::maybeCancelPreviousTouchEvent(
   touchCancelEvent.changedTouches = {};
   touchCancelEvent.touches = {};
   for (auto touch : m_previousEvent.touches) {
-    touch.timestamp = timestampInMs;
+    touch.timestamp = timestampInSecs;
     touchCancelEvent.changedTouches.insert(touch);
   }
 

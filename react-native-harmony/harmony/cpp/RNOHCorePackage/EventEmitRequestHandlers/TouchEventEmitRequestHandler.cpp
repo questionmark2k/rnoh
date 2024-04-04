@@ -17,7 +17,10 @@ void TouchEventEmitRequestHandler::handleEvent(
 
   auto timestampNanos =
       arkJs.getDouble(arkJs.getObjectProperty(touchEvent, "timestamp"));
-  react::Float timestamp = timestampNanos / 1e6;
+  // rn expects a timestamp in seconds. We need to convert the timestamp from
+  // nanoseconds to miliseconds, use floor to round down and then convert to
+  // seconds. RN multiplies it by 1e3 to convert to miliseconds.
+  react::Float timestamp = std::floor(timestampNanos / 1e6) / 1e3;
 
   auto touches = convertTouches(
       arkJs,
