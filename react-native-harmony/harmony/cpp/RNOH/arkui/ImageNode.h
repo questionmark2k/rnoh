@@ -10,8 +10,8 @@ namespace rnoh {
 class ImageNodeDelegate {
  public:
   virtual ~ImageNodeDelegate() = default;
-  virtual void onComplete(float width, float height) {};
-  virtual void onError(int32_t errorCode) {};
+  virtual void onComplete(float width, float height){};
+  virtual void onError(int32_t errorCode){};
 };
 
 class ImageNode : public ArkUINode {

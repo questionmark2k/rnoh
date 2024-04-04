@@ -79,14 +79,14 @@ class ComponentInstance
 
   virtual facebook::react::Props::Shared getProps() const = 0;
 
-  virtual void setProps(facebook::react::Props::Shared props) {};
+  virtual void setProps(facebook::react::Props::Shared props){};
 
-  virtual void setState(facebook::react::State::Shared state) {};
+  virtual void setState(facebook::react::State::Shared state){};
 
-  virtual void setLayout(facebook::react::LayoutMetrics layoutMetrics) {};
+  virtual void setLayout(facebook::react::LayoutMetrics layoutMetrics){};
 
   virtual void setEventEmitter(
-      facebook::react::SharedEventEmitter eventEmitter) {};
+      facebook::react::SharedEventEmitter eventEmitter){};
 
   virtual void finalizeUpdates() {
     this->getLocalRootArkUINode().markDirty();

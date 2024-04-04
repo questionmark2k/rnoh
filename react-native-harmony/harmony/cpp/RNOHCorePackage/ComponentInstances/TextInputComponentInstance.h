@@ -16,10 +16,7 @@ class TextInputComponentInstance
   TextAreaNode m_textAreaNode;
   bool m_multiline{false};
 
-  int32_t m_nativeEventCount = 0;
-
-  facebook::react::TextInputMetrics getTextInputMetrics();
-  facebook::react::TextInputMetrics getTextInputMetrics(std::string text);
+  facebook::react::TextInputMetrics getTextInputMetrics(ArkUI_NodeEvent* event);
 
   bool m_secureInput{false};
 
@@ -35,13 +32,13 @@ class TextInputComponentInstance
   void handleCommand(std::string const& commandName, folly::dynamic const& args)
       override;
 
-  void onChange(std::string text) override;
+  void onChange(ArkUI_NodeEvent* event) override;
 
-  void onBlur() override;
+  void onBlur(ArkUI_NodeEvent* event) override;
 
-  void onSubmit() override;
+  void onSubmit(ArkUI_NodeEvent* event) override;
 
-  void onFocus() override;
+  void onFocus(ArkUI_NodeEvent* event) override;
 
   ArkUINode& getLocalRootArkUINode() override;
 };

@@ -5,7 +5,7 @@
 class RefreshNodeDelegate {
  public:
   virtual ~RefreshNodeDelegate() = default;
-  virtual void onRefresh() {};
+  virtual void onRefresh(){};
 };
 
 namespace rnoh {

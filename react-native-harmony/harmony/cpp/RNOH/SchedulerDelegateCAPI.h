@@ -61,20 +61,14 @@ class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
           auto mutations = transaction.getMutations();
           m_mountingManager->processMutations(mutations);
           m_taskExecutor->runTask(TaskThread::MAIN, [this, mutations] {
-            std::exception_ptr exception;
             for (auto mutation : mutations) {
               try {
                 this->handleMutation(mutation);
-              } catch (std::exception const& e) {
-                // Save the first exception that occurs, but continue to process
-                exception = exception ? exception : std::current_exception();
-                LOG(ERROR) << "Error processing mutation "
-                           << getMutationNameFromType(mutation.type) << ": "
-                           << e.what();
+              } catch (std::runtime_error& e) {
+                LOG(ERROR) << "Mutation "
+                           << this->getMutationNameFromType(mutation.type)
+                           << " failed: " << e.what();
               }
-            }
-            if (exception) {
-              std::rethrow_exception(exception);
             }
           });
         });

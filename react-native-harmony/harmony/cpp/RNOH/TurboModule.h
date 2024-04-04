@@ -25,9 +25,10 @@ class TurboModule : public facebook::react::TurboModule {
       facebook::jsi::Runtime& rt,
       const facebook::jsi::PropNameID& name,
       const facebook::jsi::Value& value) override {
-    LOG(INFO) << "Turbo Module: " << name_ << "::" << "set(" << "_, \""
-              << name.utf8(rt) << "\", \"" << value.toString(rt).utf8(rt)
-              << "\")";
+    LOG(INFO) << "Turbo Module: " << name_ << "::"
+              << "set("
+              << "_, \"" << name.utf8(rt) << "\", \""
+              << value.toString(rt).utf8(rt) << "\")";
   }
 };
 
