@@ -65,16 +65,19 @@ export function ModalTest() {
           expect(state).to.be.true;
         }}
       />
-      <TestCase.Example itShould="soft keyboard should cover modal">
+      <TestCase.Example
         tags={['C_API']}
+        itShould="soft keyboard should cover modal">
         <ModalExample withTextInput />
       </TestCase.Example>
-      <TestCase.Example itShould="allow to display one modal on top of another">
+      <TestCase.Example
         tags={['C_API']}
+        itShould="allow to display one modal on top of another">
         <NestedModalinModal />
       </TestCase.Example>
-      <TestCase.Example itShould="display modal from flatlist item">
+      <TestCase.Example
         tags={['C_API']}
+        itShould="display modal from flatlist item">
         <NestedModalInFlatlist />
       </TestCase.Example>
     </TestSuite>

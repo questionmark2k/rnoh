@@ -44,6 +44,7 @@ ModalHostViewComponentInstance::ModalHostViewComponentInstance(Context context)
       m_touchHandler(std::make_unique<ModalHostTouchHandler>(this)) {
   m_virtualNode.setSize(facebook::react::Size{0, 0});
   m_dialogHandler.setDialogDelegate(this);
+  m_rootStackNode.setPosition({0, 0});
 }
 
 void ModalHostViewComponentInstance::onPropsChanged(
