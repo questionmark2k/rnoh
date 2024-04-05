@@ -1,6 +1,6 @@
 # Performance analysis using SmartPerf-Host instructions
 
-Performance of ArkUI applications can be analysed using SmartPerf-Host tool, which can be downloaded from https://gitee.com/openharmony/developtools_smartperf_host/releases. 
+Performance of ArkUI applications can be analysed using SmartPerf-Host tool, which can be downloaded from https://gitee.com/openharmony/developtools_smartperf_host/releases.
 
 To run trace on an tester application do the following
 - download and unpack SmartPerf from the link above
@@ -12,14 +12,20 @@ To run trace on an tester application do the following
 - the trace decomposition should now be visible in the browser
 
 ## Adding custom trace sections
-- you can add custom `systrace` sections to the cpp files by creating `facebook::react::SystraceSection` in the method that you want to analyse - it's trace will be then visible in the `SmartPerf` tool under the `com.rnoh.tester` tab
+1. You can use Systrace Turbomodule to trace some actions from ArkTS side:
+```ts
+Systrace.beginTrace('Some event I want to trace');
+// do some expensive calculations
+Systrace.endTrace();
+```
+2. You can add custom `systrace` sections to the cpp files by creating `facebook::react::SystraceSection` in the method that you want to analyse - it's trace will be then visible in the `SmartPerf` tool under the `com.rnoh.tester` tab
 ```cpp
 //systrace example
 void Component::onUpdate() {
   facebook::react::SystraceSection s("Component::onUpdate", ...args);
   ...
 }
-``` 
+```
 
 ## hiprofiler config
 To analyse ArkUI builtin functionalites (for example rendering and layouting) you can use the more detailed profiler configuration visible below. To use this config paste it into `scripts/hiprofiler-config.txt` in the tester dir.
@@ -81,6 +87,23 @@ plugin_configs {
 }
 ```
 
+## hitrace
+To trace some variable changes you may use:
+```
+Systrace.counterEvent('SOME_VARIABLE', 1000)
+```
+To later get those changes simply open htrace data in SmartPerf tool (but search tool will not show you correct results, simply use cmd + f in browser to find right row).
+However you can also use more primitive tool (which will give you text output):
+```sh
+hdc shell
+hitrace --trace_begin app
+# make some interactions in the app which will call counterEvent
+hitrace --trace_dump | grep tracing_mark_write
+hitrace --trace_finish
+```
+
 ## Further details
-- [Common trace usage instructions](https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/performance/common-trace-using-instructions.md)
+- [Common trace usage instructions](https://docs.openharmony.cn/pages/v4.0/en/application-dev/performance/common-trace-using-instructions.md)
 - [Analyzing application performance using SmartPerf-Host](https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/performance/performance-optimization-using-smartperf-host.md)
+- [Development of Performance Tracing (ArkTS)
+](https://docs.openharmony.cn/pages/v4.0/en/application-dev/dfx/hitracemeter-guidelines.md)

@@ -50,7 +50,7 @@ export * from 'react-native/Libraries/Lists/SectionList';
 export * from '@react-native/virtualized-lists';
 export * from 'react-native/Libraries/LogBox/LogBox';
 export * from 'react-native/Libraries/Modal/Modal';
-// export * as Systrace from 'react-native/Libraries/Performance/Systrace';
+export * as Systrace from 'react-native/Libraries/Performance/Systrace';
 // export * from 'react-native/Libraries/PermissionsAndroid/PermissionsAndroid';
 // export * from 'react-native/Libraries/PushNotificationIOS/PushNotificationIOS';
 export * from 'react-native/Libraries/ReactNative/AppRegistry';

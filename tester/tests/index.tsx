@@ -43,6 +43,7 @@ export * from './ShareTest';
 export * from './StatusBarTest';
 export * from './StyleSheetTest';
 export * from './SwitchTest';
+export * from './SystraceTest';
 export * from './TextInputTest';
 export * from './TextTest/TextTest';
 export * from './TimerTest';

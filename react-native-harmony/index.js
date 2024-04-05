@@ -128,6 +128,9 @@ module.exports = {
   get Switch() {
     return require('react-native/Libraries/Components/Switch/Switch').default;
   },
+  get Systrace() {
+    return require('react-native/Libraries/Performance/Systrace');
+  },
   get Text() {
     return require('react-native/Libraries/Text/Text');
   },

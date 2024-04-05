@@ -8,6 +8,7 @@
 #include "NativeLogger.h"
 #include "RNOH/EventBeat.h"
 #include "RNOH/MessageQueueThread.h"
+#include "RNOH/Performance/NativeTracing.h"
 #include "RNOH/ShadowViewRegistry.h"
 #include "RNOH/TurboModuleFactory.h"
 #include "RNOH/TurboModuleProvider.h"
@@ -46,6 +47,8 @@ void RNInstanceArkTS::initialize() {
       [](facebook::jsi::Runtime& rt) {
         // install `console.log` (etc.) implementation
         react::bindNativeLogger(rt, nativeLogger);
+        // install tracing functions
+        rnoh::setupTracing(rt);
       });
   jsExecutorFactory->setEnableDebugger(m_shouldEnableDebugger);
   m_jsQueue = std::make_shared<MessageQueueThread>(this->taskExecutor);
