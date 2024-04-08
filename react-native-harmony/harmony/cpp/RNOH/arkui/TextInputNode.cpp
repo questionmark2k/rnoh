@@ -133,16 +133,10 @@ void TextInputNode::setEnterKeyType(
 
 void TextInputNode::setCancelButtonMode(
     facebook::react::TextInputAccessoryVisibilityMode mode) {
-  ArkUI_AttributeItem item;
-  if (mode == facebook::react::TextInputAccessoryVisibilityMode::Always) {
-    ArkUI_NumberValue value[] = {
-        {.i32 = static_cast<int32_t>(ARKUI_CANCELBUTTON_STYLE_INPUT)}};
-    item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
-  } else {
-    ArkUI_NumberValue value[] = {
-        {.i32 = static_cast<int32_t>(ARKUI_CANCELBUTTON_STYLE_INVISIBLE)}};
-    item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
-  }
+  ArkUI_NumberValue value[] = {{.i32 = mode == facebook::react::TextInputAccessoryVisibilityMode::Always
+                                  ? static_cast<int32_t>(ARKUI_CANCELBUTTON_STYLE_INPUT)
+                                  : static_cast<int32_t>(ARKUI_CANCELBUTTON_STYLE_INVISIBLE)}};
+  ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_TEXT_INPUT_CANCEL_BUTTON, &item));
 }
