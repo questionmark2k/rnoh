@@ -5,6 +5,7 @@ import {
   View,
   registerViewConfig,
   ReactNativeViewAttributes,
+  TouchableOpacity,
 } from 'react-native';
 import {Button, TestCase} from '../components';
 
@@ -43,6 +44,9 @@ export function RenderingTest() {
             </View>
           )}
         />
+      </TestCase.Example>
+      <TestCase.Example itShould="display green view over blue after pressing">
+        <RenderOrderExample />
       </TestCase.Example>
       <TestCase.Example itShould="display all props after pressing the button, not only the recently updated one">
         <Timeout
@@ -108,5 +112,32 @@ function Timeout({
       />
       {renderItem(refreshKey)}
     </React.Fragment>
+  );
+}
+
+function RenderOrderExample() {
+  const [show, setShow] = React.useState(false);
+  return (
+    <TouchableOpacity
+      style={{
+        backgroundColor: 'red',
+        height: 100,
+        width: 100,
+      }}
+      onPress={() => {
+        setShow(s => !s);
+      }}>
+      {show ? (
+        <View
+          style={{
+            position: 'absolute',
+            backgroundColor: 'blue',
+            height: 90,
+            width: 90,
+          }}
+        />
+      ) : null}
+      <View style={{backgroundColor: 'green', width: 80, height: 80}} />
+    </TouchableOpacity>
   );
 }
