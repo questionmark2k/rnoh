@@ -25,7 +25,6 @@ export const NestedScrollingExample = () => {
           offset: 48 * index,
           index,
         })}
-        inverted
         renderItem={({item}: {item: ItemData}) => (
           <TouchableOpacity onPress={() => console.log(item.title)}>
             <Item title={item.title} />

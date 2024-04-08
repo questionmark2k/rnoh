@@ -26,6 +26,7 @@ class ScrollViewComponentInstance
   facebook::react::Float m_scrollEventThrottle = 0;
   bool m_isNativeResponderBlocked = false;
   std::weak_ptr<NativeAnimatedTurboModule> m_nativeAnimatedTurboModule{};
+  bool m_allowScrollPropagation = false;
 
   facebook::react::Float getFrictionFromDecelerationRate(
       facebook::react::Float decelerationRate);
@@ -49,6 +50,7 @@ class ScrollViewComponentInstance
 
   void sendEventForNativeAnimations(
       facebook::react::ScrollViewMetrics const& scrollViewMetrics);
+  bool isHorizontal(SharedConcreteProps const& props);
 
  public:
   ScrollViewComponentInstance(Context context);
@@ -91,5 +93,7 @@ class ScrollViewComponentInstance
 
  private:
   void updateStateWithContentOffset(facebook::react::Point contentOffset);
+  bool isContentSmallerThanContainer();
+  bool isAtEnd(facebook::react::Point currentOffset);
 };
 } // namespace rnoh
