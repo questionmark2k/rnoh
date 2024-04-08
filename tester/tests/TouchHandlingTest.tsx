@@ -105,7 +105,7 @@ export function TouchHandlingTest() {
           ]}
         />
       </TestCase.Example>
-      <TestCase.Example itShould="report transformed touch coordinates">
+      <TestCase.Example itShould="report transformed touch coordinates (2)">
         <TouchCoordinatesTest
           transform={[
             {rotate: '-45deg'},
@@ -185,6 +185,7 @@ export function TouchHandlingTest() {
         <ScrollViewLockedIssue />
       </TestCase.Example>
       <TestCase.Manual
+        tags={['C_API']}
         itShould="pass after tapping cyan area but not red area (child's hitSlop)"
         initialState={false}
         arrange={({setState}) => {

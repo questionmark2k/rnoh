@@ -17,14 +17,14 @@ class TextComponentInstance
   TextNode m_textNode{};
   StackNode m_stackNode{};
   std::vector<std::shared_ptr<ArkUINode>> m_childNodes{};
-  mutable FragmentTouchTargetByTag m_fragmentTouchTargetByTag{};
-  mutable bool m_touchTargetChildrenNeedUpdate = false;
+  FragmentTouchTargetByTag m_fragmentTouchTargetByTag{};
+  bool m_touchTargetChildrenNeedUpdate = false;
 
  public:
   TextComponentInstance(Context context);
   ~TextComponentInstance();
   StackNode& getLocalRootArkUINode() override;
-  std::vector<TouchTarget::Shared> getTouchTargetChildren() const override;
+  std::vector<TouchTarget::Shared> getTouchTargetChildren() override;
 
  protected:
   void onChildInserted(
@@ -48,6 +48,6 @@ class TextComponentInstance
       const facebook::react::ParagraphAttributes& paragraphAttributes);
   std::string stringCapitalize(const std::string& strInput);
   void updateFragmentTouchTargets(
-      facebook::react::ParagraphState const& newState) const;
+      facebook::react::ParagraphState const& newState);
 };
 } // namespace rnoh

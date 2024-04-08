@@ -131,8 +131,7 @@ class ComponentInstance
     return nullptr;
   }
 
-  virtual std::vector<TouchTarget::Shared> getTouchTargetChildren()
-      const override {
+  virtual std::vector<TouchTarget::Shared> getTouchTargetChildren() override {
     auto children = getChildren();
     return std::vector<TouchTarget::Shared>(children.begin(), children.end());
   }

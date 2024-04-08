@@ -427,7 +427,7 @@ class TextFragmentTouchTarget : public TouchTarget {
   }
 
   bool containsPointInBoundingBox(
-      facebook::react::Point const& point) const override {
+      facebook::react::Point const& point) override {
     return containsPoint(point);
   }
 
@@ -447,7 +447,7 @@ class TextFragmentTouchTarget : public TouchTarget {
     return m_parentTouchTarget.lock();
   };
 
-  std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
+  std::vector<TouchTarget::Shared> getTouchTargetChildren() override {
     return {};
   }
 
@@ -459,6 +459,16 @@ class TextFragmentTouchTarget : public TouchTarget {
     return {};
   }
 
+  facebook::react::Rect getBoundingBox() override {
+    return {};
+  };
+
+  bool isClippingSubviews() const override {
+    return false;
+  }
+
+  void markBoundingBoxAsDirty() override{};
+
  private:
   facebook::react::Tag m_tag;
   facebook::react::SharedTouchEventEmitter m_touchEventEmitter;
@@ -466,8 +476,8 @@ class TextFragmentTouchTarget : public TouchTarget {
   TouchTarget::Weak m_parentTouchTarget;
 };
 
-std::vector<TouchTarget::Shared> TextComponentInstance::getTouchTargetChildren()
-    const {
+std::vector<TouchTarget::Shared>
+TextComponentInstance::getTouchTargetChildren() {
   if (m_state == nullptr) {
     m_fragmentTouchTargetByTag.clear();
     return {};
@@ -495,7 +505,7 @@ std::vector<TouchTarget::Shared> TextComponentInstance::getTouchTargetChildren()
 }
 
 void TextComponentInstance::updateFragmentTouchTargets(
-    facebook::react::ParagraphState const& newState) const {
+    facebook::react::ParagraphState const& newState) {
   auto const& fragments = newState.attributedString.getFragments();
   auto textLayoutManager =
       newState.paragraphLayoutManager.getTextLayoutManager();

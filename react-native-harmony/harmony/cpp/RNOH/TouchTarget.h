@@ -9,14 +9,14 @@ class TouchTarget {
   using Point = facebook::react::Point;
 
  public:
-  using Shared = std::shared_ptr<const TouchTarget>;
-  using Weak = std::weak_ptr<const TouchTarget>;
+  using Shared = std::shared_ptr<TouchTarget>;
+  using Weak = std::weak_ptr<TouchTarget>;
 
   virtual Point computeChildPoint(
       Point const& point,
       TouchTarget::Shared const& child) const;
   virtual bool containsPoint(Point const& point) const = 0;
-  virtual bool containsPointInBoundingBox(Point const& point) const = 0;
+  virtual bool containsPointInBoundingBox(Point const& point) = 0;
   virtual bool canHandleTouch() const = 0;
   virtual bool canChildrenHandleTouch() const = 0;
   /**
@@ -31,9 +31,12 @@ class TouchTarget {
   virtual facebook::react::Tag getTouchTargetTag() const = 0;
   virtual facebook::react::SharedTouchEventEmitter getTouchEventEmitter()
       const = 0;
-  virtual std::vector<Shared> getTouchTargetChildren() const = 0;
+  virtual std::vector<Shared> getTouchTargetChildren() = 0;
   virtual facebook::react::LayoutMetrics getLayoutMetrics() const = 0;
   virtual facebook::react::Transform getTransform() const = 0;
   virtual TouchTarget::Shared getTouchTargetParent() const = 0;
+  virtual facebook::react::Rect getBoundingBox() = 0;
+  virtual void markBoundingBoxAsDirty() = 0;
+  virtual bool isClippingSubviews() const = 0;
 };
 } // namespace rnoh

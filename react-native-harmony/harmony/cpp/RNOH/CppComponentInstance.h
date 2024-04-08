@@ -13,6 +13,7 @@
 #include "RNOH/ComponentInstance.h"
 
 namespace rnoh {
+
 template <typename ShadowNodeT>
 class CppComponentInstance : public ComponentInstance {
   static_assert(
@@ -83,6 +84,7 @@ class CppComponentInstance : public ComponentInstance {
     this->getLocalRootArkUINode().setPosition(layoutMetrics.frame.origin);
     this->getLocalRootArkUINode().setSize(layoutMetrics.frame.size);
     m_layoutMetrics = layoutMetrics;
+    markBoundingBoxAsDirty();
   }
 
   // TouchTarget implementation
@@ -91,31 +93,14 @@ class CppComponentInstance : public ComponentInstance {
   }
 
   bool containsPoint(facebook::react::Point const& point) const override {
-    if (m_props != nullptr) {
-      auto props = m_props;
-      return point.x >= -props->hitSlop.left &&
-          point.y >= -props->hitSlop.top &&
-          point.x < m_layoutMetrics.frame.size.width + props->hitSlop.right &&
-          point.y < m_layoutMetrics.frame.size.height + props->hitSlop.bottom;
-    }
-    return point.x >= 0 && point.y >= 0 &&
-        point.x < m_layoutMetrics.frame.size.width &&
-        point.y < m_layoutMetrics.frame.size.height;
+    auto hitRect = getHitRect();
+    return hitRect.containsPoint(point);
   }
 
   bool containsPointInBoundingBox(
-      facebook::react::Point const& point) const override {
-    if (containsPoint(point)) {
-      return true;
-    } else if (m_props != nullptr && !m_props->getClipsContentToBounds()) {
-      for (auto child : m_children) {
-        auto childPoint = this->computeChildPoint(point, child);
-        if (child->containsPointInBoundingBox(childPoint)) {
-          return true;
-        }
-      }
-    }
-    return false;
+      facebook::react::Point const& point) override {
+    auto boundingBox = this->getBoundingBox();
+    return boundingBox.containsPoint(point);
   }
 
   bool canHandleTouch() const override {
@@ -151,7 +136,7 @@ class CppComponentInstance : public ComponentInstance {
     return m_eventEmitter;
   }
 
-  std::vector<TouchTarget::Shared> getTouchTargetChildren() const override {
+  std::vector<TouchTarget::Shared> getTouchTargetChildren() override {
     auto children = getChildren();
     return std::vector<TouchTarget::Shared>(children.begin(), children.end());
   }
@@ -162,6 +147,28 @@ class CppComponentInstance : public ComponentInstance {
     }
     return facebook::react::Transform::Identity();
   }
+
+  facebook::react::Rect getBoundingBox() override {
+    if (!m_boundingBox.has_value()) {
+      calculateBoundingBox();
+    }
+    return m_boundingBox.value();
+  };
+
+  bool isClippingSubviews() const override {
+    return m_isClipping;
+  }
+
+  void markBoundingBoxAsDirty() override {
+    if (m_boundingBox.has_value()) {
+      m_boundingBox.reset();
+      auto parent = getTouchTargetParent();
+      while (parent != nullptr && !parent->isClippingSubviews()) {
+        parent->markBoundingBoxAsDirty();
+        parent = parent->getTouchTargetParent();
+      }
+    }
+  };
 
  protected:
   virtual void onPropsChanged(SharedConcreteProps const& props) {
@@ -217,6 +224,7 @@ class CppComponentInstance : public ComponentInstance {
         m_oldPointScaleFactor = m_layoutMetrics.pointScaleFactor;
         this->getLocalRootArkUINode().setTransform(
             props->transform, m_layoutMetrics.pointScaleFactor);
+        markBoundingBoxAsDirty();
       }
 
       if (!old || props->pointerEvents != old->pointerEvents) {
@@ -255,7 +263,9 @@ class CppComponentInstance : public ComponentInstance {
 
       auto newOverflow = props->getClipsContentToBounds();
       if (!old || (old->getClipsContentToBounds() != newOverflow)) {
+        m_isClipping = newOverflow;
         this->getLocalRootArkUINode().setClip(newOverflow);
+        markBoundingBoxAsDirty();
       }
       m_oldBorderMetrics = props->resolveBorderMetrics(this->m_layoutMetrics);
     }
@@ -265,6 +275,30 @@ class CppComponentInstance : public ComponentInstance {
 
   virtual void onEventEmitterChanged(
       SharedConcreteEventEmitter const& eventEmitter){};
+
+  void calculateBoundingBox() {
+    auto newBoundingBox = getHitRect();
+    if (!m_isClipping) {
+      for (auto& child : m_children) {
+        auto childBoundingBox = child->getBoundingBox();
+        childBoundingBox.origin += child->getLayoutMetrics().frame.origin;
+        newBoundingBox.unionInPlace(childBoundingBox);
+      }
+    }
+    m_boundingBox = newBoundingBox;
+  };
+
+  facebook::react::Rect getHitRect() const {
+    facebook::react::Point origin = {0, 0};
+    auto size = m_layoutMetrics.frame.size;
+    if (m_props) {
+      origin -= {m_props->hitSlop.left, m_props->hitSlop.top};
+      size +=
+          {m_props->hitSlop.right + m_props->hitSlop.left,
+           m_props->hitSlop.top + m_props->hitSlop.bottom};
+    }
+    return {origin, size};
+  };
 
  private:
   void setOpacity(SharedConcreteProps const& props) {
@@ -286,5 +320,7 @@ class CppComponentInstance : public ComponentInstance {
   SharedConcreteProps m_props;
   SharedConcreteState m_state;
   SharedConcreteEventEmitter m_eventEmitter;
+  std::optional<facebook::react::Rect> m_boundingBox;
+  bool m_isClipping = false;
 };
 } // namespace rnoh
