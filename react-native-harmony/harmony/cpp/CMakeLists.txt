@@ -492,7 +492,6 @@ if(DEFINED WITH_HITRACE_SYSTRACE)
     target_link_libraries(react_render_debug libhitrace_ndk.z.so)
 endif()
 target_link_libraries(rnoh PUBLIC
-    libqos.so
     libace_napi.z.so
     libace_ndk.z.so
     libhilog_ndk.z.so
@@ -522,6 +521,7 @@ target_compile_options(rnoh PUBLIC
 
 if("$ENV{RNOH_C_API_ARCH}" STREQUAL "1")
     message("Experimental C-API architecture enabled")
+    target_link_libraries(rnoh PUBLIC libqos.so)
     target_compile_definitions(rnoh PUBLIC C_API_ARCH)
 endif()
 

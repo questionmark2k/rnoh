@@ -25,11 +25,15 @@ TaskExecutor::TaskExecutor(napi_env mainEnv, bool shouldEnableBackground) {
 }
 
 void TaskExecutor::setTaskThreadPriority(QoS_Level level) {
-  int ret = OH_QoS_SetThreadQoS(level);
-  std::array<char, 16> buffer = {0};
-  pthread_getname_np(pthread_self(), buffer.data(), sizeof(buffer));
-  DLOG(INFO) << "TaskExecutor::setTaskThreadPriority " << buffer.data()
-             << (ret == 0 ? " SUCCESSFUL" : " FAILED");
+  #ifdef C_API_ARCH
+    int ret = OH_QoS_SetThreadQoS(level);
+    std::array<char, 16> buffer = {0};
+    pthread_getname_np(pthread_self(), buffer.data(), sizeof(buffer));
+    DLOG(INFO) << "TaskExecutor::setTaskThreadPriority " << buffer.data()
+               << (ret == 0 ? " SUCCESSFUL" : " FAILED");
+  #else
+    DLOG(WARNING) << "TaskExecutor::setTaskThreadPriority available only with C-API";
+  #endif
 }
 
 void TaskExecutor::runTask(TaskThread thread, Task&& task) {
