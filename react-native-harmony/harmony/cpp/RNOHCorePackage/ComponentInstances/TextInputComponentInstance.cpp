@@ -74,8 +74,8 @@ void TextInputComponentInstance::onPropsChanged(
       m_textAreaNode.setBackgroundColor(props->backgroundColor);
       m_textInputNode.setBackgroundColor(props->backgroundColor);
     } else {
-      m_textAreaNode.setBackgroundColor(facebook::react::whiteColor());
-      m_textInputNode.setBackgroundColor(facebook::react::whiteColor());
+      m_textAreaNode.setBackgroundColor(facebook::react::clearColor());
+      m_textInputNode.setBackgroundColor(facebook::react::clearColor());
     }
   }
   if (props->textAttributes.alignment) {

@@ -478,6 +478,17 @@ export function TextInputTest() {
         itShould="allow to change the text input value via props">
         <TextInputValueSetProgrammatically />
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="should show transparent TextInput on a red background">
+        <View style={{backgroundColor: 'red'}}>
+          <TextInput
+            value="parent is red but I am transparent"
+            style={{height: 40}}
+          />
+        </View>
+      </TestCase.Example>
     </TestSuite>
   );
 }
