@@ -59,6 +59,8 @@ class TextInputNode : public TextInputNodeBase {
 
   void setPlaceholderColor(facebook::react::SharedColor const& color) override;
 
+  void resetSelectedBackgroundColor();
+
   std::string getTextContent() override;
 };
 

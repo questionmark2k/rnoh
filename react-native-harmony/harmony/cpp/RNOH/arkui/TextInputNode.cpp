@@ -204,6 +204,10 @@ void TextInputNode::setPlaceholderColor(
       m_nodeHandle, NODE_TEXT_INPUT_PLACEHOLDER_COLOR, &colorItem));
 }
 
+void TextInputNode::resetSelectedBackgroundColor() {
+  maybeThrow(NativeNodeApi::getInstance()->resetAttribute(m_nodeHandle, NODE_TEXT_INPUT_SELECTED_BACKGROUND_COLOR));
+}
+
 std::string TextInputNode::getTextContent() {
   auto item = NativeNodeApi::getInstance()->getAttribute(
       m_nodeHandle, NODE_TEXT_INPUT_TEXT);

@@ -144,7 +144,11 @@ void TextInputComponentInstance::onPropsChanged(
   }
 
   if (!m_props || *(props->selectionColor) != *(m_props->selectionColor)) {
-    m_textInputNode.setSelectedBackgroundColor(props->selectionColor);
+    if (props->selectionColor) {
+      m_textInputNode.setSelectedBackgroundColor(props->selectionColor);
+    } else {
+      m_textInputNode.resetSelectedBackgroundColor();
+    }
   }
   if (!m_props ||
       props->traits.secureTextEntry != m_props->traits.secureTextEntry ||
