@@ -13,7 +13,8 @@ class TextInputNodeBase : public ArkUINode {
       facebook::react::TextAttributes const& textAttributes);
 
  public:
-  void setPadding(int32_t padding);
+  void setPadding(
+      facebook::react::RectangleEdges<facebook::react::Float> padding);
 
   void setFocusable(bool const& focusable);
 

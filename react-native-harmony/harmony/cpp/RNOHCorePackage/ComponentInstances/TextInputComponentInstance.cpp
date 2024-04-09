@@ -1,5 +1,6 @@
 #include "TextInputComponentInstance.h"
 #include "RNOH/arkui/conversions.h"
+#include "conversions.h"
 
 #include <folly/dynamic.h>
 #include <glog/logging.h>
@@ -168,6 +169,11 @@ void TextInputComponentInstance::onPropsChanged(
   if (!m_props ||
       props->traits.clearButtonMode != m_props->traits.clearButtonMode) {
     m_textInputNode.setCancelButtonMode(props->traits.clearButtonMode);
+  }
+  if (!m_props ||
+      !(props->yogaStyle.padding() == m_props->yogaStyle.padding())) {
+    m_textInputNode.setPadding(resolveEdges(props->yogaStyle.padding()));
+    m_textAreaNode.setPadding(resolveEdges(props->yogaStyle.padding()));
   }
 }
 

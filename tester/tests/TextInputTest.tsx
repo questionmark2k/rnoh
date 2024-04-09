@@ -378,7 +378,10 @@ export function TextInputTest() {
           defaultValue="Not scaled big"
         />
       </TestCase.Example>
-      <TestCase.Example itShould="show textInput with padding" modal>
+      <TestCase.Example
+        itShould="show textInput with padding"
+        modal
+        tags={['C_API']}>
         <View style={{width: 300, height: 200}}>
           <TextInputWithText
             style={{
@@ -391,7 +394,10 @@ export function TextInputTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="show textInput multiline with padding" modal>
+      <TestCase.Example
+        itShould="show textInput multiline with padding"
+        modal
+        tags={['C_API']}>
         <View style={{width: 300, height: 200}}>
           <TextInputWithText
             style={{

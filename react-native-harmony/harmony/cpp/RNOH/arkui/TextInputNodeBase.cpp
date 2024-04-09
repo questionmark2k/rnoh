@@ -7,9 +7,14 @@ namespace rnoh {
 TextInputNodeBase::TextInputNodeBase(ArkUI_NodeType nodeType)
     : ArkUINode(NativeNodeApi::getInstance()->createNode(nodeType)) {}
 
-void TextInputNodeBase::setPadding(int32_t padding) {
-  ArkUI_NumberValue value[] = {(float)padding};
-  ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
+void TextInputNodeBase::setPadding(
+    facebook::react::RectangleEdges<facebook::react::Float> padding) {
+  std::array<ArkUI_NumberValue, 4> value = {
+      static_cast<float>(padding.top),
+      static_cast<float>(padding.right),
+      static_cast<float>(padding.bottom),
+      static_cast<float>(padding.left)};
+  ArkUI_AttributeItem item = {value.data(), value.size()};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_PADDING, &item));
 }
