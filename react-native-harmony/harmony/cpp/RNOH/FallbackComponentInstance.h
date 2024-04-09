@@ -34,9 +34,7 @@ class FallbackComponentInstance
   void onChildInserted(
       ComponentInstance::Shared const& childComponentInstance,
       std::size_t index) override {
-    LOG(FATAL)
-        << "ArkTS components can't render children in C-API architecture. Please declare your component on C++ side, or don't provide children to '"
-        << this->getComponentName() << "' in your JS code.";
+    // The child node is added on the ArkTS side.
   }
 };
 } // namespace rnoh
