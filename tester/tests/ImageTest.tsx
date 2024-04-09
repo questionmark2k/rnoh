@@ -447,6 +447,12 @@ export const ImageTest = () => {
           defaultSource={require('../assets/expo.png')}
         />
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould='Load images from different folders within assets directory (e.g. "assets/large-images", "assets/small-images")'>
+        <LoadLocalImagesFromDifferentFolders />
+      </TestCase.Example>
     </TestSuite>
   );
 };
@@ -546,6 +552,50 @@ const SwitchSourceTest = () => {
           setIdx(i => (i + 1) % SOURCES.length);
         }}
       />
+    </View>
+  );
+};
+
+const LOCAL_CODE_IMAGE_ASSET_1 = require('../assets/code-images/altumcode-dMUt0X3f59Q-unsplash.jpg');
+const LOCAL_CODE_IMAGE_ASSET_2 = require('../assets/code-images/james-harrison-vpOeXr5wmR4-unsplash.jpg');
+
+const LOCAL_DASHBOARD_IMAGE_ASSET_1 = require('../assets/dashboard-images/dashboard/luke-chesser-JKUTrJ4vK00-unsplash.jpg');
+const LOCAL_DASHBOARD_IMAGE_ASSET_2 = require('../assets/dashboard-images/dashboard/stephen-dawson-qwtCeJ5cLYs-unsplash.jpg');
+
+const LoadLocalImagesFromDifferentFolders = () => {
+  return (
+    <View style={{}}>
+      <Text style={{marginTop: 16}}>Images from: /assets/ </Text>
+      <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+        <Image
+          style={{width: 100, height: 100, margin: 4, borderRadius: 8}}
+          source={LOCAL_IMAGE_ASSET_ID}
+        />
+      </View>
+      <Text style={{marginTop: 16}}>Images from: /assets/code-images/ </Text>
+      <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+        <Image
+          style={{width: 100, height: 100, margin: 4, borderRadius: 8}}
+          source={LOCAL_CODE_IMAGE_ASSET_1}
+        />
+        <Image
+          style={{width: 100, height: 100, margin: 4, borderRadius: 8}}
+          source={LOCAL_CODE_IMAGE_ASSET_2}
+        />
+      </View>
+      <Text style={{marginTop: 16}}>
+        Images from: /assets/dashboard-images/dashboard
+      </Text>
+      <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+        <Image
+          style={{width: 100, height: 100, margin: 4, borderRadius: 8}}
+          source={LOCAL_DASHBOARD_IMAGE_ASSET_1}
+        />
+        <Image
+          style={{width: 100, height: 100, margin: 4, borderRadius: 8}}
+          source={LOCAL_DASHBOARD_IMAGE_ASSET_2}
+        />
+      </View>
     </View>
   );
 };
