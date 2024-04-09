@@ -1,11 +1,11 @@
 import {TestSuite} from '@rnoh/testerino';
 import React from 'react';
-import {StyleSheet, Systrace, Text, View} from 'react-native';
+import {StyleSheet, Systrace, View} from 'react-native';
 import {Button, TestCase} from '../components';
 
 // Refer to docs/performace-analysis-instructions.md how to use Systrace
 export function SystraceTest() {
-  const traceCookie = React.useRef<number|null>(null);
+  const traceCookie = React.useRef<number | null>(null);
   return (
     <TestSuite name="Systrace">
       <TestCase.Example itShould="Syncronous systrace tracing">
@@ -71,7 +71,7 @@ export function SystraceTest() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'red',
-},
+  },
   button: {
     height: 50,
     flex: 1,

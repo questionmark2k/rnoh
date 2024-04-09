@@ -496,6 +496,7 @@ export class RNInstanceImpl implements RNInstance {
 
   public onWindowSizeChange(windowSize: window.Size) {
     this.lifecycleEventEmitter.emit("WINDOW_SIZE_CHANGE", windowSize);
+    this.postMessageToCpp("WINDOW_SIZE_CHANGE", windowSize);
   }
 
   private getNextSurfaceTag(): Tag {

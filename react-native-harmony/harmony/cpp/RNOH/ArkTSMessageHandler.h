@@ -1,8 +1,10 @@
 #pragma once
+#include <folly/dynamic.h>
 #include <string>
-#include "RNInstance.h"
 
 namespace rnoh {
+class RNInstance;
+
 /**
  * Provides a mechanism to respond to messages sent from the ArkTS side.
  * Messages are sent within the context of an RNInstance.
@@ -14,7 +16,7 @@ class ArkTSMessageHandler {
   struct Context {
     std::string messageName;
     folly::dynamic messagePayload;
-    RNInstance::Weak rnInstance;
+    std::weak_ptr<RNInstance> rnInstance;
   };
 
   /**

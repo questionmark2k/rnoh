@@ -10,6 +10,7 @@
 #include <react/renderer/core/State.h>
 #include <vector>
 #include "RNOH/ArkTSChannel.h"
+#include "RNOH/ArkTSMessageHub.h"
 #include "RNOH/RNInstance.h"
 #include "RNOH/TouchTarget.h"
 #include "RNOH/arkui/ArkUINode.h"
@@ -32,6 +33,7 @@ class ComponentInstance
     using Shared = std::shared_ptr<const Dependencies>;
 
     ArkTSChannel::Shared arkTSChannel;
+    ArkTSMessageHub::Shared arkTSMessageHub;
     RNInstance::Weak rnInstance;
   };
 
@@ -47,7 +49,7 @@ class ComponentInstance
   using Shared = std::shared_ptr<ComponentInstance>;
   using Weak = std::weak_ptr<ComponentInstance>;
 
-  ComponentInstance(Context context);
+  ComponentInstance(Context ctx);
 
   virtual ~ComponentInstance() = default;
 

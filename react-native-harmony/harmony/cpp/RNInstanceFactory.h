@@ -161,11 +161,14 @@ std::shared_ptr<RNInstanceInternal> createRNInstance(
       });
   auto schedulerDelegateArkTS =
       std::make_unique<SchedulerDelegateArkTS>(mountingManager, arkTSChannel);
+  auto arkTSMessageHub = std::make_shared<ArkTSMessageHub>();
+  arkTSMessageHandlers.emplace_back(arkTSMessageHub);
   if (shouldUseCAPIArchitecture) {
 #ifdef C_API_ARCH
     auto componentInstanceDependencies =
         std::make_shared<ComponentInstance::Dependencies>();
     componentInstanceDependencies->arkTSChannel = arkTSChannel;
+    componentInstanceDependencies->arkTSMessageHub = std::move(arkTSMessageHub);
     auto customComponentArkUINodeFactory =
         std::make_shared<CustomComponentArkUINodeHandleFactory>(
             env, frameNodeFactoryRef, taskExecutor);
@@ -194,7 +197,7 @@ std::shared_ptr<RNInstanceInternal> createRNInstance(
         shadowViewRegistry,
         std::move(schedulerDelegateCAPI),
         std::move(arkTSMessageHandlers),
-        arkTSChannel,
+        std::move(arkTSChannel),
         componentInstanceRegistry,
         componentInstanceFactory,
         shouldEnableDebugger,

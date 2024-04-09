@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RNOH/ArkTSMessageHub.h"
 #include "RNOH/CppComponentInstance.h"
 #include "RNOH/arkui/ArkUIDialogHandler.h"
 #include "RNOH/arkui/ArkUINodeRegistry.h"
@@ -9,12 +10,19 @@
 namespace rnoh {
 class ModalHostViewComponentInstance
     : public CppComponentInstance<facebook::react::ModalHostViewShadowNode>,
-      public ArkUIDialogDelegate {
+      public ArkUIDialogDelegate,
+      public ArkTSMessageHub::Observer {
  private:
   StackNode m_virtualNode;
   StackNode m_rootStackNode;
   ArkUIDialogHandler m_dialogHandler;
   std::unique_ptr<TouchEventHandler> m_touchHandler;
+  std::shared_ptr<ArkTSMessageHandler> m_displaySizeChangeHandler;
+
+ private:
+  void updateDisplaySize(
+      DisplayMetrics const& displayMetrics,
+      SharedConcreteState const& state);
 
  public:
   ModalHostViewComponentInstance(Context context);
@@ -37,6 +45,9 @@ class ModalHostViewComponentInstance
   void onRequestClose() override;
 
   StackNode& getLocalRootArkUINode() override;
+
+  // ArkTSMessageHub::Observer
+  void onMessageReceived(ArkTSMessage const& message) override;
 
   friend class ModalHostTouchHandler;
 };
