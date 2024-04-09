@@ -33,6 +33,14 @@ export function TextInputTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        itShould="not crash when invalid keyboardType is supplied">
+        <TextInputWithText
+          style={styles.textInput}
+          keyboardType={'invalid_type' as KeyboardTypeOptions}
+        />
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
         itShould="render non-editable textInput">
         <TextInputWithText
           defaultValue="test"

@@ -1609,6 +1609,16 @@ const ExportedForwardRef: React.AbstractComponent<
     delete style.verticalAlign;
   }
 
+  // RNOH patch: invalid `keyboardType` prop values crash the app
+  {
+    // supported keyboard types from `textinput/conversions.h`
+  const SUPPORTED_KEYBOARD_TYPES = ["default", "email-address", "numeric", "phone-pad", "number-pad", "url", "decimal-pad", "ascii-capable", "numbers-and-punctuation", "name-phone-pad", "twitter", "web-search", "ascii-capable-number-pad", "visible-password"];
+  if (keyboardType && !SUPPORTED_KEYBOARD_TYPES.includes(keyboardType)) {
+    keyboardType = "default";
+  }
+  }
+  // END RNOH patch
+
   return (
     <InternalTextInput
       allowFontScaling={allowFontScaling}
