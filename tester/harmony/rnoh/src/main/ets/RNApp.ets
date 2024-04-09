@@ -3,7 +3,6 @@ import {
   Tag,
   RNOHError,
   JSBundleProvider,
-  RNAbility,
   RNInstance,
   RNInstanceOptions,
   RNOHLogger,
@@ -12,6 +11,8 @@ import {
   RNComponentContext,
   WrappedCustomRNComponentBuilder,
   CustomRNComponentFrameNodeFactory,
+  RNOHCoreContext,
+  RNOHContext
 } from './RNOH';
 import { RNSurface, SurfaceConfig2 } from './RNSurface';
 import { LogBoxDialog } from "./LogBoxDialog"
@@ -62,7 +63,7 @@ export struct RNApp {
    */
   public onSetUp: (rnInstance: RNInstance) => Promise<void> | void = () => Promise.resolve()
   // -------------------------------------------------------------------------------------------------------------------
-  @StorageLink('RNAbility') private rnAbility: RNAbility = {} as RNAbility
+  @StorageLink('RNOHCoreContext') private rnohCoreContext: RNOHCoreContext | undefined = undefined
   private rnInstance!: RNInstance
   @State private shouldShow: boolean = false
   private logBoxDialogController!: CustomDialogController
@@ -80,7 +81,7 @@ export struct RNApp {
   }
 
   private async init() {
-    this.logger = this.rnAbility.getLogger().clone("RNApp")
+    this.logger = this.rnohCoreContext!.logger.clone("RNApp")
     const stopTracing = this.logger.clone("init").startTracing()
 
     try {
@@ -94,9 +95,7 @@ export struct RNApp {
         }
         this.rnInstance = await this.getOrCreateRNInstance()
         this.ctx = new RNComponentContext(
-          this.rnAbility.createRNOHContext({
-            rnInstance: this.rnInstance
-          }),
+          RNOHContext.fromCoreContext(this.rnohCoreContext!, this.rnInstance),
           this.wrappedCustomRNComponentBuilder,
           wrapBuilder(buildRNComponentForTag),
           new Map(),
@@ -143,11 +142,11 @@ export struct RNApp {
       stopTracing()
     } catch (reason) {
       if (typeof reason === "string")
-        this.rnAbility.getLogger().error(reason)
+        this.rnohCoreContext!.logger.error(reason)
       else if (reason instanceof Error) {
-        this.rnAbility.getLogger().error(reason.message)
+        this.rnohCoreContext!.logger.error(reason.message)
       } else {
-        this.rnAbility.getLogger().error("Fatal exception")
+        this.rnohCoreContext!.logger.error("Fatal exception")
       }
       stopTracing()
     }
@@ -157,7 +156,7 @@ export struct RNApp {
     const stopTracing = this.logger.clone("cleanUp").startTracing()
     this.shouldShow = false
     if (this.shouldDestroyRNInstance) {
-      await this.rnAbility.destroyAndUnregisterRNInstance(this.rnInstance)
+      await this.rnohCoreContext!.destroyAndUnregisterRNInstance(this.rnInstance)
     }
     this.cleanUpCallbacks.forEach(cleanUp => cleanUp())
     stopTracing()
@@ -169,8 +168,8 @@ export struct RNApp {
     } else {
       const options = this.rnInstanceConfig
       this.shouldDestroyRNInstance = true
-      return this.rnAbility.createAndRegisterRNInstance(options as RNInstanceOptions,
-        new CustomRNComponentFrameNodeFactory(this.getUIContext(), this.rnAbility.rnohCoreContext.logger, () => this.ctx))
+      return this.rnohCoreContext!.createAndRegisterRNInstance(options as RNInstanceOptions,
+        new CustomRNComponentFrameNodeFactory(this.getUIContext(), this.rnohCoreContext!.logger, () => this.ctx))
     }
   }
 
@@ -185,8 +184,8 @@ export struct RNApp {
           } as SurfaceConfig2,
         })
       }
-      if (this.rnAbility!.isDebugModeEnabled()) {
-        RNDevLoadingView({ useSafeAreaInsets: true, ctx: this.rnAbility.rnohCoreContext }).position({ x: 0, y: 0 })
+      if (this.rnohCoreContext!.isDebugModeEnabled) {
+        RNDevLoadingView({ useSafeAreaInsets: true, ctx: this.rnohCoreContext }).position({ x: 0, y: 0 })
       }
     }
     .expandSafeArea([SafeAreaType.KEYBOARD])

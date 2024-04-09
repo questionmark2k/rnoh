@@ -11,24 +11,23 @@ export class RNInstanceRegistry {
   constructor(
     private logger: RNOHLogger,
     private napiBridge: NapiBridge,
+    private devToolsController: DevToolsController,
     private createRNOHContext: (rnInstance: RNInstance) => RNOHContext
   ) {
   }
 
   public async createInstance(
-    options: RNInstanceOptions & {
-      devToolsController: DevToolsController,
-      frameNodeFactory?: FrameNodeFactory,
-    }
+    options: RNInstanceOptions,
+    frameNodeFactory?: FrameNodeFactory,
   ): Promise<RNInstance> {
     const id = this.napiBridge.getNextRNInstanceId();
     const instance = new RNInstanceImpl(
       id,
       this.logger,
-      options.frameNodeFactory ?? null,
+      frameNodeFactory ?? null,
       this.napiBridge,
       this.getDefaultProps(),
-      options.devToolsController,
+      this.devToolsController,
       this.createRNOHContext,
       options.enableDebugger ?? false,
       options.enableBackgroundExecutor ?? false,

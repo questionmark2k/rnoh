@@ -1,5 +1,5 @@
 export default class BuildProfile { 
-	static readonly HAR_VERSION = '0.72.19';
+	static readonly HAR_VERSION = '0.72.20';
 	static readonly BUILD_MODE_NAME = 'debug';
 	static readonly DEBUG = true;
 }

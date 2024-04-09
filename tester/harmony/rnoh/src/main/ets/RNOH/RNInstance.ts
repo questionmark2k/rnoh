@@ -134,11 +134,6 @@ export interface RNInstance {
   postMessageToCpp(name: string, payload: any): void
 }
 
-/**
- * @deprecated Use `RNInstance` instead.
- */
-export type RNInstanceManager = RNInstance
-
 export type RNInstanceOptions = {
   createRNPackages: (ctx: RNPackageContext) => RNPackage[],
   enableDebugger?: boolean,
@@ -271,6 +266,9 @@ export class RNInstanceImpl implements RNInstance {
     }
     if (this.shouldUseNDKToMeasureText) {
       cppFeatureFlags.push("ENABLE_NDK_TEXT_MEASURING")
+    }
+    if (this.shouldUseCApiArchitecture && !this.frameNodeFactory) {
+      throw new RNOHError({ whatHappened: "frameNodeFactory is undefined, but it is required when C-API architecture is enabled", howCanItBeFixed: []})
     }
     this.napiBridge.createReactNativeInstance(
       this.id,

@@ -1,3 +1,5 @@
+// @ts-ignore
+import libRNOHApp from 'librnoh_app.so';
 import type { TurboModuleProvider } from "./TurboModuleProvider";
 import type { Mutation } from "./Mutation";
 import type { Tag } from "./DescriptorBase";
@@ -5,17 +7,25 @@ import type { AttributedString, ParagraphAttributes, LayoutConstrains } from "./
 import { measureParagraph } from "./TextLayoutManager"
 import type { DisplayMode } from './CppBridgeUtils'
 import { RNOHLogger } from "./RNOHLogger"
-import type { InspectorInstance } from './types'
-import { FatalRNOHError } from "./RNOHError"
+import type { InspectorInstance, DisplayMetrics } from './types'
+import { FatalRNOHError, RNOHError } from "./RNOHError"
 import type { FrameNodeFactory } from "./RNInstance"
-import type { ArkTSBridgeHandler } from './ArkTSBridgeHandler';
+
 
 export type CppFeatureFlag = "ENABLE_NDK_TEXT_MEASURING" | "C_API_ARCH"
 
+
+export interface ArkTSBridgeHandler {
+  getDisplayMetrics: () => DisplayMetrics
+  handleError: (rnohError: RNOHError) => void
+}
+
 export class NapiBridge {
   private logger: RNOHLogger
+  private libRNOHApp: any
 
-  constructor(private libRNOHApp: any, logger: RNOHLogger) {
+  constructor(logger: RNOHLogger) {
+    this.libRNOHApp = libRNOHApp;
     this.logger = logger.clone("NapiBridge")
   }
 
@@ -196,8 +206,21 @@ export class NapiBridge {
     return this.libRNOHApp?.getInspectorWrapper();
   }
 
-  initializeArkTSBridge(bridge: ArkTSBridgeHandler) {
-    this.libRNOHApp?.initializeArkTSBridge(bridge);
+  initializeArkTSBridge(handler: ArkTSBridgeHandler) {
+    this.libRNOHApp?.initializeArkTSBridge({
+      getDisplayMetrics: () => handler.getDisplayMetrics(),
+      handleError: (errData: {
+        message: string,
+        stacktrace?: string[],
+        suggestions?: string[]
+      }) => {
+        handler.handleError(new RNOHError({
+          whatHappened: errData.message,
+          howCanItBeFixed: (errData.suggestions ?? []),
+          customStack: (errData.stacktrace ?? []).join("\n"),
+        }))
+      }
+    });
   }
 
   postMessageToCpp(name: string, payload: any) {

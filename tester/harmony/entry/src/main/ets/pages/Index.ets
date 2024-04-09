@@ -4,12 +4,14 @@ import {
   FileJSBundleProvider,
   MetroJSBundleProvider,
   ResourceJSBundleProvider,
-  RNAbility,
+  RNInstancesCoordinator,
   RNApp,
   RNOHErrorDialog,
   RNOHLogger,
-  TraceJSBundleProviderDecorator
+  TraceJSBundleProviderDecorator,
+  RNOHCoreContext
 } from 'rnoh';
+import type common from '@ohos.app.ability.common'
 import { GeneratedSampleView, PropsDisplayer, SampleView } from 'rnoh-sample-package';
 import font from '@ohos.font';
 import { createRNPackages } from '../RNPackagesFactory';
@@ -61,12 +63,13 @@ const fonts: font.FontOptions[] = [
 @Entry
 @Component
 struct Index {
-  @StorageLink('RNAbility') rnAbility: RNAbility | undefined = undefined
+  @StorageLink('RNOHCoreContext') private rnohCoreContext: RNOHCoreContext | undefined = undefined
   @State shouldShow: boolean = false
   private logger!: RNOHLogger
 
+
   aboutToAppear() {
-    this.logger = this.rnAbility!.getLogger().clone("Index")
+    this.logger = this.rnohCoreContext!.logger.clone("Index")
     const stopTracing = this.logger.clone("aboutToAppear").startTracing()
     for (const customFont of fonts) {
       font.registerFont(customFont)
@@ -80,14 +83,15 @@ struct Index {
     // NOTE: this is required since `Ability`'s `onBackPressed` function always
     // terminates or puts the app in the background, but we want Ark to ignore it completely
     // when handled by RN
-    return this.rnAbility?.onBackPress();
+    this.rnohCoreContext!.dispatchBackPress()
+    return true
   }
 
   build() {
     Column() {
-      if (this.rnAbility && this.shouldShow) {
-        if (this.rnAbility.isDebugModeEnabled()) {
-          RNOHErrorDialog({ ctx: this.rnAbility.rnohCoreContext })
+      if (this.rnohCoreContext && this.shouldShow) {
+        if (this.rnohCoreContext?.isDebugModeEnabled) {
+          RNOHErrorDialog({ ctx: this.rnohCoreContext })
         }
         RNApp({
           rnInstanceConfig: {
@@ -109,10 +113,10 @@ struct Index {
               // `/data/app/el2/100/base/com.rnoh.tester/files/bundle.harmony.js`
               // on your device. The path mismatch is due to app sandboxing on HarmonyOS
               new FileJSBundleProvider('/data/storage/el2/base/files/bundle.harmony.js'),
-              new ResourceJSBundleProvider(this.rnAbility.context.resourceManager, 'hermes_bundle.hbc'),
-              new ResourceJSBundleProvider(this.rnAbility.context.resourceManager, 'bundle.harmony.js')
+              new ResourceJSBundleProvider(this.rnohCoreContext.uiAbilityContext.resourceManager, 'hermes_bundle.hbc'),
+              new ResourceJSBundleProvider(this.rnohCoreContext.uiAbilityContext.resourceManager, 'bundle.harmony.js')
             ]),
-            this.rnAbility.getLogger()),
+            this.rnohCoreContext.logger),
         })
       }
     }

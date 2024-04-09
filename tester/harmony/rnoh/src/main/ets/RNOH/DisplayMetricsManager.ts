@@ -2,6 +2,7 @@ import { DisplayMetrics } from './types';
 import window from '@ohos.window';
 import { RNOHLogger } from './RNOHLogger';
 import display from '@ohos.display';
+import { RNOHError } from "./RNOHError"
 
 const defaultDisplayMetrics: DisplayMetrics = {
   windowPhysicalPixels: {
@@ -18,7 +19,6 @@ const defaultDisplayMetrics: DisplayMetrics = {
     fontScale: 1,
     densityDpi: 480
   },
-
 } as const;
 
 export class DisplayMetricsManager {
@@ -32,28 +32,28 @@ export class DisplayMetricsManager {
   public updateWindowSize(windowSize: window.Size | window.Rect) {
     this.displayMetrics.windowPhysicalPixels.height = windowSize.height;
     this.displayMetrics.windowPhysicalPixels.width = windowSize.width;
+    this.updateDisplayMetrics()
   }
 
-  public updateDisplayMetrics(windowSize?: window.Size | window.Rect) {
-    if (windowSize) {
-      this.updateWindowSize(windowSize);
-    }
+  public updateDisplayMetrics() {
     try {
       const displayInstance = display.getDefaultDisplaySync();
-      this.displayMetrics = { screenPhysicalPixels: {
-        width: displayInstance.width,
-        height: displayInstance.height,
-        scale: displayInstance.densityPixels,
-        fontScale: 1,
-        densityDpi: displayInstance.densityDPI,
-      },
+      this.displayMetrics = {
+        screenPhysicalPixels: {
+          width: displayInstance.width,
+          height: displayInstance.height,
+          scale: displayInstance.densityPixels,
+          fontScale: 1,
+          densityDpi: displayInstance.densityDPI,
+        },
         windowPhysicalPixels: {
           width: this.displayMetrics.windowPhysicalPixels.width,
           height: this.displayMetrics.windowPhysicalPixels.height,
           scale: displayInstance.densityPixels,
           fontScale: 1,
           densityDpi: displayInstance.densityDPI,
-        } };
+        }
+      };
     }
     catch (err) {
       this.logger.error('Failed to update display size ' + JSON.stringify(err));
@@ -61,6 +61,9 @@ export class DisplayMetricsManager {
   }
 
   public getDisplayMetrics(): DisplayMetrics {
+    if (!this.displayMetrics) {
+      throw new RNOHError({ whatHappened: "DisplayMetrics are undefined", howCanItBeFixed: [] });
+    }
     return this.displayMetrics;
   }
 }
