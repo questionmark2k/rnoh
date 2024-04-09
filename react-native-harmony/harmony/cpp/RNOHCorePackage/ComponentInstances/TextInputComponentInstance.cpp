@@ -58,8 +58,8 @@ TextInputComponentInstance::getTextInputMetrics(ArkUI_NodeEvent* event) {
 
 void TextInputComponentInstance::onPropsChanged(
     SharedConcreteProps const& props) {
-  CppComponentInstance::onPropsChanged(props);
-  m_multiline = props->traits.multiline;
+    m_multiline = props->traits.multiline;
+    CppComponentInstance::onPropsChanged(props);
   m_clearTextOnFocus = props->traits.clearTextOnFocus;
   auto canUpdateWithEventCount = props->mostRecentEventCount >= this->m_nativeEventCount;
   if (!m_props ||
