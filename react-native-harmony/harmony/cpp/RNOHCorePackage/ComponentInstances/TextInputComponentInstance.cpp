@@ -18,18 +18,27 @@ TextInputComponentInstance::TextInputComponentInstance(Context context)
 }
 
 void TextInputComponentInstance::onChange(ArkUI_NodeEvent* event) {
+  this->m_nativeEventCount++;
+  this->m_content = event->stringEvent.pStr;
   m_eventEmitter->onChange(getTextInputMetrics(event));
 }
 
 void TextInputComponentInstance::onSubmit(ArkUI_NodeEvent* event) {
+  this->m_nativeEventCount++;
   m_eventEmitter->onSubmitEditing(getTextInputMetrics(event));
 }
 
 void TextInputComponentInstance::onBlur(ArkUI_NodeEvent* event) {
+  this->m_nativeEventCount++;
   m_eventEmitter->onBlur(getTextInputMetrics(event));
 }
 
 void TextInputComponentInstance::onFocus(ArkUI_NodeEvent* event) {
+  this->m_nativeEventCount++;
+  if (this->m_clearTextOnFocus) {
+    m_textAreaNode.setTextContent("");
+    m_textInputNode.setTextContent("");
+  }
   m_eventEmitter->onFocus(getTextInputMetrics(event));
 }
 
@@ -40,13 +49,9 @@ TextInputComponentInstance::getTextInputMetrics(ArkUI_NodeEvent* event) {
       ? m_textAreaNode.getTextAreaOffset()
       : m_textInputNode.getTextInputOffset();
   textInputMetrics.containerSize = m_layoutMetrics.frame.size;
-  textInputMetrics.eventCount = 1;
+  textInputMetrics.eventCount = this->m_nativeEventCount;
   textInputMetrics.zoomScale = 1;
-
-  if (event->kind == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_CHANGE ||
-      event->kind == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_CHANGE) {
-    textInputMetrics.text = event->stringEvent.pStr;
-  }
+  textInputMetrics.text = this->m_content;
 
   return textInputMetrics;
 }
@@ -55,6 +60,8 @@ void TextInputComponentInstance::onPropsChanged(
     SharedConcreteProps const& props) {
   CppComponentInstance::onPropsChanged(props);
   m_multiline = props->traits.multiline;
+  m_clearTextOnFocus = props->traits.clearTextOnFocus;
+  auto canUpdateWithEventCount = props->mostRecentEventCount >= this->m_nativeEventCount;
   if (!m_props ||
       *(props->textAttributes.foregroundColor) !=
           *(m_props->textAttributes.foregroundColor)) {
@@ -139,7 +146,7 @@ void TextInputComponentInstance::onPropsChanged(
     m_textAreaNode.setTextContent(props->defaultValue);
     m_textInputNode.setTextContent(props->defaultValue);
   }
-  if (!m_props || props->text != m_props->text) {
+  if (canUpdateWithEventCount && (!m_props || props->text != m_props->text)) {
     m_textAreaNode.setTextContent(props->text);
     m_textInputNode.setTextContent(props->text);
   }
@@ -227,10 +234,12 @@ void TextInputComponentInstance::onStateChanged(
     contentStream << fragment.string;
   }
   auto content = contentStream.str();
-  if (m_multiline) {
-    m_textAreaNode.setTextContent(content);
-  } else {
-    m_textInputNode.setTextContent(content);
+  if (state->getData().mostRecentEventCount >= m_nativeEventCount) {
+      if (m_multiline) {
+        m_textAreaNode.setTextContent(content);
+      } else {
+        m_textInputNode.setTextContent(content);
+      }
   }
 }
 

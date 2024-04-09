@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bits/alltypes.h>
 #include "RNOH/CppComponentInstance.h"
 #include "RNOH/arkui/TextAreaNode.h"
 #include "RNOH/arkui/TextInputNode.h"
@@ -19,6 +20,12 @@ class TextInputComponentInstance
   facebook::react::TextInputMetrics getTextInputMetrics(ArkUI_NodeEvent* event);
 
   bool m_secureInput{false};
+    
+  bool m_clearTextOnFocus{false};
+    
+  std::string m_content = "";
+    
+  int32_t m_nativeEventCount = 0;
 
  public:
   TextInputComponentInstance(Context context);
