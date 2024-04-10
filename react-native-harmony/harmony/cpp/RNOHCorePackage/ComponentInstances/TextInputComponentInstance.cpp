@@ -8,6 +8,7 @@
 #include <react/renderer/components/textinput/TextInputState.h>
 #include <react/renderer/core/ConcreteState.h>
 #include <sstream>
+#include <utility>
 
 namespace rnoh {
 
@@ -17,40 +18,40 @@ TextInputComponentInstance::TextInputComponentInstance(Context context)
   m_textAreaNode.setTextAreaNodeDelegate(this);
 }
 
-void TextInputComponentInstance::onChange(ArkUI_NodeEvent* event) {
+void TextInputComponentInstance::onChange(std::string text) {
   this->m_nativeEventCount++;
-  this->m_content = event->stringEvent.pStr;
-  m_eventEmitter->onChange(getTextInputMetrics(event));
+  this->m_content = std::move(text);
+  m_eventEmitter->onChange(getTextInputMetrics());
 }
 
-void TextInputComponentInstance::onSubmit(ArkUI_NodeEvent* event) {
+void TextInputComponentInstance::onSubmit() {
   this->m_nativeEventCount++;
-  m_eventEmitter->onSubmitEditing(getTextInputMetrics(event));
+  m_eventEmitter->onSubmitEditing(getTextInputMetrics());
 }
 
-void TextInputComponentInstance::onBlur(ArkUI_NodeEvent* event) {
+void TextInputComponentInstance::onBlur() {
+  m_eventEmitter->onBlur(getTextInputMetrics());
   this->m_nativeEventCount++;
-  m_eventEmitter->onBlur(getTextInputMetrics(event));
-  this->m_nativeEventCount++;
-  m_eventEmitter->onEndEditing(getTextInputMetrics(event));
+  m_eventEmitter->onEndEditing(getTextInputMetrics());
 }
 
-void TextInputComponentInstance::onFocus(ArkUI_NodeEvent* event) {
+void TextInputComponentInstance::onFocus() {
   this->m_nativeEventCount++;
   if (this->m_clearTextOnFocus) {
     m_textAreaNode.setTextContent("");
     m_textInputNode.setTextContent("");
   }
-  m_eventEmitter->onFocus(getTextInputMetrics(event));
+  m_eventEmitter->onFocus(getTextInputMetrics());
 }
 
 facebook::react::TextInputMetrics
-TextInputComponentInstance::getTextInputMetrics(ArkUI_NodeEvent* event) {
+TextInputComponentInstance::getTextInputMetrics() {
   auto textInputMetrics = facebook::react::TextInputMetrics();
   textInputMetrics.contentOffset = m_multiline
       ? m_textAreaNode.getTextAreaOffset()
       : m_textInputNode.getTextInputOffset();
   textInputMetrics.containerSize = m_layoutMetrics.frame.size;
+
   textInputMetrics.eventCount = this->m_nativeEventCount;
   textInputMetrics.zoomScale = 1;
   textInputMetrics.text = this->m_content;
@@ -64,6 +65,7 @@ void TextInputComponentInstance::onPropsChanged(
   m_clearTextOnFocus = props->traits.clearTextOnFocus;
   auto canUpdateWithEventCount =
       props->mostRecentEventCount >= this->m_nativeEventCount;
+
   if (!m_props ||
       *(props->textAttributes.foregroundColor) !=
           *(m_props->textAttributes.foregroundColor)) {
@@ -110,9 +112,12 @@ void TextInputComponentInstance::onPropsChanged(
     m_textInputNode.setEnabled(props->traits.editable);
   }
   if (!m_props || props->traits.keyboardType != m_props->traits.keyboardType) {
-    m_textAreaNode.setInputType(props->traits.keyboardType);
+    m_textAreaNode.setInputType(
+        props->traits.secureTextEntry
+            ? ARKUI_TEXTINPUT_TYPE_PASSWORD
+            : rnoh::convertInputType(props->traits.keyboardType));
   }
-  if (props->maxLength) {
+  if (props->maxLength != 0) {
     if (!m_props || props->maxLength != m_props->maxLength) {
       m_textAreaNode.setMaxLength(props->maxLength);
       m_textInputNode.setMaxLength(props->maxLength);
@@ -235,18 +240,21 @@ void TextInputComponentInstance::onStateChanged(
     SharedConcreteState const& state) {
   CppComponentInstance::onStateChanged(state);
 
+  if (state->getData().mostRecentEventCount < this->m_nativeEventCount) {
+    return;
+  }
+
   std::ostringstream contentStream;
   for (auto const& fragment :
        state->getData().attributedStringBox.getValue().getFragments()) {
     contentStream << fragment.string;
   }
   auto content = contentStream.str();
-  if (state->getData().mostRecentEventCount >= m_nativeEventCount) {
-    if (m_multiline) {
-      m_textAreaNode.setTextContent(content);
-    } else {
-      m_textInputNode.setTextContent(content);
-    }
+
+  if (m_multiline) {
+    m_textAreaNode.setTextContent(content);
+  } else {
+    m_textInputNode.setTextContent(content);
   }
 }
 

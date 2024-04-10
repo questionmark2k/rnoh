@@ -11,16 +11,15 @@ namespace rnoh {
 class TextAreaNodeDelegate {
  public:
   virtual ~TextAreaNodeDelegate() = default;
-  virtual void onChange(ArkUI_NodeEvent* event){};
-  virtual void onBlur(ArkUI_NodeEvent* event){};
-  virtual void onFocus(ArkUI_NodeEvent* event){};
+  virtual void onChange(std::string text){};
+  virtual void onBlur(){};
+  virtual void onFocus(){};
   virtual void onPaste(){};
   virtual void onTextSelectionChange(){};
 };
 
 class TextAreaNode : public TextInputNodeBase {
  protected:
-  ArkUI_NodeHandle m_childArkUINodeHandle;
   TextAreaNodeDelegate* m_textAreaNodeDelegate;
 
  public:
@@ -35,7 +34,7 @@ class TextAreaNode : public TextInputNodeBase {
 
   void setTextContent(std::string const& textContent);
 
-  void setInputType(facebook::react::KeyboardType keyboardType);
+  void setInputType(ArkUI_TextInputType keyboardType);
 
   void setFont(facebook::react::TextAttributes const& textAttributes) override;
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bits/alltypes.h>
 #include "RNOH/CppComponentInstance.h"
 #include "RNOH/arkui/TextAreaNode.h"
 #include "RNOH/arkui/TextInputNode.h"
@@ -17,15 +16,16 @@ class TextInputComponentInstance
   TextAreaNode m_textAreaNode;
   bool m_multiline{false};
 
-  facebook::react::TextInputMetrics getTextInputMetrics(ArkUI_NodeEvent* event);
+  int32_t m_nativeEventCount = 0;
+
+  facebook::react::TextInputMetrics getTextInputMetrics();
+  facebook::react::TextInputMetrics getTextInputMetrics(std::string text);
 
   bool m_secureInput{false};
 
   bool m_clearTextOnFocus{false};
 
-  std::string m_content = "";
-
-  int32_t m_nativeEventCount = 0;
+  std::string m_content;
 
  public:
   TextInputComponentInstance(Context context);
@@ -39,13 +39,13 @@ class TextInputComponentInstance
   void handleCommand(std::string const& commandName, folly::dynamic const& args)
       override;
 
-  void onChange(ArkUI_NodeEvent* event) override;
+  void onChange(std::string text) override;
 
-  void onBlur(ArkUI_NodeEvent* event) override;
+  void onBlur() override;
 
-  void onSubmit(ArkUI_NodeEvent* event) override;
+  void onSubmit() override;
 
-  void onFocus(ArkUI_NodeEvent* event) override;
+  void onFocus() override;
 
   ArkUINode& getLocalRootArkUINode() override;
 };
