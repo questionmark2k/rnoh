@@ -58,10 +58,11 @@ TextInputComponentInstance::getTextInputMetrics(ArkUI_NodeEvent* event) {
 
 void TextInputComponentInstance::onPropsChanged(
     SharedConcreteProps const& props) {
-    m_multiline = props->traits.multiline;
-    CppComponentInstance::onPropsChanged(props);
+  m_multiline = props->traits.multiline;
+  CppComponentInstance::onPropsChanged(props);
   m_clearTextOnFocus = props->traits.clearTextOnFocus;
-  auto canUpdateWithEventCount = props->mostRecentEventCount >= this->m_nativeEventCount;
+  auto canUpdateWithEventCount =
+      props->mostRecentEventCount >= this->m_nativeEventCount;
   if (!m_props ||
       *(props->textAttributes.foregroundColor) !=
           *(m_props->textAttributes.foregroundColor)) {
@@ -218,9 +219,11 @@ void TextInputComponentInstance::handleCommand(
   }
 
   if (commandName == "setTextAndSelection" && args.isArray() &&
-      args.size() == 4) {
+      args.size() == 4 && args[0].asInt() >= m_nativeEventCount) {
     m_textInputNode.setTextContent(args[1].asString());
-    m_textInputNode.setTextSelection(args[2].asInt(), args[3].asInt());
+    if (args[2].asInt() >= 0 && args[3].asInt() >= 0) {
+      m_textInputNode.setTextSelection(args[2].asInt(), args[3].asInt());
+    }
   }
 }
 
@@ -235,11 +238,11 @@ void TextInputComponentInstance::onStateChanged(
   }
   auto content = contentStream.str();
   if (state->getData().mostRecentEventCount >= m_nativeEventCount) {
-      if (m_multiline) {
-        m_textAreaNode.setTextContent(content);
-      } else {
-        m_textInputNode.setTextContent(content);
-      }
+    if (m_multiline) {
+      m_textAreaNode.setTextContent(content);
+    } else {
+      m_textInputNode.setTextContent(content);
+    }
   }
 }
 
