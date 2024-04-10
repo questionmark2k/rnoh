@@ -120,21 +120,17 @@ void TextComponentInstance::onStateChanged(
     SharedConcreteState const& textState) {
   CppComponentInstance::onStateChanged(textState);
   m_touchTargetChildrenNeedUpdate = true;
-  if (textState == nullptr) {
-    return;
-  }
-  if (textState->getData().attributedString.getFragments().empty()) {
-    return;
-  }
   for (const auto& item : m_childNodes) {
     m_textNode.removeChild(*item);
   }
   m_childNodes.clear();
   uint32_t childIndex = 0;
-  VLOG(3) << "[text-debug] getFragments size:"
-          << textState->getData().attributedString.getFragments().size();
-  for (const auto& fragment :
-       textState->getData().attributedString.getFragments()) {
+  auto const& fragments = textState->getData().attributedString.getFragments();
+  VLOG(3) << "[text-debug] getFragments size:" << fragments.size();
+  if (fragments.empty()) {
+    return;
+  }
+  for (const auto& fragment : fragments) {
     if (!fragment.isAttachment()) {
       std::shared_ptr<SpanNode> spanNode = std::make_shared<SpanNode>();
       VLOG(3) << "[text-debug] create span text=" << fragment.string.c_str()
@@ -154,8 +150,7 @@ void TextComponentInstance::onStateChanged(
       childIndex++;
     }
   }
-  this->setTextAttributes(
-      textState->getData().attributedString.getFragments()[0].textAttributes);
+  this->setTextAttributes(fragments[0].textAttributes);
 }
 
 void TextComponentInstance::setTextAttributes(

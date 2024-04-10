@@ -180,7 +180,9 @@ export function TextInputTest() {
           placeholderTextColor={'red'}
         />
       </TestCase.Example>
-      <TestCase.Example tags={['C_API']} itShould="render textinput with default selection color">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render textinput with default selection color">
         <TextInputWithText style={styles.textInput} />
       </TestCase.Example>
       <TestCase.Example itShould="render textinput with green selection color">
@@ -192,8 +194,7 @@ export function TextInputTest() {
       <TestCase.Example
         tags={['C_API']}
         itShould="render multiline text input with common border">
-        <TextInputWithText
-          style={styles.multilineInput} multiline={true} />
+        <TextInputWithText style={styles.multilineInput} multiline={true} />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
@@ -724,5 +725,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 5,
     marginBottom: 20,
-  }
+  },
 });

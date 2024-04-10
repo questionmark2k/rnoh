@@ -166,7 +166,8 @@ class SchedulerDelegateCAPI : public facebook::react::SchedulerDelegate {
         // C++ nodes and ArkTS subtrees cannot be inserted into their ArkTS
         // parent unless the parent is a C++ node. builderNode is then
         // constructed in the ArkTS subtree of C++ nodes.
-        if (newChildComponentInstance == nullptr && parentComponentInstance != nullptr) {
+        if (newChildComponentInstance == nullptr &&
+            parentComponentInstance != nullptr) {
           newChildComponentInstance =
               m_componentInstanceFactory->createArkTSComponent(
                   mutation.newChildShadowView.tag,
