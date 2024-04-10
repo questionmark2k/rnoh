@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Button, StyleSheet, Text} from 'react-native';
+import {View, Button, StyleSheet, Text, findNodeHandle} from 'react-native';
 import {TestSuite} from '@rnoh/testerino';
 import {TestCase} from '../components';
 
@@ -26,6 +26,12 @@ export const ButtonTest = () => {
       </TestCase.Example>
       <TestCase.Example itShould="render a button with accessibility label">
         <ButtonAccessibilityLabel />
+      </TestCase.Example>
+      <TestCase.Example
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}}
+        modal
+        itShould="allow user to move with keyboard's arrows keys between buttons">
+        <ButtonNextFocus />
       </TestCase.Example>
     </TestSuite>
   );
@@ -139,6 +145,77 @@ function ButtonAccessibilityLabel() {
   );
 }
 
+function ButtonNextFocus() {
+  const [pressCounter, setPressCounter] = React.useState(0);
+
+  const topLeftButtonRef = React.useRef(null);
+  const topRightButtonRef = React.useRef(null);
+  const botLeftButtonRef = React.useRef(null);
+  const botRightButtonRef = React.useRef(null);
+
+  const topLeftNode = findNodeHandle(topLeftButtonRef.current);
+  const topRightNode = findNodeHandle(topRightButtonRef.current);
+  const botLeftNode = findNodeHandle(botLeftButtonRef.current);
+  const botRightNode = findNodeHandle(botRightButtonRef.current);
+
+  const incrementPressCounter = () => {
+    setPressCounter(count => count + 1);
+  };
+
+  return (
+    <View>
+      <View style={styles.buttonNextFocusContainer}>
+        <Button
+          ref={topLeftButtonRef}
+          title={'Top Left'}
+          onPress={incrementPressCounter}
+          nextFocusDown={botLeftNode ?? undefined}
+          nextFocusUp={botLeftNode ?? undefined}
+          nextFocusRight={topRightNode ?? undefined}
+          nextFocusLeft={topRightNode ?? undefined}
+        />
+        <Button title={'Skip'} color="#A4A4A4" onPress={() => {}} />
+        <Button
+          ref={topRightButtonRef}
+          title={'Top Right'}
+          onPress={incrementPressCounter}
+          nextFocusDown={botRightNode ?? undefined}
+          nextFocusUp={botRightNode ?? undefined}
+          nextFocusLeft={topLeftNode ?? undefined}
+          nextFocusRight={botLeftNode ?? undefined}
+        />
+      </View>
+      <View style={styles.buttonNextFocusContainer}>
+        <Button title={'SkipLeft'} color="#A4A4A4" onPress={() => {}} />
+        <Button title={'Skip'} color="#A4A4A4" onPress={() => {}} />
+        <Button title={'SkipRight'} color="#A4A4A4" onPress={() => {}} />
+      </View>
+      <View style={styles.buttonNextFocusContainer}>
+        <Button
+          ref={botLeftButtonRef}
+          title={'Bot Left'}
+          onPress={incrementPressCounter}
+          nextFocusDown={topLeftNode ?? undefined}
+          nextFocusUp={topLeftNode ?? undefined}
+          nextFocusRight={botRightNode ?? undefined}
+          nextFocusLeft={topRightNode ?? undefined}
+        />
+        <Button title={'Skip'} color="#A4A4A4" onPress={() => {}} />
+        <Button
+          ref={botRightButtonRef}
+          title={'Bot Right'}
+          onPress={incrementPressCounter}
+          nextFocusDown={topRightNode ?? undefined}
+          nextFocusUp={topRightNode ?? undefined}
+          nextFocusLeft={botLeftNode ?? undefined}
+          nextFocusRight={botLeftNode ?? undefined}
+        />
+      </View>
+      <Text style={styles.text}>Count: {pressCounter}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   buttonContainer: {
     width: 80,
@@ -154,5 +231,16 @@ const styles = StyleSheet.create({
     height: 20,
     width: 200,
     fontSize: 14,
+  },
+  buttonNextFocusContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 10,
+  },
+  buttonNextFocus: {
+    width: 50,
+    height: 20,
   },
 });

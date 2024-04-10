@@ -1,4 +1,10 @@
-import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+  findNodeHandle,
+} from 'react-native';
 import {TestSuite} from '@rnoh/testerino';
 import React, {useState} from 'react';
 import {Button, TestCase} from '../components';
@@ -901,6 +907,12 @@ export function ViewTest() {
           style={[styles.accessibilityLayout, {backgroundColor: 'red'}]}
         />
       </TestCase.Example>
+      <TestCase.Example
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}}
+        modal
+        itShould="allow user to move with keyboard's arrows keys between blue squares">
+        <ViewNextFocus />
+      </TestCase.Example>
     </TestSuite>
   );
 }
@@ -1020,6 +1032,80 @@ function ViewAccessibilityAriaChecked() {
   );
 }
 
+const BasicView = React.forwardRef<View, any>(({text, ...props}, ref) => (
+  <View ref={ref} style={styles.gridContainerSquare} focusable {...props}>
+    <Text style={styles.squareContent}>{text}</Text>
+  </View>
+));
+
+function ViewNextFocus() {
+  const [pressCounter, setPressCounter] = useState(0);
+
+  const topLeftViewRef = React.useRef<View>(null);
+  const topRightViewRef = React.useRef<View>(null);
+  const midLeftViewRef = React.useRef<View>(null);
+  const midRightViewRef = React.useRef<View>(null);
+  const botLeftViewRef = React.useRef<View>(null);
+  const botRightViewRef = React.useRef<View>(null);
+
+  // Implementation details:
+  // normally, in order to detect change in ref we would use callback ref
+  // https://legacy.reactjs.org/docs/refs-and-the-dom.html#callback-refs
+  // to make it very simply, we use button to force rerender of the component
+  // to get the "updated" ref
+  const topLeftViewNode = findNodeHandle(topLeftViewRef.current);
+  const topRightViewNode = findNodeHandle(topRightViewRef.current);
+  const midLeftViewNode = findNodeHandle(midLeftViewRef.current);
+  const midRightViewNode = findNodeHandle(midRightViewRef.current);
+  const botLeftViewNode = findNodeHandle(botLeftViewRef.current);
+  const botRightViewNode = findNodeHandle(botRightViewRef.current);
+
+  return (
+    <View style={{height: '90%'}}>
+      <Button
+        label={`Rerender (${pressCounter}) Component - force ref to be updated`}
+        onPress={() => setPressCounter(count => count + 1)}
+      />
+      <View style={styles.gridContainer}>
+        <BasicView
+          ref={topLeftViewRef}
+          text="Top Left"
+          nextFocusUp={botLeftViewNode ?? undefined}
+          nextFocusLeft={botRightViewNode ?? undefined}
+        />
+        <BasicView
+          ref={topRightViewRef}
+          text="Top Right"
+          nextFocusUp={botRightViewNode ?? undefined}
+          nextFocusRight={midLeftViewNode ?? undefined}
+        />
+        <BasicView
+          ref={midLeftViewRef}
+          text="Mid Left"
+          nextFocusLeft={topRightViewNode ?? undefined}
+        />
+        <BasicView
+          ref={midRightViewRef}
+          text="Mid Right"
+          nextFocusRight={botLeftViewNode ?? undefined}
+        />
+        <BasicView
+          ref={botLeftViewRef}
+          text="Bot Left"
+          nextFocusDown={topLeftViewNode ?? undefined}
+          nextFocusLeft={midRightViewNode ?? undefined}
+        />
+        <BasicView
+          ref={botRightViewRef}
+          text="Bot Right"
+          nextFocusDown={topRightViewNode ?? undefined}
+          nextFocusRight={topLeftViewNode ?? undefined}
+        />
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   squaresContainer: {
     flexDirection: 'row',
@@ -1046,5 +1132,18 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 100,
     backgroundColor: 'lightblue',
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  gridContainerSquare: {
+    width: 150,
+    height: 150,
+    backgroundColor: 'lightblue',
+    margin: 4,
   },
 });
