@@ -1,13 +1,12 @@
 {
   license: 'ISC',
   types: '',
-  devDependencies: {
-    rnoh: 'file:../rnoh',
-  },
-  name: 'rnoh-sample-package',
+  name: '@rnoh/sample-package',
   description: '',
   main: 'index.ets',
   type: 'module',
   version: '1.0.0',
-  dependencies: {},
+  dependencies: {
+    "@rnoh/react-native-openharmony": 'file:../react_native_openharmony'
+  },
 }

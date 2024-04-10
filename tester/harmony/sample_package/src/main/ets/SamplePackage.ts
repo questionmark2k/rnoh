@@ -1,11 +1,11 @@
-import { RNPackage, TurboModulesFactory } from 'rnoh/ts';
+import { RNPackage, TurboModulesFactory } from '@rnoh/react-native-openharmony/ts';
 import type {
   TurboModule,
   TurboModuleContext,
   DescriptorWrapperFactoryByDescriptorTypeCtx,
   DescriptorWrapperFactoryByDescriptorType
-} from 'rnoh/ts';
-import { TM, RNC } from "rnoh/generated/ts"
+} from '@rnoh/react-native-openharmony/ts';
+import { TM, RNC } from "@rnoh/react-native-openharmony/generated/ts"
 import { SampleTurboModule } from './SampleTurboModule';
 
 class SampleTurboModulesFactory extends TurboModulesFactory {

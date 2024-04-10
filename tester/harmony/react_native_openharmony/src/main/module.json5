@@ -1,6 +1,6 @@
 {
   "module": {
-    "name": "rnoh",
+    "name": "react_native_openharmony",
     "type": "har",
     "deviceTypes": [
       "default"

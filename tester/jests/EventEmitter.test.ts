@@ -1,4 +1,4 @@
-import {EventEmitter} from '../harmony/rnoh/src/main/ets/RNOH/EventEmitter';
+import {EventEmitter} from '../harmony/react_native_openharmony/src/main/ets/RNOH/EventEmitter';
 
 it('should listen to emitted events', async () => {
   const ee = new EventEmitter<{FOO: [string, string]}>();

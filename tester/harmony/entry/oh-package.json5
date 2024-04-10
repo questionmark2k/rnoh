@@ -6,7 +6,8 @@
   "repository": {},
   "version": "1.0.0",
   "dependencies": {
-    "rnoh": "file:../rnoh",
+    "@rnoh/react-native-openharmony": "file:../react_native_openharmony",
+    "rnoh": "file:../react_native_openharmony", // old name for react_native_openharmony module
     "rnoh-sample-package": "file:../sample_package"
   }
 }

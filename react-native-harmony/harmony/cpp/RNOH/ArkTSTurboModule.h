@@ -31,14 +31,18 @@
         .callAsync(rt, #name, args, count);            \
   }
 
-#define ARK_METHOD_METADATA(name, argc)      \
-  {                                          \
-#name, { argc, ARK_METHOD_CALLER(name) } \
+#define ARK_METHOD_METADATA(name, argc) \
+  {                                     \
+    #name, {                            \
+      argc, ARK_METHOD_CALLER(name)     \
+    }                                   \
   }
 
-#define ARK_ASYNC_METHOD_METADATA(name, argc)      \
-  {                                                \
-#name, { argc, ARK_ASYNC_METHOD_CALLER(name) } \
+#define ARK_ASYNC_METHOD_METADATA(name, argc) \
+  {                                           \
+    #name, {                                  \
+      argc, ARK_ASYNC_METHOD_CALLER(name)     \
+    }                                         \
   }
 
 namespace rnoh {

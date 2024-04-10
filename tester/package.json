@@ -31,7 +31,7 @@
     "lint:cpp:fast": "node ./scripts/lint-cpp-fast.js",
     "verify": "npm run typecheck && npm run test && npm run lint && npm run format:cpp:check",
     "start": "npm run codegen && hdc rport tcp:8081 tcp:8081 && react-native start",
-    "codegen": "react-native codegen-harmony --rnoh-module-path ./harmony/rnoh",
+    "codegen": "react-native codegen-harmony --rnoh-module-path ./harmony/react_native_openharmony",
     "benchmark-fps": "node ./scripts/get-frame-times | node ./scripts/create-fps-stats",
     "find_changed_files": "{ git diff --name-only main...; git diff --name-only; git diff --name-only --cached; } | sort | uniq",
     "find_changed_files:cpp": "npm run find_changed_files | grep -E \"\\.(h|cpp)$\"",

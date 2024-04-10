@@ -45,8 +45,8 @@
       ]
     },
     {
-      name: 'rnoh',
-      srcPath: './rnoh',
+      name: 'react_native_openharmony',
+      srcPath: "./react_native_openharmony"
     },
     {
       name: 'sample_package',

@@ -4,14 +4,12 @@ import {
   FileJSBundleProvider,
   MetroJSBundleProvider,
   ResourceJSBundleProvider,
-  RNInstancesCoordinator,
   RNApp,
   RNOHErrorDialog,
   RNOHLogger,
   TraceJSBundleProviderDecorator,
   RNOHCoreContext
-} from 'rnoh';
-import type common from '@ohos.app.ability.common'
+} from '@rnoh/react-native-openharmony';
 import { GeneratedSampleView, PropsDisplayer, SampleView } from 'rnoh-sample-package';
 import font from '@ohos.font';
 import { createRNPackages } from '../RNPackagesFactory';

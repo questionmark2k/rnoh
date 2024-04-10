@@ -1,4 +1,4 @@
-import { RNC } from "rnoh/generated/ts"
+import { RNC } from "@rnoh/react-native-openharmony/generated/ts"
 
 
 export function getDirectProps(descriptorWrapper: RNC.GeneratedSampleView.DescriptorWrapper ): Record<keyof RNC.GeneratedSampleView.DirectRawProps, any> {

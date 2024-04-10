@@ -7,7 +7,7 @@ import {
   UnhyphenatedWordWrapStrategy,
   TailEllipsisInserter,
   isChineseOrJapaneseCharacter,
-} from '../harmony/rnoh/src/main/ets/ParagraphMeasurer';
+} from '../harmony/react_native_openharmony/src/main/ets/ParagraphMeasurer';
 
 type TextExtraData = {
   fontSize?: number;
