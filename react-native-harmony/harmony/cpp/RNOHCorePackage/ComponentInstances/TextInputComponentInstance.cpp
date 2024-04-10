@@ -31,6 +31,8 @@ void TextInputComponentInstance::onSubmit(ArkUI_NodeEvent* event) {
 void TextInputComponentInstance::onBlur(ArkUI_NodeEvent* event) {
   this->m_nativeEventCount++;
   m_eventEmitter->onBlur(getTextInputMetrics(event));
+  this->m_nativeEventCount++;
+  m_eventEmitter->onEndEditing(getTextInputMetrics(event));
 }
 
 void TextInputComponentInstance::onFocus(ArkUI_NodeEvent* event) {
@@ -52,7 +54,6 @@ TextInputComponentInstance::getTextInputMetrics(ArkUI_NodeEvent* event) {
   textInputMetrics.eventCount = this->m_nativeEventCount;
   textInputMetrics.zoomScale = 1;
   textInputMetrics.text = this->m_content;
-
   return textInputMetrics;
 }
 

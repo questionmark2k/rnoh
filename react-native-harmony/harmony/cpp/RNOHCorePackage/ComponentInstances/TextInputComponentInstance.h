@@ -16,7 +16,7 @@ class TextInputComponentInstance
   TextInputNode m_textInputNode;
   TextAreaNode m_textAreaNode;
   bool m_multiline{false};
-
+    
   facebook::react::TextInputMetrics getTextInputMetrics(ArkUI_NodeEvent* event);
 
   bool m_secureInput{false};
@@ -26,6 +26,7 @@ class TextInputComponentInstance
   std::string m_content = "";
     
   int32_t m_nativeEventCount = 0;
+
 
  public:
   TextInputComponentInstance(Context context);
