@@ -348,6 +348,14 @@ ArkUINode& ArkUINode::setTransition(
   }
   return *this;
 }
+ArkUINode& ArkUINode::setOffset(float x, float y) {
+  ArkUI_NumberValue offsetValue[] = {{.f32 = x}, {.f32 = y}};
+  ArkUI_AttributeItem offsetItem = {
+      offsetValue, sizeof(offsetValue) / sizeof(ArkUI_NumberValue)};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_OFFSET, &offsetItem));
+  return *this;
+}
 
 ArkUINode& ArkUINode::resetAccessibilityText() {
   maybeThrow(NativeNodeApi::getInstance()->resetAttribute(

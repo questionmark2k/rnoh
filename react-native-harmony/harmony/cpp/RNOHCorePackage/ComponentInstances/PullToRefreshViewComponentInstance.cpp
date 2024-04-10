@@ -31,6 +31,7 @@ void PullToRefreshViewComponentInstance::onChildRemoved(
 void PullToRefreshViewComponentInstance::onPropsChanged(
     SharedConcreteProps const& props) {
   CppComponentInstance::onPropsChanged(props);
+  m_loadingProgressNode.setOffset(0, -props->progressViewOffset);
   m_refreshNode.setNativeRefreshing(props->refreshing);
   if (facebook::react::isColorMeaningful(props->tintColor)) {
     m_loadingProgressNode.setLoadingProgressNodeColor(props->tintColor);

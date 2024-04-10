@@ -77,6 +77,7 @@ class ArkUINode {
   virtual ArkUINode& setAlignment(Alignment alignment);
   virtual ArkUINode& setTransition(
       facebook::react::ModalHostViewAnimationType animationType);
+  virtual ArkUINode& setOffset(float x, float y);
 
   virtual ArkUINode& resetAccessibilityText();
 
