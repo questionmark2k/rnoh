@@ -90,9 +90,7 @@ class ComponentInstance
   virtual void setEventEmitter(
       facebook::react::SharedEventEmitter eventEmitter){};
 
-  virtual void finalizeUpdates() {
-    this->getLocalRootArkUINode().markDirty();
-  }
+  virtual void finalizeUpdates() {}
 
   virtual void handleCommand(
       std::string const& commandName,
