@@ -133,10 +133,12 @@ void TextInputNode::setEnterKeyType(
 
 void TextInputNode::setCancelButtonMode(
     facebook::react::TextInputAccessoryVisibilityMode mode) {
-  int32_t cancelButtonStyle = static_cast<int32_t>(ARKUI_CANCELBUTTON_STYLE_INVISIBLE);
+  int32_t cancelButtonStyle =
+      static_cast<int32_t>(ARKUI_CANCELBUTTON_STYLE_INVISIBLE);
   if (mode == facebook::react::TextInputAccessoryVisibilityMode::Always) {
     cancelButtonStyle = static_cast<int32_t>(ARKUI_CANCELBUTTON_STYLE_CONSTANT);
-  } else if (mode == facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
+  } else if (
+      mode == facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
     cancelButtonStyle = static_cast<int32_t>(ARKUI_CANCELBUTTON_STYLE_INPUT);
   }
 

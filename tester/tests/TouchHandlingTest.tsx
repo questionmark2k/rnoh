@@ -225,6 +225,56 @@ export function TouchHandlingTest() {
           expect(state).to.be.true;
         }}
       />
+      <TestCase.Manual
+        itShould="handle views with scale: 0 correctly"
+        initialState={false}
+        arrange={({setState, reset}) => {
+          return (
+            <View>
+              <TouchableOpacity onPress={() => setState(true)}>
+                <View
+                  style={{
+                    backgroundColor: 'red',
+                    width: 100,
+                    height: 100,
+                  }}
+                />
+              </TouchableOpacity>
+              <View
+                style={{
+                  position: 'absolute',
+                  transform: [{scale: 0}],
+                  backgroundColor: 'green',
+                  width: 100,
+                  height: 100,
+                }}
+              />
+              <View
+                style={{
+                  position: 'absolute',
+                  transform: [{scaleX: 0}],
+                  backgroundColor: 'blue',
+                  width: 100,
+                  height: 100,
+                }}
+              />
+              <View
+                style={{
+                  position: 'absolute',
+                  transform: [{scaleY: 0}],
+                  backgroundColor: 'yellow',
+                  width: 100,
+                  height: 100,
+                }}
+              />
+              <Button label="Reset" onPress={reset} />
+            </View>
+          );
+        }}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
       <TestCase.Example
         tags={['C_API']}
         itShould="emit touch events with resonable timestamps (event.timeStamp is the UNIX time, nativeEvent.timestamp is the device uptime, both are in ms)">
