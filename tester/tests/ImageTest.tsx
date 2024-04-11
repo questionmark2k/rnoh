@@ -7,6 +7,8 @@ import {getScrollViewContentHorizontal} from './ScrollViewTest/fixtures';
 const WRONG_IMAGE_SRC = 'not_image';
 const LOCAL_IMAGE_ASSET_ID = require('../assets/pravatar-131.jpg');
 const REMOTE_IMAGE_URL = 'https://i.pravatar.cc/100?img=31';
+const BASE64_IMAGE_STRING =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQz0AEYBxVSF+FABJADveWkH6oAAAAAElFTkSuQmCC';
 const LARGE_REMOTE_IMAGE_URL =
   'https://images.unsplash.com/photo-1556740749-887f6717d7e4';
 const REMOTE_REDIRECT_IMAGE_URL = 'http://placeholder.com/350x150';
@@ -67,6 +69,24 @@ export const ImageTest = () => {
               (width, height) => {
                 expect(width).to.be.eq(100);
                 expect(height).to.be.eq(100);
+                resolve();
+              },
+              e => {
+                reject(e);
+              },
+            );
+          });
+        }}
+      />
+      <TestCase.Logical
+        itShould="retrieve base64 image size"
+        fn={({expect}) => {
+          return new Promise((resolve, reject) => {
+            Image.getSize(
+              BASE64_IMAGE_STRING,
+              (width, height) => {
+                expect(width).to.be.eq(10);
+                expect(height).to.be.eq(10);
                 resolve();
               },
               e => {

@@ -37,6 +37,10 @@ export class RemoteImageLoader {
   }
 
   public async getImageSource(uri: string): Promise<RemoteImageSource> {
+    if (uri.startsWith("data:")) {
+      const imageSource = image.createImageSource(uri);
+      return new RemoteImageSource(imageSource, '');
+    }
     if (this.memoryCache.has(uri)) {
       return this.memoryCache.get(uri);
     }
