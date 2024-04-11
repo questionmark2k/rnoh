@@ -14,6 +14,10 @@
 
 namespace rnoh {
 
+inline facebook::react::Rect transformRectAroundPoint(
+    const facebook::react::Rect& rect,
+    const facebook::react::Point& point,
+    const facebook::react::Transform& transform);
 template <typename ShadowNodeT>
 class CppComponentInstance : public ComponentInstance {
   static_assert(
@@ -282,6 +286,12 @@ class CppComponentInstance : public ComponentInstance {
       for (auto& child : m_children) {
         auto childBoundingBox = child->getBoundingBox();
         childBoundingBox.origin += child->getLayoutMetrics().frame.origin;
+
+        auto childCenter = child->getLayoutMetrics().frame.getCenter();
+        auto childTransform = child->getTransform();
+
+        childBoundingBox = transformRectAroundPoint(
+            childBoundingBox, childCenter, childTransform);
         newBoundingBox.unionInPlace(childBoundingBox);
       }
     }
@@ -323,4 +333,25 @@ class CppComponentInstance : public ComponentInstance {
   std::optional<facebook::react::Rect> m_boundingBox;
   bool m_isClipping = false;
 };
+
+inline facebook::react::Rect transformRectAroundPoint(
+    const facebook::react::Rect& rect,
+    const facebook::react::Point& point,
+    const facebook::react::Transform& transform) {
+  using Point = facebook::react::Point;
+
+  auto leftTopTransformed =
+      (Point({rect.getMinX(), rect.getMinY()}) - point) * transform + point;
+  auto leftBottomTransformed =
+      (Point({rect.getMinX(), rect.getMaxY()}) - point) * transform + point;
+  auto rightTopTransformed =
+      (Point({rect.getMaxX(), rect.getMinY()}) - point) * transform + point;
+  auto rightBottomTransformed =
+      (Point({rect.getMaxX(), rect.getMaxY()}) - point) * transform + point;
+  return facebook::react::Rect::boundingRect(
+      leftTopTransformed,
+      leftBottomTransformed,
+      rightTopTransformed,
+      rightBottomTransformed);
+}
 } // namespace rnoh

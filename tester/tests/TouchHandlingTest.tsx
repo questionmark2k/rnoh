@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
   ViewStyle,
 } from 'react-native';
@@ -226,6 +227,7 @@ export function TouchHandlingTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
         itShould="handle views with scale: 0 correctly"
         initialState={false}
         arrange={({setState, reset}) => {
@@ -280,6 +282,39 @@ export function TouchHandlingTest() {
         itShould="emit touch events with resonable timestamps (event.timeStamp is the UNIX time, nativeEvent.timestamp is the device uptime, both are in ms)">
         <TimestampExample />
       </TestCase.Example>
+      <TestCase.Manual
+        tags={['C_API']}
+        itShould="report touches to transformed children that exceed parent"
+        initialState={false}
+        arrange={({setState}) => {
+          return (
+            <View>
+              <TouchableWithoutFeedback onPress={() => setState(false)}>
+                <View
+                  style={{
+                    width: 50,
+                    height: 50,
+                    backgroundColor: 'red',
+                  }}>
+                  <TouchableWithoutFeedback onPress={() => setState(true)}>
+                    <View
+                      style={{
+                        width: 50,
+                        height: 50,
+                        backgroundColor: 'blue',
+                        transform: [{translateX: 100}],
+                      }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          );
+        }}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
     </TestSuite>
   );
 }
