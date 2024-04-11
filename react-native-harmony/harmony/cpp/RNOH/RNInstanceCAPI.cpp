@@ -293,12 +293,17 @@ void RNInstanceCAPI::registerNativeXComponentHandle(
   if (nativeXComponent == nullptr) {
     return;
   }
-  auto it = m_surfaceById.find(surfaceId);
-  if (it == m_surfaceById.end()) {
-    LOG(ERROR) << "Surface with id: " << surfaceId << " not found";
-    return;
-  }
-  it->second.attachNativeXComponent(nativeXComponent);
+  // NOTE: for some reason, attaching in the NAPI call made by XComponent
+  // fails to mount the ArkUI node. Posting a task to be executed separately
+  // fixes the issue.
+  taskExecutor->runTask(TaskThread::MAIN, [this, nativeXComponent, surfaceId] {
+    auto it = m_surfaceById.find(surfaceId);
+    if (it == m_surfaceById.end()) {
+      LOG(ERROR) << "Surface with id: " << surfaceId << " not found";
+      return;
+    }
+    it->second.attachNativeXComponent(nativeXComponent);
+  });
 }
 
 TurboModule::Shared RNInstanceCAPI::getTurboModule(const std::string& name) {

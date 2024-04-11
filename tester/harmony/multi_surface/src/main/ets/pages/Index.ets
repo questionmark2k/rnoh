@@ -1,7 +1,3 @@
-import {
-  RNAbility,
-} from 'rnoh'
-
 const PAGES = [
   ['app_name', "App"],
   ['tester', "Tester Example"],
@@ -20,8 +16,6 @@ const PAGES = [
 @Entry
 @Component
 struct Index {
-  @StorageLink('RNAbility') rnAbility: RNAbility | undefined = undefined
-
   build() {
     Column() {
       List({ space: 12, initialIndex: 0 }) {

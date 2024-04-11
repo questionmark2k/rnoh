@@ -6,7 +6,8 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "rnoh": "file:../react_native_openharmony",
+    "@rnoh/react-native-openharmony": "file:../react_native_openharmony",
+    "rnoh": "file:../react_native_openharmony", // old name for react_native_openharmony module
     "rnoh-sample-package": "file:../sample_package"
   }
 }

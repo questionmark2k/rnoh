@@ -28,12 +28,12 @@ void maybeAttachRootNode(
 
 void maybeDetachRootNode(
     OH_NativeXComponent* nativeXComponent,
-    ComponentInstance& rootView) {
+    ComponentInstance& /* rootView */) {
   if (nativeXComponent != nullptr) {
 #ifdef C_API_ARCH
-    OH_NativeXComponent_DetachNativeRootNode(
-        nativeXComponent,
-        rootView.getLocalRootArkUINode().getArkUINodeHandle());
+    // NOTE: this is noop, because detaching a destroyed XComponent is
+    // incorrect, and we're not notified when it's destroyed. We may want to
+    // detach it from `RNSurface` in the future.
 #endif
   }
 }
@@ -58,6 +58,10 @@ class SurfaceTouchEventHandler : public TouchEventHandler {
   SurfaceTouchEventHandler& operator=(SurfaceTouchEventHandler const& other) =
       delete;
 
+  SurfaceTouchEventHandler(SurfaceTouchEventHandler&& other) noexcept = delete;
+  SurfaceTouchEventHandler& operator=(
+      SurfaceTouchEventHandler&& other) noexcept = delete;
+
   ~SurfaceTouchEventHandler() override {
     NativeNodeApi::getInstance()->unregisterNodeEvent(
         m_rootView->getLocalRootArkUINode().getArkUINodeHandle(),
@@ -74,7 +78,7 @@ class SurfaceTouchEventHandler : public TouchEventHandler {
 XComponentSurface::XComponentSurface(
     std::shared_ptr<Scheduler> scheduler,
     ComponentInstanceRegistry::Shared componentInstanceRegistry,
-    ComponentInstanceFactory::Shared componentInstanceFactory,
+    ComponentInstanceFactory::Shared const& componentInstanceFactory,
     SurfaceId surfaceId,
     std::string const& appKey)
     : m_surfaceId(surfaceId),
@@ -139,9 +143,7 @@ void XComponentSurface::attachNativeXComponent(
   }
   maybeDetachRootNode(m_nativeXComponent, *m_rootView);
   m_nativeXComponent = nativeXComponent;
-  if (m_surfaceHandler.getStatus() == SurfaceHandler::Status::Running) {
-    maybeAttachRootNode(m_nativeXComponent, *m_rootView);
-  }
+  maybeAttachRootNode(nativeXComponent, *m_rootView);
 }
 
 void XComponentSurface::updateConstraints(
@@ -167,23 +169,22 @@ void XComponentSurface::start(
     float viewportOffsetX,
     float viewportOffsetY,
     float pixelRatio,
-    folly::dynamic&& initialProps,
-    std::shared_ptr<facebook::react::LayoutAnimationDriver> animationDriver) {
-  this->setProps(std::move(initialProps));
+    folly::dynamic const& initialProps,
+    std::shared_ptr<facebook::react::LayoutAnimationDriver> const&
+        animationDriver) {
+  this->setProps(initialProps);
   this->updateConstraints(
       width, height, viewportOffsetX, viewportOffsetY, pixelRatio);
   m_surfaceHandler.start();
   auto mountingCoordinator = m_surfaceHandler.getMountingCoordinator();
   mountingCoordinator->setMountingOverrideDelegate(animationDriver);
-  maybeAttachRootNode(m_nativeXComponent, *m_rootView);
 }
 
-void XComponentSurface::setProps(folly::dynamic&& props) {
-  m_surfaceHandler.setProps(std::move(props));
+void XComponentSurface::setProps(folly::dynamic const& props) {
+  m_surfaceHandler.setProps(props);
 }
 
 void XComponentSurface::stop() {
-  maybeDetachRootNode(m_nativeXComponent, *m_rootView);
   m_surfaceHandler.stop();
 }
 

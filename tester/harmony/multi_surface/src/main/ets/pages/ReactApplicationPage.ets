@@ -1,47 +1,62 @@
-import type {
-  ComponentBuilderContext} from 'rnoh';
-import {
-  RNApp,
-  RNAbility,
-  AnyJSBundleProvider,
-  MetroJSBundleProvider,
-  ResourceJSBundleProvider,
-} from 'rnoh'
-import { SampleView, SAMPLE_VIEW_TYPE, PropsDisplayer } from "rnoh-sample-package"
+import type { ComponentBuilderContext, RNOHCoreContext } from 'rnoh';
+import { RNApp, RNAbility, AnyJSBundleProvider, MetroJSBundleProvider, ResourceJSBundleProvider, } from 'rnoh'
+import { SampleView, PropsDisplayer, GeneratedSampleView } from "rnoh-sample-package"
 import { createRNPackages } from '../RNPackagesFactory'
+
+@Builder
+export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
+  // There seems to be a problem with the placement of ArkTS components in mixed mode. Nested Stack temporarily avoided.
+  Stack() {
+    if (ctx.componentName === SampleView.NAME) {
+      SampleView({
+        ctx: ctx.rnComponentContext,
+        tag: ctx.tag,
+      })
+    }
+    if (ctx.componentName === GeneratedSampleView.NAME) {
+      GeneratedSampleView({
+        ctx: ctx.rnComponentContext,
+        tag: ctx.tag,
+      })
+    }
+    if (ctx.componentName === PropsDisplayer.NAME) {
+      PropsDisplayer({
+        ctx: ctx.rnComponentContext,
+        tag: ctx.tag
+      })
+    }
+  }
+  .position({ x: 0, y: 0 })
+
+}
+
+const wrappedCustomRNComponentBuilder = wrapBuilder(buildCustomRNComponent)
 
 @Entry
 @Component
 struct ReactApplicationPage {
-  @StorageLink('RNAbility') rnAbility: RNAbility | undefined = undefined
-
-  @Builder
-  buildCustomComponent(ctx: ComponentBuilderContext) {
-    if (ctx.descriptor.type === SAMPLE_VIEW_TYPE) {
-      SampleView({
-        ctx: ctx.rnohContext,
-        tag: ctx.descriptor.tag,
-        buildCustomComponent: this.buildCustomComponent
-      })
-    } else if (ctx.descriptor.type === PropsDisplayer.NAME) {
-      PropsDisplayer({
-        ctx: ctx.rnohContext,
-        tag: ctx.descriptor.tag
-      })
-    }
-  }
+  @StorageLink('RNOHCoreContext') private rnohCoreContext: RNOHCoreContext | undefined = undefined
 
   onBackPress(): boolean {
-    return this.rnAbility?.onBackPress() ?? false;
+    this.rnohCoreContext?.dispatchBackPress();
+    return false;
   }
 
   build() {
     Column() {
       RNApp({
-        rnInstanceConfig: {createRNPackages},
+        rnInstanceConfig: {
+          createRNPackages,
+          enableNDKTextMeasuring: true,
+          enableBackgroundExecutor: false,
+          enableCAPIArchitecture: true,
+        },
         appKey: "app_name",
-        buildCustomComponent: this.buildCustomComponent,
-        jsBundleProvider: new AnyJSBundleProvider([new MetroJSBundleProvider(), new ResourceJSBundleProvider(this.rnAbility!.context.resourceManager)]),
+        wrappedCustomRNComponentBuilder: wrappedCustomRNComponentBuilder,
+        onSetUp: (rnInstance) => {
+          rnInstance.enableFeatureFlag("ENABLE_RN_INSTANCE_CLEAN_UP")
+        },
+        jsBundleProvider: new AnyJSBundleProvider([new MetroJSBundleProvider(), new ResourceJSBundleProvider(this.rnohCoreContext!.uiAbilityContext.resourceManager)]),
       })
     }
     .height('100%')

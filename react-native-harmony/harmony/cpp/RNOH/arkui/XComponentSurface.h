@@ -16,7 +16,7 @@ class XComponentSurface {
   XComponentSurface(
       std::shared_ptr<facebook::react::Scheduler> scheduler,
       ComponentInstanceRegistry::Shared componentInstanceRegistry,
-      ComponentInstanceFactory::Shared componentInstanceFactory,
+      ComponentInstanceFactory::Shared const& componentInstanceFactory,
       facebook::react::SurfaceId surfaceId,
       std::string const& appKey);
 
@@ -42,9 +42,10 @@ class XComponentSurface {
       float viewportOffsetX,
       float viewportOffsetY,
       float pixelRatio,
-      folly::dynamic&& initialProps,
-      std::shared_ptr<facebook::react::LayoutAnimationDriver> animationDriver);
-  void setProps(folly::dynamic&& props);
+      folly::dynamic const& initialProps,
+      std::shared_ptr<facebook::react::LayoutAnimationDriver> const&
+          animationDriver);
+  void setProps(folly::dynamic const& props);
   void stop();
   void setDisplayMode(facebook::react::DisplayMode displayMode);
 
