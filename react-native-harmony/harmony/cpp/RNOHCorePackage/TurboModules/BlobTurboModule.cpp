@@ -18,6 +18,10 @@ BlobTurboModule::BlobTurboModule(
       ARK_METHOD_METADATA(createFromParts, 2)};
 }
 
+/**
+ * This method is used because calling the generated method 'release' is
+ * cumbersome.
+ */
 void BlobTurboModule::release(std::string blobId) {
   m_ctx.taskExecutor->runTask(
       TaskThread::MAIN, [ctx = m_ctx, name = name_, blobId]() {

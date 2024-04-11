@@ -7,6 +7,12 @@
 
 namespace rnoh {
 
+/**
+ * This is a hack to get around the fact that there's no easy way to call a
+ * method in a TurboModule at the destruction of an object. Because we add the
+ * BlobCollector as a HostObject to the Blob in js, it's destructor will be
+ * called when the Blob is garbage collected.
+ */
 BlobCollector::BlobCollector(
     facebook::react::TurboModule& turboModule,
     const std::string& blobId)

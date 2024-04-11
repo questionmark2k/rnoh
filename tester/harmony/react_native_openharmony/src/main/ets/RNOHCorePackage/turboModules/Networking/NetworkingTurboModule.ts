@@ -27,6 +27,18 @@ export type UriHandler = {
   fetch: (query: Query) => Object;
 }
 
+export type JsFormPart = {
+  fieldName: string,
+  headers: object,
+  name: string,
+  uri: string,
+  string?: string,
+}
+
+export type JsFormData = {
+  formData: JsFormPart[]
+}
+
 export type RequestBodyHandler = {
   supports: (data: Object) => boolean;
   handleRequest: (data: { blob: BlobMetadata }, contentType?: string) => {
@@ -39,6 +51,12 @@ export type ResponseBodyHandler = {
   supports: (responseType: ResponseType) => boolean,
   handleResponse: (response: string | Object | ArrayBuffer) => BlobMetadata
 }
+
+/**
+ * This is a TurboModule for handling Networking requests. It encodes the data it gets from JS
+ * (a JSON object with different fields) into a Harmony specific format.
+ * It also exposes handlers which can be used to customize how requests are handled.
+ */
 
 export class NetworkingTurboModule extends TurboModule {
   public static readonly NAME = 'Networking';
@@ -130,6 +148,19 @@ export class NetworkingTurboModule extends TurboModule {
     return data;
   }
 
+  private encodeFormData(jsFormData: JsFormData): Array<http.MultiFormData> {
+    const formData = jsFormData.formData.map((jsFormPart: JsFormPart): http.MultiFormData => {
+      const contentType = jsFormPart.headers['content-type'] ?? 'text/plain'
+      return {
+        name: jsFormPart.fieldName,
+        contentType: contentType,
+        data: jsFormPart.string,
+        filePath: jsFormPart.uri,
+        remoteFileName: jsFormPart.name,
+      }
+    })
+    return formData;
+  }
 
   sendRequest(query: Query, callback: (requestId: number) => void) {
     const requestId = this.createId()
@@ -156,13 +187,17 @@ export class NetworkingTurboModule extends TurboModule {
 
     let extraData = null;
     let headers: any = query.headers;
-
+    let multiFormDataList: Array<http.MultiFormData> = [];
 
     if (requestBodyHandler != null) {
       const requestData = requestBodyHandler.handleRequest(query.data as { blob: BlobMetadata }, query.responseType);
       extraData = requestData.body;
-      headers.contentType = requestData.contentType;
-    } else {
+      headers['Content-Type'] = requestData.contentType;
+    } else if ('formData' in query.data) {
+      headers['Content-Type'] = 'multipart/form-data'
+      multiFormDataList = this.encodeFormData(query.data as JsFormData);
+    }
+    else {
       extraData = this.encodeBody(query.data);
     }
 
@@ -173,7 +208,8 @@ export class NetworkingTurboModule extends TurboModule {
         header: query.headers,
         extraData: extraData,
         connectTimeout: query.timeout,
-        readTimeout: query.timeout
+        readTimeout: query.timeout,
+        multiFormDataList: multiFormDataList
       },
       async (err, data) => {
         if (!err) {
@@ -195,7 +231,8 @@ export class NetworkingTurboModule extends TurboModule {
         }
         httpRequest.destroy();
         this.requestMap.delete(requestId)
-      }
+      },
+
     );
 
     this.requestMap.set(requestId, httpRequest);

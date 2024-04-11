@@ -7,6 +7,10 @@ import uri from '@ohos.uri';
 import { Blob, BlobMetadata, BlobPart } from './types';
 import { BlobRegistry } from './BlobRegistry';
 
+/**
+ * BlobTurboModule implements js Blobs. NetworkingTurboModule handlers are used, to allow handling blobs differently than normal data.
+ * Reading the data stored in Blobs is implemented by FileReaderTurboModule.
+ */
 
 export class BlobTurboModule extends TurboModule {
   public static readonly NAME = 'BlobModule';

@@ -2,7 +2,6 @@ import { TurboModule } from '../../../RNOH/TurboModule';
 import { BlobTurboModule } from './BlobTurboModule';
 import { BlobMetadata as BlobMetadata } from './types';
 import util from '@ohos.util';
-import url from '@ohos.url';
 
 export class FileReaderTurboModule extends TurboModule {
   public static readonly NAME = 'FileReaderModule';
