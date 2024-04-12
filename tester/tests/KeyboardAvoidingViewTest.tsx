@@ -22,7 +22,9 @@ export const KeyboardAvoidingViewTest = () => {
           enabled={false}
         />
       </TestCase.Example>
-      <TestCase.Example itShould="avoid keyboard by changing height">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="avoid keyboard by changing height">
         <KeyboardAvoidingViewTestCase
           behavior="height"
           justifyContent="space-around"

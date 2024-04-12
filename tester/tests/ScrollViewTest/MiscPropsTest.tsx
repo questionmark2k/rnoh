@@ -115,6 +115,50 @@ export function MiscPropsTest() {
         </View>
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="the left scrollview should bounce (briefly scroll beyond the content to show the view below and then come back to top/bottom accordingly) (alwaysBounceVertical)">
+        <View style={[styles.wrapperView, {flexDirection: 'row'}]}>
+          <ScrollView
+            bounces
+            alwaysBounceVertical={true}
+            style={COMMON_PROPS.style}
+            contentContainerStyle={COMMON_PROPS.contentContainerStyle}>
+            {getScrollViewContent({amountOfChildren: 2})}
+          </ScrollView>
+          <ScrollView
+            bounces
+            alwaysBounceVertical={false}
+            style={COMMON_PROPS.style}
+            contentContainerStyle={COMMON_PROPS.contentContainerStyle}>
+            {getScrollViewContent({amountOfChildren: 2})}
+          </ScrollView>
+        </View>
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="the top scrollview should bounce (briefly scroll beyond the content to show the view below and then come back to left/right accordingly) (alwaysBounceHorizontal)">
+        <View style={[styles.wrapperView]}>
+          <ScrollView
+            horizontal
+            bounces
+            alwaysBounceHorizontal={true}
+            style={COMMON_PROPS.style}
+            contentContainerStyle={COMMON_PROPS.contentContainerStyle}>
+            {getScrollViewContentHorizontal({amountOfChildren: 2})}
+          </ScrollView>
+          <ScrollView
+            horizontal
+            bounces
+            alwaysBounceHorizontal={false}
+            style={COMMON_PROPS.style}
+            contentContainerStyle={COMMON_PROPS.contentContainerStyle}>
+            {getScrollViewContentHorizontal({amountOfChildren: 2})}
+          </ScrollView>
+        </View>
+      </TestCase.Example>
+      <TestCase.Example
         modal
         skip={Platform.select({android: 'fails', harmony: 'fails on Android'})}
         itShould="scroll outside of the content when pressing the button (scrollToOverflowEnabled)"

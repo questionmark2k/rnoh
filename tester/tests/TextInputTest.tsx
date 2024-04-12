@@ -531,9 +531,57 @@ export function TextInputTest() {
           />
         </View>
       </TestCase.Example>
+      <TestCase.Manual
+        tags={['C_API']}
+        modal
+        itShould="trigger onEndEditing event after editing ends"
+        initialState={false}
+        arrange={({setState}) => (
+          <TextInputWithText
+            style={styles.textInput}
+            autoFocus
+            onEndEditing={() => setState(true)}
+          />
+        )}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
+      <TestCase.Manual
+        tags={['C_API']}
+        modal
+        itShould="trigger onChange event after changing value"
+        initialState={false}
+        arrange={({setState}) => (
+          <TextInputWithText onChange={() => setState(true)} />
+        )}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="set cursorColor to red after pressing button (setNativeProps)">
+        <SetNativePropsTest />
+      </TestCase.Example>
     </TestSuite>
   );
 }
+
+const SetNativePropsTest = () => {
+  const ref = useRef<TextInput>(null);
+
+  return (
+    <View>
+      <TextInput cursorColor={'blue'} ref={ref} />
+      <Button
+        label="setCursorColor"
+        onPress={() => ref.current?.setNativeProps({cursorColor: 'red'})}
+      />
+    </View>
+  );
+};
 
 const SelectionTest = () => {
   return (

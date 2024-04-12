@@ -455,6 +455,7 @@ export const ImageTest = () => {
         <ImagePointerEventsTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         itShould="Display placeholder image before loading image"
         modal>
         <Image

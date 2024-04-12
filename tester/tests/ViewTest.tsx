@@ -6,7 +6,7 @@ import {
   findNodeHandle,
 } from 'react-native';
 import {TestSuite} from '@rnoh/testerino';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Button, TestCase} from '../components';
 
 export function ViewTest() {
@@ -923,9 +923,33 @@ export function ViewTest() {
         itShould="allow user to move with keyboard's arrows keys between blue squares">
         <ViewNextFocus />
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="change backgroundColor to red after pressing a button (setNativeProps)">
+        <SetNativePropsTest />
+      </TestCase.Example>
     </TestSuite>
   );
 }
+
+const SetNativePropsTest = () => {
+  const ref = useRef<View>(null);
+  return (
+    <View>
+      <View
+        style={{backgroundColor: 'yellow', width: 50, height: 50}}
+        ref={ref}
+      />
+      <Button
+        label="setBackgroudColor"
+        onPress={() =>
+          ref.current?.setNativeProps({style: {backgroundColor: 'red'}})
+        }
+      />
+    </View>
+  );
+};
 
 function PointerEventsView(props: {
   disableOuterContainerTouch?: boolean;
