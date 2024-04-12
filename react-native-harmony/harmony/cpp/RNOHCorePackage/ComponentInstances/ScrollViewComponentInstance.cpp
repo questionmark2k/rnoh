@@ -89,6 +89,12 @@ void rnoh::ScrollViewComponentInstance::onPropsChanged(
               : 0xFF000000)
       .setEnablePaging(props->pagingEnabled);
 
+  if (!m_props || props->contentOffset != m_props->contentOffset) {
+    m_scrollNode.scrollTo(
+        props->contentOffset.x, props->contentOffset.y, false);
+    updateStateWithContentOffset(props->contentOffset);
+  }
+
   setScrollSnap(
       props->snapToStart,
       props->snapToEnd,

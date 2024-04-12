@@ -35,17 +35,15 @@ export function MiscPropsTest() {
         </View>
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
-        itShould="display ScrollView with the third view at the top (contentOffset)"
-        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/305
-      >
+        itShould="display ScrollView with the third view at the top (contentOffset)">
         <ContentOffsetTestCase />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
-        itShould="scroll when contentOffset property is changed (contentOffset)"
-        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/305
-      >
+        itShould="scroll when contentOffset property is changed (contentOffset)">
         <ToggleContentOffsetTestCase />
       </TestCase.Example>
       <TestCase.Example
