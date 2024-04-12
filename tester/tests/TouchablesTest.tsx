@@ -16,12 +16,15 @@ export const TouchablesTest = () => {
   return (
     <TestSuite name="Touchables">
       <TestCase.Logical
+        tags={['C_API']}
         itShould="export Touchable"
         fn={({expect}) => {
           expect(Touchable).to.be.not.undefined;
         }}
       />
-      <TestCase.Example itShould="use cyan background on press in (TouchableHighlight)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="use cyan background on press in (TouchableHighlight)">
         <TouchableHighlight
           activeOpacity={1}
           underlayColor="cyan"
@@ -29,19 +32,24 @@ export const TouchablesTest = () => {
           <PressMe />
         </TouchableHighlight>
       </TestCase.Example>
-      <TestCase.Example itShould="show number of presses on press in (TouchableHighlight)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show number of presses on press in (TouchableHighlight)">
         <TouchableHighlight
           onPress={() => setPressCountHighlight(pressCountHighlight + 1)}>
           <PressMe endLabel={pressCountHighlight} />
         </TouchableHighlight>
       </TestCase.Example>
       <TestCase.Logical
+        tags={['C_API']}
         itShould="export TouchableNativeFeedback (Android only)"
         fn={({expect}) => {
           expect(TouchableNativeFeedback).to.be.not.undefined;
         }}
       />
-      <TestCase.Example itShould="handle press without showing feedback">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="handle press without showing feedback">
         <TouchableWithoutFeedbackDemo />
       </TestCase.Example>
       <TestCase.Manual

@@ -60,6 +60,13 @@ export const RefreshControlTest = () => {
       <TestCase.Example
         modal
         tags={['C_API']}
+        skip={{
+          harmony: {
+            cAPI: true,
+            arkTS: false,
+          },
+          android: false,
+        }}
         itShould="immediately stop refreshing after pulling to refresh">
         <PullToRefreshExample doNothingOnRefresh />
       </TestCase.Example>
@@ -107,28 +114,63 @@ export const RefreshControlTest = () => {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        skip={{
+          harmony: {
+            cAPI: true,
+            arkTS: false,
+          },
+          android: false,
+        }}
         itShould="Refresh control in nested scroll view - one source of truth for both RefreshControl (one state)"
         modal>
         <PullToRefreshInNestedScrollViews />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        skip={{
+          harmony: {
+            cAPI: true,
+            arkTS: false,
+          },
+          android: false,
+        }}
         itShould="Refresh control in nested scroll view - two sources of truth - one for each RefreshControl (two states)"
         modal>
         <PullToRefreshInNestedScrollViewsDifferentSource />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        skip={{
+          harmony: {
+            cAPI: true,
+            arkTS: false,
+          },
+          android: false,
+        }}
         itShould="Refresh control in nested scroll view - two sources of truth - one for each RefreshControl (two states) - with the content between"
         modal>
         <PullToRefreshInNestedScrollViewsDifferentSourceContentBetween />
       </TestCase.Example>
       <TestCase.Example
+        skip={{
+          harmony: {
+            cAPI: true,
+            arkTS: false,
+          },
+          android: false,
+        }}
         itShould="display ScrollView with green border, pink background and yellow items when RefreshControl component is set"
         modal>
         <RefreshControlInsideScrollViewWithStylesExample />
       </TestCase.Example>
       <TestCase.Example
+        skip={{
+          harmony: {
+            cAPI: true,
+            arkTS: false,
+          },
+          android: false,
+        }}
         itShould="display FlatList with with green border, pink background and yellow items when RefreshControl component is set"
         modal>
         <RefreshControlInsideFlatListWithStylesExample />

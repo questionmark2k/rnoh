@@ -1,6 +1,6 @@
 import {Platform, StyleSheet, Text, View} from 'react-native';
-import {TestSuite, TestCase} from '@rnoh/testerino';
-import {Button} from '../../components';
+import {TestSuite} from '@rnoh/testerino';
+import {Button, TestCase} from '../../components';
 import {useState} from 'react';
 import {TextStyleTest} from './TextStyleTest';
 import {TextMeasuringTest} from './TextMeasuringTest';
@@ -16,22 +16,22 @@ export function TextTest() {
       <TextPaddingTest />
       <TextAccessibilityTest />
       <TextNestedTest />
-      <TestCase tags={['C_API']} itShould="show selectable text">
+      <TestCase.Example tags={['C_API']} itShould="show selectable text">
         <View style={styles.smallContainer}>
           <Text style={styles.smallText} selectable={true}>
             Selectable text
           </Text>
         </View>
-      </TestCase>
-      <TestCase tags={['C_API']} itShould="render text in one line">
+      </TestCase.Example>
+      <TestCase.Example tags={['C_API']} itShould="render text in one line">
         <View style={{flexDirection: 'row'}}>
           <Text style={{fontSize: 10}}>/ {'100'}</Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show 3 texts each with a different line break startegy"
-        skip
+        skip={{android: true, harmony: true}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/274
       >
         <View style={styles.bigContainer}>
@@ -45,11 +45,11 @@ export function TextTest() {
             Lorem ipsum dolor sit amet
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="wrap two texts differently (hangul-word linebreak stategy)"
-        skip
+        skip={{android: true, harmony: true}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/274
       >
         <View style={styles.container}>
@@ -62,8 +62,8 @@ export function TextTest() {
             ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ ㄱㄱㄱㄱ
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show two texts, both selectable, but one disabled ">
         <View
@@ -79,8 +79,8 @@ export function TextTest() {
             Enabled
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with different ellipsize mode and clip in the middle of second sentence">
         <View style={styles.hugeContainer}>
@@ -91,8 +91,8 @@ export function TextTest() {
             head, AReallyReallyLongSentenceWithoutSeperatorsOrSpaces.
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Manual
         tags={['C_API']}
         itShould="fire onTextLayoutEvent after layout change"
         initialState={false}
@@ -100,10 +100,10 @@ export function TextTest() {
         assert={({expect, state}) => {
           expect(state).to.be.true;
         }}
-        skip
+        skip={{android: false, harmony: {arkTS: true, cAPI: true}}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/277
       />
-      <TestCase
+      <TestCase.Manual
         tags={['C_API']}
         itShould="fire onLayout event after layout change"
         initialState={{}}
@@ -112,15 +112,15 @@ export function TextTest() {
           expect(state).to.have.all.keys('x', 'y', 'width', 'height');
         }}
       />
-      <TestCase
+      <TestCase.Example
         tags={['C_API']}
         itShould="display text with a selection color of Indian Red"
         skip={Platform.select({harmony: 'Missing prop on ArkUI side'})}>
         <Text selectionColor="#F15156" selectable>
           Text with indian red selection color
         </Text>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="display text with a selection color of Blue"
         skip={Platform.select({harmony: 'Missing prop on ArkUI side'})}>
@@ -131,7 +131,7 @@ export function TextTest() {
           useful when you want the text highlight color to match your app's
           theme. 一 乙 二 十 丁 厂 七 卜 人 入 八 九 几 儿 了 力 乃 又
         </Text>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

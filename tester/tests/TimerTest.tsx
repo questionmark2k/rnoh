@@ -15,6 +15,7 @@ export function TimerTest() {
   return (
     <TestSuite name="Timer">
       <TestCase.Manual
+        tags={['C_API']}
         itShould="take three seconds to finish this test (setTimeout)"
         initialState={0}
         arrange={({setState}) => {
@@ -41,6 +42,7 @@ export function TimerTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
         itShould="take three seconds to finish this test (setInterval)"
         initialState={0}
         arrange={({setState}) => {
@@ -74,6 +76,7 @@ export function TimerTest() {
         }}
       />
       <TestCase.Manual<{date: Date; appStateStatus: AppStateStatus}[]>
+        tags={['C_API']}
         modal
         itShould="not trigger updates when the application is in background"
         initialState={[]}

@@ -43,7 +43,7 @@ const HorizontalItem = ({title}: {title: string}) => (
 export function VirtualizedListTest() {
   return (
     <TestSuite name="VirtualizedList">
-      <TestCase.Example itShould="display list of 3 items">
+      <TestCase.Example tags={['C_API']} itShould="display list of 3 items">
         <VirtualizedList<number[]>
           style={{height: 64}}
           data={[1, 2, 3]}
@@ -58,6 +58,7 @@ export function VirtualizedListTest() {
         />
       </TestCase.Example>
       <TestCase.Manual
+        tags={['C_API']}
         modal
         itShould="trigger onStartReached event when start of the content is within half the visible length of the list"
         initialState={-1}
@@ -90,6 +91,7 @@ export function VirtualizedListTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
         modal
         itShould="display event sent to by onScrollToIndexFailed when pressing the button before scrolling"
         initialState={undefined}
@@ -110,24 +112,30 @@ export function VirtualizedListTest() {
           ]);
         }}
       />
-      <TestCase.Example modal itShould="invert the list">
+      <TestCase.Example tags={['C_API']} modal itShould="invert the list">
         <InvertedVirtualizedListTest />
       </TestCase.Example>
-      <TestCase.Example modal itShould="start at the 81st item">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="start at the 81st item">
         <InitialScrollIndexTest />
       </TestCase.Example>
       <TestSuite name="ref">
         <TestCase.Example
+          tags={['C_API']}
           modal
           itShould="scroll to the element with the index 10 (Item 11) - scrollToIndex()">
           <VirtualizedListScrollToIndexTest />
         </TestCase.Example>
         <TestCase.Example
+          tags={['C_API']}
           modal
           itShould="scroll to the specific element (Item 3) - scrollToItem()">
           <VirtualizedListScrollToItemTest />
         </TestCase.Example>
         <TestCase.Manual
+          tags={['C_API']}
           modal
           itShould="scroll to the end of the list - scrollToEnd()"
           initialState={false}
@@ -144,6 +152,7 @@ export function VirtualizedListTest() {
           }}
         />
         <TestCase.Manual
+          tags={['C_API']}
           modal
           itShould="get the node number - getScrollableNode()"
           initialState={undefined}
@@ -162,6 +171,7 @@ export function VirtualizedListTest() {
         />
 
         <TestCase.Manual
+          tags={['C_API']}
           modal
           itShould="get the scroll ref - getScrollRef()"
           initialState={undefined}
@@ -176,6 +186,7 @@ export function VirtualizedListTest() {
         />
       </TestSuite>
       <TestCase.Manual
+        tags={['C_API']}
         modal
         itShould="click (call on ref.recordInteraction()) on button before first scroll should trigger onViewableItemsChanged and change the first two items background color to blue"
         initialState={[]}
@@ -194,78 +205,102 @@ export function VirtualizedListTest() {
         }}
       />
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="change background color of visible items after scrolling slightly (to blue when fully visible and lightblue when at least 20% is visible)">
         <VirtualizedListTestViewabiliyConfigCallbackPairs />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="change background color of fully visible items after 2 seconds">
         <VirtualizedListViewabilityConfigViewTime />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="display even items with a lightgray background and odd items should have lightblue background (CellRenderedComponent)">
         <VirtualizedListCellRendererComponent />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould='display "Separator" text on lightgray background between items'>
         <VirtualizedListItemSeparatorTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould='display "Empty Component" text on lightgray background when data is empty'>
         <VirtualizedListListEmptyComponentTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould='display "Item Component" text on lightgray background'>
         <VirtualizedListListItemComponent />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould='display "List Footer Component" text on lightgray background at the end of the list'>
         <VirtualizedListListFooterComponent />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould='display "List Footer Component" text on red background at the end of the list'>
         <VirtualizedListListFooterComponentStyles />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould='display "List Header Component" text on small lightgray background on red background at the start of the list'>
         <VirtualizedListListHeaderComponent />
       </TestCase.Example>
-      <TestCase.Example itShould="display debugging scroll bars (debug = true)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="display debugging scroll bars (debug = true)">
         <VirtualizedListDebugTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="change background color of selected items to red">
         <VirtualizedListExtraDataTest />
       </TestCase.Example>
-      <TestCase.Example modal itShould="display items horizontally">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="display items horizontally">
         <VirtualizedListHorizontalTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="display items horizontally and invert the list">
         <VirtualizedListHorizontalInvertedTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="display 'refreshing' on red background when pulling down (onRefresh method)">
         <VirtualizedListOnRefreshTest />
       </TestCase.Example>
-      <TestCase.Example modal itShould="display persistent scrollbar">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="display persistent scrollbar">
         <VirtualizedListPersistentScrollbarTest />
       </TestCase.Example>
-      <TestCase.Example modal itShould="render cell in 2 second batches">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="render cell in 2 second batches">
         <VirtualizedListUpdateCellsBatchingPeriodTest />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="display refreshing indicator when pulling down (refreshControl)">
         <VirtualizedListRefreshControlTest />

@@ -47,12 +47,14 @@ function StatusBarView() {
   return (
     <View>
       <StatusBar
-        backgroundColor={backgroundColor}
+        backgroundColor={backgroundColor} // 'rgba(200, 0, 0, 0.5)'
         barStyle={statusBarStyle}
         hidden={hidden}
         translucent={translucent}
       />
-      <TestCase.Example itShould="toggle status bar visibility">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="toggle status bar visibility">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -61,7 +63,9 @@ function StatusBarView() {
           <Text style={styles.buttonText}>{hidden ? 'hidden' : 'visible'}</Text>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="toggle status bar background color(red/green), with alpha 88">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="toggle status bar background color(red/green), with alpha 88">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -70,7 +74,9 @@ function StatusBarView() {
           <Text style={styles.buttonText}>{backgroundColor}</Text>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="toggle status bar style (light-content(default)/dark-content) ">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="toggle status bar style (light-content(default)/dark-content) ">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -90,7 +96,9 @@ function StatusBarView() {
           </Text>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="set status bar color to blue (StatusBar.setBackgroundColor)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="set status bar color to blue (StatusBar.setBackgroundColor)">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -99,7 +107,9 @@ function StatusBarView() {
           <Text style={styles.buttonText}>Set blue</Text>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="set status bar dark style (light-content(default)/dark-content) (StatusBar.setBarStyle) ">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="set status bar dark style (light-content(default)/dark-content) (StatusBar.setBarStyle) ">
         <View
           style={styles.button}
           onTouchEnd={() => {
@@ -118,6 +128,7 @@ function StatusBarView() {
         </View>
       </TestCase.Example>
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return correct status bar height for device"
         fn={({expect}) => {
           expect(StatusBar.currentHeight).to.be.closeTo(38.8, 0.1);

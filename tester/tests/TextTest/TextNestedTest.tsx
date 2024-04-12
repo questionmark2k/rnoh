@@ -8,7 +8,9 @@ import {SAMPLE_PARAGRAPH_TEXT} from './fixtures';
 export function TextNestedTest() {
   return (
     <TestSuite name="nested texts">
-      <TestCase.Example itShould="show INNER and OUTER texts on the same height (various lineHeights)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show INNER and OUTER texts on the same height (various lineHeights)">
         <View
           style={{
             flexDirection: 'row',
@@ -21,7 +23,9 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="show text with ellipsize at the end of the first line">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show text with ellipsize at the end of the first line">
         <Text ellipsizeMode="tail" numberOfLines={1}>
           Cupidatat irure velit id consequat magna irure quis laborum aute anim
           est cillum aliqua dolor.
@@ -219,7 +223,9 @@ export function TextNestedTest() {
           <Text style={{fontSize: 8}}>{SAMPLE_PARAGRAPH_TEXT}</Text>
         </Text>
       </TestCase.Example>
-      <TestCase.Example itShould="display 2 lines of text (placeholder test)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="display 2 lines of text (placeholder test)">
         <Text style={{textAlign: 'left'}} numberOfLines={2}>
           <View style={{width: 0, height: 8, backgroundColor: 'red'}} />
           <Text style={{fontSize: 8}}>{SAMPLE_PARAGRAPH_TEXT}</Text>
@@ -235,7 +241,7 @@ export function TextNestedTest() {
           </Text>
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="text should be disabled">
+      <TestCase.Example tags={['C_API']} itShould="text should be disabled">
         <TextDisabledTest />
       </TestCase.Example>
       <TestCase.Example
@@ -259,6 +265,7 @@ export function TextNestedTest() {
         </Text>
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="activate onPress() on <Text /> if the touch moves up to 100px above or below the <Text /> body">
         <TextPressRetentionOffsetTest />

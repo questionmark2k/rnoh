@@ -6,12 +6,14 @@ export const StyleSheetTest = () => {
   return (
     <TestSuite name="Stylesheet">
       <TestCase.Logical
+        tags={['C_API']}
         itShould="see if StyleSheet.create returns reference to an object with the correct props"
         fn={({expect}) => {
           expect(styles.test).to.be.eql(testStyle);
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="compose styles correctly"
         fn={({expect}) => {
           const composed = StyleSheet.compose(testStyle, testStyle2);
@@ -21,6 +23,7 @@ export const StyleSheetTest = () => {
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="flatten styles correctly"
         fn={({expect}) => {
           expect(StyleSheet.flatten([testStyle, testStyle2])).to.be.eql(
@@ -29,6 +32,7 @@ export const StyleSheetTest = () => {
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return a sensible hairlineWidth value"
         fn={({expect}) => {
           expect(StyleSheet.hairlineWidth).to.be.greaterThan(0).and.lessThan(2);

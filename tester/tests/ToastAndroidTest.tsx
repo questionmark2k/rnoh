@@ -7,6 +7,7 @@ export const ToastAndroidTest = () => {
   return (
     <TestSuite name="ToastAndroid">
       <TestCase.Logical
+        tags={['C_API']}
         itShould="have constants defined"
         fn={({expect}) => {
           expect(ToastAndroid.BOTTOM).to.not.be.undefined;
@@ -16,7 +17,9 @@ export const ToastAndroidTest = () => {
           expect(ToastAndroid.LONG).to.not.be.undefined;
         }}
       />
-      <TestCase.Example itShould="show Toast with message (show)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show Toast with message (show)">
         <ToastExample options="basic" />
       </TestCase.Example>
       <TestCase.Example

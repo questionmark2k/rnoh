@@ -8,33 +8,39 @@ export const TouchableOpacityTest = () => {
   const [onLayoutTestText, setOnLayoutTestText] = useState('');
   return (
     <TestSuite name="TouchableOpacity">
-      <TestCase.Example itShould="make the text less visible on press">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="make the text less visible on press">
         <TouchableOpacity onPress={() => {}}>
           <PressMe />
         </TouchableOpacity>
       </TestCase.Example>
-      <TestCase.Example itShould="make the text slightly less visible on press (activeOpacity)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="make the text slightly less visible on press (activeOpacity)">
         <TouchableOpacity activeOpacity={0.5} onPress={() => {}}>
           <PressMe />
         </TouchableOpacity>
       </TestCase.Example>
-      <TestCase.Example itShould="show number of presses on press">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show number of presses on press">
         <TouchableOpacity
           onPress={() => setPressCountOpacity(pressCountOpacity + 1)}>
           <PressMe endLabel={pressCountOpacity} />
         </TouchableOpacity>
       </TestCase.Example>
-      <TestCase.Example itShould="render disabled">
+      <TestCase.Example tags={['C_API']} itShould="render disabled">
         <TouchableOpacity disabled>
           <PressMe endLabel={'disabled'} />
         </TouchableOpacity>
       </TestCase.Example>
-      <TestCase.Example itShould="show layout data onLayout">
+      <TestCase.Example tags={['C_API']} itShould="show layout data onLayout">
         <TouchableOpacity
           onLayout={event => {
             setOnLayoutTestText(JSON.stringify(event.nativeEvent.layout));
           }}>
-          <PressMe endLabel={onLayoutTestText} />
+          <PressMe style={{height: 100}} endLabel={onLayoutTestText} />
         </TouchableOpacity>
       </TestCase.Example>
       <TestCase.Example itShould="show square (red background, white border, rounded corners)">
@@ -59,8 +65,8 @@ export const TouchableOpacityTest = () => {
 
 function PressMe(props: ViewProps & {endLabel?: string | number}) {
   return (
-    <View {...props} style={{padding: 16, borderWidth: 1}}>
-      <Text style={{color: 'blue', height: 24, width: '100%'}}>
+    <View {...props} style={[{padding: 16, borderWidth: 1}, props.style]}>
+      <Text style={{color: 'blue', height: 'auto', width: '100%'}}>
         Press me{props.endLabel !== undefined ? ` (${props.endLabel})` : ''}
       </Text>
     </View>

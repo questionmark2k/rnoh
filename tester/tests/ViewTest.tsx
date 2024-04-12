@@ -249,7 +249,7 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="hide the overflow">
+      <TestCase.Example tags={['C_API']} itShould="hide the overflow">
         <View
           style={{
             width: 64,
@@ -268,7 +268,7 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="not hide the overflow">
+      <TestCase.Example tags={['C_API']} itShould="not hide the overflow">
         <View
           style={{
             width: 64,
@@ -286,7 +286,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="not show view with height 0 and overflow hidden">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="not show view with height 0 and overflow hidden">
         <View
           style={{
             width: 64,
@@ -305,7 +307,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render blue rectangle (zIndex test)">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render blue rectangle (zIndex test)">
         <View>
           <View
             style={{
@@ -328,6 +332,7 @@ export function ViewTest() {
         </View>
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         itShould="render square with elevation"
         skip={{android: false, harmony: {arkTS: true, cAPI: true}}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/238
@@ -484,6 +489,7 @@ export function ViewTest() {
         />
       </TestSuite>
       <TestCase.Manual
+        tags={['C_API']}
         itShould="pass on touching blue background"
         initialState={false}
         arrange={({setState}) => (
@@ -563,7 +569,9 @@ export function ViewTest() {
           });
         }}
       />
-      <TestCase.Example itShould="render view with fixed width and aspectRatio 1">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render view with fixed width and aspectRatio 1">
         <View style={{width: '100%', height: 100}}>
           <View
             style={{
@@ -574,7 +582,9 @@ export function ViewTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render views with set flex and aspectRatio 1">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render views with set flex and aspectRatio 1">
         <View style={{width: '100%', height: 100}}>
           <View
             style={{

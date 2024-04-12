@@ -67,28 +67,33 @@ export function MiscPropsTest() {
         </View>
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="display current contentHeight (onContentSizeChange)">
-        <OnContentSizeChangeTestCase />
+        <View style={{height: 500}}>
+          <OnContentSizeChangeTestCase />
+        </View>
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
         modal
         itShould="display onScroll native event throttled every second">
-        <ObjectDisplayer
-          renderContent={setObject => {
-            return (
-              <ScrollView
-                {...COMMON_PROPS}
-                style={{height: 300}}
-                scrollEventThrottle={1000}
-                onScroll={(e: {nativeEvent: Object}) => {
-                  setObject(e.nativeEvent);
-                }}
-              />
-            );
-          }}
-        />
+        <View style={{height: 500}}>
+          <ObjectDisplayer
+            renderContent={setObject => {
+              return (
+                <ScrollView
+                  {...COMMON_PROPS}
+                  style={{height: 300}}
+                  scrollEventThrottle={1000}
+                  onScroll={(e: {nativeEvent: Object}) => {
+                    setObject(e.nativeEvent);
+                  }}
+                />
+              );
+            }}
+          />
+        </View>
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
@@ -101,6 +106,7 @@ export function MiscPropsTest() {
       </TestCase.Example>
 
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="the left scrollview should bounce (briefly scroll beyond the content to show the view below and then come back to top/bottom accordingly)">
         <View style={[styles.wrapperView, {flexDirection: 'row'}]}>

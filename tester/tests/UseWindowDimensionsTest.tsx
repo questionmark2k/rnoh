@@ -8,24 +8,28 @@ export function UseWindowDimensionsTest() {
   return (
     <TestSuite name="useWindowDimensions">
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return plausible width (greater than 0)"
         fn={({expect}) => {
           expect(width).to.be.greaterThan(0);
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return plausible height (greater than 0)"
         fn={({expect}) => {
           expect(height).to.be.greaterThan(0);
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return plausible scale (greater than 0)"
         fn={({expect}) => {
           expect(scale).to.be.greaterThan(0);
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return plausible fontScale (greater than 0)"
         fn={({expect}) => {
           expect(fontScale).to.be.greaterThan(0);

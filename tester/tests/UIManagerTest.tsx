@@ -92,22 +92,25 @@ export function UIManagerTest() {
           expect(state.text.height).not.to.be.eq(64);
         }}
       />
-      <TestCase.Example itShould="scroll down on press">
+      <TestCase.Example tags={['C_API']} itShould="scroll down on press">
         <DispatchCommandTest />
       </TestCase.Example>
       <TestCase.Logical
+        tags={['C_API']}
         itShould="return view manager config"
         fn={({expect}) => {
           expect(UIManager.getViewManagerConfig('RCTView')).to.be.an('object');
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="not return view manager config for non-existing view"
         fn={({expect}) => {
           expect(UIManager.getViewManagerConfig('RCTNotAView')).to.be.null;
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="check if view manager config exists"
         fn={({expect}) => {
           expect(UIManager.hasViewManagerConfig('RCTView')).to.be.true;
@@ -115,6 +118,7 @@ export function UIManagerTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
         itShould="measure the view with respect to the window"
         initialState={
           {} as {x: number; y: number; width: number; height: number}
@@ -128,6 +132,7 @@ export function UIManagerTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
         itShould="measure the view with respect to the parent"
         initialState={
           {} as {x: number; y: number; width: number; height: number}

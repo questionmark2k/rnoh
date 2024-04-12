@@ -13,12 +13,15 @@ export const PanResponderTest = () => {
   return (
     <TestSuite name="PanResponder">
       <TestCase.Logical
+        tags={['C_API']}
         itShould="create PanResponder"
         fn={({expect}) => {
           expect(PanResponder.create({})).to.be.not.empty;
         }}
       />
-      <TestCase.Example itShould="allow panning inside ScrollView">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="allow panning inside ScrollView">
         <PanResponderInScrollView />
       </TestCase.Example>
     </TestSuite>

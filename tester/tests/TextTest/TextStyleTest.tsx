@@ -1,11 +1,12 @@
 import {Platform, StyleSheet, Text, View} from 'react-native';
-import {TestSuite, TestCase} from '@rnoh/testerino';
+import {TestSuite} from '@rnoh/testerino';
 import {SAMPLE_PARAGRAPH_TEXT} from './fixtures';
+import {TestCase} from '../../components';
 
 export function TextStyleTest() {
   return (
     <TestSuite name="TextStyle">
-      <TestCase
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with the Pacifico Regular font">
         <View style={{height: 30, width: '100%'}}>
@@ -18,8 +19,8 @@ export function TextStyleTest() {
             Lorem ipsum dolor sit amet
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with the 'sans-serif' font"
         skip={Platform.select({harmony: 'Not supported'})}
@@ -35,8 +36,8 @@ export function TextStyleTest() {
             Lorem ipsum dolor sit amet
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with the 'serif' font"
         skip={Platform.select({harmony: 'Not supported'})}
@@ -52,8 +53,8 @@ export function TextStyleTest() {
             Lorem ipsum dolor sit amet
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with the 'monospace' font"
         skip={Platform.select({harmony: 'Not supported'})}
@@ -69,8 +70,8 @@ export function TextStyleTest() {
             Lorem ipsum dolor sit amet
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with different horizontal alignments">
         <Text style={{textAlign: 'left'}}>Left:</Text>
@@ -87,8 +88,8 @@ export function TextStyleTest() {
         <Text style={{fontSize: 8, textAlign: 'justify'}}>
           {SAMPLE_PARAGRAPH_TEXT}
         </Text>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with different vertical alignments (textAlignVertical)">
         <View style={styles.smallContainerRow}>
@@ -115,8 +116,8 @@ export function TextStyleTest() {
             Bottom
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with different vertical alignments (verticalAlign)">
         <View style={styles.smallContainerRow}>
@@ -139,16 +140,18 @@ export function TextStyleTest() {
             Bottom
           </Text>
         </View>
-      </TestCase>
-      <TestCase tags={['C_API']} itShould="format nested Text components">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="format nested Text components">
         <View style={styles.container}>
           <Text style={{...styles.text, textAlign: 'right'}}>
             <Text style={{fontWeight: 'bold'}}>Bold</Text>
             <Text style={{fontStyle: 'italic'}}>Italic</Text>
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="test the the left and right padding of the text">
         <View style={{height: 32, flexDirection: 'row'}}>
@@ -167,8 +170,8 @@ export function TextStyleTest() {
             right
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="align text same way after adding padding">
         <View style={{height: 70, flexDirection: 'column'}}>
@@ -211,8 +214,8 @@ export function TextStyleTest() {
             fragment1fragment2
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with different textDecorationLines">
         <View style={styles.container}>
@@ -224,11 +227,11 @@ export function TextStyleTest() {
             line-through
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show lined-through text with text decoration color or font color"
-        skip
+        skip={{android: false, harmony: {arkTS: true, cAPI: false}}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/271
       >
         <View style={styles.container}>
@@ -248,20 +251,17 @@ export function TextStyleTest() {
             line-through white
           </Text>
         </View>
-      </TestCase>
-      <TestCase tags={['C_API']} itShould="show text with big letter spacing">
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show text with big letter spacing">
         <View style={styles.smallContainer}>
           <Text style={{...styles.smallText, letterSpacing: 8}}>
             Spacing: 8
           </Text>
         </View>
-      </TestCase>
-      <TestCase
-        tags={['C_API']}
-        itShould="show text with shadow"
-        skip
-        //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/278
-      >
+      </TestCase.Example>
+      <TestCase.Example tags={['C_API']} itShould="show text with shadow">
         <View>
           <Text
             style={{
@@ -275,8 +275,8 @@ export function TextStyleTest() {
             Text with shadow
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with correct textTransform"
         //  123 1one is added to the end of text to see if the code correctly handles number
@@ -305,11 +305,11 @@ export function TextStyleTest() {
             Text transform lowercase 123 1one
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text with different writing direction"
-        skip
+        skip={{harmony: true, android: false}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/280
       >
         <View style={styles.container}>
@@ -329,11 +329,11 @@ export function TextStyleTest() {
             Writing direction rtl
           </Text>
         </View>
-      </TestCase>
-      <TestCase
+      </TestCase.Example>
+      <TestCase.Example
         tags={['C_API']}
         itShould="show text aligned vertically with/without font padding included"
-        skip
+        skip={{android: false, harmony: true}}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/281
       >
         <View style={styles.smallContainerRow}>
@@ -353,7 +353,7 @@ export function TextStyleTest() {
             TEXT
           </Text>
         </View>
-      </TestCase>
+      </TestCase.Example>
     </TestSuite>
   );
 }

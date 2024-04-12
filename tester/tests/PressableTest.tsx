@@ -7,6 +7,7 @@ export function PressableTest() {
   return (
     <TestSuite name="Pressable">
       <TestCase.Manual
+        tags={['C_API']}
         itShould="handle short presses"
         initialState={{
           onPressIn: false,
@@ -29,6 +30,7 @@ export function PressableTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
         itShould="handle long press"
         initialState={{
           onLongPress: false,
@@ -47,6 +49,7 @@ export function PressableTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
         itShould="handle pressing out"
         initialState={{
           onPressOut: false,
@@ -65,6 +68,7 @@ export function PressableTest() {
         }}
       />
       <TestCase.Manual
+        tags={['C_API']}
         itShould="inner view should not react to presses"
         initialState={{
           tested: false,
@@ -97,6 +101,7 @@ export function PressableTest() {
         <HoverView />
       </TestCase.Example>
       <TestCase.Manual
+        tags={['C_API']}
         itShould="pass when blue background is pressed"
         initialState={false}
         arrange={({setState}) => (

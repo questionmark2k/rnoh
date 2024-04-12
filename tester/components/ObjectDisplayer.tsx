@@ -7,11 +7,11 @@ export function ObjectDisplayer(props: {
   const [object, setObject] = useState<Object>();
 
   return (
-    <View style={{width: '100%'}}>
+    <View style={{width: '100%', height: '100%'}}>
       <Text
         style={{
           width: '100%',
-          height: 128,
+          padding: 16,
           fontSize: 8,
           backgroundColor: '#EEE',
         }}>

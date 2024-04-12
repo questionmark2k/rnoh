@@ -10,7 +10,7 @@ import {
   ViewabilityConfig,
 } from 'react-native';
 import {TestSuite} from '@rnoh/testerino';
-import {Button, Modal, ObjectDisplayer, TestCase} from '../components';
+import {Button, ObjectDisplayer, TestCase} from '../components';
 
 interface SectionData {
   id: string;
@@ -44,7 +44,7 @@ const DATA: SectionData[] = [
 const commonProps = {
   style: {width: 256},
   sections: DATA,
-  keyExtractor: (item, _index) => item.id,
+  keyExtractor: (item, index) => `${item.id}-${index}`,
   renderSectionHeader: ({section}) => (
     <Text style={styles.title}>{section.title}</Text>
   ),
@@ -58,26 +58,30 @@ const commonProps = {
 export const SectionListTest = () => {
   return (
     <TestSuite name="SectionList">
-      <TestCase.Example itShould="display items in the SectionList">
-        <Modal>
-          <View style={styles.container}>
-            <SectionList
-              sections={DATA}
-              keyExtractor={(item, index) => item + index}
-              renderItem={({item}) => (
-                <View style={styles.item}>
-                  <Text style={styles.title}>{item}</Text>
-                </View>
-              )}
-              renderSectionHeader={({section: {title}}) => (
-                <Text style={styles.title}>{title}</Text>
-              )}
-            />
-          </View>
-        </Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="display items in the SectionList">
+        <View style={styles.container}>
+          <SectionList
+            sections={DATA}
+            keyExtractor={(item, index) => `${item}-${index}`}
+            renderItem={({item}) => (
+              <View style={styles.item}>
+                <Text style={styles.title}>{item}</Text>
+              </View>
+            )}
+            renderSectionHeader={({section: {title}}) => (
+              <Text style={styles.title}>{title}</Text>
+            )}
+          />
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="display an array of visible items">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="display an array of visible items">
+        <View style={styles.container}>
           <ObjectDisplayer
             renderContent={setObject => {
               return (
@@ -91,10 +95,12 @@ export const SectionListTest = () => {
               );
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render no more than 2 new items per batch when scrolling down">
-        <Modal>
+      <TestCase.Example
+        modal
+        itShould="render no more than 2 new items per batch when scrolling down">
+        <View style={{height: 200}}>
           <SectionList
             {...commonProps}
             windowSize={2}
@@ -113,10 +119,13 @@ export const SectionListTest = () => {
               );
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="display nativeEvent when onMomentumScrollBegin">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="display nativeEvent when onMomentumScrollBegin">
+        <View style={styles.container}>
           <ObjectDisplayer
             renderContent={setObject => {
               return (
@@ -129,10 +138,13 @@ export const SectionListTest = () => {
               );
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="display nativeEvent when onMomentumScrollEnd">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="display nativeEvent when onMomentumScrollEnd">
+        <View style={styles.container}>
           <ObjectDisplayer
             renderContent={setObject => {
               return (
@@ -145,38 +157,53 @@ export const SectionListTest = () => {
               );
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="display event sent to by onScrollToIndexFailed when pressing the button before scrolling">
-        <Modal>
-          <ScrollToIndexFailureTestCase />
-        </Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="display event sent to by onScrollToIndexFailed when pressing the button before scrolling">
+        <ScrollToIndexFailureTestCase />
       </TestCase.Example>
       {/* sticky headers seems to work on Android when App.tsx was replaced with content of this test */}
       <TestCase.Example
+        tags={['C_API']}
+        modal
         itShould="stick section headers (fails on Android when fabric is enabled)"
         skip={{android: true, harmony: false}}>
-        <Modal>
+        <View style={styles.container}>
           <SectionList {...commonProps} stickySectionHeadersEnabled />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="support viewOffset when scrolling to location">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="support viewOffset when scrolling to location">
+        <View style={styles.container}>
           <ScrollToLocationOffset />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="show vertical scroll indicator">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="show vertical scroll indicator">
+        <View style={styles.container}>
           <SectionList {...commonProps} showsVerticalScrollIndicator={true} />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="hide vertical scroll indicator">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="hide vertical scroll indicator">
+        <View style={styles.container}>
           <SectionList {...commonProps} showsVerticalScrollIndicator={false} />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="show horizontal scroll indicator">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="show horizontal scroll indicator">
+        <View style={styles.container}>
           <View style={{width: 200, height: '100%'}}>
             <SectionList
               {...commonProps}
@@ -184,10 +211,13 @@ export const SectionListTest = () => {
               horizontal
             />
           </View>
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="hide horizontal scroll indicator">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="hide horizontal scroll indicator">
+        <View style={styles.container}>
           <View style={{width: 200, height: '100%'}}>
             <SectionList
               {...commonProps}
@@ -195,18 +225,22 @@ export const SectionListTest = () => {
               horizontal
             />
           </View>
-        </Modal>
+        </View>
       </TestCase.Example>
       <TestCase.Example
+        modal
         itShould="display overscroll effect"
         skip={{android: false, harmony: true}}>
-        <Modal>
+        <View style={styles.container}>
           {/* On Android this settings enables stretching the ScrollView content. On Harmony `bounces` prop can be used instead. */}
           <SectionList {...commonProps} overScrollMode="always" />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render custom RefreshControl on pull to refresh">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="render custom RefreshControl on pull to refresh">
+        <View style={styles.container}>
           <ObjectDisplayer
             renderContent={setObject => {
               return (
@@ -219,7 +253,7 @@ export const SectionListTest = () => {
                         setObject({onRefreshCalled: true});
                       }}
                       refreshing={false}
-                      tintColor={'red'} // iOS. It's unknown how to set the color of the refreshing widget in ArkUI.
+                      tintColor={'red'} // iOS.
                       colors={['red', 'green']} // Android
                     />
                   }
@@ -227,10 +261,13 @@ export const SectionListTest = () => {
               );
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="render standard RefreshControl on pull to refresh">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="render standard RefreshControl on pull to refresh">
+        <View style={styles.container}>
           <ObjectDisplayer
             renderContent={setObject => {
               return (
@@ -244,16 +281,16 @@ export const SectionListTest = () => {
               );
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
+        modal
         itShould="display onScroll native event throttled every second"
         skip={Platform.select({
-          android: 'RN bug',
-          harmony: "doesn't work on Android",
+          android: 'RN bug', // https://github.com/facebook/react-native/issues/18441
         })}>
-        {/* https://github.com/facebook/react-native/issues/18441 */}
-        <Modal>
+        <View style={styles.container}>
           <ObjectDisplayer
             renderContent={setObject => {
               return (
@@ -267,10 +304,13 @@ export const SectionListTest = () => {
               );
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="allow scrolling beneath the content due to large lengths returned in getItemLayout">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="allow scrolling beneath the content due to large lengths returned in getItemLayout">
+        <View style={styles.container}>
           <SectionList
             {...commonProps}
             getItemLayout={(data, index) => {
@@ -282,10 +322,13 @@ export const SectionListTest = () => {
               };
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="display onEndReached event when scroll reached bottom">
-        <Modal>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="display onEndReached event when scroll reached bottom and onStartReached event when scroll reached top">
+        <View style={styles.container}>
           <ObjectDisplayer
             renderContent={setObject => {
               return (
@@ -294,16 +337,22 @@ export const SectionListTest = () => {
                   onEndReached={e => {
                     setObject(e);
                   }}
+                  onStartReached={e => {
+                    setObject(e);
+                  }}
                 />
               );
             }}
           />
-        </Modal>
+        </View>
       </TestCase.Example>
-      <TestCase.Example itShould="click on 'Record interaction' button changes the first three items background color to blue">
-        <Modal contentContainerStyle={{width: '85%'}}>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="click on 'Record interaction' button changes the first three items background color to blue">
+        <View style={{height: 500}}>
           <SectionListRecordInteractionTest />
-        </Modal>
+        </View>
       </TestCase.Example>
     </TestSuite>
   );
@@ -313,7 +362,7 @@ function ScrollToIndexFailureTestCase() {
   const ref = useRef<SectionList>(null);
 
   return (
-    <>
+    <View style={{height: 500}}>
       <Button
         label="Scroll to index"
         onPress={() => {
@@ -326,21 +375,23 @@ function ScrollToIndexFailureTestCase() {
           }
         }}
       />
-      <ObjectDisplayer
-        renderContent={setObject => {
-          return (
-            <SectionList
-              ref={ref}
-              {...commonProps}
-              windowSize={1}
-              onScrollToIndexFailed={info => {
-                setObject(info);
-              }}
-            />
-          );
-        }}
-      />
-    </>
+      <View style={{flex: 1}}>
+        <ObjectDisplayer
+          renderContent={setObject => {
+            return (
+              <SectionList
+                ref={ref}
+                {...commonProps}
+                windowSize={1}
+                onScrollToIndexFailed={info => {
+                  setObject(info);
+                }}
+              />
+            );
+          }}
+        />
+      </View>
+    </View>
   );
 }
 
@@ -470,7 +521,7 @@ function SectionListRecordInteractionTest() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 120,
+    height: 300,
   },
   item: {
     backgroundColor: '#f9c2ff',

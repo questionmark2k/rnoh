@@ -151,8 +151,9 @@ export function TextInputTest() {
           }}
         />
         <TestCase.Manual
-          itShould="focus textInput when pressing the button"
+          tags={['C_API']}
           modal
+          itShould="focus textInput when pressing the button"
           initialState={false}
           arrange={({setState}) => <FocusTextInputTest setState={setState} />}
           assert={({state, expect}) => {
@@ -185,7 +186,9 @@ export function TextInputTest() {
         itShould="render textinput with default selection color">
         <TextInputWithText style={styles.textInput} />
       </TestCase.Example>
-      <TestCase.Example itShould="render textinput with green selection color">
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render textinput with green selection color">
         <TextInputWithText style={styles.textInput} selectionColor="green" />
       </TestCase.Example>
       <TestCase.Example tags={['C_API']} itShould="render multiline text input">
@@ -245,6 +248,7 @@ export function TextInputTest() {
         <AutoCapitalize />
       </TestCase.Example>
       <TestCase.Manual
+        tags={['C_API']}
         modal
         itShould="trigger onSubmitEditing event after submiting"
         initialState={false}
@@ -277,7 +281,10 @@ export function TextInputTest() {
           <TextInputWithText
             style={styles.textInput}
             autoFocus
-            onKeyPress={event => setState(event.nativeEvent.key)}
+            onKeyPress={event => {
+              console.log('[Debug] onKeyPress event: ', JSON.stringify(event));
+              setState(event.nativeEvent.key);
+            }}
           />
         )}
         assert={({expect, state}) => {
@@ -312,6 +319,7 @@ export function TextInputTest() {
         <TextInput style={styles.textInput} defaultValue="defaultText" />
       </TestCase.Example>
       <TestCase.Manual
+        tags={['C_API']}
         modal
         itShould="trigger onLayout event on mount"
         initialState={{}}
@@ -333,6 +341,7 @@ export function TextInputTest() {
         }}
       />
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="render textinputs with different keyboard types">
         <View>
@@ -345,6 +354,7 @@ export function TextInputTest() {
         </View>
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="render multiline textinputs with different keyboard types">
         <View>
@@ -413,11 +423,19 @@ export function TextInputTest() {
           />
         </View>
       </TestCase.Example>
-      <TestCase.Example modal itShould="render textinput with readonly">
-        {/* @ts-ignore */}
-        <TextInputWithText style={styles.textInput} readOnly />
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="render textinput with readonly">
+        <TextInputWithText
+          style={styles.textInput}
+          defaultValue="readOnly"
+          // @ts-ignore
+          readOnly
+        />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="display bold, italic, large placeholder with a custom font">
         <TextInput
@@ -430,10 +448,13 @@ export function TextInputTest() {
           placeholder="placeholder"
         />
       </TestCase.Example>
-      <TestCase.Example modal itShould="render textinput with red text color">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="render textinput with red text color">
         <TextInputWithText style={[styles.textInput, {color: 'red'}]} />
       </TestCase.Example>
-      <TestCase.Example modal itShould="clear text on focus">
+      <TestCase.Example tags={['C_API']} modal itShould="clear text on focus">
         {/* iOS only */}
         <TextInputWithText
           style={styles.textInput}
@@ -441,7 +462,10 @@ export function TextInputTest() {
           clearTextOnFocus
         />
       </TestCase.Example>
-      <TestCase.Example modal itShould="use different clearButtonMode values">
+      <TestCase.Example
+        tags={['C_API']} // Only "unless-editing" mode doesn't work on C_API
+        modal
+        itShould="use different clearButtonMode values">
         <TextInputWithText style={styles.textInput} clearButtonMode="always" />
         <Text>clearButtonMode="always"</Text>
         {
@@ -462,7 +486,8 @@ export function TextInputTest() {
           )
         }
         <TextInputWithText style={styles.textInput} clearButtonMode="never" />
-        <Text>clearButtonMode="never"</Text>
+        {/* You cannot see inputs with */}
+        <Text style={{marginBottom: 200}}>clearButtonMode="never"</Text>
       </TestCase.Example>
       <TestCase.Example modal itShould="show selection start and end values">
         <TextSelectionChangeTest />
@@ -490,6 +515,7 @@ export function TextInputTest() {
         />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         modal
         itShould="allow to change the text input value via props">
         <TextInputValueSetProgrammatically />
