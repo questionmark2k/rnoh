@@ -66,11 +66,14 @@ ArkUINode& ArkUINode::setSize(facebook::react::Size const& size) {
 
 ArkUINode& ArkUINode::setBorderWidth(
     facebook::react::BorderWidths const& borderWidths) {
-  ArkUI_NumberValue borderWidthValue[] = {
-      static_cast<float>(borderWidths.top),
-      static_cast<float>(borderWidths.right),
-      static_cast<float>(borderWidths.bottom),
-      static_cast<float>(borderWidths.left)};
+  facebook::react::BorderWidths  borderWidth;
+  borderWidth.top = std::max(borderWidths.top, 0);
+  borderWidth.right = std::max(borderWidths.right, 0);
+  borderWidth.bottom = std::max(borderWidths.bottom, 0);
+  borderWidth.left = std::max(borderWidths.left, 0);
+   ArkUI_NumberValue borderWidthValue[] = {
+      static_cast<float>(borderWidth.top), static_cast<float>(borderWidth.right),
+      static_cast<float>(borderWidth.bottom), static_cast<float>(borderWidth.left)};
 
   ArkUI_AttributeItem borderWidthItem = {
       borderWidthValue, sizeof(borderWidthValue) / sizeof(ArkUI_NumberValue)};
