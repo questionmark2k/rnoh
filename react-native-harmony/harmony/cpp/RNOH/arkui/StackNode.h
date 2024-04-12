@@ -19,7 +19,8 @@ class StackNode : public ArkUINode {
 
   void insertChild(ArkUINode& child, std::size_t index);
   void removeChild(ArkUINode& child);
-  void onNodeEvent(ArkUI_NodeEvent* event) override;
+  void onNodeEvent(ArkUI_NodeEventType eventType, EventArgs& eventArgs)
+      override;
   void onClick();
   void setStackNodeDelegate(StackNodeDelegate* stackNodeDelegate);
   StackNode& setMargin(float left, float top, float right, float bottom);

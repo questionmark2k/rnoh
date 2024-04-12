@@ -37,7 +37,7 @@ static std::pair<TouchTarget::Shared, Point> findTargetForTouchPoint(
 }
 
 facebook::react::Touch convertTouchPointToReactTouch(
-    ArkUI_NodeTouchPoint const& touchPoint,
+    TouchPoint const& touchPoint,
     TouchTarget::Shared const& target,
     double timestampSeconds) {
   Point rootPoint{
@@ -58,23 +58,6 @@ facebook::react::Touch convertTouchPointToReactTouch(
       .timestamp = timestampSeconds};
 
   return touch;
-}
-
-std::pair<std::unique_ptr<ArkUI_NodeTouchPoint[]>, int32_t> getTouchesFromEvent(
-    ArkUI_NodeTouchEvent event) {
-  if (event.getTouches == nullptr) {
-    // `getTouches` is not implemented -- we assume there's only one active
-    // touch
-    ArkUI_NodeTouchPoint* touchPoints =
-        new ArkUI_NodeTouchPoint[1]{event.actionTouch};
-    return std::make_pair(
-        std::unique_ptr<ArkUI_NodeTouchPoint[]>(touchPoints), 1);
-  }
-  ArkUI_NodeTouchPoint* touchPointsPtr;
-  auto touchPointsCount = event.getTouches(&touchPointsPtr);
-  return std::make_pair(
-      std::unique_ptr<ArkUI_NodeTouchPoint[]>(touchPointsPtr),
-      touchPointsCount);
 }
 
 bool TouchEventDispatcher::canIgnoreMoveEvent(
@@ -98,38 +81,75 @@ bool TouchEventDispatcher::canIgnoreMoveEvent(
   return true;
 }
 
+TouchPoint getActiveTouchFromEvent(ArkUI_UIInputEvent* event) {
+  TouchPoint actionTouch{};
+#ifdef C_API_ARCH
+  actionTouch = TouchPoint{
+      .id = OH_ArkUI_PointerEvent_GetPointerId(event, 0),
+      .nodeX = int32_t(OH_ArkUI_PointerEvent_GetX(event)),
+      .nodeY = int32_t(OH_ArkUI_PointerEvent_GetY(event)),
+      .screenX = int32_t(OH_ArkUI_PointerEvent_GetDisplayX(event)),
+      .screenY = int32_t(OH_ArkUI_PointerEvent_GetDisplayY(event))};
+#endif
+  return actionTouch;
+}
+
+std::vector<TouchPoint> getTouchesFromEvent(ArkUI_UIInputEvent* event) {
+  std::vector<TouchPoint> result;
+#ifdef C_API_ARCH
+  auto touchPointCount = OH_ArkUI_PointerEvent_GetPointerCount(event);
+  result.reserve(touchPointCount);
+  for (auto idx = 0; idx < touchPointCount; idx++) {
+    result.emplace_back(TouchPoint{
+        .id = OH_ArkUI_PointerEvent_GetPointerId(event, idx),
+        .nodeX = int32_t(OH_ArkUI_PointerEvent_GetXByIndex(event, idx)),
+        .nodeY = int32_t(OH_ArkUI_PointerEvent_GetYByIndex(event, idx)),
+        .screenX =
+            int32_t(OH_ArkUI_PointerEvent_GetDisplayXByIndex(event, idx)),
+        .screenY =
+            int32_t(OH_ArkUI_PointerEvent_GetDisplayYByIndex(event, idx))});
+  }
+#endif
+  return result;
+}
+
 void TouchEventDispatcher::dispatchTouchEvent(
-    ArkUI_NodeTouchEvent event,
+    ArkUI_UIInputEvent* event,
     TouchTarget::Shared const& rootTarget) {
-  VLOG(2) << "Touch event received: id=" << event.actionTouch.id
-          << ", action type:" << event.action;
+#ifdef C_API_ARCH
+  auto action = OH_ArkUI_UIInputEvent_GetAction(event);
+  auto timestamp = OH_ArkUI_UIInputEvent_GetEventTime(event);
+  auto activeTouch = getActiveTouchFromEvent(event);
+  auto touchPoints = getTouchesFromEvent(event);
+
+  VLOG(2) << "Touch event received: id=" << activeTouch.id
+          << ", action type:" << action;
   // react-native expects a timestamp in seconds (because rn multiplies the
   // value by 1e3). The timestamp passed by ArkUI is in nanoseconds. We convert
   // it first to miliseconds before casting to lose unnecessary precision. Then
   // we cast it to a double and convert it to seconds.
-  double timestampSeconds = static_cast<double>(event.timeStamp / 1e6) / 1e3;
+  double timestampSeconds = static_cast<double>(timestamp) / 1e9;
 
-  if (event.action == NODE_ACTION_DOWN) {
-    registerTargetForTouch(event.actionTouch, rootTarget);
+  if (action == UI_TOUCH_EVENT_ACTION_DOWN) {
+    registerTargetForTouch(activeTouch, rootTarget);
   } else if (
-      m_touchTargetByTouchId.find(event.actionTouch.id) !=
+      m_touchTargetByTouchId.find(activeTouch.id) !=
       m_touchTargetByTouchId.end()) {
     Point touchPoint{
-        .x = static_cast<facebook::react::Float>(event.actionTouch.nodeX),
-        .y = static_cast<facebook::react::Float>(event.actionTouch.nodeY)};
+        .x = static_cast<facebook::react::Float>(activeTouch.nodeX),
+        .y = static_cast<facebook::react::Float>(activeTouch.nodeY)};
     auto touchTarget = findTargetForTouchPoint(touchPoint, rootTarget).first;
     auto hasCancelled =
         maybeCancelPreviousTouchEvent(timestampSeconds, touchTarget);
     if (hasCancelled) {
-      m_touchTargetByTouchId.erase(event.actionTouch.id);
+      m_touchTargetByTouchId.erase(activeTouch.id);
       return;
     }
   }
 
-  auto it = m_touchTargetByTouchId.find(event.actionTouch.id);
+  auto it = m_touchTargetByTouchId.find(activeTouch.id);
   if (it == m_touchTargetByTouchId.end()) {
-    VLOG(2) << "No target for current touch event with id: "
-            << event.actionTouch.id;
+    VLOG(2) << "No target for current touch event with id: " << activeTouch.id;
     return;
   }
   auto eventTarget = it->second.lock();
@@ -139,14 +159,11 @@ void TouchEventDispatcher::dispatchTouchEvent(
     return;
   }
 
-  auto [touchPoints, touchPointsCount] = getTouchesFromEvent(event);
-
   facebook::react::Touches touches;
   std::optional<facebook::react::Touch> changedTouch;
   facebook::react::Touches targetTouches;
 
-  for (int i = 0; i < touchPointsCount; i++) {
-    auto touchPoint = touchPoints[i];
+  for (auto const& touchPoint : touchPoints) {
     auto id = touchPoint.id;
     if (m_touchTargetByTouchId.find(id) == m_touchTargetByTouchId.end()) {
       DLOG(INFO) << "Touch with id " << id << " does not exist";
@@ -163,7 +180,7 @@ void TouchEventDispatcher::dispatchTouchEvent(
     if (touchTarget->getTouchTargetTag() == eventTarget->getTouchTargetTag()) {
       targetTouches.insert(touch);
     }
-    if (id == event.actionTouch.id) {
+    if (id == activeTouch.id) {
       changedTouch = touch;
     }
   }
@@ -173,7 +190,7 @@ void TouchEventDispatcher::dispatchTouchEvent(
     return;
   }
 
-  if (event.action == NODE_ACTION_UP) {
+  if (action == UI_TOUCH_EVENT_ACTION_UP) {
     touches.erase(changedTouch.value());
     targetTouches.erase(changedTouch.value());
     m_touchTargetByTouchId.erase(changedTouch.value().identifier);
@@ -184,31 +201,32 @@ void TouchEventDispatcher::dispatchTouchEvent(
       .changedTouches = {changedTouch.value()},
       .targetTouches = std::move(targetTouches)};
 
-  if (event.action == NODE_ACTION_MOVE && canIgnoreMoveEvent(touchEvent)) {
+  if (action == UI_TOUCH_EVENT_ACTION_MOVE && canIgnoreMoveEvent(touchEvent)) {
     VLOG(2) << "Should ignore current touchEvent";
     return;
   }
   m_previousEvent = touchEvent;
 
-  switch (event.action) {
-    case NODE_ACTION_DOWN:
+  switch (action) {
+    case UI_TOUCH_EVENT_ACTION_DOWN:
       eventTarget->getTouchEventEmitter()->onTouchStart(touchEvent);
       break;
-    case NODE_ACTION_MOVE:
+    case UI_TOUCH_EVENT_ACTION_MOVE:
       eventTarget->getTouchEventEmitter()->onTouchMove(touchEvent);
       break;
-    case NODE_ACTION_UP:
+    case UI_TOUCH_EVENT_ACTION_UP:
       eventTarget->getTouchEventEmitter()->onTouchEnd(touchEvent);
       break;
-    case NODE_ACTION_CANCEL:
+    case UI_TOUCH_EVENT_ACTION_CANCEL:
     default:
       eventTarget->getTouchEventEmitter()->onTouchCancel(touchEvent);
       break;
   }
+#endif
 }
 
 TouchTarget::Shared TouchEventDispatcher::registerTargetForTouch(
-    ArkUI_NodeTouchPoint activeTouch,
+    TouchPoint activeTouch,
     TouchTarget::Shared const& rootTarget) {
   auto id = activeTouch.id;
   if (m_touchTargetByTouchId.find(id) != m_touchTargetByTouchId.end()) {

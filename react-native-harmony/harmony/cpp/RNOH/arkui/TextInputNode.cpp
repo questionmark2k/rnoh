@@ -18,7 +18,7 @@ TextInputNode::TextInputNode()
       m_textInputNodeDelegate(nullptr) {
   for (auto eventType : TEXT_INPUT_NODE_EVENT_TYPES) {
     maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(
-        m_nodeHandle, eventType, eventType));
+        m_nodeHandle, eventType, eventType, this));
   }
 }
 
@@ -28,33 +28,41 @@ TextInputNode::~TextInputNode() {
   }
 }
 
-void TextInputNode::onNodeEvent(ArkUI_NodeEvent* event) {
-  if (event->kind == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_PASTE) {
+void TextInputNode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    EventArgs& eventArgs) {
+  if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_PASTE) {
     if (m_textInputNodeDelegate != nullptr) {
       m_textInputNodeDelegate->onPaste();
     }
-  } else if (event->kind == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_CHANGE) {
-    if (m_textInputNodeDelegate != nullptr) {
-      std::string text = event->stringEvent.pStr;
-      m_textInputNodeDelegate->onChange(std::move(text));
-    }
-  } else if (event->kind == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_SUBMIT) {
+  } else if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_SUBMIT) {
     if (m_textInputNodeDelegate != nullptr) {
       m_textInputNodeDelegate->onSubmit();
     }
-  } else if (event->kind == ArkUI_NodeEventType::NODE_ON_FOCUS) {
+  } else if (eventType == ArkUI_NodeEventType::NODE_ON_FOCUS) {
     if (m_textInputNodeDelegate != nullptr) {
       m_textInputNodeDelegate->onFocus();
     }
-  } else if (event->kind == ArkUI_NodeEventType::NODE_ON_BLUR) {
+  } else if (eventType == ArkUI_NodeEventType::NODE_ON_BLUR) {
     if (m_textInputNodeDelegate != nullptr) {
       m_textInputNodeDelegate->onBlur();
     }
   } else if (
-      event->kind ==
+      eventType ==
       ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_TEXT_SELECTION_CHANGE) {
     if (m_textInputNodeDelegate != nullptr) {
       m_textInputNodeDelegate->onTextSelectionChange();
+    }
+  }
+}
+
+void TextInputNode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    std::string_view eventString) {
+  if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_CHANGE) {
+    if (m_textInputNodeDelegate != nullptr) {
+      std::string text(eventString);
+      m_textInputNodeDelegate->onChange(std::move(text));
     }
   }
 }

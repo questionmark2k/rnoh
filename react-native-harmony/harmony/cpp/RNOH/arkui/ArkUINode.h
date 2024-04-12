@@ -12,6 +12,7 @@
 #include <react/renderer/graphics/Rect.h>
 #include <react/renderer/graphics/Transform.h>
 #include <stdexcept>
+#include "ArkUINodeRegistry.h"
 #include "glog/logging.h"
 #include "react/renderer/components/view/primitives.h"
 
@@ -81,7 +82,12 @@ class ArkUINode {
 
   virtual ArkUINode& resetAccessibilityText();
 
-  virtual void onNodeEvent(ArkUI_NodeEvent* event);
+  // method for handling node events with ArkUI_NodeComponentEvent payload type
+  virtual void onNodeEvent(ArkUI_NodeEventType eventType, EventArgs& eventArgs);
+  // method for handling node events with ArkUI_StringAsyncEvent payload type
+  virtual void onNodeEvent(
+      ArkUI_NodeEventType eventType,
+      std::string_view eventString);
 
   virtual ~ArkUINode();
 

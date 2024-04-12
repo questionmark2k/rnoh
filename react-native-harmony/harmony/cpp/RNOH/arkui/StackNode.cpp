@@ -11,7 +11,7 @@ StackNode::StackNode()
           ArkUI_NodeType::ARKUI_NODE_STACK)),
       m_stackNodeDelegate(nullptr) {
   maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(
-      m_nodeHandle, NODE_ON_CLICK, 0));
+      m_nodeHandle, NODE_ON_CLICK, 0, this));
 }
 
 void StackNode::insertChild(ArkUINode& child, std::size_t index) {
@@ -28,9 +28,11 @@ void StackNode::setStackNodeDelegate(StackNodeDelegate* stackNodeDelegate) {
   m_stackNodeDelegate = stackNodeDelegate;
 }
 
-void StackNode::onNodeEvent(ArkUI_NodeEvent* event) {
-  if (event->kind == ArkUI_NodeEventType::NODE_ON_CLICK &&
-      event->componentEvent.data[3].i32 != 2) {
+void StackNode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    EventArgs& eventArgs) {
+  if (eventType == ArkUI_NodeEventType::NODE_ON_CLICK &&
+      eventArgs[3].i32 != 2) {
     onClick();
   }
 }

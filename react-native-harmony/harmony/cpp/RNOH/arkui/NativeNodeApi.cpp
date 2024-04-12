@@ -7,8 +7,11 @@ ArkUI_NativeNodeAPI_1* NativeNodeApi::getInstance() {
 #ifdef C_API_ARCH
   static ArkUI_NativeNodeAPI_1* INSTANCE = nullptr;
   if (INSTANCE == nullptr) {
-    INSTANCE = reinterpret_cast<ArkUI_NativeNodeAPI_1*>(
-        OH_ArkUI_GetNativeAPI(ARKUI_NATIVE_NODE, 1));
+    OH_ArkUI_GetModuleInterface(
+        ARKUI_NATIVE_NODE, ArkUI_NativeNodeAPI_1, INSTANCE);
+    if (INSTANCE == nullptr) {
+      LOG(FATAL) << "Failed to get native node API instance.";
+    }
   }
   return INSTANCE;
 #endif

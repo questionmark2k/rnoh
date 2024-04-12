@@ -1,7 +1,7 @@
 #include "ScrollNode.h"
 #include <glog/logging.h>
 
-static constexpr ArkUI_NodeEventType SCROLL_NODE_EVENT_TYPES[] = {
+static constexpr std::array SCROLL_NODE_EVENT_TYPES{
     NODE_SCROLL_EVENT_ON_SCROLL,
     NODE_SCROLL_EVENT_ON_SCROLL_START,
     NODE_SCROLL_EVENT_ON_SCROLL_STOP,
@@ -15,7 +15,7 @@ ScrollNode::ScrollNode()
       m_scrollNodeDelegate(nullptr) {
   for (auto eventType : SCROLL_NODE_EVENT_TYPES) {
     maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(
-        m_nodeHandle, eventType, eventType));
+        m_nodeHandle, eventType, eventType, this));
   }
 }
 
@@ -25,28 +25,30 @@ ScrollNode::~ScrollNode() {
   }
 }
 
-void ScrollNode::onNodeEvent(ArkUI_NodeEvent* event) {
-  if (event->kind == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL) {
+void ScrollNode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    EventArgs& eventArgs) {
+  if (eventType == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL) {
     if (m_scrollNodeDelegate != nullptr) {
       m_scrollNodeDelegate->onScroll();
     }
   } else if (
-      event->kind == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL_START) {
+      eventType == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL_START) {
     if (m_scrollNodeDelegate != nullptr) {
       m_scrollNodeDelegate->onScrollStart();
     }
   } else if (
-      event->kind == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL_STOP) {
+      eventType == ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL_STOP) {
     if (m_scrollNodeDelegate != nullptr) {
       m_scrollNodeDelegate->onScrollStop();
     }
   } else if (
-      event->kind ==
+      eventType ==
       ArkUI_NodeEventType::NODE_SCROLL_EVENT_ON_SCROLL_FRAME_BEGIN) {
     if (m_scrollNodeDelegate != nullptr) {
       auto remainingOffset = m_scrollNodeDelegate->onScrollFrameBegin(
-          event->componentEvent.data[0].f32, event->componentEvent.data[1].i32);
-      event->componentEvent.data[0].f32 = remainingOffset;
+          eventArgs[0].f32, eventArgs[1].i32);
+      eventArgs[0].f32 = remainingOffset;
     }
   }
 }

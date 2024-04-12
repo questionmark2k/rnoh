@@ -51,7 +51,8 @@ class SurfaceTouchEventHandler : public TouchEventHandler {
     NativeNodeApi::getInstance()->registerNodeEvent(
         m_rootView->getLocalRootArkUINode().getArkUINodeHandle(),
         NODE_TOUCH_EVENT,
-        NODE_TOUCH_EVENT);
+        NODE_TOUCH_EVENT,
+        this);
   }
 
   SurfaceTouchEventHandler(SurfaceTouchEventHandler const& other) = delete;
@@ -70,7 +71,7 @@ class SurfaceTouchEventHandler : public TouchEventHandler {
         &m_rootView->getLocalRootArkUINode());
   }
 
-  void onTouchEvent(ArkUI_NodeTouchEvent event) override {
+  void onTouchEvent(ArkUI_UIInputEvent* event) override {
     m_touchEventDispatcher.dispatchTouchEvent(event, m_rootView);
   }
 };

@@ -20,7 +20,7 @@ class RefreshNode : public ArkUINode {
 
   void insertChild(ArkUINode& child, std::size_t index);
   void removeChild(ArkUINode& child);
-  void onNodeEvent(ArkUI_NodeEvent* event);
+  void onNodeEvent(ArkUI_NodeEventType eventType, EventArgs& eventArgs);
   RefreshNode& setNativeRefreshing(bool isRefreshing);
   RefreshNode& setRefreshNodeDelegate(RefreshNodeDelegate* refreshNodeDelegate);
   RefreshNode& setRefreshContent(ArkUINode& refreshContent);

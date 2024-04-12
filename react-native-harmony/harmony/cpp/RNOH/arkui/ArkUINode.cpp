@@ -21,8 +21,6 @@ ArkUINode& ArkUINode::operator=(ArkUINode&& other) noexcept {
   return *this;
 }
 
-void ArkUINode::onNodeEvent(ArkUI_NodeEvent* event) {}
-
 ArkUI_NodeHandle ArkUINode::getArkUINodeHandle() {
   return m_nodeHandle;
 }
@@ -66,14 +64,16 @@ ArkUINode& ArkUINode::setSize(facebook::react::Size const& size) {
 
 ArkUINode& ArkUINode::setBorderWidth(
     facebook::react::BorderWidths const& borderWidths) {
-  facebook::react::BorderWidths  borderWidth;
+  facebook::react::BorderWidths borderWidth;
   borderWidth.top = std::max(borderWidths.top, 0.0);
   borderWidth.right = std::max(borderWidths.right, 0.0);
   borderWidth.bottom = std::max(borderWidths.bottom, 0.0);
   borderWidth.left = std::max(borderWidths.left, 0.0);
-   ArkUI_NumberValue borderWidthValue[] = {
-      static_cast<float>(borderWidth.top), static_cast<float>(borderWidth.right),
-      static_cast<float>(borderWidth.bottom), static_cast<float>(borderWidth.left)};
+  ArkUI_NumberValue borderWidthValue[] = {
+      static_cast<float>(borderWidth.top),
+      static_cast<float>(borderWidth.right),
+      static_cast<float>(borderWidth.bottom),
+      static_cast<float>(borderWidth.left)};
 
   ArkUI_AttributeItem borderWidthItem = {
       borderWidthValue, sizeof(borderWidthValue) / sizeof(ArkUI_NumberValue)};
@@ -365,6 +365,14 @@ ArkUINode& ArkUINode::resetAccessibilityText() {
       m_nodeHandle, NODE_ACCESSIBILITY_TEXT));
   return *this;
 }
+
+void ArkUINode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    EventArgs& eventArgs) {}
+
+void ArkUINode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    std::string_view eventString) {}
 
 ArkUINode::~ArkUINode() {
   if (m_nodeHandle) {

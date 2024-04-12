@@ -16,7 +16,7 @@ TextAreaNode::TextAreaNode()
       m_textAreaNodeDelegate(nullptr) {
   for (auto eventType : TEXT_AREA_NODE_EVENT_TYPES) {
     maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(
-        m_nodeHandle, eventType, eventType));
+        m_nodeHandle, eventType, eventType, this));
   }
 }
 
@@ -26,29 +26,37 @@ TextAreaNode::~TextAreaNode() {
   }
 }
 
-void TextAreaNode::onNodeEvent(ArkUI_NodeEvent* event) {
-  if (event->kind == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_PASTE) {
+void TextAreaNode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    EventArgs& /* eventArgs */) {
+  if (eventType == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_PASTE) {
     if (m_textAreaNodeDelegate != nullptr) {
       m_textAreaNodeDelegate->onPaste();
     }
-  } else if (event->kind == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_CHANGE) {
-    if (m_textAreaNodeDelegate != nullptr) {
-      std::string text = event->stringEvent.pStr;
-      m_textAreaNodeDelegate->onChange(std::move(text));
-    }
-  } else if (event->kind == ArkUI_NodeEventType::NODE_ON_FOCUS) {
+  } else if (eventType == ArkUI_NodeEventType::NODE_ON_FOCUS) {
     if (m_textAreaNodeDelegate != nullptr) {
       m_textAreaNodeDelegate->onFocus();
     }
-  } else if (event->kind == ArkUI_NodeEventType::NODE_ON_BLUR) {
+  } else if (eventType == ArkUI_NodeEventType::NODE_ON_BLUR) {
     if (m_textAreaNodeDelegate != nullptr) {
       m_textAreaNodeDelegate->onBlur();
     }
   } else if (
-      event->kind ==
+      eventType ==
       ArkUI_NodeEventType::NODE_TEXT_AREA_ON_TEXT_SELECTION_CHANGE) {
     if (m_textAreaNodeDelegate != nullptr) {
       m_textAreaNodeDelegate->onTextSelectionChange();
+    }
+  }
+}
+
+void TextAreaNode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    std::string_view eventString) {
+  if (eventType == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_CHANGE) {
+    if (m_textAreaNodeDelegate != nullptr) {
+      std::string text(eventString);
+      m_textAreaNodeDelegate->onChange(std::move(text));
     }
   }
 }

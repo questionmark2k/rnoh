@@ -70,7 +70,9 @@ napi_value initializeArkTSBridge(napi_env env, napi_callback_info info) {
   return arkJs.getUndefined();
 }
 
-static napi_value getNextRNInstanceId(napi_env env, napi_callback_info info) {
+static napi_value getNextRNInstanceId(
+    napi_env env,
+    napi_callback_info /*info*/) {
   try {
     static std::atomic_size_t nextId = 0;
     auto id = nextId++;
@@ -208,10 +210,9 @@ static napi_value loadScript(napi_env env, napi_callback_info info) {
         arkJs.getArrayBuffer(args[1]),
         arkJs.getString(args[2]),
         [taskExecutor = rnInstance->getTaskExecutor(), env, onFinishRef](
-            const std::string errorMsg) {
+            const std::string& errorMsg) {
           taskExecutor->runTask(
-              TaskThread::MAIN,
-              [env, onFinishRef, errorMsg = std::move(errorMsg)]() {
+              TaskThread::MAIN, [env, onFinishRef, errorMsg]() {
                 ArkJS arkJs(env);
                 auto listener = arkJs.getReferenceValue(onFinishRef);
                 arkJs.call<1>(listener, {arkJs.createString(errorMsg)});
@@ -513,9 +514,8 @@ static void registerNativeXComponent(napi_env env, napi_value exports) {
   }
   auto& rnInstance = rnInstanceById.at(instanceIdNum);
 
-  RNInstanceCAPI* rnInstanceCPIRawPtr =
-      dynamic_cast<RNInstanceCAPI*>(rnInstance.get());
-  if (rnInstanceCPIRawPtr) {
+  auto* rnInstanceCPIRawPtr = dynamic_cast<RNInstanceCAPI*>(rnInstance.get());
+  if (rnInstanceCPIRawPtr != nullptr) {
     rnInstanceCPIRawPtr->registerNativeXComponentHandle(
         nativeXComponent, std::stoi(surfaceId));
   }
@@ -684,8 +684,8 @@ static napi_module demoModule = {
     .nm_filename = nullptr,
     .nm_register_func = Init,
     .nm_modname = "rnoh_app",
-    .nm_priv = ((void*)0),
-    .reserved = {0},
+    .nm_priv = ((void*)nullptr),
+    .reserved = {nullptr},
 };
 
 extern "C" __attribute__((constructor)) void RegisterEntryModule(void) {

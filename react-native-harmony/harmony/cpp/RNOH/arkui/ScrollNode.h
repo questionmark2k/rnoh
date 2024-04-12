@@ -28,7 +28,8 @@ class ScrollNode : public ArkUINode {
 
   void insertChild(ArkUINode& child);
   void removeChild(ArkUINode& child);
-  void onNodeEvent(ArkUI_NodeEvent* event) override;
+  void onNodeEvent(ArkUI_NodeEventType eventType, EventArgs& eventArgs)
+      override;
 
   Point getScrollOffset() const;
   void setScrollNodeDelegate(ScrollNodeDelegate* scrollNodeDelegate);

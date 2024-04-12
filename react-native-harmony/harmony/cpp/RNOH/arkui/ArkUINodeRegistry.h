@@ -9,9 +9,11 @@ namespace rnoh {
 
 class ArkUINode;
 
+using EventArgs = ArkUI_NumberValue[MAX_COMPONENT_EVENT_ARG_NUM];
+
 class TouchEventHandler {
  public:
-  virtual void onTouchEvent(ArkUI_NodeTouchEvent event) = 0;
+  virtual void onTouchEvent(ArkUI_UIInputEvent* event) = 0;
   virtual ~TouchEventHandler() = default;
 };
 

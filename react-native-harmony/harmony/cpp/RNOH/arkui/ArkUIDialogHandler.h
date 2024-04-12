@@ -46,7 +46,7 @@ class ArkUIDialogHandler {
 
   bool isShow_ = false;
   ArkUI_NativeDialogHandle handler_;
-  ArkUIDialogDelegate* m_dialogDelegate;
+  ArkUIDialogDelegate* m_dialogDelegate{};
 };
 
 } // namespace rnoh

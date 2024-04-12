@@ -26,7 +26,10 @@ class ModalHostTouchHandler : public TouchEventHandler {
     auto* rootNode = &rootView->m_rootStackNode;
     ArkUINodeRegistry::getInstance().registerTouchHandler(rootNode, this);
     NativeNodeApi::getInstance()->registerNodeEvent(
-        rootNode->getArkUINodeHandle(), NODE_TOUCH_EVENT, NODE_TOUCH_EVENT);
+        rootNode->getArkUINodeHandle(),
+        NODE_TOUCH_EVENT,
+        NODE_TOUCH_EVENT,
+        this);
   }
 
   ~ModalHostTouchHandler() override {
@@ -36,7 +39,7 @@ class ModalHostTouchHandler : public TouchEventHandler {
     ArkUINodeRegistry::getInstance().unregisterTouchHandler(rootNode);
   }
 
-  void onTouchEvent(ArkUI_NodeTouchEvent event) override {
+  void onTouchEvent(ArkUI_UIInputEvent* event) override {
     m_touchEventDispatcher.dispatchTouchEvent(
         event, m_rootView->shared_from_this());
   }

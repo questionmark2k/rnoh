@@ -39,7 +39,8 @@ class ImageNode : public ArkUINode {
   ImageNode& resetFocusable();
   ImageNode& resetResizeMethod();
 
-  void onNodeEvent(ArkUI_NodeEvent* event) override;
+  void onNodeEvent(ArkUI_NodeEventType eventType, EventArgs& eventArgs)
+      override;
   void setNodeDelegate(ImageNodeDelegate* imageNodeDelegate);
 
   std::string getUri();

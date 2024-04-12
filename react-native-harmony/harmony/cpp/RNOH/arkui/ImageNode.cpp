@@ -19,7 +19,7 @@ ImageNode::ImageNode()
       m_imageNodeDelegate(nullptr) {
   for (auto eventType : IMAGE_NODE_EVENT_TYPES) {
     maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(
-        m_nodeHandle, eventType, eventType));
+        m_nodeHandle, eventType, eventType, this));
   }
 }
 
@@ -33,18 +33,18 @@ void ImageNode::setNodeDelegate(ImageNodeDelegate* imageNodeDelegate) {
   m_imageNodeDelegate = imageNodeDelegate;
 }
 
-void ImageNode::onNodeEvent(ArkUI_NodeEvent* event) {
-  if (event->kind == ArkUI_NodeEventType::NODE_IMAGE_ON_COMPLETE) {
-    if (m_imageNodeDelegate != nullptr &&
-        event->componentEvent.data[0].i32 == 1) {
-      m_imageNodeDelegate->onComplete(
-          event->componentEvent.data[1].f32, event->componentEvent.data[2].f32);
+void ImageNode::onNodeEvent(
+    ArkUI_NodeEventType eventType,
+    EventArgs& eventArgs) {
+  if (eventType == ArkUI_NodeEventType::NODE_IMAGE_ON_COMPLETE) {
+    if (m_imageNodeDelegate != nullptr && eventArgs[0].i32 == 1) {
+      m_imageNodeDelegate->onComplete(eventArgs[1].f32, eventArgs[2].f32);
     }
   }
 
-  if (event->kind == ArkUI_NodeEventType::NODE_IMAGE_ON_ERROR) {
+  if (eventType == ArkUI_NodeEventType::NODE_IMAGE_ON_ERROR) {
     if (m_imageNodeDelegate != nullptr) {
-      m_imageNodeDelegate->onError(event->componentEvent.data[0].i32);
+      m_imageNodeDelegate->onError(eventArgs[0].i32);
     }
   }
 }

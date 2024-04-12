@@ -39,7 +39,7 @@ void ArkUIDialogHandler::setContent(ArkUINode& node) {
 }
 
 void ArkUIDialogHandler::close() {
-  if (handler_) {
+  if (handler_ != nullptr) {
     NativeDialogApi::getInstance()->close(handler_);
   }
   isShow_ = false;
@@ -47,19 +47,19 @@ void ArkUIDialogHandler::close() {
 
 void ArkUIDialogHandler::destroy() {
   close();
-  if (handler_) {
+  if (handler_ != nullptr) {
     NativeDialogApi::getInstance()->dispose(handler_);
   }
 }
 
 void ArkUIDialogHandler::onShow() {
-  if (m_dialogDelegate) {
+  if (m_dialogDelegate != nullptr) {
     m_dialogDelegate->onShow();
   }
 }
 
 void ArkUIDialogHandler::onRequestClose() {
-  if (m_dialogDelegate) {
+  if (m_dialogDelegate != nullptr) {
     m_dialogDelegate->onRequestClose();
   }
 }
@@ -74,7 +74,7 @@ void ArkUIDialogHandler::initDialogProperties() {
   NativeDialogApi::getInstance()->setMask(handler_, 0, nullptr);
   // register onWillDismiss event
   NativeDialogApi::getInstance()->registerOnWillDismiss(
-      handler_, [](int32_t reason) -> bool {
+      handler_, [](int32_t /*reason*/) -> bool {
         if (!dialogs.empty()) {
           auto dialog = dialogs.back();
           dialog->onRequestClose();

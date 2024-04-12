@@ -73,29 +73,51 @@ ArkUINodeRegistry::ArkUINodeRegistry(ArkTSBridge::Shared arkTSBridge)
 }
 
 void ArkUINodeRegistry::receiveEvent(ArkUI_NodeEvent* event) {
+#ifdef C_API_ARCH
   try {
-    if (event->kind == ArkUI_NodeEventType::NODE_TOUCH_EVENT) {
-      auto it = m_touchHandlerByNodeHandle.find(event->node);
+    auto eventType = OH_ArkUI_NodeEvent_GetEventType(event);
+    auto node = OH_ArkUI_NodeEvent_GetNodeHandle(event);
+
+    if (eventType == ArkUI_NodeEventType::NODE_TOUCH_EVENT) {
+      auto it = m_touchHandlerByNodeHandle.find(node);
       if (it == m_touchHandlerByNodeHandle.end()) {
-        LOG(WARNING) << "Touch event for node with handle: " << event->node
+        LOG(WARNING) << "Touch event for node with handle: " << node
                      << " not found";
         return;
       }
 
-      it->second->onTouchEvent(event->touchEvent);
+      auto inputEvent = OH_ArkUI_NodeEvent_GetInputEvent(event);
+      if (inputEvent == nullptr ||
+          OH_ArkUI_UIInputEvent_GetType(inputEvent) !=
+              ArkUI_UIInputEvent_Type::ARKUI_UIINPUTEVENT_TYPE_TOUCH) {
+        return;
+      }
+
+      it->second->onTouchEvent(inputEvent);
       return;
     }
 
-    auto it = m_nodeByHandle.find(event->node);
+    auto it = m_nodeByHandle.find(node);
     if (it == m_nodeByHandle.end()) {
-      LOG(WARNING) << "Node with handle: " << event->node << " not found";
+      LOG(WARNING) << "Node with handle: " << node << " not found";
       return;
     }
 
-    it->second->onNodeEvent(event);
+    auto componentEvent = OH_ArkUI_NodeEvent_GetNodeComponentEvent(event);
+    if (componentEvent != nullptr) {
+      it->second->onNodeEvent(eventType, componentEvent->data);
+      return;
+    }
+    auto eventString = OH_ArkUI_NodeEvent_GetStringAsyncEvent(event);
+    if (eventString != nullptr) {
+      it->second->onNodeEvent(eventType, std::string_view(eventString->pStr));
+      return;
+    }
+
   } catch (std::exception& e) {
     m_arkTSBridge->handleError(std::current_exception());
   }
+#endif
 }
 
 } // namespace rnoh

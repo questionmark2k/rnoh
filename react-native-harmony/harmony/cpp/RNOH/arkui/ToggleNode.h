@@ -19,7 +19,7 @@ class ToggleNode : public ArkUINode {
   ToggleNode();
   ~ToggleNode();
 
-  void onNodeEvent(ArkUI_NodeEvent* event);
+  void onNodeEvent(ArkUI_NodeEventType eventType, EventArgs& eventArgs);
   void setToggleNodeDelegate(ToggleNodeDelegate* ToggleNodeDelegate);
 
   ToggleNode& setSelectedColor(facebook::react::SharedColor const& color);

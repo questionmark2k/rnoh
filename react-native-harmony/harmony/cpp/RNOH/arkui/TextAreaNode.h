@@ -28,7 +28,11 @@ class TextAreaNode : public TextInputNodeBase {
 
   facebook::react::Point getTextAreaOffset() const;
 
-  void onNodeEvent(ArkUI_NodeEvent* event) override;
+  void onNodeEvent(ArkUI_NodeEventType eventType, EventArgs& eventArgs)
+      override;
+
+  void onNodeEvent(ArkUI_NodeEventType eventType, std::string_view eventString)
+      override;
 
   void setTextAreaNodeDelegate(TextAreaNodeDelegate* textAreaNodeDelegate);
 
