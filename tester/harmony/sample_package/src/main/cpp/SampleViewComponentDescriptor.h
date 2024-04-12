@@ -7,7 +7,7 @@
 namespace facebook {
 namespace react {
 
-extern const char SampleViewComponentName[] = "SampleView";
+inline const char SampleViewComponentName[] = "SampleView";
 
 class SampleViewProps : public ViewProps {
  public:

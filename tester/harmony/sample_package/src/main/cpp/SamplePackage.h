@@ -18,5 +18,8 @@ class SamplePackage : public Package {
 
   std::vector<ArkTSMessageHandler::Shared> createArkTSMessageHandlers()
       override;
+
+  ComponentInstanceFactoryDelegate::Shared
+  createComponentInstanceFactoryDelegate() override;
 };
 } // namespace rnoh

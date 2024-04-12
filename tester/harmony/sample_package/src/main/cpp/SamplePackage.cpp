@@ -6,6 +6,7 @@
 #include "RNOHCorePackage/ComponentBinders/ViewComponentNapiBinder.h"
 #include "SampleTurboModuleSpec.h"
 #include "SampleViewComponentDescriptor.h"
+#include "SampleViewComponentInstance.h"
 
 using namespace rnoh;
 using namespace facebook;
@@ -86,4 +87,19 @@ class SampleArkTSMessageHandler : public ArkTSMessageHandler {
 std::vector<ArkTSMessageHandler::Shared>
 SamplePackage::createArkTSMessageHandlers() {
   return {std::make_shared<SampleArkTSMessageHandler>()};
+}
+
+ComponentInstanceFactoryDelegate::Shared
+rnoh::SamplePackage::createComponentInstanceFactoryDelegate() {
+  class SampleComponentInstanceFactoryDelegate
+      : public ComponentInstanceFactoryDelegate {
+   public:
+    ComponentInstance::Shared create(ComponentInstance::Context ctx) override {
+      if (ctx.componentName == "SampleView") {
+        return std::make_shared<SampleViewComponentInstance>(ctx);
+      }
+      return nullptr;
+    }
+  };
+  return std::make_shared<SampleComponentInstanceFactoryDelegate>();
 };
