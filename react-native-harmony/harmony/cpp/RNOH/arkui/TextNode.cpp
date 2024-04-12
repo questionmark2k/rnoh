@@ -34,6 +34,12 @@ TextNode& TextNode::setFontColor(uint32_t color) {
   return *this;
 }
 
+TextNode& TextNode::resetFontColor() {
+  maybeThrow(NativeNodeApi::getInstance()->resetAttribute(
+      m_nodeHandle, NODE_FONT_COLOR));
+  return *this;
+}
+
 TextNode& TextNode::setFontSize(float fontSize) {
   ArkUI_NumberValue value[] = {{.f32 = fontSize}};
   ArkUI_AttributeItem item = {.value = value, .size = 1};

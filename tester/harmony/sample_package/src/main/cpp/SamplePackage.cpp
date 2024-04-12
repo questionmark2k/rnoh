@@ -16,7 +16,17 @@ class SampleViewJSIBinder : public ViewComponentJSIBinder {
   facebook::jsi::Object createNativeProps(facebook::jsi::Runtime& rt) override {
     auto nativeProps = ViewComponentJSIBinder::createNativeProps(rt);
     nativeProps.setProperty(rt, "size", "true");
+    nativeProps.setProperty(rt, "textColor", "true");
     return nativeProps;
+  }
+
+  facebook::jsi::Object createDirectEventTypes(
+      facebook::jsi::Runtime& rt) override {
+    facebook::jsi::Object events =
+        ViewComponentJSIBinder::createDirectEventTypes(rt);
+    events.setProperty(
+        rt, "topSampleClick", createDirectEvent(rt, "onSampleClick"));
+    return events;
   }
 };
 

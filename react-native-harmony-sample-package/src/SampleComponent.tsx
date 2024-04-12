@@ -1,6 +1,14 @@
-import React, { useRef } from 'react';
-import { SampleNativeComponent } from './SampleNativeComponent';
-import { StyleProp, UIManager, ViewStyle, findNodeHandle } from 'react-native';
+import React, { useRef } from "react";
+import { SampleNativeComponent } from "./SampleNativeComponent";
+import {
+  ColorValue,
+  NativeSyntheticEvent,
+  StyleProp,
+  UIManager,
+  ViewStyle,
+  findNodeHandle,
+  processColor,
+} from "react-native";
 
 export type SampleComponentRef = { toggleFontSize: () => void };
 
@@ -10,8 +18,10 @@ export const SampleComponent = React.forwardRef<
     children?: any;
     backgroundColor: string;
     size: number;
+    textColor?: number | ColorValue;
+    onSampleClick?: (event: NativeSyntheticEvent<{}>) => void;
   }
->(({ children, backgroundColor, size }, ref) => {
+>(({ children, backgroundColor, size, textColor, onSampleClick }, ref) => {
   const nativeRef = useRef<any>(null);
 
   React.useImperativeHandle(
@@ -21,7 +31,7 @@ export const SampleComponent = React.forwardRef<
         if (nativeRef?.current) {
           UIManager.dispatchViewManagerCommand(
             findNodeHandle(nativeRef.current),
-            'toggleFontSize',
+            "toggleFontSize",
             []
           );
         }
@@ -34,14 +44,16 @@ export const SampleComponent = React.forwardRef<
     backgroundColor: backgroundColor,
     width: size,
     height: size,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: 'green',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "green",
     borderWidth: 1,
     borderRadius: 4,
     opacity: 1,
   };
+
+  const processedTextColor = processColor(textColor ?? "white")!;
 
   return (
     <SampleNativeComponent
@@ -49,6 +61,8 @@ export const SampleComponent = React.forwardRef<
       style={style}
       size={size}
       children={children}
+      textColor={processedTextColor}
+      onSampleClick={onSampleClick}
     />
   );
 });

@@ -1,4 +1,9 @@
-import { requireNativeComponent, ViewProps } from 'react-native';
+import {
+  NativeSyntheticEvent,
+  ProcessedColorValue,
+  requireNativeComponent,
+  ViewProps,
+} from "react-native";
 
 /**
  * Importing custom native components:
@@ -7,8 +12,12 @@ import { requireNativeComponent, ViewProps } from 'react-native';
  * 1) SampleView JSI binder on CPP side needs to be provided to make this function work.
  */
 export const SampleNativeComponent = requireNativeComponent<
-  ViewProps & { size: number }
->('SampleView');
+  ViewProps & {
+    size: number;
+    textColor: ProcessedColorValue;
+    onSampleClick?: (event: NativeSyntheticEvent<{}>) => void;
+  }
+>("SampleView");
 
 /**
  * 2) An alternative to JSI binders and `requireNativeComponent` is `registerViewConfig` function (Harmony-only API).

@@ -7,7 +7,8 @@
 
 namespace rnoh {
 class SampleViewComponentInstance
-    : public CppComponentInstance<facebook::react::SampleViewShadowNode> {
+    : public CppComponentInstance<facebook::react::SampleViewShadowNode>,
+      public StackNodeDelegate {
  public:
   SampleViewComponentInstance(Context context);
 
@@ -21,6 +22,9 @@ class SampleViewComponentInstance
       override;
 
   ArkUINode& getLocalRootArkUINode() override;
+
+  // StackNodeDelegate
+  void onClick() override;
 
  private:
   StackNode m_stackNode{};

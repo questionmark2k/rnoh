@@ -34,6 +34,7 @@ class TextNode : public ArkUINode {
 
   TextNode& setTextContent(const std::string& text);
   TextNode& setFontColor(uint32_t fontColor);
+  TextNode& resetFontColor();
   TextNode& setFontSize(float fontSize);
   TextNode& setFontStyle(int32_t fontStyle);
   TextNode& setFontWeight(int32_t fontWeight);

@@ -4,6 +4,7 @@ namespace rnoh {
 
 SampleViewComponentInstance::SampleViewComponentInstance(Context context)
     : CppComponentInstance(std::move(context)) {
+  m_stackNode.setStackNodeDelegate(this);
   m_stackNode.insertChild(m_textNode, 0);
   m_textNode.setTextContent(std::to_string(m_tag));
   m_textNode.setFontSize(m_fontSize);
@@ -27,6 +28,11 @@ void SampleViewComponentInstance::onChildRemoved(
 void SampleViewComponentInstance::onPropsChanged(
     SharedConcreteProps const& props) {
   CppComponentInstance::onPropsChanged(props);
+  if (props->textColor) {
+    m_textNode.setFontColor(*props->textColor);
+  } else {
+    m_textNode.resetFontColor();
+  }
   DLOG(INFO) << "SampleView props changed";
 }
 
@@ -44,6 +50,11 @@ void SampleViewComponentInstance::handleCommand(
 
 ArkUINode& SampleViewComponentInstance::getLocalRootArkUINode() {
   return m_stackNode;
+}
+
+void SampleViewComponentInstance::onClick() {
+  DLOG(INFO) << "SampleView clicked";
+  m_eventEmitter->onSampleClick();
 }
 
 } // namespace rnoh
