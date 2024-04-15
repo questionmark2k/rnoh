@@ -44,6 +44,15 @@ void TextInputComponentInstance::onFocus() {
   m_eventEmitter->onFocus(getTextInputMetrics());
 }
 
+void TextInputComponentInstance::onTextSelectionChange(
+    int32_t location,
+    int32_t length) {
+  this->m_nativeEventCount++;
+  this->m_selectionLocation = location;
+  this->m_selectionLength = length;
+  m_eventEmitter->onSelectionChange(getTextInputMetrics());
+}
+
 facebook::react::TextInputMetrics
 TextInputComponentInstance::getTextInputMetrics() {
   auto textInputMetrics = facebook::react::TextInputMetrics();
@@ -53,6 +62,8 @@ TextInputComponentInstance::getTextInputMetrics() {
   textInputMetrics.containerSize = m_layoutMetrics.frame.size;
 
   textInputMetrics.eventCount = this->m_nativeEventCount;
+  textInputMetrics.selectionRange.location = this->m_selectionLocation;
+  textInputMetrics.selectionRange.length = this->m_selectionLength;
   textInputMetrics.zoomScale = 1;
   textInputMetrics.text = this->m_content;
   return textInputMetrics;

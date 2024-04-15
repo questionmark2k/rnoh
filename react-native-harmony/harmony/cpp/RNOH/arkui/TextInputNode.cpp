@@ -51,7 +51,10 @@ void TextInputNode::onNodeEvent(
       eventType ==
       ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_TEXT_SELECTION_CHANGE) {
     if (m_textInputNodeDelegate != nullptr) {
-      m_textInputNodeDelegate->onTextSelectionChange();
+      int32_t selectionLocation = eventArgs[0].i32;
+      int32_t selectionLength = eventArgs[1].i32 - eventArgs[0].i32;
+      m_textInputNodeDelegate->onTextSelectionChange(
+          selectionLocation, selectionLength);
     }
   }
 }

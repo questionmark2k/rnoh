@@ -489,7 +489,10 @@ export function TextInputTest() {
         {/* You cannot see inputs with */}
         <Text style={{marginBottom: 200}}>clearButtonMode="never"</Text>
       </TestCase.Example>
-      <TestCase.Example modal itShould="show selection start and end values">
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="show selection start and end values">
         <TextSelectionChangeTest />
       </TestCase.Example>
       <TestCase.Example

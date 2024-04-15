@@ -14,7 +14,7 @@ class TextInputNodeDelegate {
   virtual void onFocus(){};
   virtual void onSubmit(){};
   virtual void onPaste(){};
-  virtual void onTextSelectionChange(){};
+  virtual void onTextSelectionChange(int32_t location, int32_t length){};
 };
 
 class TextInputNode : public TextInputNodeBase {

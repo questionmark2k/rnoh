@@ -1,4 +1,5 @@
 #include "TextAreaNode.h"
+#include <bits/alltypes.h>
 #include "NativeNodeApi.h"
 #include "RNOH/arkui/conversions.h"
 
@@ -28,7 +29,7 @@ TextAreaNode::~TextAreaNode() {
 
 void TextAreaNode::onNodeEvent(
     ArkUI_NodeEventType eventType,
-    EventArgs& /* eventArgs */) {
+    EventArgs& eventArgs) {
   if (eventType == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_PASTE) {
     if (m_textAreaNodeDelegate != nullptr) {
       m_textAreaNodeDelegate->onPaste();
@@ -45,7 +46,10 @@ void TextAreaNode::onNodeEvent(
       eventType ==
       ArkUI_NodeEventType::NODE_TEXT_AREA_ON_TEXT_SELECTION_CHANGE) {
     if (m_textAreaNodeDelegate != nullptr) {
-      m_textAreaNodeDelegate->onTextSelectionChange();
+      int32_t selectionLocation = eventArgs[0].i32;
+      int32_t selectionLength = eventArgs[1].i32 - eventArgs[0].i32;
+      m_textAreaNodeDelegate->onTextSelectionChange(
+          selectionLocation, selectionLength);
     }
   }
 }

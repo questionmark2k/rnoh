@@ -27,6 +27,10 @@ class TextInputComponentInstance
 
   std::string m_content;
 
+  int32_t m_selectionLocation = 0;
+
+  int32_t m_selectionLength = 0;
+
  public:
   TextInputComponentInstance(Context context);
 
@@ -46,6 +50,8 @@ class TextInputComponentInstance
   void onSubmit() override;
 
   void onFocus() override;
+
+  void onTextSelectionChange(int32_t location, int32_t length) override;
 
   ArkUINode& getLocalRootArkUINode() override;
 };

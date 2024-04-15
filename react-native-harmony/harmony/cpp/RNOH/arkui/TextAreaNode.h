@@ -15,7 +15,7 @@ class TextAreaNodeDelegate {
   virtual void onBlur(){};
   virtual void onFocus(){};
   virtual void onPaste(){};
-  virtual void onTextSelectionChange(){};
+  virtual void onTextSelectionChange(int32_t location, int32_t length){};
 };
 
 class TextAreaNode : public TextInputNodeBase {
