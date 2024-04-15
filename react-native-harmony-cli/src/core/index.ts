@@ -6,3 +6,4 @@ export * from './PackageJSON';
 export * from './ProjectDependenciesManager';
 export * from './CodegenConfig';
 export * from './fs';
+export * from './OHPackageJSON5';

@@ -13,7 +13,7 @@
     "pack_react_native_harmony": "cd ../react-native-harmony && npm pack && cd ../tester",
     "pack_react_native_harmony_sample_package": "cd ../react-native-harmony-sample-package && npm pack && cd ../tester",
     "dev:codegen": "npm run reinstall:react_native_harmony_sample_package && npm run install:local-cli && npm run codegen -- --debug",
-    "install:local-cli": "cd ../react-native-harmony-cli && npm pack && cd ../tester && npm i ../react-native-harmony-cli/rnoh-react-native-harmony-cli-0.0.21.tgz",
+    "install:local-cli": "cd ../react-native-harmony-cli && npm pack && cd ../tester && npm i ../react-native-harmony-cli/rnoh-react-native-harmony-cli-0.0.24.tgz",
     "dev:rn": "npm i && npm run dev",
     "dev": "npm run codegen && react-native bundle-harmony --dev --minify=false",
     "prod": "npm run codegen && react-native bundle-harmony --dev=false --minify=true",

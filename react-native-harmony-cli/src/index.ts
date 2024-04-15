@@ -5,6 +5,7 @@ import {
   commandUnpackHarmony,
   commandCreateMetroConstantsHarmony,
   commandCodegenHarmony,
+  commandVerifyPackageHarmony,
 } from './commands';
 
 export const config = {
@@ -14,5 +15,6 @@ export const config = {
     commandUnpackHarmony,
     commandCreateMetroConstantsHarmony,
     commandCodegenHarmony,
+    commandVerifyPackageHarmony,
   ],
 } satisfies Partial<Config>;

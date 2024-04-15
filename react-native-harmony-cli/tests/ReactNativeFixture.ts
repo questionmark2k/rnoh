@@ -3,6 +3,10 @@ import pathUtils from 'path';
 export class ReactNativeFixture {
   constructor(private cwd: string) {}
 
+  help() {
+    return execaCommandSync(`react-native --help`).stdout;
+  }
+
   packHarmony(args: {
     harmonyDirPath: string;
     ohModulePath: string;
