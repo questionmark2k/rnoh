@@ -20,7 +20,12 @@ import AbilityConfiguration from '@ohos.app.ability.Configuration';
  */
 export interface RNInstancesCoordinatorDependencies {
   logger: RNOHLogger,
-  uiAbilityContext: common.UIAbilityContext
+  uiAbilityContext: common.UIAbilityContext,
+
+  /**
+   * invoked when the React application doesn't want to handle the device back press
+   */
+  defaultBackPressHandler: () => void
 }
 
 export type BuildMode = "DEBUG" | "RELEASE"
@@ -86,6 +91,7 @@ export class RNInstancesCoordinator {
       devToolsController,
       devMenu,
       jsPackagerClient,
+      dependencies.defaultBackPressHandler,
       options);
   }
 
@@ -102,6 +108,7 @@ export class RNInstancesCoordinator {
   private jsPackagerClient: JSPackagerClient
   private options: RNInstancesCoordinatorOptions | undefined
   private appState: AppState = "FOREGROUND"
+  private defaultBackPressHandler: () => void
 
   private constructor(napiBridge: NapiBridge,
                       logger: RNOHLogger,
@@ -111,6 +118,7 @@ export class RNInstancesCoordinator {
                       devToolsController: DevToolsController,
                       devMenu: DevMenu,
                       jsPackagerClient: JSPackagerClient,
+                      defaultBackPressHandler: () => void,
                       options?: RNInstancesCoordinatorOptions) {
     this.logger = logger.clone("RNInstancesCoordinator")
     this.rawLogger = logger
@@ -122,6 +130,7 @@ export class RNInstancesCoordinator {
     this.devMenu = devMenu;
     this.options = options;
     this.jsPackagerClient = jsPackagerClient;
+    this.defaultBackPressHandler = defaultBackPressHandler;
     this.rnInstanceRegistry = new RNInstanceRegistry(
       this.rawLogger,
       napiBridge,
@@ -135,6 +144,7 @@ export class RNInstancesCoordinator {
       this.rawLogger,
       this.uiAbilityContext,
       this.isDebugModeEnabled,
+      this.defaultBackPressHandler,
       this.devToolsController,
       this.devMenu,
     );

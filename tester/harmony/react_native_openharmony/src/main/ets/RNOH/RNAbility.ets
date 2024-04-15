@@ -21,7 +21,10 @@ export abstract class RNAbility extends UIAbility {
     this.logger = this.createLogger().clone("RNAbility")
     this.rnInstancesCoordinator = RNInstancesCoordinator.create({
       logger: this.createLogger(),
-      uiAbilityContext: this.context
+      uiAbilityContext: this.context,
+      defaultBackPressHandler: () => {
+        this.defaultBackPressHandler()
+      },
     }, {
       launchURI: want.uri, onGetPackagerClientConfig: (buildMode) => buildMode === "DEBUG" ? {
         host: "localhost",
@@ -107,4 +110,11 @@ export abstract class RNAbility extends UIAbility {
   }
 
   abstract getPagePath(): string
+  
+  /**
+   * invoked when the React application doesn't want to handle the device back press
+   */
+  protected defaultBackPressHandler() {
+    this.context.terminateSelf()
+  }
 }

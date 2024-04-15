@@ -19,6 +19,7 @@ export class RNOHCoreContext {
     logger: RNOHLogger,
     uiAbilityContext: common.UIAbilityContext,
     isDebugModeEnabled: boolean,
+    defaultBackPressHandler: () => void,
     devToolsController?: DevToolsController,
     devMenu?: DevMenu,
   ): RNOHCoreContext {
@@ -56,7 +57,7 @@ export class RNOHCoreContext {
       safeAreaInsetsProvider,
       isDebugModeEnabled,
       launchUri,
-
+      defaultBackPressHandler
     )
   }
 
@@ -77,12 +78,20 @@ export class RNOHCoreContext {
     public devMenu: DevMenu,
     public safeAreaInsetsProvider: SafeAreaInsetsProvider,
     public isDebugModeEnabled: boolean,
-    public launchUri?: string,
+    public launchUri: string | undefined,
+    public defaultBackPressHandler: () => void
   ) {
   }
 
+  /**
+   * invoked when the React application doesn't want to handle the device back press
+   */
   public reportRNOHError(rnohError: RNOHError) {
     this.devToolsController.setLastError(rnohError)
     this.devToolsController.eventEmitter.emit("NEW_ERROR", rnohError)
+  }
+
+  public invokeDefaultBackPressHandler() {
+    this.defaultBackPressHandler();
   }
 }

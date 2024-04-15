@@ -47,6 +47,7 @@ export class RNOHContext extends RNOHCoreContext {
       coreContext.safeAreaInsetsProvider,
       coreContext.isDebugModeEnabled,
       coreContext.launchUri,
+      coreContext.defaultBackPressHandler
     )
     this.devToolsController = coreContext.devToolsController
     this.devMenu = coreContext.devMenu
