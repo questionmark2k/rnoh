@@ -47,6 +47,7 @@ void ScrollViewComponentInstance::setLayout(
         isContentSmallerThanContainer() ? ARKUI_SCROLL_NESTED_MODE_SELF_FIRST
                                         : ARKUI_SCROLL_NESTED_MODE_SELF_ONLY);
   }
+  markBoundingBoxAsDirty();
 }
 
 void rnoh::ScrollViewComponentInstance::onStateChanged(
