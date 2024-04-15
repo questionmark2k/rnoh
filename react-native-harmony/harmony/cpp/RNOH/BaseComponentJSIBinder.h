@@ -23,6 +23,12 @@ class BaseComponentJSIBinder : public ComponentJSIBinder {
     nativeProps.setProperty(rt, "nativeID", true);
     nativeProps.setProperty(rt, "hitSlop", true);
     nativeProps.setProperty(rt, "onLayout", true);
+    nativeProps.setProperty(rt, "bottom", true);
+    nativeProps.setProperty(rt, "height", true);
+    nativeProps.setProperty(rt, "left", true);
+    nativeProps.setProperty(rt, "right", true);
+    nativeProps.setProperty(rt, "top", true);
+    nativeProps.setProperty(rt, "width", true);
     nativeProps.setProperty(rt, "pointerEvents", "string");
     nativeProps.setProperty(rt, "collapsable", "boolean");
     nativeProps.setProperty(rt, "focusable", "boolean");

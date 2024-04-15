@@ -929,6 +929,12 @@ export function ViewTest() {
         itShould="change backgroundColor to red after pressing a button (setNativeProps)">
         <SetNativePropsTest />
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="Change the height of the View by using setNativeProps({height: h}), similarly for width, top, right, bottom, and left">
+        <SetNativePropsOfHeight />
+      </TestCase.Example>
     </TestSuite>
   );
 }
@@ -1137,6 +1143,20 @@ function ViewNextFocus() {
         />
       </View>
     </View>
+  );
+}
+
+function SetNativePropsOfHeight() {
+  const viewRef = useRef<View>(null);
+  const onPress = () => {
+    viewRef?.current?.setNativeProps({height: Math.random() * 256});
+  };
+  return (
+    <TouchableWithoutFeedback onPress={onPress}>
+      <View ref={viewRef} style={{backgroundColor: 'deepskyblue'}}>
+        <Text>Press Me to change the height of View</Text>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
