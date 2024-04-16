@@ -29,7 +29,10 @@ export function TextInputTest() {
       <TestCase.Example
         tags={['C_API']}
         itShould="render textinput and change the text component based on the values inputted">
-        <TextInputWithText style={styles.textInput} />
+        <TextInputWithText
+          style={styles.textInput}
+          onKeyPress={e => console.log(e.nativeEvent.key)}
+        />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
@@ -274,6 +277,7 @@ export function TextInputTest() {
         <TextInputWithText style={styles.textInput} secureTextEntry />
       </TestCase.Example>
       <TestCase.Manual
+        tags={['C_API']}
         modal
         itShould="trigger onKeyPress event after pressing key (press 'A' to pass)"
         initialState={''}
@@ -282,7 +286,6 @@ export function TextInputTest() {
             style={styles.textInput}
             autoFocus
             onKeyPress={event => {
-              console.log('[Debug] onKeyPress event: ', JSON.stringify(event));
               setState(event.nativeEvent.key);
             }}
           />
@@ -293,7 +296,8 @@ export function TextInputTest() {
       />
       <TestCase.Manual
         modal
-        skip={{android: false, harmony: true}}
+        skip={{android: false, harmony: {arkTS: true, cAPI: false}}}
+        tags={['C_API']}
         //https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/736
         itShould="trigger onKeyPress event after pressing backspace"
         initialState={''}
@@ -301,6 +305,7 @@ export function TextInputTest() {
           <TextInputWithText
             style={styles.textInput}
             autoFocus
+            defaultValue="a"
             onKeyPress={event => setState(event.nativeEvent.key)}
           />
         )}

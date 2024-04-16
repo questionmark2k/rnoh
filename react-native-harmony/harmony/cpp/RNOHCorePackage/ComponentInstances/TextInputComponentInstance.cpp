@@ -19,9 +19,8 @@ TextInputComponentInstance::TextInputComponentInstance(Context context)
 }
 
 void TextInputComponentInstance::onChange(std::string text) {
-  this->m_nativeEventCount++;
-  this->m_content = std::move(text);
-  m_eventEmitter->onChange(getTextInputMetrics());
+  m_valueChanged = true;
+  m_content = std::move(text);
 }
 
 void TextInputComponentInstance::onSubmit() {
@@ -44,12 +43,40 @@ void TextInputComponentInstance::onFocus() {
   m_eventEmitter->onFocus(getTextInputMetrics());
 }
 
+void TextInputComponentInstance::onPasteOrCut() {
+  m_textWasPastedOrCut = true;
+}
+
 void TextInputComponentInstance::onTextSelectionChange(
     int32_t location,
     int32_t length) {
-  this->m_nativeEventCount++;
-  this->m_selectionLocation = location;
-  this->m_selectionLength = length;
+  if (m_textWasPastedOrCut) {
+    m_textWasPastedOrCut = false;
+  } else if (m_valueChanged) {
+    std::string key;
+    bool noPreviousSelection = m_selectionLength == 0;
+    bool cursorDidNotMove = location == m_selectionLocation;
+    bool cursorMovedBackwardsOrAtBeginningOfInput =
+        (location < m_selectionLocation) || location <= 0;
+    if (!cursorMovedBackwardsOrAtBeginningOfInput &&
+        (noPreviousSelection || !cursorDidNotMove)) {
+      key = m_content.at(location - 1);
+    }
+    m_nativeEventCount++;
+    auto keyPressMetrics = facebook::react::KeyPressMetrics();
+    keyPressMetrics.text = key;
+    keyPressMetrics.eventCount = m_nativeEventCount;
+    m_eventEmitter->onKeyPress(keyPressMetrics);
+  }
+  if (m_valueChanged) {
+    m_valueChanged = false;
+    m_nativeEventCount++;
+    m_eventEmitter->onChange(getTextInputMetrics());
+  }
+
+  m_nativeEventCount++;
+  m_selectionLocation = location;
+  m_selectionLength = length;
   m_eventEmitter->onSelectionChange(getTextInputMetrics());
 }
 

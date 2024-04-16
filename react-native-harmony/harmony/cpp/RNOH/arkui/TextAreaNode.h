@@ -14,7 +14,7 @@ class TextAreaNodeDelegate {
   virtual void onChange(std::string text){};
   virtual void onBlur(){};
   virtual void onFocus(){};
-  virtual void onPaste(){};
+  virtual void onPasteOrCut(){};
   virtual void onTextSelectionChange(int32_t location, int32_t length){};
 };
 

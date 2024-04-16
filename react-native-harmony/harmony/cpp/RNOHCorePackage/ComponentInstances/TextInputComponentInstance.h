@@ -31,6 +31,9 @@ class TextInputComponentInstance
 
   int32_t m_selectionLength = 0;
 
+  bool m_textWasPastedOrCut = false;
+  bool m_valueChanged = false;
+
  public:
   TextInputComponentInstance(Context context);
 
@@ -50,6 +53,8 @@ class TextInputComponentInstance
   void onSubmit() override;
 
   void onFocus() override;
+
+  void onPasteOrCut() override;
 
   void onTextSelectionChange(int32_t location, int32_t length) override;
 

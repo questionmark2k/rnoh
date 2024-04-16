@@ -2,14 +2,14 @@
 #include "NativeNodeApi.h"
 #include "RNOH/arkui/conversions.h"
 
-static constexpr std::array<ArkUI_NodeEventType, 6>
-    TEXT_INPUT_NODE_EVENT_TYPES = {
-        NODE_TEXT_INPUT_ON_PASTE,
-        NODE_TEXT_INPUT_ON_CHANGE,
-        NODE_TEXT_INPUT_ON_SUBMIT,
-        NODE_ON_FOCUS,
-        NODE_ON_BLUR,
-        NODE_TEXT_INPUT_ON_TEXT_SELECTION_CHANGE};
+static constexpr std::array TEXT_INPUT_NODE_EVENT_TYPES = {
+    NODE_TEXT_INPUT_ON_PASTE,
+    NODE_TEXT_INPUT_ON_CUT,
+    NODE_TEXT_INPUT_ON_CHANGE,
+    NODE_TEXT_INPUT_ON_SUBMIT,
+    NODE_ON_FOCUS,
+    NODE_ON_BLUR,
+    NODE_TEXT_INPUT_ON_TEXT_SELECTION_CHANGE};
 
 namespace rnoh {
 
@@ -31,11 +31,7 @@ TextInputNode::~TextInputNode() {
 void TextInputNode::onNodeEvent(
     ArkUI_NodeEventType eventType,
     EventArgs& eventArgs) {
-  if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_PASTE) {
-    if (m_textInputNodeDelegate != nullptr) {
-      m_textInputNodeDelegate->onPaste();
-    }
-  } else if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_SUBMIT) {
+  if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_SUBMIT) {
     if (m_textInputNodeDelegate != nullptr) {
       m_textInputNodeDelegate->onSubmit();
     }
@@ -66,6 +62,14 @@ void TextInputNode::onNodeEvent(
     if (m_textInputNodeDelegate != nullptr) {
       std::string text(eventString);
       m_textInputNodeDelegate->onChange(std::move(text));
+    }
+  } else if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_PASTE) {
+    if (m_textInputNodeDelegate != nullptr) {
+      m_textInputNodeDelegate->onPasteOrCut();
+    }
+  } else if (eventType == ArkUI_NodeEventType::NODE_TEXT_INPUT_ON_CUT) {
+    if (m_textInputNodeDelegate != nullptr) {
+      m_textInputNodeDelegate->onPasteOrCut();
     }
   }
 }

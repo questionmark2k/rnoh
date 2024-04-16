@@ -30,11 +30,7 @@ TextAreaNode::~TextAreaNode() {
 void TextAreaNode::onNodeEvent(
     ArkUI_NodeEventType eventType,
     EventArgs& eventArgs) {
-  if (eventType == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_PASTE) {
-    if (m_textAreaNodeDelegate != nullptr) {
-      m_textAreaNodeDelegate->onPaste();
-    }
-  } else if (eventType == ArkUI_NodeEventType::NODE_ON_FOCUS) {
+  if (eventType == ArkUI_NodeEventType::NODE_ON_FOCUS) {
     if (m_textAreaNodeDelegate != nullptr) {
       m_textAreaNodeDelegate->onFocus();
     }
@@ -62,7 +58,12 @@ void TextAreaNode::onNodeEvent(
       std::string text(eventString);
       m_textAreaNodeDelegate->onChange(std::move(text));
     }
+  } else if (eventType == ArkUI_NodeEventType::NODE_TEXT_AREA_ON_PASTE) {
+    if (m_textAreaNodeDelegate != nullptr) {
+      m_textAreaNodeDelegate->onPasteOrCut();
+    }
   }
+  // NODE_TEXT_AREA_ON_CUT missing
 }
 
 void TextAreaNode::setTextAreaNodeDelegate(

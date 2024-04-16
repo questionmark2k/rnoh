@@ -13,7 +13,8 @@ class TextInputNodeDelegate {
   virtual void onBlur(){};
   virtual void onFocus(){};
   virtual void onSubmit(){};
-  virtual void onPaste(){};
+  virtual void onPasteOrCut(){};
+
   virtual void onTextSelectionChange(int32_t location, int32_t length){};
 };
 
