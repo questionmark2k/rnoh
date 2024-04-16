@@ -101,6 +101,7 @@ export const NetworkingTest = () => {
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="correctly send requests with FormData"
         fn={async ({expect}) => {
           const formData = new FormData();
@@ -120,6 +121,7 @@ export const NetworkingTest = () => {
         }}
       />
       <TestCase.Logical
+        tags={['C_API']}
         itShould="correctly send a text file in FormData"
         fn={async ({expect}) => {
           try {
@@ -149,51 +151,17 @@ export const NetworkingTest = () => {
         }}
       />
       <TestCase.Logical
-        itShould="correctly send requests with FormData"
+        tags={['C_API']}
+        itShould="correctly read response headers"
         fn={async ({expect}) => {
-          const formData = new FormData();
-          formData.append('name', 'test');
-          formData.append('surname', 'test2');
-          formData.append('boolean', true);
-          formData.append('number', 72);
-          const response = await fetch('https://httpbin.org/post', {
-            method: 'POST',
-            body: formData,
-          });
-          const result = await response.json();
-          expect(result.form.name).to.be.eq('test');
-          expect(result.form.boolean).to.be.eq('true');
-          expect(result.form.number).to.be.eq('72');
-          expect(result.form.surname).to.be.eq('test2');
-        }}
-      />
-      <TestCase.Logical
-        itShould="correctly send a text file in FormData"
-        fn={async ({expect}) => {
-          try {
-            let formData = new FormData();
-            formData.append('file', {
-              uri: FILE_URI,
-              type: 'text/plain',
-              name: 'testFile.txt',
-            });
-            formData.append('text', 'test text field');
-            let response = await fetch('https://httpbin.org/post', {
-              method: 'POST',
-              body: formData,
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            });
-            let responseJson = await response.json();
-            expect(responseJson.form.text).to.be.eq('test text field');
-            expect(responseJson.files.file).to.exist;
-          } catch (error) {
-            console.error(
-              'To run this test, you need to create a file at the correct path on the phone. You can run this command in the hdc shell: echo "Test file content" >> /data/app/el2/100/base/com.rnoh.tester/files/testFile.txt',
-            );
-            throw error;
-          }
+          const response = await fetch(
+            'https://httpbin.org/response-headers?Set-Cookie=theme%3Dlight&Set-Cookie=sessionToken%3Dabc123',
+          );
+          const cookies = response.headers.get('set-cookie');
+          expect(cookies).to.be.oneOf([
+            'theme=light, sessionToken=abc123',
+            'theme=light,sessionToken=abc123',
+          ]);
         }}
       />
       <TestCase.Logical

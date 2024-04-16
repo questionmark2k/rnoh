@@ -213,7 +213,7 @@ export class NetworkingTurboModule extends TurboModule {
       },
       async (err, data) => {
         if (!err) {
-          this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, data.responseCode, query.headers, query.url);
+          this.networkEventDispatcher.dispatchDidReceiveNetworkResponse(requestId, data.responseCode, data.header, query.url);
           for (const handler of this.responseBodyHandlers) {
             if (handler.supports(query.responseType)) {
 
