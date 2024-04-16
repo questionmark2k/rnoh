@@ -3,6 +3,7 @@
 #include <react/renderer/components/scrollview/ScrollViewState.h>
 #include <react/renderer/core/ConcreteState.h>
 #include <cmath>
+#include <optional>
 #include "PullToRefreshViewComponentInstance.h"
 #include "conversions.h"
 
@@ -70,6 +71,7 @@ void rnoh::ScrollViewComponentInstance::onPropsChanged(
     m_persistentScrollbar = props->rawProps["persistentScrollbar"].asBool();
   }
   m_scrollEventThrottle = props->scrollEventThrottle;
+  m_disableIntervalMomentum = props->disableIntervalMomentum;
   m_scrollNode.setHorizontal(isHorizontal(props))
       .setEnableScrollInteraction(
           !m_isNativeResponderBlocked && props->scrollEnabled)
@@ -217,6 +219,7 @@ void ScrollViewComponentInstance::onScrollStop() {
 float ScrollViewComponentInstance::onScrollFrameBegin(
     float offset,
     int32_t scrollState) {
+  m_recentScrollFrameOffset = offset;
   auto newScrollState = static_cast<ScrollState>(scrollState);
   if (m_scrollState != newScrollState) {
     if (m_scrollState == ScrollState::SCROLL) {
@@ -236,6 +239,9 @@ float ScrollViewComponentInstance::onScrollFrameBegin(
 }
 
 void ScrollViewComponentInstance::emitOnScrollEndDragEvent() {
+  if (m_disableIntervalMomentum) {
+    disableIntervalMomentum();
+  }
   auto scrollViewMetrics = getScrollViewMetrics();
   m_eventEmitter->onScrollEndDrag(scrollViewMetrics);
   updateStateWithContentOffset(scrollViewMetrics.contentOffset);
@@ -293,11 +299,24 @@ void ScrollViewComponentInstance::setScrollSnap(
     facebook::react::Float snapToInterval,
     facebook::react::ScrollViewSnapToAlignment snapToAlignment) {
   if (!snapToOffsets.empty()) {
+    m_snapToOffsets = snapToOffsets;
+    m_snapToOffsets.erase(
+        std::remove_if(
+            m_snapToOffsets.begin(),
+            m_snapToOffsets.end(),
+            [](facebook::react::Float x) { return std::isnan(x); }),
+        m_snapToOffsets.end());
+    std::sort(m_snapToOffsets.begin(), m_snapToOffsets.end());
+
+    if (m_snapToOffsets.size() == 1) {
+      m_snapToOffsets.push_back(
+          std::numeric_limits<facebook::react::Float>::infinity());
+    }
     m_scrollNode.setScrollSnap(
         ArkUI_ScrollSnapAlign::ARKUI_SCROLL_SNAP_ALIGN_START,
         snapToStart,
         snapToEnd,
-        snapToOffsets);
+        m_snapToOffsets);
   }
   if (snapToInterval > 0) {
     const std::vector<facebook::react::Float> snapPoints = {snapToInterval};
@@ -394,6 +413,57 @@ bool ScrollViewComponentInstance::isHorizontal(
   }
   return props->alwaysBounceHorizontal ||
       m_contentSize.width > m_containerSize.width;
+}
+
+void ScrollViewComponentInstance::disableIntervalMomentum() {
+  if (m_props->pagingEnabled) {
+    return;
+  }
+  auto nextSnapTarget = getNextSnapTarget();
+  if (nextSnapTarget.has_value()) {
+    if (isHorizontal(m_props)) {
+      m_scrollNode.scrollTo(
+          nextSnapTarget.value(), static_cast<float>(m_currentOffset.y), true);
+    } else {
+      m_scrollNode.scrollTo(
+          static_cast<float>(m_currentOffset.x), nextSnapTarget.value(), true);
+    }
+  }
+}
+
+std::optional<float> ScrollViewComponentInstance::getNextSnapTarget() {
+  std::optional<float> nextSnapTarget = std::nullopt;
+  auto currentOffset =
+      isHorizontal(m_props) ? m_currentOffset.x : m_currentOffset.y;
+
+  if (!m_snapToOffsets.empty()) {
+    if (m_recentScrollFrameOffset > 0) {
+      auto upper = std::upper_bound(
+          m_snapToOffsets.begin(), m_snapToOffsets.end(), currentOffset);
+      if (upper != m_snapToOffsets.end() &&
+          *upper < std::numeric_limits<facebook::react::Float>::infinity()) {
+        nextSnapTarget = static_cast<float>(*upper);
+      } else {
+        nextSnapTarget =
+            isHorizontal(m_props) ? m_contentSize.width : m_contentSize.height;
+      }
+    } else {
+      auto lower = std::lower_bound(
+          m_snapToOffsets.begin(), m_snapToOffsets.end(), currentOffset);
+      if (lower == m_snapToOffsets.begin()) {
+        nextSnapTarget = 0;
+      } else {
+        nextSnapTarget = static_cast<float>(*(std::prev(lower, 1)));
+      }
+    }
+  } else if (m_props->snapToInterval > 0) {
+    auto interval = m_props->snapToInterval;
+    auto intervalIndex = (m_recentScrollFrameOffset > 0)
+        ? std::ceil(currentOffset / interval)
+        : std::floor(currentOffset / interval);
+    nextSnapTarget = static_cast<float>(intervalIndex * interval);
+  }
+  return nextSnapTarget;
 }
 
 } // namespace rnoh

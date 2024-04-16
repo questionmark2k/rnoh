@@ -27,6 +27,9 @@ class ScrollViewComponentInstance
   bool m_isNativeResponderBlocked = false;
   std::weak_ptr<NativeAnimatedTurboModule> m_nativeAnimatedTurboModule{};
   bool m_allowScrollPropagation = false;
+  bool m_disableIntervalMomentum = false;
+  float m_recentScrollFrameOffset = 0;
+  std::vector<facebook::react::Float> m_snapToOffsets = {};
 
   facebook::react::Float getFrictionFromDecelerationRate(
       facebook::react::Float decelerationRate);
@@ -51,6 +54,8 @@ class ScrollViewComponentInstance
   void sendEventForNativeAnimations(
       facebook::react::ScrollViewMetrics const& scrollViewMetrics);
   bool isHorizontal(SharedConcreteProps const& props);
+  void disableIntervalMomentum();
+  std::optional<float> getNextSnapTarget();
 
  public:
   ScrollViewComponentInstance(Context context);
