@@ -20,6 +20,11 @@ TextInputNode::TextInputNode()
     maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(
         m_nodeHandle, eventType, eventType, this));
   }
+
+  ArkUI_NumberValue value = {.i32 = 1};
+  ArkUI_AttributeItem item = {&value, 1};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_TEXT_INPUT_ENABLE_KEYBOARD_ON_FOCUS, &item));
 }
 
 TextInputNode::~TextInputNode() {

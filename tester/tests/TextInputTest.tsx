@@ -29,10 +29,7 @@ export function TextInputTest() {
       <TestCase.Example
         tags={['C_API']}
         itShould="render textinput and change the text component based on the values inputted">
-        <TextInputWithText
-          style={styles.textInput}
-          onKeyPress={e => console.log(e.nativeEvent.key)}
-        />
+        <TextInputWithText style={styles.textInput} />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}

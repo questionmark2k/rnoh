@@ -18,6 +18,7 @@ TextAreaNode::TextAreaNode()
   for (auto eventType : TEXT_AREA_NODE_EVENT_TYPES) {
     maybeThrow(NativeNodeApi::getInstance()->registerNodeEvent(
         m_nodeHandle, eventType, eventType, this));
+    // NODE_TEXT_AREA_ENABLE_KEYBOARD_ON_FOCUS missing in C-API
   }
 }
 

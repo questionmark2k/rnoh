@@ -31,8 +31,8 @@ void TextInputNodeBase::setFocusable(bool const& focusable) {
 }
 
 void TextInputNodeBase::setAutoFocus(bool autoFocus) {
-  ArkUI_NumberValue value[] = {{.i32 = autoFocus}};
-  ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
+  ArkUI_NumberValue value = {.i32 = static_cast<int32_t>(autoFocus)};
+  ArkUI_AttributeItem item = {&value, 1};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_FOCUS_STATUS, &item));
 }
