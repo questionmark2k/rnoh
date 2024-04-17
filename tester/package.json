@@ -18,7 +18,7 @@
     "dev": "npm run codegen && react-native bundle-harmony --dev --minify=false",
     "prod": "npm run codegen && react-native bundle-harmony --dev=false --minify=true",
     "dev:hbc": "npm run codegen && react-native bundle-harmony --dev --bundle-output /tmp/bundle.harmony.js && hermesc --emit-binary /tmp/bundle.harmony.js -out ./harmony/entry/src/main/resources/rawfile/hermes_bundle.hbc",
-    "dev:multi_surface": "npm run codegen && react-native bundle-harmony --dev --bundle-output './harmony/multi_surface/src/main/resources/rawfile/bundle.harmony.js' --assets-dest './harmony/multi_surface/src/main/resources/rawfile/assets'",
+    "dev:multi_surface": "react-native codegen-harmony --rnoh-module-path ./harmony/react_native_openharmony --cpp-output-path ./harmony/multi_surface/src/main/cpp/generated  && react-native bundle-harmony --dev --bundle-output './harmony/multi_surface/src/main/resources/rawfile/bundle.harmony.js' --assets-dest './harmony/multi_surface/src/main/resources/rawfile/assets'",
     "android": "react-native run-android",
     "format": "npm run format:js && npm run format:cpp",
     "format:js": "prettier App.tsx ./benchmarks ./components ./examples ./jests ./scripts ./tests -w",

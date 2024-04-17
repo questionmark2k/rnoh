@@ -4,18 +4,16 @@ import {
   ResourceJSBundleProvider,
   RNInstance,
   RNOHCoreContext,
-  RNOHLogger,
   SurfaceHandle,
   Tag
 } from 'rnoh/ts';
-import { createRNPackages } from '../RNPackagesFactory';
-import window from '@ohos.window';
 import { RNAbility } from 'rnoh';
+import { createRNPackages } from '../RNPackagesFactory';
+
 
 export default class EntryAbility extends RNAbility {
-  public async onWindowSetup(windowStage: window.WindowStage, providedLogger: RNOHLogger): Promise<void> {
-    super.onWindowSetup(windowStage, providedLogger)
-    const rnohCoreContext = AppStorage.get<RNOHCoreContext>('RNOHCoreContext')!;
+  protected async onPrepareRNInstance(rnohCoreContext: RNOHCoreContext): Promise<void> {
+    super.onPrepareRNInstance(rnohCoreContext)
     const rnInstance: RNInstance = await rnohCoreContext.createAndRegisterRNInstance({
       createRNPackages,
       enableCAPIArchitecture: true
@@ -31,7 +29,7 @@ export default class EntryAbility extends RNAbility {
     AppStorage.setOrCreate("ReactSurfaceByAppKey", surfaceByAppKey);
   }
 
-  getPagePath() {
+  protected getPagePath() {
     return 'pages/Index';
   }
 }
