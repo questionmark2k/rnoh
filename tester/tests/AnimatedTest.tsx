@@ -91,6 +91,12 @@ export function AnimatedTest() {
         itShould="(broken everywhere) move both squares, with blue square following the red with a spring">
         <TrackingValue />
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="gradually change color from green to red when scrolling down (color interpolation)">
+        <ColorInterpolationExample />
+      </TestCase.Example>
     </TestSuite>
   );
 }
@@ -805,5 +811,50 @@ const Perspective = () => {
       </View>
       <Text style={{height: 20}}>Press me to start animation</Text>
     </Pressable>
+  );
+};
+
+export const ColorInterpolationExample: React.FC = () => {
+  const animatedValue = new Animated.Value(0);
+
+  const backgroundColor = animatedValue.interpolate({
+    inputRange: [0, 3000],
+    outputRange: ['rgb(0, 255, 0)', 'rgb(255, 0, 0)'],
+  });
+
+  return (
+    <View
+      style={{
+        height: 512,
+        width: 256,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <Animated.FlatList
+        style={{
+          height: '100%',
+        }}
+        data={new Array(20).fill(0).map((_, idx) => idx)}
+        renderItem={({}) => {
+          return (
+            <Animated.View
+              style={{
+                width: 256,
+                marginTop: 24,
+                height: 256,
+                backgroundColor: backgroundColor,
+              }}
+            />
+          );
+        }}
+        keyExtractor={item => String(item)}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: animatedValue}}}],
+          {
+            useNativeDriver: true,
+          },
+        )}
+      />
+    </View>
   );
 };

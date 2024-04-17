@@ -1,5 +1,6 @@
 #include "ArkTSBridge.h"
 
+#include <boost/exception/diagnostic_information.hpp>
 #include <glog/logging.h>
 #include <jsi/jsi.h>
 #include "RNOH/Assert.h"
@@ -34,6 +35,7 @@ ArkTSBridge::~ArkTSBridge() {
 
 void ArkTSBridge::handleError(std::exception_ptr ex) {
   try {
+    LOG(ERROR) << boost::diagnostic_information(ex);
     std::rethrow_exception(ex);
   } catch (const RNOHError& e) {
     m_arkJs.getObject(m_arkTSBridgeRef)

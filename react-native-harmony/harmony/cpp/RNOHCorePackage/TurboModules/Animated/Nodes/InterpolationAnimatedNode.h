@@ -25,6 +25,12 @@ class InterpolationAnimatedNode : public ValueAnimatedNode {
     EXTRAPOLATE_TYPE_EXTEND
   };
 
+  enum OutputType {
+    Number,
+    Color,
+    String,
+  };
+
   static ExtrapolateType extrapolateTypeFromString(
       std::string const& extrapolateType);
 
@@ -44,7 +50,7 @@ class InterpolationAnimatedNode : public ValueAnimatedNode {
 
   folly::dynamic m_inputRange;
   folly::dynamic m_outputRange;
-
+  OutputType m_outputType;
   std::optional<facebook::react::Tag> m_parent;
   AnimatedNodesManager& m_nodesManager;
 };

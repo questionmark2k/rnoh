@@ -1,4 +1,6 @@
 #include "InterpolationAnimatedNode.h"
+#include "RNOH/Color.h"
+#include "glog/logging.h"
 
 using namespace facebook;
 
@@ -23,6 +25,18 @@ InterpolationAnimatedNode::InterpolationAnimatedNode(
       extrapolateTypeFromString(config["extrapolateLeft"].asString());
   m_extrapolateRight =
       extrapolateTypeFromString(config["extrapolateRight"].asString());
+
+  m_outputType = OutputType::Number;
+  if (!config["outputType"].empty()) {
+    auto outputType = config["outputType"].asString();
+    if (outputType == "number") {
+      m_outputType = OutputType::Number;
+    } else if (outputType == "color") {
+      m_outputType = OutputType::Color;
+    } else if (outputType == "string") {
+      m_outputType = OutputType::String;
+    }
+  }
 }
 
 void InterpolationAnimatedNode::update() {
@@ -37,7 +51,6 @@ void InterpolationAnimatedNode::update() {
 
   auto rangeIndex = findRangeIndex(value, m_inputRange);
 
-  // TODO: string and color interpolation
   m_value = interpolate(
       value,
       m_inputRange[rangeIndex].asDouble(),
@@ -46,6 +59,33 @@ void InterpolationAnimatedNode::update() {
       m_outputRange[rangeIndex + 1].asDouble(),
       m_extrapolateLeft,
       m_extrapolateRight);
+
+  switch (m_outputType) {
+    case OutputType::Number:
+      m_value = interpolate(
+          value,
+          m_inputRange[rangeIndex].asDouble(),
+          m_inputRange[rangeIndex + 1].asDouble(),
+          m_outputRange[rangeIndex].asDouble(),
+          m_outputRange[rangeIndex + 1].asDouble(),
+          m_extrapolateLeft,
+          m_extrapolateRight);
+      break;
+    case OutputType::String:
+      // TODO: implement
+      m_value = value;
+      break;
+    case OutputType::Color:
+      auto colorA = Color::from(m_outputRange[rangeIndex].asInt());
+      auto colorB = Color::from(m_outputRange[rangeIndex + 1].asInt());
+      auto mixValue = (value - m_inputRange[rangeIndex].asDouble()) /
+          (m_inputRange[rangeIndex + 1].asDouble() -
+           m_inputRange[rangeIndex].asDouble());
+      auto clampedMixValue = std::max(std::min(mixValue, 1.0), 0.0);
+      auto newColor = colorA * (1 - clampedMixValue) + colorB * clampedMixValue;
+      m_value = newColor.asColorValue();
+      break;
+  }
 }
 
 void InterpolationAnimatedNode::onAttachedToNode(facebook::react::Tag tag) {
