@@ -101,13 +101,6 @@ void TextInputNodeBase::setCommonFontAttributes(
       m_nodeHandle, NODE_FONT_STYLE, &itemStyle));
 }
 
-void TextInputNodeBase::setEnabled(bool enabled) {
-  ArkUI_NumberValue value[] = {{.i32 = enabled}};
-  ArkUI_AttributeItem item = {value, sizeof(value) / sizeof(ArkUI_NumberValue)};
-  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-      m_nodeHandle, NODE_ENABLED, &item));
-}
-
 void TextInputNodeBase::setTextAlign(
     std::optional<facebook::react::TextAlignment> const& textAlign) {
   ArkUI_NumberValue value[] = {rnoh::convertTextAlign(textAlign.value())};

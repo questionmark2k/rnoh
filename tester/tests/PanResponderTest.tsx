@@ -1,6 +1,7 @@
 import {
   Animated,
   PanResponder,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   View,
@@ -8,6 +9,7 @@ import {
 import {TestSuite} from '@rnoh/testerino';
 import {useRef} from 'react';
 import {TestCase} from '../components';
+import React from 'react';
 
 export const PanResponderTest = () => {
   return (
@@ -21,8 +23,15 @@ export const PanResponderTest = () => {
       />
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="allow panning inside ScrollView">
         <PanResponderInScrollView />
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="allow panning inside ScrollView with refreshControl">
+        <PanResponderInScrollViewWithRefresh />
       </TestCase.Example>
     </TestSuite>
   );
@@ -33,19 +42,77 @@ const PanResponderInScrollView = () => {
 
   const panResponder = useRef(
     PanResponder.create({
+      onStartShouldSetPanResponder: () => {
+        return true;
+      },
       onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: Animated.event(
-        [null, {dx: pan.x, dy: pan.y}],
-        undefined,
-      ),
+      onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {
+        useNativeDriver: false,
+      }),
       onPanResponderRelease: () => {
         pan.extractOffset();
       },
-      onShouldBlockNativeResponder: () => true,
+      onShouldBlockNativeResponder: () => {
+        return true;
+      },
     }),
   ).current;
+
   return (
     <ScrollView style={styles.scrollview} horizontal pagingEnabled>
+      <View style={[styles.base, styles.view1]}>
+        <Animated.View
+          style={{
+            transform: [{translateX: pan.x}, {translateY: pan.y}],
+          }}
+          {...panResponder.panHandlers}>
+          <View style={styles.box} />
+        </Animated.View>
+      </View>
+      <View style={[styles.base, styles.view2]} />
+      <View style={[styles.base, styles.view1]} />
+      <View style={[styles.base, styles.view2]} />
+    </ScrollView>
+  );
+};
+
+const PanResponderInScrollViewWithRefresh = () => {
+  const pan = useRef(new Animated.ValueXY()).current;
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => {
+        return true;
+      },
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y}], {
+        useNativeDriver: false,
+      }),
+      onPanResponderRelease: () => {
+        pan.extractOffset();
+      },
+      onShouldBlockNativeResponder: () => {
+        return true;
+      },
+    }),
+  ).current;
+
+  return (
+    <ScrollView
+      style={styles.scrollview}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      pagingEnabled>
       <View style={[styles.base, styles.view1]}>
         <Animated.View
           style={{

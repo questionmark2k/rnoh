@@ -37,8 +37,6 @@ class TextInputNodeBase : public ArkUINode {
 
   virtual void setCaretColor(facebook::react::SharedColor const& color) = 0;
 
-  void setEnabled(bool enabled);
-
   virtual void setMaxLength(int32_t maxLength) = 0;
 
   virtual void setPlaceholder(std::string const& placeholder) = 0;

@@ -351,12 +351,21 @@ ArkUINode& ArkUINode::setTransition(
   }
   return *this;
 }
+
 ArkUINode& ArkUINode::setOffset(float x, float y) {
   ArkUI_NumberValue offsetValue[] = {{.f32 = x}, {.f32 = y}};
   ArkUI_AttributeItem offsetItem = {
       offsetValue, sizeof(offsetValue) / sizeof(ArkUI_NumberValue)};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_OFFSET, &offsetItem));
+  return *this;
+}
+
+ArkUINode& ArkUINode::setEnabled(bool enabled) {
+  ArkUI_NumberValue value = {.i32 = int32_t(enabled)};
+  ArkUI_AttributeItem item = {&value, 1};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_ENABLED, &item));
   return *this;
 }
 
@@ -375,7 +384,7 @@ void ArkUINode::onNodeEvent(
     std::string_view eventString) {}
 
 ArkUINode::~ArkUINode() {
-  if (m_nodeHandle) {
+  if (m_nodeHandle != nullptr) {
     ArkUINodeRegistry::getInstance().unregisterNode(this);
     NativeNodeApi::getInstance()->disposeNode(m_nodeHandle);
   }
