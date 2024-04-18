@@ -1,4 +1,5 @@
 #include <ace/xcomponent/native_interface_xcomponent.h>
+#include <cxxreact/JSExecutor.h>
 #include <js_native_api.h>
 #include <js_native_api_types.h>
 #include <array>
@@ -12,6 +13,7 @@
 #include "RNOH/ArkTSBridge.h"
 #include "RNOH/Inspector.h"
 #include "RNOH/LogSink.h"
+#include "RNOH/Performance/HarmonyReactMarker.h"
 #include "RNOH/RNInstance.h"
 #include "RNOH/RNInstanceCAPI.h"
 #include "RNOH/TaskExecutor/ThreadTaskRunner.h"
@@ -25,6 +27,7 @@ auto uiTicker = std::make_shared<UITicker>();
 static auto cleanupRunner = std::make_unique<ThreadTaskRunner>("RNOH_CLEANUP");
 
 static napi_value onInit(napi_env env, napi_callback_info info) {
+  HarmonyReactMarker::setLogPerfMarkerIfNeeded();
   LogSink::initializeLogging();
   auto logVerbosityLevel = 0;
 #ifdef LOG_VERBOSITY_LEVEL
@@ -90,6 +93,8 @@ static napi_value createReactNativeInstance(
   ArkJS arkJs(env);
   try {
     DLOG(INFO) << "createReactNativeInstance";
+    HarmonyReactMarker::setAppStartTime(
+        facebook::react::JSExecutor::performanceNow());
     auto args = arkJs.getCallbackArgs(info, 10);
     size_t instanceId = arkJs.getDouble(args[0]);
     auto arkTsTurboModuleProviderRef = arkJs.createReference(args[1]);

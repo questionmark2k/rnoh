@@ -102,6 +102,18 @@ hitrace --trace_dump | grep tracing_mark_write
 hitrace --trace_finish
 ```
 
+## ReactMarker
+A valuable information for measuring app performance is looking at traces from ReactMarker. They are created from ReactNative core for monitoring some events related to application startup. You can get those markers the same way as Systrace events, and after running hiprofiler you can easily filter traces by "ReactMarker".
+ReactMarker also provides StartupLogger which currently is accessible only from C++ code:
+```cpp
+facebook::react::ReactMarker::StartupLogger& startupLogger =
+    facebook::react::ReactMarker::StartupLogger::getInstance();
+LOG(INFO) << "StartupLogger " << startupLogger.getAppStartTime();
+LOG(INFO) << "StartupLogger " << startupLogger.getRunJSBundleStartTime();
+LOG(INFO) << "StartupLogger " << startupLogger.getRunJSBundleEndTime();
+```
+You should not use ReactMarker for adding your custom traces. For such cases please use regular Systrace.
+
 ## Further details
 - [Common trace usage instructions](https://docs.openharmony.cn/pages/v4.0/en/application-dev/performance/common-trace-using-instructions.md)
 - [Analyzing application performance using SmartPerf-Host](https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/performance/performance-optimization-using-smartperf-host.md)
