@@ -150,7 +150,7 @@ void TextInputComponentInstance::onPropsChanged(
     m_textInputNode.setEnabled(props->traits.editable);
   }
   if (!m_props || props->traits.keyboardType != m_props->traits.keyboardType) {
-    m_textAreaNode.setInputType(
+    m_textInputNode.setInputType(
         props->traits.secureTextEntry
             ? ARKUI_TEXTINPUT_TYPE_PASSWORD
             : rnoh::convertInputType(props->traits.keyboardType));
