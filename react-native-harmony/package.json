@@ -8,6 +8,7 @@
     "pack:prod": "npm run pack:harmony && npm pack",
     "prepublishOnly": "npm run test && npm run pack:harmony",
     "hermes:build": "sh ./scripts/build-hermes.sh",
+    "gen:changelog": "node ./scripts/generate-changelog.js",
     "test": "jest"
   },
   "author": "",

@@ -1,3 +1,4 @@
+<!-- PLEASE REMOVE COMMENTS BEFORE MERGING TO AVOID INCLUDING THEM IN GIT HISTORY -->
 ## Summary
 <!--
 Briefly describe the purpose of the MR, for example:
@@ -6,8 +7,15 @@ This PR adds support for rounded corners for components in C-API architecture.
 -->
 
 ## Changes
-<!-- List main changes in bullet points that can be included in the changelog. E.g.,
-- Added rounded corner support in C-API architecture.
+<!-- List main changes in bullet points that can be included in the changelog. Those changes should be written for
+application developers and react third-party library authors. Internal changes shouldn't be listed. Please start each bullet point with:
+- added
+- fixed
+- deprecated
+- removed
+
+For breaking changes, use "[breaking]" prefix, for example:
+- [breaking] removed something
 -->
 
 ## Test Plan
