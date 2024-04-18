@@ -76,8 +76,13 @@ class ArkUINode {
   virtual ArkUINode& setOpacity(facebook::react::Float opacity);
   virtual ArkUINode& setClip(bool clip);
   virtual ArkUINode& setAlignment(Alignment alignment);
-  virtual ArkUINode& setTransition(
-      facebook::react::ModalHostViewAnimationType animationType);
+  virtual ArkUINode& setTranslateTransition(
+      float translateX,
+      float translateY,
+      int32_t animationDurationMillis);
+  virtual ArkUINode& resetTranslateTransition();
+  virtual ArkUINode& setOpacityTransition(int32_t animationDurationMillis);
+  virtual ArkUINode& resetOpacityTransition();
   virtual ArkUINode& setOffset(float x, float y);
   virtual ArkUINode& setEnabled(bool enabled);
 

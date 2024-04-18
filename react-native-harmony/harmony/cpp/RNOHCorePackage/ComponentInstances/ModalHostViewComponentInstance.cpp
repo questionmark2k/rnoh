@@ -10,6 +10,8 @@
 
 namespace rnoh {
 
+static constexpr int32_t ANIMATION_DURATION = 300;
+
 class ModalHostTouchHandler : public TouchEventHandler {
  private:
   ModalHostViewComponentInstance* m_rootView;
@@ -53,6 +55,18 @@ void ModalHostViewComponentInstance::updateDisplaySize(
       .width = screenMetrics.width / screenMetrics.scale,
       .height = screenMetrics.height / screenMetrics.scale};
   state->updateState({screenSize});
+  if (m_props != nullptr &&
+      m_props->animationType ==
+          facebook::react::ModalHostViewAnimationType::Slide) {
+    updateSlideTransition(displayMetrics);
+  }
+}
+
+void ModalHostViewComponentInstance::updateSlideTransition(
+    DisplayMetrics const& displayMetrics) {
+  auto screenSize = displayMetrics.screenPhysicalPixels;
+  m_rootStackNode.setTranslateTransition(
+      0, float(screenSize.height / screenSize.scale), ANIMATION_DURATION);
 }
 
 ModalHostViewComponentInstance::ModalHostViewComponentInstance(Context context)
@@ -66,12 +80,23 @@ ModalHostViewComponentInstance::ModalHostViewComponentInstance(Context context)
 
 void ModalHostViewComponentInstance::onPropsChanged(
     SharedConcreteProps const& props) {
+  using AnimationType = facebook::react::ModalHostViewAnimationType;
   CppComponentInstance::onPropsChanged(props);
   if (!props) {
     return;
   }
   if (!m_props || props->animationType != m_props->animationType) {
-    m_rootStackNode.setTransition(props->animationType);
+    if (props->animationType == AnimationType::Slide) {
+      m_rootStackNode.resetOpacityTransition();
+      auto screenSize = ArkTSBridge::getInstance()->getDisplayMetrics();
+      updateSlideTransition(screenSize);
+    } else if (props->animationType == AnimationType::Fade) {
+      m_rootStackNode.resetTranslateTransition();
+      m_rootStackNode.setOpacityTransition(ANIMATION_DURATION);
+    } else {
+      m_rootStackNode.resetTranslateTransition();
+      m_rootStackNode.resetOpacityTransition();
+    }
   }
 }
 

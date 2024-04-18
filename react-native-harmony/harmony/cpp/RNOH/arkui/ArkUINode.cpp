@@ -322,33 +322,43 @@ ArkUINode& ArkUINode::setAlignment(Alignment alignment) {
   return *this;
 }
 
-ArkUINode& ArkUINode::setTransition(
-    facebook::react::ModalHostViewAnimationType animationType) {
-  constexpr int32_t MODAL_ANIMATION_DURATION = 500;
-  ArkUI_AttributeItem selfOffset =
-      *NativeNodeApi::getInstance()->getAttribute(m_nodeHandle, NODE_OFFSET);
-  if (animationType == facebook::react::ModalHostViewAnimationType::Slide) {
-    ArkUI_NumberValue translateValue[] = {
-        selfOffset.value[0],
-        selfOffset.value[1],
-        {.f32 = 0},
-        {.i32 = MODAL_ANIMATION_DURATION},
-        {.i32 = static_cast<int32_t>(ARKUI_CURVE_LINEAR)}};
-    ArkUI_AttributeItem translateItem = {
-        translateValue, sizeof(translateValue) / sizeof(ArkUI_NumberValue)};
-    maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-        m_nodeHandle, NODE_TRANSLATE_TRANSITION, &translateItem));
-  }
-  if (animationType == facebook::react::ModalHostViewAnimationType::Fade) {
-    ArkUI_NumberValue opacityValue[] = {
-        {.f32 = 1},
-        {.i32 = MODAL_ANIMATION_DURATION},
-        {.i32 = static_cast<int32_t>(ARKUI_CURVE_LINEAR)}};
-    ArkUI_AttributeItem opacityItem = {
-        opacityValue, sizeof(opacityValue) / sizeof(ArkUI_NumberValue)};
-    maybeThrow(NativeNodeApi::getInstance()->setAttribute(
-        m_nodeHandle, NODE_OPACITY_TRANSITION, &opacityItem));
-  }
+ArkUINode& ArkUINode::setTranslateTransition(
+    float translateX,
+    float translateY,
+    int32_t animationDurationMillis) {
+  std::array<ArkUI_NumberValue, 5> translateValue = {
+      ArkUI_NumberValue{.f32 = translateX},
+      {.f32 = translateY},
+      {.f32 = 0},
+      {.i32 = animationDurationMillis},
+      {.i32 = static_cast<int32_t>(ARKUI_CURVE_LINEAR)}};
+  ArkUI_AttributeItem translateItem = {
+      translateValue.data(), translateValue.size()};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_TRANSLATE_TRANSITION, &translateItem));
+  return *this;
+}
+
+ArkUINode& ArkUINode::resetTranslateTransition() {
+  maybeThrow(NativeNodeApi::getInstance()->resetAttribute(
+      m_nodeHandle, NODE_TRANSLATE_TRANSITION));
+  return *this;
+}
+
+ArkUINode& ArkUINode::setOpacityTransition(int32_t animationDurationMillis) {
+  std::array<ArkUI_NumberValue, 3> args = {
+      ArkUI_NumberValue{.f32 = 0},
+      {.i32 = animationDurationMillis},
+      {.i32 = static_cast<int32_t>(ARKUI_CURVE_LINEAR)}};
+  ArkUI_AttributeItem opacityItem = {args.data(), args.size()};
+  maybeThrow(NativeNodeApi::getInstance()->setAttribute(
+      m_nodeHandle, NODE_OPACITY_TRANSITION, &opacityItem));
+  return *this;
+}
+
+ArkUINode& ArkUINode::resetOpacityTransition() {
+  maybeThrow(NativeNodeApi::getInstance()->resetAttribute(
+      m_nodeHandle, NODE_OPACITY_TRANSITION));
   return *this;
 }
 
