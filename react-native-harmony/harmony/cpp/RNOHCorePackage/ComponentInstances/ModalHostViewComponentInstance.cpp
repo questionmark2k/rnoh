@@ -91,10 +91,10 @@ void ModalHostViewComponentInstance::onPropsChanged(
       auto screenSize = ArkTSBridge::getInstance()->getDisplayMetrics();
       updateSlideTransition(screenSize);
     } else if (props->animationType == AnimationType::Fade) {
-      m_rootStackNode.resetTranslateTransition();
+      m_rootStackNode.setTranslateTransition(0, 0, 0);
       m_rootStackNode.setOpacityTransition(ANIMATION_DURATION);
     } else {
-      m_rootStackNode.resetTranslateTransition();
+      m_rootStackNode.setTranslateTransition(0, 0, 0);
       m_rootStackNode.resetOpacityTransition();
     }
   }
