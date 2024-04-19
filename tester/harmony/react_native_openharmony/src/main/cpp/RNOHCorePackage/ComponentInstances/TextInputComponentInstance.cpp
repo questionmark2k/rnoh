@@ -24,18 +24,15 @@ void TextInputComponentInstance::onChange(std::string text) {
 }
 
 void TextInputComponentInstance::onSubmit() {
-  this->m_nativeEventCount++;
   m_eventEmitter->onSubmitEditing(getTextInputMetrics());
 }
 
 void TextInputComponentInstance::onBlur() {
   m_eventEmitter->onBlur(getTextInputMetrics());
-  this->m_nativeEventCount++;
   m_eventEmitter->onEndEditing(getTextInputMetrics());
 }
 
 void TextInputComponentInstance::onFocus() {
-  this->m_nativeEventCount++;
   if (this->m_clearTextOnFocus) {
     m_textAreaNode.setTextContent("");
     m_textInputNode.setTextContent("");
@@ -62,7 +59,6 @@ void TextInputComponentInstance::onTextSelectionChange(
         (noPreviousSelection || !cursorDidNotMove)) {
       key = m_content.at(location - 1);
     }
-    m_nativeEventCount++;
     auto keyPressMetrics = facebook::react::KeyPressMetrics();
     keyPressMetrics.text = key;
     keyPressMetrics.eventCount = m_nativeEventCount;
@@ -74,7 +70,6 @@ void TextInputComponentInstance::onTextSelectionChange(
     m_eventEmitter->onChange(getTextInputMetrics());
   }
 
-  m_nativeEventCount++;
   m_selectionLocation = location;
   m_selectionLength = length;
   m_eventEmitter->onSelectionChange(getTextInputMetrics());
@@ -101,8 +96,6 @@ void TextInputComponentInstance::onPropsChanged(
   m_multiline = props->traits.multiline;
   CppComponentInstance::onPropsChanged(props);
   m_clearTextOnFocus = props->traits.clearTextOnFocus;
-  auto canUpdateWithEventCount =
-      props->mostRecentEventCount >= this->m_nativeEventCount;
 
   if (!m_props ||
       *(props->textAttributes.foregroundColor) !=
@@ -187,15 +180,6 @@ void TextInputComponentInstance::onPropsChanged(
     m_textAreaNode.setAutoFocus(props->autoFocus);
     m_textInputNode.setAutoFocus(props->autoFocus);
   }
-  if (!m_props || props->defaultValue != m_props->defaultValue) {
-    m_textAreaNode.setTextContent(props->defaultValue);
-    m_textInputNode.setTextContent(props->defaultValue);
-  }
-  if (canUpdateWithEventCount && (!m_props || props->text != m_props->text)) {
-    m_textAreaNode.setTextContent(props->text);
-    m_textInputNode.setTextContent(props->text);
-  }
-
   if (!m_props || *(props->selectionColor) != *(m_props->selectionColor)) {
     if (props->selectionColor) {
       m_textInputNode.setSelectedBackgroundColor(props->selectionColor);
@@ -288,12 +272,8 @@ void TextInputComponentInstance::onStateChanged(
     contentStream << fragment.string;
   }
   auto content = contentStream.str();
-
-  if (m_multiline) {
-    m_textAreaNode.setTextContent(content);
-  } else {
-    m_textInputNode.setTextContent(content);
-  }
+  m_textAreaNode.setTextContent(content);
+  m_textInputNode.setTextContent(content);
 }
 
 ArkUINode& TextInputComponentInstance::getLocalRootArkUINode() {

@@ -33,11 +33,17 @@ export function TextInputTest() {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="not crash when invalid keyboardType is supplied">
         <TextInputWithText
           style={styles.textInput}
           keyboardType={'invalid_type' as KeyboardTypeOptions}
         />
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="render textinput with set content">
+        <TextInputWithTextContent style={styles.textInput} />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
@@ -312,6 +318,7 @@ export function TextInputTest() {
       />
       <TestCase.Example
         tags={['C_API']}
+        modal
         itShould="show text input with default value (defaultProps)">
         <DefaultProps />
       </TestCase.Example>
@@ -657,6 +664,26 @@ const TextInputKeyboardType = (props: TextInputProps) => {
     </>
   );
 };
+
+const TextInputWithTextContent = (props: TextInputProps) => {
+  const texts = [
+    'Text content',
+    'Hello, World!',
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  ];
+  const [index, setIndex] = useState(0);
+
+  return (
+    <>
+      <TextInput {...props}>{texts[index]}</TextInput>
+      <Button
+        label="Toggle text"
+        onPress={() => setIndex(i => (i + 1) % texts.length)}
+      />
+    </>
+  );
+};
+
 const TextInputWithText = (props: TextInputProps) => {
   const [text, onChangeText] = useState(props.defaultValue ?? '');
   return (
