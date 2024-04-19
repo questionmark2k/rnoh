@@ -60,7 +60,11 @@ class ComponentInstanceRegistry {
 
   void deleteByTag(facebook::react::Tag tag) {
     std::lock_guard<std::mutex> lock(m_mtx);
-    auto componentInstance = m_componentInstanceByTag.find(tag)->second;
+    auto tagAndComponentInstance = m_componentInstanceByTag.find(tag);
+    if (tagAndComponentInstance == m_componentInstanceByTag.end()) {
+      return;
+    }
+    auto componentInstance = tagAndComponentInstance->second;
     auto componentInstanceId = componentInstance->getId();
     if (!componentInstanceId.empty()) {
       m_tagById.erase(componentInstanceId);
