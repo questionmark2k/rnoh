@@ -31,8 +31,7 @@ function createHarmonyMetroConfig(options) {
       }),
     },
     resolver: {
-      /** By default, Metro pickups files from native, "harmony" directory what causes conflicts.  */
-      blockList: [/\\harmony\/.*/],
+      blockList: [/third-party(\\\\|\\|\/)hermes/],
       resolveRequest: (ctx, moduleName, platform) => {
         if (platform === 'harmony') {
           if (shouldPrintInfoAboutRNRedirection) {
