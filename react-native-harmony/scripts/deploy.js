@@ -2,7 +2,16 @@
 const { execSync } = require('child_process');
 const fs = require('node:fs');
 const readline = require('readline');
+const https = require('node:https');
 
+const RNOH_REPO_TOKEN = process.env.RNOH_REPO_TOKEN ?? '';
+
+if (!RNOH_REPO_TOKEN) {
+  console.log('RNOH_REPO_TOKEN not found');
+  process.exit(1);
+}
+
+const GITLAB_URL = 'https://gl.swmansion.com';
 const HAR_FILE_OUTPUT_PATH =
   'tester/harmony/react_native_openharmony/build/default/outputs/default/react_native_openharmony.har';
 
@@ -10,21 +19,6 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-
-/**
- * @returns {boolean}
- */
-function isRepositoryClean() {
-  const status = execSync('git status --porcelain', { encoding: 'utf-8' });
-  const branch = execSync('git branch --show-current', {
-    encoding: 'utf-8',
-  }).trim();
-  const isUpdated =
-    execSync('git rev-list HEAD...origin/main --count', {
-      encoding: 'utf-8',
-    }).trim() === '0';
-  return !status && branch === 'main' && isUpdated;
-}
 
 function runDeployment() {
   if (!process.cwd().endsWith('react-native-harmony')) {
@@ -86,9 +80,10 @@ function runDeployment() {
 
           rl.question(
             'Are changes good to be published and pushed to the upstream? (yes/no): ',
-            (answer) => {
+            async (answer) => {
               if (answer.toLowerCase() === 'yes') {
                 execSync(`npm publish`, { stdio: 'inherit' });
+                console.log('NPM Package was published successfully.');
                 execSync(
                   `git checkout -b release-react-native-harmony-${version}`
                 );
@@ -99,12 +94,16 @@ function runDeployment() {
                     stdio: 'inherit',
                   }
                 );
-                execSync(`git push`, { stdio: 'inherit' });
+                execSync(`git push -u origin HEAD`, { stdio: 'inherit' });
                 execSync(`git push -u origin v${version}`, {
                   stdio: 'inherit',
                 });
-                console.log('Changes published successfully.');
-
+                const mergeRequestId = await createMergeRequest(
+                  `release-react-native-harmony-${version}`,
+                  'release: react-native-harmony@${version}'
+                );
+                console.log(`Please merge the following Merge Request:\n
+                https://gl.swmansion.com/rnoh/react-native-harmony/-/merge_requests/${mergeRequestId}`);
                 rl.close();
               } else {
                 console.log('Deployment aborted.');
@@ -119,6 +118,21 @@ function runDeployment() {
 }
 
 /**
+ * @returns {boolean}
+ */
+function isRepositoryClean() {
+  const status = execSync('git status --porcelain', { encoding: 'utf-8' });
+  const branch = execSync('git branch --show-current', {
+    encoding: 'utf-8',
+  }).trim();
+  const isUpdated =
+    execSync('git rev-list HEAD...origin/main --count', {
+      encoding: 'utf-8',
+    }).trim() === '0';
+  return !status && branch === 'main' && isUpdated;
+}
+
+/**
  * @param {string} version
  *  @param {string} changelogForCurrentVersion
  */
@@ -129,6 +143,43 @@ function updateChangelog(version, changelogForCurrentVersion) {
     `# Changelog\n\n## v${version}\n ${changelogForCurrentVersion}`
   );
   fs.writeFileSync('../CHANGELOG.md', data);
+}
+
+/**
+ * @param {string} sourceBranch
+ * @param {string} title
+ * @returns {Promise<number>}
+ */
+async function createMergeRequest(sourceBranch, title) {
+  try {
+    const response = await fetch(
+      `${GITLAB_URL}/api/v4/projects/447/merge_requests`,
+      {
+        method: 'POST',
+        headers: {
+          'PRIVATE-TOKEN': RNOH_REPO_TOKEN,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          source_branch: sourceBranch,
+          target_branch: 'main',
+          title: title,
+          squash: false,
+          remove_source_branch: true,
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error(
+        `Failed to create merge request: ${response.statusText} ${response.status}`
+      );
+    }
+    const responseData = await response.json();
+    return responseData.iid;
+  } catch (error) {
+    console.error('Error creating merge request:', error);
+    throw error;
+  }
 }
 
 runDeployment();
