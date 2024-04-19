@@ -15,7 +15,21 @@ import {
 import { Check, CheckStatus } from './types';
 import { unpackTarGz } from '../io';
 
-export async function* verifyNPMPackage({
+type StartProcessMessage = {
+  type: 'START_PROCESS';
+  name: string;
+};
+
+type FinishedCheckingMessage = {
+  type: 'FINISHED_CHECKING';
+  name: string;
+  status: CheckStatus;
+  message: string;
+};
+
+type VerificationMessage = StartProcessMessage | FinishedCheckingMessage;
+
+export async function* verifyRNOHPackage({
   npmPackagePath,
   hasHarmonyCode,
   checkNamesToSkip,
@@ -23,7 +37,7 @@ export async function* verifyNPMPackage({
   npmPackagePath: AbsolutePath;
   hasHarmonyCode: boolean;
   checkNamesToSkip: string[];
-}) {
+}): AsyncGenerator<VerificationMessage, void, unknown> {
   const npmPackageJson = PackageJSON.fromProjectRootPath(
     npmPackagePath,
     npmPackagePath
@@ -47,6 +61,10 @@ export async function* verifyNPMPackage({
       });
     }
     const tmpDirPath = new AbsolutePath(tmp.dirSync().name);
+    yield {
+      type: 'START_PROCESS',
+      name: `Unpacking the har file to the tmpdir`,
+    };
     await unpackTarGz(harPath, tmpDirPath);
     const ohPackageJson5 = OHPackageJSON5.fromPath(
       tmpDirPath.copyWithNewSegment('package', 'oh-package.json5')
@@ -65,16 +83,24 @@ export async function* verifyNPMPackage({
   }
 }
 
-async function* runChecks(checks: Check[], checkNamesToSkip: string[]) {
+async function* runChecks(
+  checks: Check[],
+  checkNamesToSkip: string[]
+): AsyncGenerator<VerificationMessage, void, unknown> {
   for (const { checkIf, run } of checks) {
     if (checkNamesToSkip.includes(checkIf)) {
-      yield { name: checkIf, status: 'skip' as CheckStatus, message: '' };
+      yield {
+        type: 'FINISHED_CHECKING',
+        name: checkIf,
+        status: 'skip' as CheckStatus,
+        message: '',
+      };
       continue;
     }
     const result = await run();
     const status = typeof result === 'string' ? result : result.status;
     const message = typeof result === 'string' ? '' : result.message;
-    yield { name: checkIf, status, message };
+    yield { type: 'FINISHED_CHECKING', name: checkIf, status, message };
   }
 }
 

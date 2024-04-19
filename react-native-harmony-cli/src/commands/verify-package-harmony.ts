@@ -1,7 +1,9 @@
 import { Command } from '@react-native-community/cli-types';
+import { getLoader, Loader } from '@react-native-community/cli-tools';
+import chalk from 'chalk';
 import { DescriptiveError, AbsolutePath } from '../core';
 import { Logger } from '../io';
-import { CheckResult, verifyNPMPackage } from '../package-verifier';
+import { CheckResult, verifyRNOHPackage } from '../package-verifier';
 
 export const commandVerifyPackageHarmony: Command = {
   name: 'verify-package-harmony',
@@ -21,35 +23,33 @@ export const commandVerifyPackageHarmony: Command = {
     },
   ],
   func: async (argv, config, rawArgs: any) => {
-    const logger = new Logger();
+    const loader = getLoader();
     try {
       const args = validateArgs(rawArgs);
-      logger.info(
-        () => `Validating NPM package: ${args.packagePath.getValue()}`,
-        {
-          prefix: true,
-        }
-      );
+      loader.info(`Verifying RNOH package: ${args.packagePath.getValue()}`);
       const checkResults: CheckResult[] = [];
-      for await (const checkResult of verifyNPMPackage({
+      for await (const checkResult of verifyRNOHPackage({
         npmPackagePath: args.packagePath,
         hasHarmonyCode: args.hasHarmonyCode,
         checkNamesToSkip: args.checkNamesToSkip,
       })) {
-        checkResults.push(checkResult);
-        logCheckResult(logger, checkResult);
+        if (checkResult.type === 'START_PROCESS') {
+          loader.start(chalk.gray(checkResult.name));
+        } else if (checkResult.type === 'FINISHED_CHECKING') {
+          checkResults.push(checkResult);
+          logCheckResult(loader, checkResult);
+        }
       }
-      logger.info(() => '');
       if (
         checkResults.every(
           (checkResult) =>
             checkResult.status === 'pass' || checkResult.status === 'skip'
         )
       ) {
-        logger.info((styles) => styles.bold('OK'));
+        loader.info(chalk.bold('OK'));
       } else {
-        logger.info((styles) =>
-          styles.red(
+        loader.info(
+          chalk.red(
             'Package verification failed. Please fix those checks before publishing your package.'
           )
         );
@@ -57,7 +57,7 @@ export const commandVerifyPackageHarmony: Command = {
       }
     } catch (err) {
       if (err instanceof DescriptiveError) {
-        logger.descriptiveError(err);
+        new Logger().descriptiveError(err);
         process.exit(1);
       }
       throw err;
@@ -85,22 +85,22 @@ function validateArgs(args: any): Args {
   };
 }
 
-function logCheckResult(logger: Logger, checkResult: CheckResult) {
-  logger.info((styles) => {
-    const prefix = (() => {
-      switch (checkResult.status) {
-        case 'pass':
-          return `[${styles.green('PASS')}]`;
-        case 'fail':
-          return `[${styles.red('FAIL')}]`;
-        case 'skip':
-          return `[${styles.yellow('SKIP')}]`;
-      }
-    })();
-    return checkResult.message
-      ? `${styles.bold(prefix)} ${styles.bold(checkResult.name)}\n${
+function logCheckResult(loader: Loader, checkResult: CheckResult) {
+  const prefix = (() => {
+    switch (checkResult.status) {
+      case 'pass':
+        return `${chalk.green('PASS')}`;
+      case 'fail':
+        return `${chalk.red('FAIL')}`;
+      case 'skip':
+        return `${chalk.yellow('SKIP')}`;
+    }
+  })();
+  loader.info(
+    checkResult.message
+      ? `[${chalk.bold(prefix)}] ${chalk.bold(checkResult.name)}\n${
           checkResult.message
         }`
-      : `${styles.bold(prefix)} ${styles.bold(checkResult.name)}`;
-  });
+      : `[${chalk.bold(prefix)}] ${chalk.bold(checkResult.name)}`
+  );
 }

@@ -17,7 +17,7 @@ export function createHarmonyDirContainsOnlyHarsCheck(
         .getValue();
       const fileOrDirNames = fs.readdirSync(harmonyPath);
       if (fileOrDirNames.length !== 1) {
-        return 'fail';
+        return { status: 'fail', message: JSON.stringify(fileOrDirNames) };
       }
       if (!fileOrDirNames[0].endsWith('.har')) {
         return 'fail';

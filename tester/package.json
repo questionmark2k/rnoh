@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "i": "npm run pack_react_native_harmony && npm run pack_react_native_harmony_sample_package && npm run install:react_native_harmony && npm run install:react_native_harmony_sample_package && npm install && react-native unpack-harmony",
+    "i": "npm run pack_react_native_harmony && npm run pack_react_native_harmony_sample_package && npm run install:react_native_harmony && npm run install:react_native_harmony_sample_package && npm install",
     "install:hooks": "cd .. && husky install tester/.husky && cd tester && npx husky add .husky/pre-push \"cd tester && npm run verify\"",
     "postinstall": "node ./scripts/create-build-profile && npm run reinstall:react_native_harmony && npm run reinstall:react_native_harmony_sample_package",
     "reinstall:react_native_harmony": "npm uninstall react-native-harmony && npm run pack_react_native_harmony && npm run install:react_native_harmony",
@@ -13,7 +13,7 @@
     "pack_react_native_harmony": "cd ../react-native-harmony && npm pack && cd ../tester",
     "pack_react_native_harmony_sample_package": "cd ../react-native-harmony-sample-package && npm pack && cd ../tester",
     "dev:codegen": "npm run reinstall:react_native_harmony_sample_package && npm run install:local-cli && npm run codegen -- --debug",
-    "install:local-cli": "cd ../react-native-harmony-cli && npm pack && cd ../tester && npm i ../react-native-harmony-cli/rnoh-react-native-harmony-cli-0.0.24.tgz",
+    "install:local-cli": "cd ../react-native-harmony-cli && npm pack && cd ../tester && npm i ../react-native-harmony-cli/rnoh-react-native-harmony-cli-0.0.25.tgz",
     "dev:rn": "npm i && npm run dev",
     "dev": "npm run codegen && react-native bundle-harmony --dev --minify=false",
     "prod": "npm run codegen && react-native bundle-harmony --dev=false --minify=true",
