@@ -1,4 +1,4 @@
-# React Native Open Harmony
+# React Native OpenHarmony
 
 ## How to add `harmony` platform to your React Native project
 
