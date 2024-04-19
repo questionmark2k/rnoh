@@ -20,6 +20,12 @@ export function ViewTest() {
           style={{width: 64, height: 64, backgroundColor: 'red'}}
         />
       </TestCase.Example>
+      <TestCase.Example modal tags={['C_API']} itShould="apply testId to view">
+        <View
+          testID="testId"
+          style={{width: 64, height: 64, backgroundColor: 'red'}}
+        />
+      </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
         itShould="render square with transparent background on gray background">

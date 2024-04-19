@@ -180,8 +180,8 @@ void TextInputComponentInstance::onPropsChanged(
       m_textInputNode.setFocusable(props->rawProps["focusable"].asBool());
     }
   }
-  m_textAreaNode.setId(getTag());
-  m_textInputNode.setId(getTag());
+  m_textAreaNode.setId(getIdFromProps(props));
+  m_textInputNode.setId(getIdFromProps(props));
 
   if (!m_props || props->autoFocus != m_props->autoFocus) {
     m_textAreaNode.setAutoFocus(props->autoFocus);

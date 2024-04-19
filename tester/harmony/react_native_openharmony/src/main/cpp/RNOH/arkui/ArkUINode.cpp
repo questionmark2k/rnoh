@@ -237,9 +237,8 @@ ArkUINode& ArkUINode::setAccessibilityGroup(bool accessible) {
   return *this;
 }
 
-ArkUINode& ArkUINode::setId(facebook::react::Tag const& tag) {
-  std::string tmpTag = std::to_string(tag);
-  ArkUI_AttributeItem idItem = {.string = tmpTag.c_str()};
+ArkUINode& ArkUINode::setId(std::string const& id) {
+  ArkUI_AttributeItem idItem = {.string = id.c_str()};
   maybeThrow(NativeNodeApi::getInstance()->setAttribute(
       m_nodeHandle, NODE_ID, &idItem));
   return *this;

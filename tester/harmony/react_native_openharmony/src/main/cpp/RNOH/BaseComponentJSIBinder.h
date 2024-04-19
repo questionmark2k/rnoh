@@ -21,6 +21,7 @@ class BaseComponentJSIBinder : public ComponentJSIBinder {
   virtual facebook::jsi::Object createNativeProps(facebook::jsi::Runtime& rt) {
     facebook::jsi::Object nativeProps(rt);
     nativeProps.setProperty(rt, "nativeID", true);
+    nativeProps.setProperty(rt, "testID", true);
     nativeProps.setProperty(rt, "hitSlop", true);
     nativeProps.setProperty(rt, "onLayout", true);
     nativeProps.setProperty(rt, "bottom", true);
