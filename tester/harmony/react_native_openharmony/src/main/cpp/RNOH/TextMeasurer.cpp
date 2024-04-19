@@ -159,12 +159,43 @@ ArkUITypography TextMeasurer::measureTypography(
     OH_Drawing_SetTypographyTextMaxLines(
         typographyStyle.get(), paragraphAttributes.maximumNumberOfLines);
   }
+  if (!attributedString.getFragments().empty()) {
+    auto textAlign =
+        attributedString.getFragments()[0].textAttributes.alignment;
+    if (textAlign.has_value()) {
+      OH_Drawing_SetTypographyTextAlign(
+          typographyStyle.get(), getOHDrawingTextAlign(textAlign.value()));
+    }
+  }
   ArkUITypographyBuilder typographyBuilder(typographyStyle.get());
   for (auto const& fragment : attributedString.getFragments()) {
     typographyBuilder.addFragment(fragment);
   }
   typographyBuilder.setMaximumWidth(layoutConstraints.maximumSize.width);
   return typographyBuilder.build();
+}
+
+int32_t TextMeasurer::getOHDrawingTextAlign(
+    const facebook::react::TextAlignment& textAlign) {
+  int32_t align = OH_Drawing_TextAlign::TEXT_ALIGN_START;
+  switch (textAlign) {
+    case facebook::react::TextAlignment::Natural:
+    case facebook::react::TextAlignment::Left:
+      align = OH_Drawing_TextAlign::TEXT_ALIGN_START;
+      break;
+    case facebook::react::TextAlignment::Right:
+      align = OH_Drawing_TextAlign::TEXT_ALIGN_END;
+      break;
+    case facebook::react::TextAlignment::Center:
+      align = OH_Drawing_TextAlign::TEXT_ALIGN_CENTER;
+      break;
+    case facebook::react::TextAlignment::Justified:
+      align = OH_Drawing_TextAlign::TEXT_ALIGN_JUSTIFY;
+      break;
+    default:
+      break;
+  }
+  return align;
 }
 
 } // namespace rnoh

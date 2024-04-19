@@ -35,5 +35,7 @@ class TextMeasurer : public facebook::react::TextLayoutManagerDelegate {
   napi_ref m_measureTextFnRef;
   std::shared_ptr<TaskExecutor> m_taskExecutor;
   FeatureFlagRegistry::Shared m_featureFlagRegistry;
+  int32_t getOHDrawingTextAlign(
+      const facebook::react::TextAlignment& textAlign);
 };
 } // namespace rnoh

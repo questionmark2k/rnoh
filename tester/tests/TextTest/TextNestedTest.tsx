@@ -209,6 +209,38 @@ export function TextNestedTest() {
           <Text style={{fontSize: 8}}>{SAMPLE_PARAGRAPH_TEXT}</Text>
         </Text>
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        skip={{
+          harmony: {arkTS: "justify isn't supported", cAPI: false},
+          android: false,
+        }}
+        itShould="show nested view with different horizontal alignments">
+        <Text>Left</Text>
+        <Text style={{textAlign: 'left'}}>
+          Non commodo et enim aliqua consequat. Nulla nostrud proident
+          exercitation dolore commodo nisi minim do irure.
+          <View style={styles.box} />
+        </Text>
+        <Text>Center</Text>
+        <Text style={{textAlign: 'center'}}>
+          Non commodo et enim aliqua consequat. Nulla nostrud proident
+          exercitation dolore commodo nisi minim do irure.
+          <View style={styles.box} />
+        </Text>
+        <Text>Right</Text>
+        <Text style={{textAlign: 'right'}}>
+          Non commodo et enim aliqua consequat. Nulla nostrud proident
+          exercitation dolore commodo nisi minim do irure.
+          <View style={styles.box} />
+        </Text>
+        <Text>Justify</Text>
+        <Text style={{textAlign: 'justify'}}>
+          Non commodo et enim aliqua consequat. Nulla nostrud proident
+          exercitation dolore commodo nisi minim do irure.
+          <View style={styles.box} />
+        </Text>
+      </TestCase.Example>
       <TestCase.Example itShould="display 1 line of text">
         <View style={{width: 200, backgroundColor: 'silver'}}>
           <Text style={{textAlign: 'left'}} numberOfLines={1}>
@@ -441,5 +473,10 @@ const styles = StyleSheet.create({
     width: 50,
     color: 'white',
     backgroundColor: 'blue',
+  },
+  box: {
+    height: 15,
+    width: 15,
+    backgroundColor: 'yellow',
   },
 });
