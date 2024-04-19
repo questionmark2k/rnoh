@@ -16,11 +16,13 @@ const rl = readline.createInterface({
  */
 function isRepositoryClean() {
   const status = execSync('git status --porcelain', { encoding: 'utf-8' });
-  const branch = execSync('git branch --show-current', { encoding: 'utf-8' });
-  const isUpdated = !execSync('git rev-list HEAD...origin/main --count', {
+  const branch = execSync('git branch --show-current', {
     encoding: 'utf-8',
-  });
-
+  }).trim();
+  const isUpdated =
+    execSync('git rev-list HEAD...origin/main --count', {
+      encoding: 'utf-8',
+    }).trim() === '0';
   return !status && branch === 'main' && isUpdated;
 }
 
@@ -87,6 +89,9 @@ function runDeployment() {
             (answer) => {
               if (answer.toLowerCase() === 'yes') {
                 execSync(`npm publish`, { stdio: 'inherit' });
+                execSync(
+                  `git checkout -b release-react-native-harmony-${version}`
+                );
                 execSync('git add -A');
                 execSync(
                   `git commit -m "release: react-native-harmony@${version}"`,
@@ -94,7 +99,6 @@ function runDeployment() {
                     stdio: 'inherit',
                   }
                 );
-                execSync(`git tag v${version}`, { stdio: 'inherit' });
                 execSync(`git push`, { stdio: 'inherit' });
                 execSync(`git push -u origin v${version}`, {
                   stdio: 'inherit',
