@@ -624,7 +624,7 @@ export struct RNScrollView {
 
   build() {
     if (this.shouldWrapWithPullToRefresh()) {
-      RNViewBase({ ctx: this.ctx, tag: this.tag }) {
+      RNViewBase({ ctx: this.ctx, tag: this.parentTag }) {
         RNPullToRefreshView({ ctx: this.ctx, tag: this.parentTag }) {
           this.buildScrollCore()
         }
