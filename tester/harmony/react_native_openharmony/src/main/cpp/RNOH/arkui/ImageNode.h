@@ -34,7 +34,7 @@ class ImageNode : public ArkUINode {
   ImageNode& setDraggable(bool draggable);
   ImageNode& setFocusable(bool focusable);
   ImageNode& setResizeMethod(std::string const& resizeMethod);
-  ImageNode& setAlt(facebook::react::ImageSources const& src);
+  ImageNode& setAlt(std::string const& uri);
 
   ImageNode& resetFocusable();
   ImageNode& resetResizeMethod();

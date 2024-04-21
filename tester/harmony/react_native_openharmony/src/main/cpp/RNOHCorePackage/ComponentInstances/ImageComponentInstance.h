@@ -15,6 +15,7 @@ class ImageComponentInstance
     std::optional<std::string> resizeMethod;
     std::optional<bool> focusable;
     std::optional<std::string> alt;
+    std::optional<std::string> loadingIndicatorSource;
     static ImageRawProps getFromDynamic(folly::dynamic value);
   };
   ImageRawProps m_rawProps;

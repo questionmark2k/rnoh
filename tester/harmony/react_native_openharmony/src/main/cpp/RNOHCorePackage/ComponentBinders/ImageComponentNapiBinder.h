@@ -23,10 +23,15 @@ class ImageComponentNapiBinder : public ViewComponentNapiBinder {
           facebook::react::ImageSource defaultSource = props->defaultSources[0];
           propsObjBuilder.addProperty("defaultSource", defaultSource.uri);
         }
+
+        auto rawProps = props->rawProps;
+        auto loadingIndicatorSrc = rawProps['loadingIndicatorSource'];
+
         return propsObjBuilder.addProperty("uri", imageSource.uri)
             .addProperty("resizeMode", static_cast<int>(props->resizeMode))
             .addProperty("tintColor", props->tintColor)
             .addProperty("blurRadius", props->blurRadius)
+            .addProperty("loadingIndicatorSource", loadingIndicatorSrc)
             .build();
       }
     }

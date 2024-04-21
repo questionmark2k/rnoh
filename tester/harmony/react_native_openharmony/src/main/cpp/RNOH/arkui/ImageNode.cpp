@@ -162,9 +162,8 @@ ImageNode& ImageNode::setResizeMethod(std::string const& resizeMethod) {
   return *this;
 }
 
-ImageNode& ImageNode::setAlt(facebook::react::ImageSources const& src) {
-  if (!src.empty()) {
-    auto uri = src[0].uri;
+ImageNode& ImageNode::setAlt(std::string const& uri) {
+  if (!uri.empty()) {
     std::string resourceStr = std::string("resource://RAWFILE/") + "assets/";
     resourceStr += uri.substr(ASSET_PREFIX.size());
     ArkUI_AttributeItem item = {.string = resourceStr.c_str()};

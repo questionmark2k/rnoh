@@ -40,7 +40,17 @@ void ImageComponentInstance::onPropsChanged(SharedConcreteProps const& props) {
   }
 
   if (!m_props || m_props->defaultSources != props->defaultSources) {
-    this->getLocalRootArkUINode().setAlt(props->defaultSources);
+    if (!(props->defaultSources.empty())) {
+      this->getLocalRootArkUINode().setAlt(props->defaultSources[0].uri);
+    }
+  }
+
+  if (m_rawProps.loadingIndicatorSource != rawProps.loadingIndicatorSource) {
+    m_rawProps.loadingIndicatorSource = rawProps.loadingIndicatorSource;
+    if (m_rawProps.loadingIndicatorSource.has_value()) {
+      this->getLocalRootArkUINode().setAlt(
+          m_rawProps.loadingIndicatorSource.value());
+    }
   }
 
   if (m_rawProps.resizeMethod != rawProps.resizeMethod) {
@@ -143,7 +153,11 @@ ImageComponentInstance::ImageRawProps::getFromDynamic(folly::dynamic value) {
       : std::nullopt;
   auto alt = (value.count("alt") > 0) ? std::optional(value["alt"].asString())
                                       : std::nullopt;
-  return {resizeMethod, focusable, alt};
+  auto loadingIndicatorSource = (value.count("loadingIndicatorSource") > 0)
+      ? std::optional(value["loadingIndicatorSource"].at("uri").getString())
+      : std::nullopt;
+
+  return {resizeMethod, focusable, alt, loadingIndicatorSource};
 }
 
 } // namespace rnoh

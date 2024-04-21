@@ -474,6 +474,20 @@ export const ImageTest = () => {
         itShould='Load images from different folders within assets directory (e.g. "assets/large-images", "assets/small-images")'>
         <LoadLocalImagesFromDifferentFolders />
       </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        modal
+        itShould="Display custom loading indicator until image is ready to be displayed">
+        <Image
+          loadingIndicatorSource={require('../assets/expo.png')}
+          source={{
+            uri:
+              'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' +
+              +Date.now(),
+          }}
+          style={{width: '100%', height: 200, marginVertical: 16}}
+        />
+      </TestCase.Example>
     </TestSuite>
   );
 };

@@ -3,16 +3,24 @@ import { ImageLoaderTurboModule } from '../turboModules/ImageLoaderTurboModule';
 import { RNViewBase, ViewBaseProps, ViewDescriptorWrapperBase, ViewRawProps } from './RNViewBase';
 import { RemoteImageLoaderError } from '../../RemoteImageLoader/RemoteImageLoaderError';
 export interface ImageProps extends ViewBaseProps {
-  uri: string,
-  resizeMode: number,
-  tintColor?: ColorSegments,
-  blurRadius: number,
-  defaultSource: string
+  uri: string;
+  resizeMode: number;
+  tintColor?: ColorSegments;
+  blurRadius: number;
+  defaultSource?: string;
 }
 
 interface ImageRawProps extends ViewRawProps {
-  alt: string
-  resizeMethod: string
+  alt: string;
+  resizeMethod: string;
+  loadingIndicatorSource?: ImageLoadingIndicatorSource;
+}
+
+interface ImageLoadingIndicatorSource {
+  uri: string;
+  width: number;
+  height: number;
+  scale: number;
 }
 
 interface ImageOnCompleteEvent {
@@ -129,15 +137,15 @@ export struct RNImage {
     })
   }
 
-  getDefaultSource(): string | Resource | undefined {
-    const defaultSource = this.descriptor.props.defaultSource;
-    if (defaultSource === undefined) {
+  getLoadingPlaceholder(): string | Resource | undefined {
+    const loadingPlaceholder = this.descriptor.props.defaultSource || this.descriptor.rawProps.loadingIndicatorSource?.uri;
+    if (loadingPlaceholder === undefined) {
       return undefined;
     }
-    if (defaultSource.startsWith("asset://")) {
-      return $rawfile(defaultSource.replace("asset://", this.ctx.rnInstance.getAssetsDest()));
+    if (loadingPlaceholder.startsWith("asset://")) {
+      return $rawfile(loadingPlaceholder.replace("asset://", this.ctx.rnInstance.getAssetsDest()));
     }
-    return defaultSource;
+    return loadingPlaceholder;
   }
 
   /*
@@ -215,7 +223,7 @@ export struct RNImage {
       if (this.imageSource?.source) {
         Image(this.imageSource.source)
           .accessibilityText(this.descriptor.rawProps.alt)
-          .alt(this.getDefaultSource())
+          .alt(this.getLoadingPlaceholder())
           .interpolation(ImageInterpolation.High)
           .draggable(false)
           .width(this.descriptorWrapper?.width)
