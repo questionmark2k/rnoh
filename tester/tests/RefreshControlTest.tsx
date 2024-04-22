@@ -73,43 +73,19 @@ export const RefreshControlTest = () => {
       <TestCase.Example
         modal
         tags={['C_API']}
-        itShould="refresh with progressViewOffset = undefined"
-        skip={{
-          harmony: {
-            cAPI: true,
-            arkTS:
-              'there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624',
-          },
-          android: false,
-        }}>
+        itShould="refresh with progressViewOffset = undefined">
         <PullToRefreshProgressViewOffset />
       </TestCase.Example>
       <TestCase.Example
         modal
         tags={['C_API']}
-        itShould="refresh with progressViewOffset = 50"
-        skip={{
-          harmony: {
-            cAPI: true,
-            arkTS:
-              'there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624',
-          },
-          android: false,
-        }}>
+        itShould="refresh with progressViewOffset = 50">
         <PullToRefreshProgressViewOffset progressViewOffset={50} />
       </TestCase.Example>
       <TestCase.Example
         modal
         tags={['C_API']}
-        itShould="refresh with progressViewOffset = 100"
-        skip={{
-          harmony: {
-            cAPI: true,
-            arkTS:
-              'there is a restriction on how tall the progress view can be - should be removed in API 11 https://gl.swmansion.com/rnoh/react-native-harmony/-/issues/624',
-          },
-          android: false,
-        }}>
+        itShould="refresh with progressViewOffset = 100">
         <PullToRefreshProgressViewOffset progressViewOffset={100} />
       </TestCase.Example>
       <TestCase.Example

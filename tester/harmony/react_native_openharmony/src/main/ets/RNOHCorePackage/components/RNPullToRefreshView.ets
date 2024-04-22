@@ -89,6 +89,7 @@ export struct RNPullToRefreshView {
         LoadingProgress()
           .width('112px')
           .height('112px')
+          .offset({x: 0, y: -(params.progressOffsetView ?? 0)})
           .color(params.tintColor)
       }
       .backgroundColor(params.progressBackgroundColor ?? Color.Transparent)
