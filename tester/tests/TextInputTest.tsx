@@ -1,4 +1,6 @@
 import {
+  EnterKeyHintType,
+  EnterKeyHintTypeAndroid,
   KeyboardTypeOptions,
   Platform,
   ReturnKeyType,
@@ -71,6 +73,24 @@ export function TextInputTest() {
         itShould="render textInput with red caret">
         <TextInputWithText style={styles.textInput} cursorColor={'red'} />
       </TestCase.Example>
+      <TestCase.Manual
+        tags={['C_API']}
+        itShould="report content size changes (onContentSizeChange)"
+        initialState={false}
+        skip={{android: false, harmony: true}}
+        arrange={({setState}) => {
+          return (
+            <TextInputWithText
+              style={styles.textInput}
+              multiline
+              onContentSizeChange={() => setState(true)}
+            />
+          );
+        }}
+        assert={({expect, state}) => {
+          expect(state).to.be.true;
+        }}
+      />
       <TestSuite name="focus/blur">
         <TestCase.Manual
           tags={['C_API']}
@@ -273,6 +293,12 @@ export function TextInputTest() {
         tags={['C_API']}
         itShould="toggle between different return keys">
         <ReturnKeyTypeView />
+      </TestCase.Example>
+      <TestCase.Example
+        modal
+        tags={['C_API']}
+        itShould="toggle between different enter keys">
+        <EnterKeyHintExample />
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
@@ -737,6 +763,30 @@ const ReturnKeyTypeView = () => {
       <TextInputWithText style={styles.textInput} returnKeyType={state} />
       <Button label="toggle return key type" onPress={toggleReturnKey} />
       <Text>Return key: {state}</Text>
+    </>
+  );
+};
+const EnterKeyHintExample = () => {
+  const [index, setIndex] = useState(0);
+  const enterKey: Array<EnterKeyHintType | EnterKeyHintTypeAndroid> = [
+    'done',
+    'go',
+    'next',
+    'previous',
+    'search',
+    'send',
+  ];
+  const toggleEnterKey = () => {
+    setIndex(i => (i + 1) % enterKey.length);
+  };
+  return (
+    <>
+      <TextInputWithText
+        style={styles.textInput}
+        enterKeyHint={enterKey[index]}
+      />
+      <Button label="toggle enter key type" onPress={toggleEnterKey} />
+      <Text>Enter key: {enterKey[index]}</Text>
     </>
   );
 };

@@ -34,6 +34,18 @@ export const TouchablesTest = () => {
       </TestCase.Example>
       <TestCase.Example
         tags={['C_API']}
+        itShould="use cyan background, displayed as if pressed (TouchableHighlight)">
+        <TouchableHighlight
+          activeOpacity={1}
+          underlayColor="cyan"
+          onPress={() => {}}
+          //@ts-ignore
+          testOnly_pressed>
+          <PressMe />
+        </TouchableHighlight>
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
         itShould="show number of presses on press in (TouchableHighlight)">
         <TouchableHighlight
           onPress={() => setPressCountHighlight(pressCountHighlight + 1)}>
