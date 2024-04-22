@@ -37,11 +37,11 @@
     "typescript": "^5.0.4"
   },
   "files": [
-    "./harmony.tar.gz",
     "./Libraries/**/*",
     "./types/**/*",
     "./*.js",
-    "./*.json"
+    "./*.json",
+    "./harmony/*"
   ],
   "dependencies": {
     "@rnoh/react-native-harmony-cli": "^0.0.25",
