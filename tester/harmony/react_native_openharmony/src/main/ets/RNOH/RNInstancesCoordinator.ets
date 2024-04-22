@@ -167,6 +167,7 @@ export class RNInstancesCoordinator {
 
   public onForeground() {
     this.setAppState("FOREGROUND")
+    this.rnInstanceRegistry.forEach(instance => instance.onForeground())
   }
 
   private setAppState(appState: AppState) {
@@ -175,6 +176,7 @@ export class RNInstancesCoordinator {
 
   public onBackground() {
     this.setAppState("BACKGROUND")
+    this.rnInstanceRegistry.forEach(instance => instance.onBackground())
   }
 
 
