@@ -34,6 +34,8 @@ class TextInputComponentInstance
   bool m_textWasPastedOrCut = false;
   bool m_valueChanged = false;
 
+  bool m_focused{false};
+
  public:
   TextInputComponentInstance(Context context);
 

@@ -28,14 +28,26 @@ void TextInputComponentInstance::onSubmit() {
 }
 
 void TextInputComponentInstance::onBlur() {
+  this->m_focused = false;
+  if (m_props->traits.clearButtonMode == facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
+    m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Never);
+  } else if (m_props->traits.clearButtonMode == facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
+    m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Always);
+  }
   m_eventEmitter->onBlur(getTextInputMetrics());
   m_eventEmitter->onEndEditing(getTextInputMetrics());
 }
 
 void TextInputComponentInstance::onFocus() {
+  this->m_focused = true;
   if (this->m_clearTextOnFocus) {
     m_textAreaNode.setTextContent("");
     m_textInputNode.setTextContent("");
+  }
+  if (m_props->traits.clearButtonMode == facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
+    m_textInputNode.setCancelButtonMode(m_props->traits.clearButtonMode);
+  } else if (m_props->traits.clearButtonMode == facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
+    m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Never);
   }
   m_eventEmitter->onFocus(getTextInputMetrics());
 }
@@ -207,7 +219,30 @@ void TextInputComponentInstance::onPropsChanged(
   }
   if (!m_props ||
       props->traits.clearButtonMode != m_props->traits.clearButtonMode) {
-    m_textInputNode.setCancelButtonMode(props->traits.clearButtonMode);
+    if (m_focused) {
+      if (props->traits.clearButtonMode == 
+          facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
+        m_textInputNode.setCancelButtonMode(props->traits.clearButtonMode);
+      } else if (props->traits.clearButtonMode == 
+                 facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
+        m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Never);
+      }
+    } else {
+      if (props->traits.clearButtonMode == 
+          facebook::react::TextInputAccessoryVisibilityMode::WhileEditing) {
+        m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Never);
+      } else if (props->traits.clearButtonMode == 
+                 facebook::react::TextInputAccessoryVisibilityMode::UnlessEditing) {
+        m_textInputNode.setCancelButtonMode(facebook::react::TextInputAccessoryVisibilityMode::Always);
+      }
+    }
+
+    if (props->traits.clearButtonMode == 
+        facebook::react::TextInputAccessoryVisibilityMode::Always ||
+        props->traits.clearButtonMode == 
+        facebook::react::TextInputAccessoryVisibilityMode::Never) {
+          m_textInputNode.setCancelButtonMode(props->traits.clearButtonMode);
+    }
   }
   if (!m_props ||
       !(props->yogaStyle.padding() == m_props->yogaStyle.padding())) {
