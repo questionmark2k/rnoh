@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.72.23
+- added Image's `loadingIndicatorSource` support in both architectures ([32787795ca](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/32787795ca075b1fe25e9807924fbb7c1e5304b3))
+- fixed har file not being included in the npm package ([f5e07d7791](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/f5e07d77916ab593af7a83dbc17b88d57cd6d3e8))
+- fixed AppState listeners not being called ([2405372295](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/2405372295e963ee1983c9e2b3b75a05cd25c978))
+
+
 ## v0.72.22
 - [breaking] react-native-openharmony ships with a har file rather than module.tgz - pack-harmony and unpack-harmony should no longer be needed and they will be removed in the future
 - added setting native node `id`s to `testID` or `nativeID` prop values ([6a7d0a5cc3](https://gl.swmansion.com/rnoh/react-native-harmony/-/commit/6a7d0a5cc373c7a01331c1515218f31e2ab19d9c))

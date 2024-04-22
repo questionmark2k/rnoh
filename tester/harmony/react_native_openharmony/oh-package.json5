@@ -8,6 +8,6 @@
     org: '',
   },
   type: 'module',
-  version: '0.72.22',
+  version: '0.72.23',
   dependencies: {},
 }
