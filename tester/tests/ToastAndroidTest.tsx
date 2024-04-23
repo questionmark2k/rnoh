@@ -23,16 +23,32 @@ export const ToastAndroidTest = () => {
         <ToastExample options="basic" />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         skip={'`showWithGravity` fallbacks to `show` on Harmony and Android ^R'}
         itShould="show Toast with message (showWithGravity)">
         <ToastExample options="withGravity" />
       </TestCase.Example>
       <TestCase.Example
+        tags={['C_API']}
         skip={
           '`showWithGravityAndOffset` fallbacks to `show` on Harmony and Android ^R'
         }
         itShould="show Toast with message (showWithGravityAndOffset)">
         <ToastExample options="withGravityAndOffset" />
+      </TestCase.Example>
+      <TestCase.Example
+        tags={['C_API']}
+        itShould="show two toasts one short, one long">
+        <ToastExample
+          options="basic"
+          message="I am a SHORT toast!"
+          duration={ToastAndroid.SHORT}
+        />
+        <ToastExample
+          options="basic"
+          message="I am a LONG toast!"
+          duration={ToastAndroid.LONG}
+        />
       </TestCase.Example>
     </TestSuite>
   );
@@ -40,10 +56,17 @@ export const ToastAndroidTest = () => {
 
 type ToastOptions = 'basic' | 'withGravity' | 'withGravityAndOffset';
 
-const ToastExample = (props: {options: ToastOptions}) => {
+const ToastExample = (props: {
+  options: ToastOptions;
+  duration?: number;
+  message?: string;
+}) => {
   const show = (options: ToastOptions) => {
     if (options === 'basic') {
-      ToastAndroid.show('I am a Toast!', 1000);
+      ToastAndroid.show(
+        props.message ?? 'I am a Toast!',
+        props.duration ?? 1000,
+      );
     } else if (options === 'withGravity') {
       ToastAndroid.showWithGravity(
         'I am a Toast with gravity!',
