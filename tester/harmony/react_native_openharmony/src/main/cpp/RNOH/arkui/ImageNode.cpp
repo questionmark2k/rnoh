@@ -52,8 +52,8 @@ void ImageNode::onNodeEvent(
 ImageNode& ImageNode::setSources(facebook::react::ImageSources const& src) {
   ArkUI_AttributeItem item;
   m_uri = src[0].uri;
+  std::string resourceStr = std::string("resource://RAWFILE/") + "assets/";
   if (m_uri.rfind(ASSET_PREFIX, 0) == 0) {
-    std::string resourceStr = std::string("resource://RAWFILE/") + "assets/";
     resourceStr += m_uri.substr(ASSET_PREFIX.size());
     item = {.string = resourceStr.c_str()};
   } else {
