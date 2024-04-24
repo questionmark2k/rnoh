@@ -23,7 +23,7 @@ class ArkTSChannel {
         m_taskExecutor(taskExecutor) {}
 
   void postMessage(std::string type, folly::dynamic payload) {
-    m_taskExecutor->runSyncTask(TaskThread::MAIN, [=]() {
+    m_taskExecutor->runTask(TaskThread::MAIN, [=]() {
       auto napi_event_handler =
           m_arkJs.getReferenceValue(m_napi_event_dispatcher_ref);
       m_arkJs.call<2>(

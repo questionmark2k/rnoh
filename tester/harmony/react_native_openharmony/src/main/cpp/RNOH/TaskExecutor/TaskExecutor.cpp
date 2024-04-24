@@ -1,6 +1,6 @@
 #include <glog/logging.h>
-#include <uv.h>
 
+#include "RNOH/RNOHError.h"
 #include "NapiTaskRunner.h"
 #include "TaskExecutor.h"
 #include "ThreadTaskRunner.h"
@@ -44,10 +44,10 @@ void TaskExecutor::runTask(TaskThread thread, Task&& task) {
 void TaskExecutor::runSyncTask(TaskThread thread, Task&& task) {
   auto waitsOnThread = m_waitsOnThread[thread];
   if (waitsOnThread.has_value() && isOnTaskThread(waitsOnThread.value())) {
-    throw std::runtime_error("Deadlock detected");
+    throw RNOHError("Deadlock detected");
   }
   auto currentThread = getCurrentTaskThread();
-  if (currentThread.has_value()) {
+  if (currentThread.has_value() && currentThread != thread) {
     m_waitsOnThread[currentThread.value()] = thread;
   }
   std::exception_ptr thrownError;
